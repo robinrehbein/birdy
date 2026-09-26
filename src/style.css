@@ -1,3 +1,12 @@
+/* Lilita One (SIL Open Font License), bundled so the app works offline. */
+@font-face {
+  font-family: 'Lilita One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/lilita-one-latin.woff2') format('woff2');
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {

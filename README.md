@@ -34,6 +34,25 @@ npm run preview  # Build lokal ansehen
 
 Der Build nutzt relative Pfade und kann daher auf jedem statischen Hosting (z. B. GitHub Pages, Netlify, Vercel) unter beliebigem Pfad liegen.
 
+## Android-App
+
+Die Android-App wird mit [Capacitor](https://capacitorjs.com) gebaut: Das Spiel läuft in einer nativen App (WebView mit WebGL), komplett offline, Optik identisch zur Web-Version.
+
+- Hochformat fest, Vollbild ohne Status- und Navigationsleiste
+- Bildschirm bleibt beim Spielen an
+- Beim Wechsel in den Hintergrund pausiert das Spiel
+- App-Icon und Splash-Screen zeigen den 3D-Vogel
+
+Voraussetzungen: Node.js, JDK 21 und das Android SDK (z. B. über Android Studio).
+
+```bash
+npm run android:sync   # Web-Build erzeugen und in das Android-Projekt kopieren
+npm run android:open   # Projekt in Android Studio öffnen (Emulator/Gerät starten)
+npm run android:apk    # Debug-APK bauen -> android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus unbekannten Quellen erlauben). Für den Play Store braucht es einen eigenen Signatur-Schlüssel und ein Release-Bundle (`./gradlew bundleRelease`). Die App-ID `app.birdy.game` in `capacitor.config.json` und `android/app/build.gradle` sollte vorher auf eine eigene Domain geändert werden, da sie nach der Veröffentlichung nicht mehr änderbar ist.
+
 ## Struktur
 
 - `src/main.js` – Spielschleife, Physik, Kollision, Eingabe, UI-Zustände
@@ -41,3 +60,4 @@ Der Build nutzt relative Pfade und kann daher auf jedem statischen Hosting (z. B
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
 - `src/audio.js` – Soundeffekte per WebAudio (keine Audiodateien nötig)
 - `src/style.css` – HUD und Menüs
+- `android/` – natives Android-Projekt (Capacitor), inkl. Icons, Splash und `MainActivity`

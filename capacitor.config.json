@@ -1,0 +1,8 @@
+{
+  "appId": "app.birdy.game",
+  "appName": "Birdy 3D",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#4ec0ca"
+  }
+}

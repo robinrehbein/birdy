@@ -59,6 +59,7 @@ const startEl = $('start');
 const overEl = $('gameover');
 
 const app = $('app');
+const pauseEl = $('pause');
 const flash = document.createElement('div');
 flash.id = 'flash';
 app.appendChild(flash);
@@ -77,6 +78,7 @@ $('best-start').textContent = best;
 // --- Game state -------------------------------------------------------------
 const state = {
   mode: 'ready', // ready | playing | dead | over
+  paused: false,
   x: 0,
   y: 5,
   vy: 0,
@@ -193,7 +195,16 @@ function spawnGate(z) {
 }
 
 // --- Input ------------------------------------------------------------------
+function setPaused(paused) {
+  state.paused = paused;
+  pauseEl.classList.toggle('hidden', !paused);
+}
+
 function flap() {
+  if (state.paused) {
+    setPaused(false);
+    return;
+  }
   if (state.mode === 'ready') resetGame();
   if (state.mode !== 'playing') return;
   state.vy = FLAP_VELOCITY;
@@ -265,6 +276,12 @@ startEl.addEventListener('pointerdown', onPointerDown);
 window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
+
+// Pause when the app goes to the background (e.g. home button on Android).
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && state.mode === 'playing') setPaused(true);
+});
+pauseEl.addEventListener('pointerdown', onPointerDown);
 
 $('retry-btn').addEventListener('click', () => {
   sfx.unlock();
@@ -450,7 +467,8 @@ camera.position.set(0, 10.5, 14);
 
 function tick() {
   const dt = Math.min(clock.getDelta(), 1 / 30);
-  if (landscapeTouch.matches) {
+  if (landscapeTouch.matches || state.paused) {
+    renderer.render(scene, camera);
     requestAnimationFrame(tick);
     return;
   }
