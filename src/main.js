@@ -39,7 +39,7 @@ const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 
 const bird = createBird();
-bird.group.scale.setScalar(0.85);
+bird.group.scale.setScalar(1.1);
 scene.add(bird.group);
 
 const gates = Array.from({ length: 8 }, () => {
@@ -58,12 +58,12 @@ const coinCountEl = $('coin-count');
 const startEl = $('start');
 const overEl = $('gameover');
 
+const app = $('app');
 const flash = document.createElement('div');
-Object.assign(flash.style, {
-  position: 'fixed', inset: '0', background: '#fff', opacity: '0',
-  pointerEvents: 'none', transition: 'opacity 0.35s',
-});
-document.body.appendChild(flash);
+flash.id = 'flash';
+app.appendChild(flash);
+// Phones held sideways get a "rotate" hint and the game pauses.
+const landscapeTouch = window.matchMedia('(orientation: landscape) and (pointer: coarse)');
 
 function loadBest() {
   try { return Number(localStorage.getItem('birdy-best')) || 0; } catch { return 0; }
@@ -420,8 +420,8 @@ const camLook = new THREE.Vector3();
 function updateCamera(dt) {
   // Camera sits above and behind the bird so it stays in the lower third
   // and the gaps ahead remain visible (Temple Run / Subway Surfers style).
-  camTarget.set(state.x * 0.6, 3.6 + state.y * 0.85, 10);
-  camLook.set(state.x * 0.8, 3.4 + state.y * 0.8, -20);
+  camTarget.set(state.x * 0.5, 7.5 + state.y * 0.6, 14);
+  camLook.set(state.x * 0.7, 1.8 + state.y * 0.6, -22);
   const k = Math.min(1, dt * 6);
   camera.position.lerp(camTarget, k);
   if (state.shake > 0) {
@@ -434,22 +434,26 @@ function updateCamera(dt) {
 }
 
 function resize() {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  const w = app.clientWidth;
+  const h = app.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  // Portrait phones need a wider vertical FOV to still see all three lanes.
-  camera.fov = camera.aspect < 1 ? 78 : 60;
+  // Narrow portrait screens need a wider vertical FOV to still see all lanes.
+  camera.fov = camera.aspect < 0.5 ? 74 : 68;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
 resize();
 
 const clock = new THREE.Clock();
-camera.position.set(0, 8, 10);
+camera.position.set(0, 10.5, 14);
 
 function tick() {
   const dt = Math.min(clock.getDelta(), 1 / 30);
+  if (landscapeTouch.matches) {
+    requestAnimationFrame(tick);
+    return;
+  }
   state.time += dt;
 
   if (state.mode === 'ready') {

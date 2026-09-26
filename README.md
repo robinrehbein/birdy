@@ -11,6 +11,10 @@ Ein Flappy-Bird-Klon in 3D-Optik im Stil von Endless-Runnern wie Subway Surfers 
 - Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher.
 - Der Rekord wird lokal im Browser gespeichert.
 
+## Hochformat
+
+Das Spiel ist für Hochkant ausgelegt. Am Desktop wird es als zentrierte 9:16-Spalte angezeigt. Hält man das Handy quer, erscheint ein Hinweis zum Drehen und das Spiel pausiert.
+
 ## Steuerung
 
 | Aktion | Desktop | Mobil |

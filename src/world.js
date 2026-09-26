@@ -20,7 +20,7 @@ export function createScene() {
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
   const cam = sun.shadow.camera;
-  cam.left = -18; cam.right = 18; cam.top = 40; cam.bottom = -20;
+  cam.left = -18; cam.right = 18; cam.top = 40; cam.bottom = -30;
   cam.near = 1; cam.far = 90;
   sun.shadow.bias = -0.0005;
   scene.add(sun, sun.target);
