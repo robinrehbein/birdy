@@ -27,19 +27,19 @@ export function createBird() {
     group.add(pupil);
   }
 
-  // Beak: two soft, rounded mandibles like Flappy's lips.
-  const smooth = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.45 });
-  const beakTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 20, 14), smooth(0xf57c21));
+  // Beak: two rounded mandibles like Flappy's lips, faceted like the body.
+  const beakTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 7), mat(0xf57c21));
   beakTop.scale.set(1.15, 0.5, 1.25);
   beakTop.position.set(0, 0.0, -0.66);
   group.add(beakTop);
-  const beakBottom = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 14), smooth(0xe0521b));
+  const beakBottom = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 7), mat(0xe0521b));
   beakBottom.scale.set(1.0, 0.42, 1.05);
   beakBottom.position.set(0, -0.15, -0.6);
   group.add(beakBottom);
 
   // Wings: rounded feather silhouette with scalloped trailing edge,
   // extruded with a bevel so the edges are soft.
+  const smooth = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.45 });
   const wingGeo = createWingGeometry();
   const wingMat = smooth(0xfff6d5);
   const coverMat = smooth(0xf6e3a1);
