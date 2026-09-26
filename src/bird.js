@@ -37,12 +37,12 @@ export function createBird() {
   beakBottom.position.set(0, -0.15, -0.6);
   group.add(beakBottom);
 
-  // Wings: rounded feather silhouette with scalloped trailing edge,
-  // extruded with a bevel so the edges are soft.
+  // Wings: feather silhouette with scalloped trailing edge, extruded with a
+  // bevel and kept low in segments so it reads faceted like the body.
   const smooth = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.45 });
   const wingGeo = createWingGeometry();
-  const wingMat = smooth(0xfff6d5);
-  const coverMat = smooth(0xf6e3a1);
+  const wingMat = mat(0xfff6d5);
+  const coverMat = mat(0xf6e3a1);
   const wings = [];
   for (const side of [-1, 1]) {
     const pivot = new THREE.Group();
@@ -101,11 +101,10 @@ function createWingGeometry() {
     bevelEnabled: true,
     bevelThickness: 0.035,
     bevelSize: 0.03,
-    bevelSegments: 4,
-    curveSegments: 16,
+    bevelSegments: 2,
+    curveSegments: 5,
   });
   geo.translate(0, 0, -0.02);
   geo.rotateX(-Math.PI / 2); // lay flat: chord along -Z (forward), thickness along Y
-  geo.computeVertexNormals();
   return geo;
 }
