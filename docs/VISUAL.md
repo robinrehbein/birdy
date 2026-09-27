@@ -81,7 +81,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 1 | 10 | Blocker | Der Splash zeigt „Flapsy“ statt „Birdy“. | Splash neu rendern mit dem Birdy-Schriftzug | ✅ It. 1 |
 | 2 | 5 | Blocker | Game Over in EN 390×844 ist nach oben verrutscht, unten erscheint ein türkiser Streifen. Ursache: Der App-Container scrollt (`scrollIntoView`). | Container gegen Scrollen sperren, nur die Liste scrollen lassen | offen |
 | 3 | 10 | ~~Blocker~~ | ~~Schwarze Ecken am runden Launcher-Icon~~ | Geprüft: Die Icons sind transparent. Das Schwarz kam vom Übersichtsbild-Werkzeug. Die gezackte Kante wird beim Neurendern mit geglättet. | – |
-| 4 | 9 | hoch | Passierte Röhren und Münzen erscheinen als riesige halbtransparente Geister vor der Kamera und verdecken den Vogel. | Schneller und vollständig ausblenden, sobald sie hinter dem Vogel sind | offen |
+| 4 | 9 | hoch | Passierte Röhren und Münzen erscheinen als riesige halbtransparente Geister vor der Kamera und verdecken den Vogel. | Schneller und vollständig ausblenden, sobald sie hinter dem Vogel sind | ✅ It. 2 |
 | 5 | 10 | hoch | Store-Screenshots ohne Rahmen, Hintergrund und Claim. | Gestaltete Screens DE/EN mit Claim | offen |
 | 6 | 6 | hoch | Emoji als Icons: Shop-Reiter, Schlösser, Toasts, Hand, Ton, Geschenk. | Eigenes SVG-Icon-Set | ⏸ Varianten zur Wahl |
 | 7 | 6 | hoch | Fließtexte in System-Schrift statt Hausschrift. | Einheitliche Schrift | ⏸ Varianten zur Wahl |
@@ -220,3 +220,31 @@ Jede Iteration behebt die größte sichtbare Schwäche und wird so belegt:
 
 **Neue Einschätzung:** Store-Assets 3 → 5. Der Blocker ist behoben, Icon und Splash sind
 eigenständig und markentreu. Es fehlen noch gestaltete Store-Screenshots mit Rahmen und Claim.
+
+### Iteration 2 – Keine Geisterbilder vor der Kamera (Bereich 9)
+
+**Warum:** Passierte Röhrenreihen blendeten langsam aus und hingen als riesige, halbtransparente
+grüne Flächen vor der Kamera. Verpasste Münzen flogen als große Scheiben ins Bild. Beides
+verdeckte den Vogel (Mangel 4, „hoch“).
+
+**Was:**
+- Eine passierte Reihe verschwindet jetzt über 1,5 Einheiten hinter dem Vogel. Die Deckkraft
+  hängt am Abstand statt an der Zeit, bei Spieltempo dauert das etwa 0,06 s. Ab 60 Punkten, wenn
+  auch die Kamera weiter wegrückt, bleibt es genauso sauber.
+- Verpasste Münzen und Power-ups schrumpfen 1,5–3 Einheiten hinter dem Vogel auf null.
+- Nur die Optik ändert sich: Kollision, Punktevergabe und Magnet laufen wie vorher. Münzen
+  bleiben einsammelbar, denn der Magnet kann sie noch zurückziehen.
+- Zusätzlich: Der Katalog hält die Echtzeit-Schleife an (`freeze`), damit Vorher/Nachher-Bilder
+  exakt dieselbe Szene zeigen.
+
+![Iteration 2 vorher/nachher](visual/it2.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`, 50 Runs je Stufe): Ergebnis für Ergebnis identisch mit der Basis
+  (Anfänger 17,4 s / 9 Punkte / 8 Münzen, Geübt 40,2 s / 23 / 23, Profi 180 s / 144 / 138). Damit
+  ist belegt, dass die Spiellogik unverändert ist.
+- Perf: erster Frame 660 ms (Median, Budget 782), 135–141 Draw Calls, 42 k Dreiecke.
+- APK baut.
+
+**Neue Einschätzung:** Lesbarkeit 5 → 6. Offen bleiben Spurlinien im Himmel sowie Toasts und
+Banner über den Hindernissen.

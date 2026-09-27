@@ -1535,10 +1535,12 @@ function updatePlaying(dt) {
       else state.nearChain = 0;
       gate.minClear = undefined;
     }
-    // Passed rows fade out so they don't hide what's coming next.
-    // Passed rows fade out completely so nothing blocks the view ahead.
-    gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0 : 1, Math.min(1, dt * 12)));
-    if (gate.passed && gate.opacity < 0.03) gate.group.visible = false;
+    // Passed rows vanish within a short distance behind the bird, so no
+    // huge see-through pipes hang in front of the camera. Looks only: the
+    // collision check below does not depend on visibility.
+    const behind = gz - (PIPE_RADIUS + r);
+    gate.setOpacity(gate.passed ? THREE.MathUtils.clamp(1 - behind / 1.5, 0, 1) : 1);
+    if (gate.passed && gate.opacity <= 0) gate.group.visible = false;
     if (!gate.passed && (!next || gz > next.group.position.z)) next = gate;
 
     if (!invincible() && Math.abs(gz) < PIPE_RADIUS + 0.25 + r) {
@@ -1579,6 +1581,11 @@ function updatePlaying(dt) {
     if (magnet && p.distanceTo(birdPos) < magnetRange() && p.z > -magnetRange()) {
       p.lerp(birdPos, Math.min(1, dt * 7));
     }
+    // Missed coins shrink away just behind the bird instead of flying into
+    // the camera as big discs. Looks only: they stay collectable (magnet).
+    const k = THREE.MathUtils.clamp(1 - (p.z - 1.5) / 1.5, 0, 1);
+    c.mesh.scale.setScalar(k);
+    c.mesh.visible = k > 0;
     if (p.z > 15) {
       c.active = false;
       c.mesh.visible = false;
@@ -1600,6 +1607,9 @@ function updatePlaying(dt) {
     const p = pu.group.position;
     p.z += dz;
     animatePickup(pu, state.time);
+    const k = THREE.MathUtils.clamp(1 - (p.z - 1.5) / 1.5, 0, 1);
+    pu.group.scale.setScalar(k);
+    pu.group.visible = k > 0;
     if (p.z > 15) {
       pu.active = false;
       pu.group.visible = false;
@@ -1863,7 +1873,7 @@ function tick() {
   timer.update();
   const rawDt = timer.getDelta();
   adaptQuality(rawDt);
-  if (!(landscapeTouch.matches || state.paused)) update(rawDt);
+  if (!(landscapeTouch.matches || state.paused || frozen)) update(rawDt);
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
@@ -1891,8 +1901,11 @@ function update(rawDt) {
   updateCamera(dt);
 }
 
-// Screenshot scripts: run game time forward without drawing each frame
+// Screenshot scripts: `freeze` stops real-time updates (frames are still
+// drawn) and `advance` runs game time forward without drawing each frame
 // (headless software rendering is far slower than a phone).
+let frozen = false;
+const freeze = (on) => { frozen = on; };
 function advance(seconds) {
   for (let s = 0; s < seconds; s += 1 / 30) if (!state.paused) update(1 / 30);
 }
@@ -1930,4 +1943,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, toast };
+window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };

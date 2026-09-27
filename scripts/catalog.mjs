@@ -75,6 +75,8 @@ async function session(lang, [w, h], save) {
   await page.addInitScript(initScript, { lang, save });
   await page.goto(URL);
   await page.waitForFunction(() => window.__birdy?.renderer?.info.render.frame > 1);
+  // Game time only moves through __run, so waiting for a screenshot changes nothing.
+  await page.evaluate(() => window.__birdy.freeze?.(true));
   const dir = `${OUT}/${lang}-${w}x${h}`;
   fs.mkdirSync(dir, { recursive: true });
   const run = (sec, until) => page.evaluate(([s, u]) => window.__run(s, u), [sec, until]);
