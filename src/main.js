@@ -4,6 +4,7 @@ import { createBird } from './bird.js';
 import { sfx, music, audio } from './audio.js';
 import { createParticles } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
+import { progress, SKINS } from './progress.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -52,6 +53,7 @@ const particles = createParticles(scene);
 
 const bird = createBird();
 bird.group.scale.setScalar(BIRD_SCALE);
+bird.setSkin(progress.skin);
 scene.add(bird.group);
 
 const gates = Array.from({ length: 12 }, () => {
@@ -93,14 +95,126 @@ for (const type of POWERUP_TYPES) {
   powerChips[type] = { chip, fill: chip.querySelector('i') };
 }
 
-function loadBest() {
-  try { return Number(localStorage.getItem('birdy-best')) || 0; } catch { return 0; }
+// --- Menus: start, skin shop, missions -------------------------------------
+const walletEl = $('wallet');
+const walletCount = $('wallet-count');
+const shopEl = $('shop');
+const skinsEl = $('skins');
+const shopName = $('shop-name');
+const shopAction = $('shop-action');
+const toastEl = $('toast');
+let shopSel = progress.skin.id;
+
+function renderWallet(bump = false) {
+  walletCount.textContent = progress.coins;
+  if (bump) {
+    walletEl.classList.remove('bump');
+    void walletEl.offsetWidth;
+    walletEl.classList.add('bump');
+  }
 }
-function saveBest(v) {
-  try { localStorage.setItem('birdy-best', String(v)); } catch { /* storage unavailable */ }
+
+function missionHTML(m, isNew = false) {
+  const pct = Math.round((m.progress / m.goal) * 100);
+  return `<div class="mission${m.done ? ' done' : ''}${isNew ? ' new' : ''}">
+    <span class="text">${m.text}</span><span class="reward">+${m.reward}</span>
+    <span class="bar"><i style="width:${pct}%"></i></span></div>`;
 }
-let best = loadBest();
-$('best-start').textContent = best;
+
+function renderStart() {
+  $('best-start').textContent = progress.best;
+  // First runs explain the controls; afterwards the daily missions.
+  const firstRuns = progress.runs < 2;
+  $('howto').classList.toggle('hidden', !firstRuns);
+  const ms = $('missions-start');
+  ms.classList.toggle('hidden', firstRuns);
+  ms.innerHTML = '<h3>Tagesmissionen</h3>' + progress.missions().map((m) => missionHTML(m)).join('');
+  renderWallet();
+}
+
+function renderShop() {
+  skinsEl.innerHTML = SKINS.map((k) => {
+    const cls = ['skin'];
+    if (!progress.owns(k.id)) cls.push('locked');
+    if (k.id === shopSel) cls.push('sel');
+    if (k.id === progress.skin.id) cls.push('equipped');
+    const hex = `#${k.body.toString(16).padStart(6, '0')}`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${hex}"></span></button>`;
+  }).join('');
+  const skin = SKINS.find((k) => k.id === shopSel);
+  shopName.textContent = skin.name;
+  shopAction.classList.remove('buy');
+  shopAction.disabled = false;
+  if (!progress.owns(skin.id)) {
+    shopAction.innerHTML = `Kaufen · ${skin.price} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+    shopAction.classList.add('buy');
+    shopAction.disabled = progress.coins < skin.price;
+  } else if (skin.id === progress.skin.id) {
+    shopAction.textContent = 'Ausgewählt';
+    shopAction.disabled = true;
+  } else {
+    shopAction.textContent = 'Auswählen';
+  }
+  bird.setSkin(skin); // live preview on the 3D bird
+  renderWallet();
+}
+
+function openShop(open) {
+  state.menu = open ? 'shop' : 'start';
+  shopSel = progress.skin.id;
+  shopEl.classList.toggle('hidden', !open);
+  startEl.classList.toggle('hidden', open);
+  if (open) renderShop();
+  else {
+    bird.setSkin(progress.skin);
+    renderStart();
+  }
+}
+
+skinsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.skin');
+  if (!btn) return;
+  shopSel = btn.dataset.id;
+  sfx.swoosh();
+  renderShop();
+});
+shopAction.addEventListener('click', () => {
+  const skin = SKINS.find((k) => k.id === shopSel);
+  if (progress.owns(skin.id)) progress.select(skin.id);
+  else if (progress.buy(skin.id)) {
+    sfx.powerup();
+    particles.emit(bird.group.position, { count: 30, colors: [skin.body, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
+  }
+  renderShop();
+});
+$('shop-btn').addEventListener('click', () => { startAudio(); openShop(true); });
+$('shop-back').addEventListener('click', () => openShop(false));
+$('menu-btn').addEventListener('click', () => {
+  state.mode = 'ready';
+  overEl.classList.add('hidden');
+  startEl.classList.remove('hidden');
+  bird.group.rotation.set(0, 0, 0);
+  state.y = 5;
+  renderStart();
+});
+
+let toastTimer = 0;
+const toastQueue = [];
+function toast(text) {
+  toastQueue.push(text);
+}
+function updateToast(dt) {
+  if (toastTimer > 0) {
+    toastTimer -= dt;
+    if (toastTimer <= 0) toastEl.classList.remove('show');
+    return;
+  }
+  if (toastQueue.length && toastTimer <= 0) {
+    toastEl.textContent = toastQueue.shift();
+    toastEl.classList.add('show');
+    toastTimer = 2.2;
+  }
+}
 
 // --- Game state -------------------------------------------------------------
 const state = {
@@ -128,6 +242,9 @@ const state = {
   time: 0,
   beat: 0,
   runTime: 0,
+  menu: 'start', // start | shop (only while mode is 'ready')
+  run: null, // per-run counters for missions
+  celebrated: new Set(),
 };
 let lastRun = null;
 
@@ -164,6 +281,8 @@ function resetGame() {
   state.deadTimer = 0;
   state.shake = 0;
   state.runTime = 0;
+  state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0 };
+  state.celebrated = new Set();
   bird.group.rotation.set(0, 0, 0);
   bird.group.visible = true;
   bird.setGlow(null);
@@ -180,7 +299,11 @@ function resetGame() {
   coinCountEl.textContent = '0';
   hud.classList.remove('hidden');
   startEl.classList.add('hidden');
+  shopEl.classList.add('hidden');
   overEl.classList.add('hidden');
+  walletEl.classList.add('hidden');
+  state.menu = 'start';
+  bird.setSkin(progress.skin);
   updateLaneDots();
   // Briefly show the three tap zones at the start of every run.
   zonesEl.classList.remove('show');
@@ -414,7 +537,14 @@ canvas.addEventListener('pointerdown', (e) => {
   const rect = canvas.getBoundingClientRect();
   tap(THREE.MathUtils.clamp(Math.floor(((e.clientX - rect.left) / rect.width) * 3), 0, 2));
 });
-startEl.addEventListener('pointerdown', () => {
+// Tapping the free area of the start screen starts right away; the panel's
+// buttons do their own thing.
+startEl.addEventListener('pointerdown', (e) => {
+  startAudio();
+  if (e.target.closest('.panel')) return;
+  flap();
+});
+$('play-btn').addEventListener('click', () => {
   startAudio();
   flap();
 });
@@ -475,22 +605,31 @@ function die(cause) {
 
 function showGameOver() {
   state.mode = 'over';
-  const isBest = state.score > best;
-  if (isBest) {
-    best = state.score;
-    saveBest(best);
-  }
+  state.run.coins = state.coins;
+  state.run.score = state.score;
+  const { isBest, completed } = progress.finishRun(state.run);
   $('final-score').textContent = state.score;
   $('final-coins').textContent = state.coins;
-  $('final-best').textContent = best;
-  $('best-start').textContent = best;
+  $('final-best').textContent = progress.best;
   $('new-best').classList.toggle('hidden', !isBest);
+  const toBest = $('to-best');
+  const missing = progress.best - state.score;
+  toBest.classList.toggle('hidden', isBest || missing > 15 || progress.best < 5);
+  toBest.textContent = missing === 0 ? 'Rekord eingestellt!' : `Nur noch ${missing + 1} bis zum Rekord!`;
+  $('missions-done').innerHTML = completed.map((m) => missionHTML(m, true)).join('');
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
+  walletEl.classList.remove('hidden');
+  renderWallet(completed.length > 0 || state.coins > 0);
 }
 
-function addScore() {
+function addScore(gate) {
   state.score++;
+  const lane = gate.lanes[state.lane];
+  if (lane.hasPlant) state.run.plants++;
+  if (lane.amp) state.run.moving++;
+  if (state.power.star > 0) state.run.starRows++;
+  checkMissions();
   scoreEl.textContent = state.score;
   scoreEl.classList.remove('pop');
   void scoreEl.offsetWidth; // restart the CSS animation
@@ -498,8 +637,24 @@ function addScore() {
   sfx.point();
 }
 
+// Celebrate a daily mission the moment it is reached.
+function checkMissions() {
+  const run = { ...state.run, coins: state.coins, score: state.score };
+  for (const id of progress.wouldComplete(run)) {
+    if (state.celebrated.has(id)) continue;
+    state.celebrated.add(id);
+    const m = progress.missions().find((x) => x.id === id);
+    toast(`✓ ${m.text} +${m.reward}`);
+    sfx.powerup();
+  }
+}
+
 function activatePower(type) {
   state.power[type] = POWERUPS[type].duration;
+  if (state.run) {
+    state.run.powerups++;
+    checkMissions();
+  }
   if (type === 'star') {
     music.setHype(true);
     state.grace = 0;
@@ -575,7 +730,7 @@ function updatePlaying(dt) {
     if (!gate.passed && gz > PIPE_RADIUS + r) {
       gate.passed = true;
       gate.popTime = 0;
-      addScore();
+      addScore(gate);
     }
     // Passed rows fade out so they don't hide what's coming next.
     gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0.1 : 1, Math.min(1, dt * 12)));
@@ -620,6 +775,7 @@ function updatePlaying(dt) {
       c.mesh.visible = false;
       state.coins++;
       coinCountEl.textContent = state.coins;
+      checkMissions();
       sfx.coin();
       particles.emit(p, { count: 8, colors: [0xfff176, 0xffd400, 0xffffff], speed: 5, size: 0.1, life: 0.45, gravity: 0 });
     }
@@ -697,20 +853,33 @@ function updateBirdVisual(dt) {
 
 const camTarget = new THREE.Vector3();
 const camLook = new THREE.Vector3();
+const camLookCur = new THREE.Vector3(0, 0.5, -9.5);
 function updateCamera(dt) {
-  // Camera sits above and behind the bird so it stays in the lower third
-  // and the gaps ahead remain visible (Temple Run / Subway Surfers style).
-  camTarget.set(state.x * 0.5, 7.5 + state.y * 0.6, 14);
-  camLook.set(state.x * 0.7, 1.8 + state.y * 0.6, -22);
-  const k = Math.min(1, dt * 6);
+  if (state.mode === 'ready' && state.menu === 'shop') {
+    // Shop: look the bird in the face so the skin preview is visible above
+    // the panel.
+    camTarget.set(5.6, state.y + 0.9, -2.1);
+    camLook.set(0, state.y - 1.2, 0);
+  } else if (state.mode === 'ready') {
+    // Start menu: closer, bird centred between title and panel.
+    camTarget.set(0, state.y + 1.2, 6.5);
+    camLook.set(0, state.y - 4.5, -9.5);
+  } else {
+    // Camera sits above and behind the bird so it stays in the lower third
+    // and the gaps ahead remain visible (Temple Run / Subway Surfers style).
+    camTarget.set(state.x * 0.5, 7.5 + state.y * 0.6, 14);
+    camLook.set(state.x * 0.7, 1.8 + state.y * 0.6, -22);
+  }
+  const k = Math.min(1, dt * (state.mode === 'ready' ? 3.5 : 6));
   camera.position.lerp(camTarget, k);
+  camLookCur.lerp(camLook, k);
   if (state.shake > 0) {
     state.shake = Math.max(0, state.shake - dt);
     const s = state.shake * 0.8;
     camera.position.x += (Math.random() - 0.5) * s;
     camera.position.y += (Math.random() - 0.5) * s;
   }
-  camera.lookAt(camLook);
+  camera.lookAt(camLookCur);
 }
 
 function resize() {
@@ -726,7 +895,8 @@ window.addEventListener('resize', resize);
 resize();
 
 const clock = new THREE.Clock();
-camera.position.set(0, 10.5, 14);
+camera.position.set(0, 6.2, 6.5);
+renderStart();
 
 // One fixed game-logic step (no rendering). Shared by the render loop and the
 // headless simulation used for automated playtests.
@@ -755,6 +925,7 @@ function tick() {
   }
   step(dt, music.beat());
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
+  updateToast(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
   renderer.render(scene, camera);
@@ -787,4 +958,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress };

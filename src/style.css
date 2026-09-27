@@ -312,3 +312,108 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
   box-shadow: 0 3px 0 #543847;
   background: rgba(222, 216, 149, 0.9);
 }
+
+/* --- Menus: title on top, bird visible in the middle, panel at the bottom -- */
+.panel-wrap.menu {
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(max(16px, env(safe-area-inset-top)) + 44px) 16px max(20px, env(safe-area-inset-bottom));
+  background: linear-gradient(rgba(20, 40, 60, 0.18), transparent 35%, transparent 55%, rgba(20, 40, 60, 0.25));
+}
+.menu-title { text-align: center; animation: slide-in 0.35s cubic-bezier(.2, 1.4, .5, 1); }
+.menu-title h1 { font-size: 56px; margin-bottom: 4px; }
+.menu-title .best { margin-top: 0; font-size: 20px; text-shadow: 0 2px 0 #543847, 2px 0 0 #543847, -2px 0 0 #543847, 0 -2px 0 #543847; }
+.panel button + button { margin-top: 10px; }
+.panel > button { display: block; width: 100%; }
+button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
+
+.wallet {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  right: 16px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 24px;
+  background: rgba(84, 56, 71, 0.55);
+  border-radius: 999px;
+  padding: 4px 12px 4px 6px;
+  text-shadow: 0 2px 0 #543847;
+  pointer-events: none;
+}
+.wallet.bump { animation: pop-wallet 0.35s ease-out; }
+@keyframes pop-wallet { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+/* Daily missions list. */
+.missions { text-align: left; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
+.missions h3 { font-weight: normal; font-size: 18px; color: #f26b1d; text-align: center; }
+.mission {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 8px;
+  background: #cbb968;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+.mission .reward { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
+.mission .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
+.mission .bar i { display: block; height: 100%; background: #73bf2e; }
+.mission.done { background: #b5d98a; }
+.mission.done .text::before { content: '✓ '; color: #3f8f16; }
+.mission.new { animation: mission-in 0.5s cubic-bezier(.2, 1.4, .5, 1) both; }
+@keyframes mission-in { from { transform: scale(0.6); opacity: 0; } }
+
+/* Skin shop. */
+.skins { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.skin {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 3px solid #543847;
+  background: #cbb968;
+  padding: 0;
+  box-shadow: 0 3px 0 #543847;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.skin .dot {
+  width: 60%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #543847;
+}
+.skin.locked .dot { filter: saturate(0.35) brightness(0.8); }
+.skin.locked::after { content: '🔒'; position: absolute; right: 2px; bottom: 0; font-size: 14px; }
+.skin.sel { background: #fcb800; transform: translateY(-2px); }
+.skin.equipped::before { content: '✓'; position: absolute; left: 5px; top: 1px; font-size: 14px; color: #fff; text-shadow: 0 1px 0 #543847; }
+#shop-action.buy { background: #fcb800; }
+#shop-action:disabled { background: #b7ad7a; box-shadow: 0 5px 0 #543847; opacity: 0.8; }
+
+#to-best { color: #543847; font-size: 18px; margin-bottom: 12px; }
+
+/* Mission-complete toast during a run. */
+.toast {
+  position: absolute;
+  top: calc(max(16px, env(safe-area-inset-top)) + 96px);
+  left: 50%;
+  transform: translate(-50%, -30px);
+  opacity: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: #73bf2e;
+  border: 3px solid #543847;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 17px;
+  white-space: nowrap;
+  text-shadow: 0 2px 0 #543847;
+  box-shadow: 0 4px 0 #543847;
+  transition: transform 0.3s cubic-bezier(.2, 1.4, .5, 1), opacity 0.3s;
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }

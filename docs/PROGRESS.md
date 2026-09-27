@@ -22,8 +22,8 @@ Bot-Werte sind Näherungen an echte Spieler, keine Messung an Menschen.
 | 2 | Game Feel / Juice | 5 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss-Feedback, Speed-Lines. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot (perfekte Reaktion) überlebt 94 % der 150-s-Runs, vorher starb er in 100 % der Runs. Reihen haben eine garantierte Erreichbarkeit, der Abstand ist zeitbasiert. Offen: Ankündigung von Pflanzen und bewegten Lücken ist nicht an Menschen getestet, 6 % Rest-Tode beim Profi. |
 | 4 | Abwechslung | 4 | Neues nur bei 6 (bewegte Lücken) und 10 Punkten (Pflanzen), plus Power-ups. Keine Biome oder Events, gleiche Optik über den ganzen Run. |
-| 5 | Session-Loop | 5 | Runs im Median: Anfänger 17 s, geübt 42,5 s ✓ (Ziel 30–90 s). Neustart per Button erst nach ca. 1,7 s. Kein Sog-Element („nur noch 2 bis zum Rekord“). |
-| 6 | Meta-Progression | 1 | Münzen haben keinen Zweck, nur ein Rekord-Wert. |
+| 5 | Session-Loop | 6 | Runs im Median: Anfänger 17 s, geübt 42,5 s ✓ (Ziel 30–90 s). Game-Over zeigt „Nur noch X bis zum Rekord“ und erfüllte Missionen. Neustart per Button erst nach ca. 1,7 s. |
+| 6 | Meta-Progression | 6 | Münzen werden gespeichert. 7 Vogel-Skins (100–1500 Münzen) mit Live-Vorschau am 3D-Vogel. Täglich 3 Missionen (+40/+70/+120) mit Einblendung beim Erreichen. Fehlt: Erfolge und Meilensteine, weitere Kosmetik (Spuren, Hüte), Langzeitziele. |
 | 7 | Audio | 6 | Prozedurale Chiptune-Musik und Effekte. Der Loop ist nur ca. 31 s lang, Wiederholung nervt vermutlich nach 10 Minuten. Mix ist ungeprüft. |
 | 8 | Performance | 4 | 892 Draw Calls pro Frame inkl. Schattenpass, 43k Dreiecke, weiche Schatten, DPR 2 – zu viel für Mittelklasse-Android. APK 5,5 MB ✓, erster Frame nach 0,7 s ✓. |
 | 9 | Politur | 5 | Einfache HTML-Panels, Game-Over ohne Animation. Icon und Splash gerendert ✓. |
@@ -31,13 +31,13 @@ Bot-Werte sind Näherungen an echte Spieler, keine Messung an Menschen.
 
 ## Backlog (nach Hebel sortiert)
 
-1. Meta: Münz-Shop mit Vogel-Skins, tägliche Missionen, Meilensteine.
-2. Performance: Szenerie per Instancing oder Merge zusammenfassen, Schattenwerfer reduzieren, DPR begrenzen.
-3. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Kombo für perfekte Durchflüge.
-4. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Variationen.
-5. Session-Loop: schnellerer Neustart (Tippen überall), „Noch X bis zum Rekord“.
-6. Onboarding: Geister-Hand im ersten Run statt Text.
-7. Store: Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+1. Performance: Szenerie per Instancing oder Merge zusammenfassen, Schattenwerfer reduzieren, DPR begrenzen.
+2. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Kombo für perfekte Durchflüge.
+3. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Variationen.
+4. Session-Loop: schnellerer Neustart (Tippen überall), „Noch X bis zum Rekord“.
+5. Onboarding: Geister-Hand im ersten Run statt Text.
+6. Store: Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+7. Meta: Erfolge und Meilensteine, Flug-Spuren als zweite Kosmetik-Kategorie.
 
 ## Iterations-Log
 
@@ -100,3 +100,32 @@ Beim Hüpfer für den Spurwechsel habe ich drei Varianten getestet:
 | ohne | 13,4 s |
 
 Der Hüpfer +6 bleibt.
+
+### Iteration 3 – Meta-Progression: Münzen, Skins, Tagesmissionen
+
+**Was:**
+- `src/progress.js`: Münzen, Rekord, Runden, freigeschaltete Skins und Missionen, alles lokal in
+  localStorage. Ohne Account, offline. Der alte Rekord wird übernommen.
+- **7 Vogel-Skins:** Sunny, Himmel, Kardinal, Minze, Flamingo, Nachteule, Goldvogel. Gleiches
+  Modell und gleicher Low-Poly-Look, nur andere Farben. Preise 100–1500 Münzen.
+- **Shop („🐦 Vögel“):** Die Kamera schwenkt auf die Seitenansicht des Vogels, eine Auswahl
+  färbt den echten 3D-Vogel sofort um. Beim Kauf gibt es Konfetti und einen Sound.
+- **3 Tagesmissionen** aus 8 Vorlagen mit wachsender Schwierigkeit und +40/+70/+120 Münzen.
+  Sie sind nach Datum festgelegt, für alle Spieler gleich. Beim Erreichen erscheint mitten im
+  Flug eine Einblendung.
+- **Startmenü neu:** Titel oben, Vogel in der Mitte, Panel unten. In den ersten 2 Runden
+  steht dort die Steuerungs-Erklärung, danach die Tagesmissionen.
+- **Game-Over:** erfüllte Missionen, „Nur noch X bis zum Rekord!“, Münz-Anzeige, Buttons
+  „Nochmal“ und „Menü“.
+
+**Warum:** Meta-Progression war mit 1/10 der schwächste Bereich. Münzen hatten keinen Zweck,
+und es gab keinen Grund, morgen wiederzukommen.
+
+**Beleg:**
+- Screenshots von Startmenü, Shop, Kauf und Game-Over, ohne Konsolenfehler.
+- Logik-Test: Ein Run mit 25 Münzen erfüllt „Sammle 20 Münzen“ (+40 → 65 Münzen), ein zweiter
+  Run erfüllt die übrigen Missionen (285 Münzen). Der Kauf von „Himmel“ zieht 100 Münzen ab,
+  der Kauf von „Gold“ wird bei zu wenig Münzen abgelehnt.
+- Ökonomie: Der geübte Bot sammelt im Median 25 Münzen pro Run. Mit den Missionen ist der
+  erste Skin also nach etwa 3 Runs erreichbar, alle Skins (4300 Münzen) nach etwa 3 Wochen
+  täglichen Spielens.

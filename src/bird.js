@@ -28,11 +28,13 @@ export function createBird() {
   }
 
   // Beak: two rounded mandibles like Flappy's lips, faceted like the body.
-  const beakTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 7), mat(0xf57c21));
+  const beakMat = mat(0xf57c21);
+  const beakLowMat = mat(0xe0521b);
+  const beakTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 7), beakMat);
   beakTop.scale.set(1.15, 0.5, 1.25);
   beakTop.position.set(0, 0.0, -0.66);
   group.add(beakTop);
-  const beakBottom = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 7), mat(0xe0521b));
+  const beakBottom = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 7), beakLowMat);
   beakBottom.scale.set(1.0, 0.42, 1.05);
   beakBottom.position.set(0, -0.15, -0.6);
   group.add(beakBottom);
@@ -63,8 +65,9 @@ export function createBird() {
 
   // Tail: three rounded feathers fanned out.
   const tailGeo = new THREE.SphereGeometry(0.2, 14, 10);
+  const tailMat = smooth(0xf2c230);
   for (const [x, rotY] of [[-0.12, 0.35], [0, 0], [0.12, -0.35]]) {
-    const feather = new THREE.Mesh(tailGeo, smooth(0xf2c230));
+    const feather = new THREE.Mesh(tailGeo, tailMat);
     feather.scale.set(0.55, 0.25, 1.2);
     feather.position.set(x, 0.18, 0.72);
     feather.rotation.set(0.45, rotY, 0);
@@ -93,7 +96,17 @@ export function createBird() {
     }
   }
 
-  return { group, animateWings, setGlow };
+  // Recolour the bird (see SKINS in progress.js). Same model and shading.
+  const skinMats = { body: yellow, belly: cream, wing: wingMat, cover: coverMat, tail: tailMat, beak: beakMat, beakLow: beakLowMat };
+  function setSkin(skin) {
+    for (const [key, m] of Object.entries(skinMats)) {
+      m.color.setHex(skin[key]);
+      m.metalness = skin.metal && key !== 'beak' && key !== 'beakLow' ? 0.55 : 0;
+      m.roughness = skin.metal ? 0.3 : key === 'tail' ? 0.45 : 0.55;
+    }
+  }
+
+  return { group, animateWings, setGlow, setSkin };
 }
 
 function createWingGeometry() {

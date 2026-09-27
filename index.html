@@ -24,10 +24,15 @@
 
     <button id="mute" type="button">🔊</button>
 
-    <div id="start" class="panel-wrap">
-      <div class="panel">
+    <div id="wallet" class="wallet"><span class="coin-icon"></span><span id="wallet-count">0</span></div>
+
+    <div id="start" class="panel-wrap menu">
+      <div class="menu-title">
         <h1>Birdy <span>3D</span></h1>
-        <div class="howto">
+        <p class="best">Rekord: <span id="best-start">0</span></p>
+      </div>
+      <div class="panel">
+        <div id="howto" class="howto">
           <div class="howto-zones"><span>◀</span><span>▲</span><span>▶</span></div>
           <p class="controls">
             Tippe in <b>deine Spur</b> zum Flattern,<br />
@@ -36,8 +41,18 @@
           <p class="controls small">Tastatur: Leertaste / ↑ flattern, ← → Spur</p>
           <p class="powers-legend">🌈 unverwundbar · 🧲 Münz-Magnet · 🍄 Mini-Vogel</p>
         </div>
+        <div id="missions-start" class="missions hidden"></div>
         <button id="play-btn">Los geht's</button>
-        <p class="best">Rekord: <span id="best-start">0</span></p>
+        <button id="shop-btn" class="secondary">🐦 Vögel</button>
+      </div>
+    </div>
+
+    <div id="shop" class="panel-wrap menu hidden">
+      <div class="menu-title"><h2 id="shop-name">Sunny</h2></div>
+      <div class="panel">
+        <div id="skins" class="skins"></div>
+        <button id="shop-action">Ausgewählt</button>
+        <button id="shop-back" class="secondary">Zurück</button>
       </div>
     </div>
 
@@ -57,10 +72,14 @@
           <div><small>Rekord</small><strong id="final-best">0</strong></div>
         </div>
         <p id="new-best" class="hidden">Neuer Rekord!</p>
+        <p id="to-best" class="hidden"></p>
+        <div id="missions-done" class="missions"></div>
         <button id="retry-btn">Nochmal</button>
+        <button id="menu-btn" class="secondary">Menü</button>
       </div>
     </div>
 
+    <div id="toast" class="toast"></div>
     </div>
 
     <div id="rotate">

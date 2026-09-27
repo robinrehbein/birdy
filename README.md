@@ -38,6 +38,12 @@ Power-ups schweben in Blasen zwischen den Röhren:
 | 🧲 Magnet | 9 s lang werden Münzen angezogen |
 | 🍄 Mini | 9 s lang ist der Vogel kleiner und passt leichter durch Lücken |
 
+## Münzen, Vögel & Missionen
+
+- Gesammelte Münzen werden gespeichert (lokal auf dem Gerät, ohne Account).
+- Unter **🐦 Vögel** schaltest du mit Münzen neue Farben für den Vogel frei (7 Stück, 100–1500 Münzen). Die Auswahl wird direkt am 3D-Vogel angezeigt.
+- Jeden Tag gibt es **3 Tagesmissionen**, z. B. Münzen sammeln oder an Pflanzen vorbeifliegen. Sie bringen +40, +70 bzw. +120 Münzen.
+
 ## Sound
 
 Musik und Effekte werden live per WebAudio erzeugt (keine Audiodateien): ein Chiptune-Loop mit Bass, Arpeggio, Melodie und Drums, der während des Regenbogens eine zusätzliche Glitzer-Stimme bekommt.
@@ -79,6 +85,7 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
 - `src/audio.js` – Musik und Soundeffekte per WebAudio (keine Audiodateien nötig)
 - `src/powerups.js` – Power-up-Definitionen und Modelle
+- `src/progress.js` – Münzen, Skins, Tagesmissionen (localStorage)
 - `src/bot.js` – Playtest-Bots (Anfänger / geübt / Profi) für die Headless-Simulation
 - `scripts/playtest.mjs`, `scripts/perf.mjs` – automatischer Bot-Playtest und Render-Budget-Messung
 - `docs/PROGRESS.md` – Bewertungsbogen und Iterations-Log
