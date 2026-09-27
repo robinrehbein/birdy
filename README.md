@@ -1,4 +1,4 @@
-# Flapsy
+# Birdy
 
 Ein Ein-Tipp-Arcade-Flieger in Low-Poly-3D: Flattere durch Röhren-Lücken, weiche über drei Spuren aus und fliege durch wechselnde Zonen – gebaut mit [Three.js](https://threejs.org) und [Vite](https://vite.dev).
 
