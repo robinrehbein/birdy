@@ -87,6 +87,10 @@ function makeGroundTexture() {
     g.lineTo(x1, i + 128);
     g.stroke();
   }
+  // Dashed lane dividers on the track (lanes at x = -3, 0, 3; the texture
+  // spans 26 units, so the dividers at ±1.5 sit ~29.5 px from the centre).
+  g.fillStyle = 'rgba(255, 252, 235, 0.75)';
+  for (const x of [226.5, 285.5]) g.fillRect(x - 2.5, 8, 5, 48);
   // track borders
   g.fillStyle = '#9ce659';
   g.fillRect(x0 - 10, 0, 10, 128);

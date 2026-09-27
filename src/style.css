@@ -733,3 +733,12 @@ button.surprise:disabled { opacity: 0.55; }
 .next-unlock.ready { animation: unlock-glow 0.9s ease-in-out infinite alternate; }
 @keyframes unlock-glow { to { box-shadow: 0 0 0 3px #fff6d5, 0 0 16px 4px rgba(255, 214, 64, 0.9); } }
 .ach-list.more { -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }
+
+/* Tap-zone dividers only in the lower part of the screen (where the bird
+   flies and fingers tap), not through the sky and the HUD. */
+#zones { -webkit-mask-image: linear-gradient(transparent 28%, #000 52%); mask-image: linear-gradient(transparent 28%, #000 52%); }
+
+/* Current lane: three lane pills, the bird's lane in gold (not pager dots). */
+#lanes { gap: 6px; padding: 5px 9px; border-radius: 999px; background: rgba(84, 56, 71, 0.45); align-items: flex-end; }
+#lanes span { width: 11px; height: 16px; border-radius: 5px; background: rgba(255, 255, 255, 0.45); border: 2px solid #543847; }
+#lanes span.on { background: #fcb800; transform: none; height: 22px; }

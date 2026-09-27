@@ -94,7 +94,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 14 | 1/5 | mittel | Shop-Vorschaubilder sind klein; gesperrte Artikel sind schlecht erkennbar. | Größere Kacheln, Preisleiste, gesperrte Artikel entsättigen | offen |
 | 15 | 5 | mittel | Listen enden mitten in einer Zeile, ohne Scroll-Hinweis. | Fade-Masken, ganze Zeilen | ✅ It. 3 (Fade) |
 | 16 | 5 | mittel | Das Unlock-Banner ragt über den Panelrand (360 px). | In Panelbreite halten, Text kürzen | ✅ It. 3 |
-| 17 | 9 | mittel | Die gestrichelten Spurlinien laufen durch Himmel und HUD. | Linien nur auf dem Boden | offen |
+| 17 | 9 | mittel | Die gestrichelten Spurlinien laufen durch Himmel und HUD. | Linien nur auf dem Boden | ✅ It. 7 |
 | 18 | 8 | mittel | Get-Ready-Pfeile bleiben halbtransparent stehen; „hierhin“ sagt wenig. | Sauber ausblenden, Text „Spur wechseln“ | offen |
 | 19 | 5/8 | mittel | Pause und Game Over dunkeln das Spiel nicht ab. | Scrim und Scale-In | ✅ It. 3 (Scrim) |
 | 20 | 9 | mittel | Toasts und Zonenbanner liegen auf den Hindernissen. | Toast kompakt unter dem HUD, Banner kürzer und höher | offen |
@@ -104,7 +104,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 24 | 10 | niedrig | Im Icon ist der Vogel angeschnitten, der Schnabel wirkt wie Lippen. | Vogel vollständig, mit Outline | ✅ It. 1 |
 | 25 | 10 | niedrig | Die Feature-Grafik ist leer, und das Logo ist anders gefärbt als im Menü. | Logo wie im Menü, Vogel vollständig | ✅ It. 1 |
 | 26 | 4 | niedrig | Nur Blob-Schatten; der Horizont ist flach. | Kontaktschatten unter Röhren, Horizont staffeln | offen |
-| 27 | 5 | niedrig | Die Spurpunkte unten wirken wie ein Karussell. | Spuranzeige neu | offen |
+| 27 | 5 | niedrig | Die Spurpunkte unten wirken wie ein Karussell. | Spuranzeige neu | ✅ It. 7 |
 | 28 | 6 | niedrig | Das Logo wirkt unausgewogen. | – (Logo bleibt, Markenzeichen) | offen |
 
 ## Styleguide
@@ -409,3 +409,30 @@ Kaktus war ein „kleiner türkiser Klecks“ (hoch).
 - APK baut.
 
 **Neue Einschätzung:** Hindernisse 5 → 6, Lesbarkeit 6 → 6.
+
+### Iteration 7 – Spurlinien auf den Boden, Spuranzeige als Spuren (Bereiche 9 und 5)
+
+**Warum:** Laut Review 1 liefen die gestrichelten Tipp-Grenzen über den ganzen Bildschirm bis in
+den Himmel und durch das HUD (hoch). Die drei Punkte unten lasen sich wie Seitenpunkte eines
+Karussells.
+
+**Was:**
+- **Boden:** Die Strecke hat gestrichelte Spurtrenner direkt in der Bodentextur. Sie kosten
+  keinen Draw Call und nehmen die Zonen-Tönung der Strecke an.
+- **Tipp-Grenzen:** Sie bleiben, wie von dir festgelegt, den ganzen Run über sichtbar. Sie sind
+  aber nur noch in der unteren Bildhälfte zu sehen, also dort, wo Vogel und Finger sind. Nach
+  oben blenden sie aus und laufen nicht mehr durch Himmel und HUD.
+- **Spuranzeige:** drei kleine Spur-Pillen in einer Plum-Pille. Die Spur des Vogels ist gold und
+  höher.
+
+![Iteration 7 vorher/nachher](visual/it7.jpg)
+
+**Messwerte:**
+- **Playtest** (`SEED=7`, 50 Runs je Stufe): Ergebnis für Ergebnis identisch mit Iteration 6.
+  Die Änderung betrifft nur Textur und CSS.
+- **Perf:** Die Messung lief parallel zum Review-Katalog, deshalb sind die Absolutwerte hoch.
+  Im direkten Wechsel gemessen: erster Frame 1212 ms gegenüber 1197 ms der Basis (+1 %).
+  Bis zu 140 Draw Calls.
+- **APK:** baut.
+
+**Neue Einschätzung:** Lesbarkeit 6 → 7, UI 7 → 7.
