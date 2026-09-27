@@ -20,7 +20,7 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 5 | Bereit-Zustand mit pulsierenden Zonen, Zielring, relative Steuerung. Aber: Die Regel steht weiter als Text im Menü, es gibt kein geführtes Tutorial. |
+| 1 | Onboarding | 7 | Der erste Start geht direkt ins Spiel, mit einem geführten Run: Geister-Hand, Einfrieren vor der blockierten Reihe bis zum Seitentipp, großer pulsierender Zielring. Der Ablauf ist per E2E-Test belegt. Offen: Test mit echten Erstspielern. |
 | 2 | Game Feel / Juice | 6 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Aber: Durchflogene Reihen bleiben als grüne Geister (10 % Deckkraft) im unteren Bildviertel. Nicht auf einem Gerät gefühlt. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Fehlt: Musik pro Zone. |
@@ -33,19 +33,14 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Onboarding (Review 2, Blocker 2):**
-   - Erster Start direkt ins Spiel.
-   - Geführter erster Run mit Geister-Hand, gezielt blockierter Reihe und Einfrieren, bis
-     richtig getippt wird.
-   - Größerer, pulsierender Marker im ersten Run.
-2. **Audio:** Musik pro Zone (transponiert, Varianten), eigener Menü-Loop, längerer Loop.
-3. **Session-Loop und Bildruhe:**
+1. **Audio:** Musik pro Zone (transponiert, Varianten), eigener Menü-Loop, längerer Loop.
+2. **Session-Loop und Bildruhe:**
    - Game-Over fest 0,45 s nach dem Crash.
    - Durchflogene Reihen nahe der Kamera ausblenden.
-4. **Store:**
+3. **Store:**
    - Zurück-Taste, eigenes Icon mit dem 3D-Vogel, Wortlaut ohne „Flappy Bird“.
    - Release-Build-Setup, Store-Texte, Datenschutz.
-5. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
+4. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -366,3 +361,33 @@ Streuung.
 
   Mehr als die Hälfte der geübten Runs erreicht den Herbstwald (15 Punkte), etwa 25 % den
   Canyon.
+
+### Iteration 9 – Geführter erster Run (Review-2-Blocker 2)
+
+**Was:**
+- **Erster Start ohne Menü,** direkt im Bereit-Zustand. Eine Geister-Hand 👆 tippt auf den Vogel,
+  darunter steht „Tippen = flattern“.
+- **Reihen 1–3** haben nur eine große Lücke in der Mitte, also genau dort, wo der Vogel ist.
+  Dabei übt der Spieler das Flattern.
+- **Reihe 4** ist in der Mitte blockiert. Kurz davor friert das Spiel ein, der Zielring leuchtet
+  rot, und die Hand tippt links neben den Vogel („Daneben tippen = ausweichen“). Ein Tipp auf
+  den Vogel ändert nichts, erst ein Tipp daneben geht weiter.
+- Nach der Reihe erscheint „Super! Jetzt allein weiter 🎉“, und das Tutorial gilt als erledigt.
+  Wer vorher stirbt, bekommt es im nächsten Run noch einmal.
+- Der Zielring ist im Tutorial 1,6× größer und pulsiert.
+- Bestehende Spieler (mit mindestens einem Run) überspringen das Tutorial.
+
+**Warum:** Beide Reviews kritisierten, dass die Regeln nur als Text im Menü stehen. Top-Titel wie
+Stack oder Helix Jump erklären sich wortlos durch Spielen.
+
+**Beleg (E2E-Test `tut.mjs`, leerer Speicher):**
+
+| Schritt | Ergebnis |
+|---|---|
+| Start | Menü übersprungen, Bereit-Zustand, Hand im Modus „flap“ ✓ |
+| 3 Mittel-Reihen | durchflogen, danach Einfrieren mit Hand im Modus „side“ ✓ |
+| Tipp auf den Vogel | Welt bleibt stehen (Röhren-Positionen identisch) ✓ |
+| Tipp daneben | Spur 0, Hand weg, Reihe passiert, `tutorialDone = true` ✓ |
+
+Screenshots `t-1-hold`, `t-2-freeze` und `t-3-done`, ohne Konsolenfehler. Ob Erstspieler es
+wirklich verstehen, muss ein Test mit Menschen zeigen.

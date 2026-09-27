@@ -21,6 +21,8 @@ Das Spiel ist für Hochkant ausgelegt. Am Desktop wird es als zentrierte 9:16-Sp
 
 Auf dem Handy reicht eine einzige Geste: **Tippe beim Vogel**, dann flattert er. **Tippe links oder rechts neben den Vogel**, dann weicht er eine Spur in diese Richtung aus und macht dabei nur einen kleinen Hüpfer. Die Zonen richten sich nach der Position, an der der Vogel auf dem Bildschirm zu sehen ist. So löst ein Tipp auf den Vogel auch in den Außenspuren immer einen Flügelschlag aus.
 
+Beim **allerersten Start** führt dich eine Geister-Hand durch die erste Runde: erst flattern, dann vor einer blockierten Röhre ausweichen (das Spiel wartet, bis du richtig tippst).
+
 Ein kleiner **Zielring** an der nächsten Reihe zeigt, auf welcher Höhe du ankommst: grün heißt, du passt gerade durch; rot heißt, du würdest anstoßen.
 
 | Aktion | Desktop | Mobil |

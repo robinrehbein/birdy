@@ -111,7 +111,9 @@ function updateMarker(next, r) {
   marker.material.color.copy(ok ? MARKER_OK : MARKER_BAD);
   marker.material.opacity = 0.9 * THREE.MathUtils.clamp((z + 48) / 16, 0, 1);
   marker.position.set(LANES[state.lane], state.y, z + PIPE_RADIUS + 0.3);
-  marker.scale.setScalar(Math.max(1, -z / 14)); // keep it readable in the distance
+  // Keep it readable in the distance; bigger and pulsing in the tutorial.
+  const pulse = tut.active ? 1.6 + 0.25 * Math.sin(state.time * 8) : 1;
+  marker.scale.setScalar(Math.max(1, -z / 14) * pulse);
   marker.quaternion.copy(camera.quaternion);
 }
 
@@ -404,13 +406,58 @@ function resetGame() {
   bird.setSkin(progress.skin);
   updateLaneDots();
   // Briefly show the three tap zones at the start of every run.
-  // The tap zones stay visible while the bird waits for the first tap.
+  // The tap zones stay visible while the bird waits for the first tap
+  // (in the tutorial the ghost hand explains instead).
   zonesEl.classList.remove('show');
-  zonesEl.classList.add('hold');
+  if (tut.active) {
+    tut.step = 'flap';
+    showHand('flap');
+  } else {
+    zonesEl.classList.add('hold');
+  }
+}
+
+// --- First-run tutorial -----------------------------------------------------
+// The very first launch skips the menu. A ghost hand shows the two gestures:
+// rows 0–2 only have a middle gap (tap the bird to flap), row 3 blocks the
+// middle – the game freezes in front of it until the player taps beside the
+// bird to dodge.
+const TUT_SWITCH_ROW = 3;
+const tut = { active: false, step: '', gate: null, freezeY: 0 };
+const handEl = document.createElement('div');
+handEl.id = 'hand';
+handEl.innerHTML = '<span class="finger">👆</span><span class="label"></span>';
+app.appendChild(handEl);
+const handLabel = handEl.querySelector('.label');
+
+function showHand(mode) {
+  handEl.className = mode ? `show ${mode}` : '';
+  handLabel.innerHTML = mode === 'flap' ? 'Tippen = flattern' : mode === 'side' ? 'Daneben tippen<br>= ausweichen' : '';
+}
+
+function updateHand() {
+  if (!handEl.className) return;
+  tmpProj.set(state.x, state.y, 0).project(camera);
+  const bx = (tmpProj.x + 1) / 2;
+  const by = (1 - tmpProj.y) / 2;
+  const x = handEl.classList.contains('side') ? Math.max(0.2, bx - 0.28) : bx;
+  handEl.style.left = `${x * 100}%`;
+  handEl.style.top = `${(by + 0.06) * 100}%`;
+}
+
+function tutorialSpec() {
+  const gap = { center: 5.2, size: 6.2 };
+  if (state.gatesSpawned < TUT_SWITCH_ROW) return [null, { ...gap }, null];
+  if (state.gatesSpawned === TUT_SWITCH_ROW) return [{ ...gap }, null, { ...gap }];
+  return null;
 }
 
 // Build one row of pipes. Later rows add moving gaps and piranha plants.
 function gateSpec() {
+  if (tut.active) {
+    const t = tutorialSpec();
+    if (t) return t;
+  }
   const d = difficulty();
   // Warm-up: the first rows are extra wide and near the start height so a
   // first-time player gets a few easy successes.
@@ -543,6 +590,7 @@ function spawnGate(z) {
   const spec = gateSpec();
   gate.active = true;
   gate.configure(z, spec);
+  if (tut.active && state.gatesSpawned === TUT_SWITCH_ROW) tut.gate = gate;
   state.gatesSpawned++;
 
   // Coins inside some (static) gaps.
@@ -602,8 +650,13 @@ function flap() {
   if (state.hold) {
     state.hold = false;
     zonesEl.classList.remove('hold');
-    void zonesEl.offsetWidth;
-    zonesEl.classList.add('show');
+    if (tut.active) {
+      tut.step = 'fly';
+      showHand(null);
+    } else {
+      void zonesEl.offsetWidth;
+      zonesEl.classList.add('show');
+    }
   }
   state.vy = FLAP_VELOCITY;
   state.wingSpeed = 38;
@@ -623,6 +676,11 @@ function birdScreenX() {
 
 function tapDir(dir) {
   if (state.hold) return flap(); // first tap just starts
+  if (tut.step === 'switch') {
+    if (dir === 0) return; // frozen until the player taps beside the bird
+    tut.step = 'go';
+    showHand(null);
+  }
   const target = state.lane + dir;
   if (state.mode === 'playing' && !state.paused && dir !== 0 && target >= 0 && target < LANES.length) {
     setLane(target);
@@ -740,6 +798,7 @@ function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
   marker.visible = false;
+  showHand(null);
   state.hitStop = HIT_STOP;
   buzz(70);
   lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause };
@@ -902,6 +961,30 @@ function updatePlaying(dt) {
     state.y = 5 + Math.sin(state.time * 3) * 0.35;
     state.vy = Math.cos(state.time * 3) * 1.05;
     return;
+  }
+  if (tut.active) {
+    if (tut.step === 'fly' && tut.gate && tut.gate.group.position.z > -13) {
+      if (tut.gate.lanes[state.lane].blocked) {
+        tut.step = 'switch';
+        tut.freezeY = state.y;
+        showHand('side');
+      } else {
+        tut.step = 'go'; // already dodged on their own
+      }
+    }
+    if (tut.step === 'switch') {
+      // Frozen in front of the blocked row; the bird just hovers.
+      state.y = tut.freezeY + Math.sin(state.time * 3) * 0.15;
+      state.vy = 0;
+      return;
+    }
+    if (tut.step === 'go' && tut.gate && tut.gate.passed) {
+      tut.active = false;
+      tut.step = '';
+      progress.finishTutorial();
+      toast('Super! Jetzt allein weiter 🎉');
+      sfx.powerup();
+    }
   }
   state.runTime += dt;
   const d = difficulty();
@@ -1235,6 +1318,7 @@ function tick() {
   step(dt, music.beat());
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   updateToast(dt);
+  updateHand();
   biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
@@ -1243,7 +1327,14 @@ function tick() {
 }
 
 const SIM = new URLSearchParams(location.search).has('sim');
-if (!SIM) tick();
+if (!SIM) {
+  // First launch: straight into the guided first run.
+  if (!progress.tutorialDone) {
+    tut.active = true;
+    resetGame();
+  }
+  tick();
+}
 
 // Headless playtest: run `runs` games with a bot at a fixed 60 Hz step and
 // return per-run stats. Only used by scripts/playtest.mjs (?sim in the URL).

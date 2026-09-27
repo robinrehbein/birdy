@@ -81,6 +81,7 @@ function load() {
     skin: 'sunny',
     missions: null,
     gift: { last: '', streak: 0 },
+    tutorialDone: false,
     ...(data || {}),
   };
   // Migrate the old best score.
@@ -110,6 +111,12 @@ export const progress = {
   get coins() { return data.coins; },
   get best() { return data.best; },
   get runs() { return data.runs; },
+  // Players from before the tutorial existed (runs > 0) skip it.
+  get tutorialDone() { return data.tutorialDone || data.runs > 0; },
+  finishTutorial() {
+    data.tutorialDone = true;
+    save();
+  },
   get skin() { return SKINS.find((s) => s.id === data.skin) || SKINS[0]; },
   owns: (id) => data.owned.includes(id),
 
