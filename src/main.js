@@ -1862,19 +1862,19 @@ function toggleFps(on) {
 function tick() {
   timer.update();
   const rawDt = timer.getDelta();
-  const dt = Math.min(rawDt, 1 / 30);
   adaptQuality(rawDt);
-  if (landscapeTouch.matches || state.paused) {
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-    return;
-  }
+  if (!(landscapeTouch.matches || state.paused)) update(rawDt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+
+// Everything a frame does except drawing.
+function update(rawDt) {
+  const dt = Math.min(rawDt, 1 / 30);
   if (state.hitStop > 0) {
     // Freeze-frame on impact; only the camera shake keeps going.
     state.hitStop -= rawDt;
     updateCamera(dt);
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
     return;
   }
   step(dt, music.beat());
@@ -1889,8 +1889,12 @@ function tick() {
   biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
+}
+
+// Screenshot scripts: run game time forward without drawing each frame
+// (headless software rendering is far slower than a phone).
+function advance(seconds) {
+  for (let s = 0; s < seconds; s += 1 / 30) if (!state.paused) update(1 / 30);
 }
 
 const SIM = new URLSearchParams(location.search).has('sim');
@@ -1926,4 +1930,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera };
+window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, toast };
