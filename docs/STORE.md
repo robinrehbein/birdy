@@ -82,7 +82,7 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >
 > 🌳 **Vier Zonen:** Fliege vom Stadtpark in den Herbstwald, durch den Canyon bis in den
 > Blütenhain – jede Zone mit eigener Tageszeit, eigener Musik und eigenen Hindernissen:
-> wandernde und atmende Lücken und Piranha-Pflanzen, die im Takt schnappen.
+> wandernde und atmende Lücken und grimmige Stachelkakteen, die im Takt aus den Röhren springen.
 >
 > 🌈 **Power-ups:** Regenbogen-Unverwundbarkeit, Münz-Magnet und Mini-Vogel.
 >
@@ -113,7 +113,7 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >
 > 🌳 **Four zones:** from the city park through the autumn forest and the canyon to the blossom
 > grove – each with its own time of day, music and obstacles: moving and breathing gaps and
-> snapping plants that bite on the beat.
+> grumpy spiky cacti that pop up on the beat.
 >
 > 🌈 **Power-ups:** rainbow invincibility, coin magnet and mini bird.
 >
@@ -168,7 +168,7 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 | Element | Einschätzung | Stand |
 |---|---|---|
-| **Piranha-Pflanze** | Rot mit weißen Punkten und Röhren-Kontext. Das erinnert stark an Nintendos Piranha-Pflanze, sie war ja auch ausdrücklich so gewünscht („aka Mario“). **Größtes Risiko.** Empfehlung: eigenes Design, z. B. violette Venusfliegenfalle mit Zähnen und ohne weiße Punkte. | offen – deine Entscheidung |
+| Hindernis | Die Piranha-Pflanze (rot mit weißen Punkten) ist durch einen eigenen grimmigen Stachelkaktus mit Blüte ersetzt. | erledigt |
 | Grüne Röhren | Generisches Motiv, in vielen Spielen verbreitet. In Kombination mit der Pflanze aber näher an Mario. | niedrig |
 | Vogel-Design | Gelber Vogel mit großen Augen und orangem Schnabel, ähnlich wie Flappy Bird. Im Spiel bleibt er (Vorgabe). Das Store-Icon zeigt ihn jetzt in 3D-Frontansicht vor Regenbogen und Sonnenuntergangshimmel statt im Profil vor türkisem Himmel. | reduziert |
 | Wortlaut | „Flappy“ kommt in Store-Texten, README und Code nicht mehr vor. | erledigt |

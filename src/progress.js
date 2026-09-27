@@ -18,7 +18,7 @@ export const ACHIEVEMENTS = [
   { id: 'near10', icon: '😬', name: { de: 'Haarscharf', en: "Hair's Breadth" }, text: { de: '10× „Knapp!“ insgesamt', en: '10 close calls in total' }, stat: 'nearTotal', goal: 10, reward: 40 },
   { id: 'chain5', icon: '🔥', name: { de: 'Nervenkitzel', en: "Thrill Seeker" }, text: { de: '5× „Knapp!“ in Folge', en: '5 close calls in a row' }, stat: 'bestChain', goal: 5, reward: 150 },
   { id: 'powers3', icon: '🌈', name: { de: 'Power-Sammler', en: "Power Collector" }, text: { de: '3 Power-ups in einem Flug', en: '3 power-ups in one flight' }, stat: 'bestPowerups', goal: 3, reward: 60 },
-  { id: 'plants25', icon: '🌱', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Piranha-Pflanzen vorbei', en: 'Pass 25 piranha plants' }, stat: 'plantsTotal', goal: 25, reward: 80 },
+  { id: 'plants25', icon: '🌱', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Stachelkakteen vorbei', en: 'Pass 25 spiky cacti' }, stat: 'plantsTotal', goal: 25, reward: 80 },
   { id: 'coins500', icon: '🪙', name: { de: 'Sparschwein', en: "Piggy Bank" }, text: { de: '500 Münzen eingesammelt', en: 'Collect 500 coins' }, stat: 'coinsTotal', goal: 500, reward: 80 },
   { id: 'coins2000', icon: '💰', name: { de: 'Schatzmeister', en: "Treasurer" }, text: { de: '2000 Münzen eingesammelt', en: 'Collect 2000 coins' }, stat: 'coinsTotal', goal: 2000, reward: 200 },
   { id: 'runs50', icon: '🎮', name: { de: 'Dauerflieger', en: "Frequent Flyer" }, text: { de: '50 Runden gespielt', en: 'Play 50 rounds' }, stat: 'runs', goal: 50, reward: 100 },
@@ -37,7 +37,7 @@ const MISSION_POOL = [
   { id: 'powers', text: (n) => ({ de: `Schnapp dir ${n} Power-ups`, en: `Grab ${n} power-ups` }), stat: 'powerups', per: 'day', goals: [2, 4, 6], minBest: 8 },
   { id: 'runs', text: (n) => ({ de: `Spiele ${n} Runden`, en: `Play ${n} rounds` }), stat: 'runs', per: 'day', goals: [3, 5, 8] },
   // Only offered once the player has seen these obstacles (best score).
-  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Piranha-Pflanzen vorbei`, en: `Pass ${n} piranha plants` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
+  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Stachelkakteen vorbei`, en: `Pass ${n} spiky cacti` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
   { id: 'moving', text: (n) => ({ de: `Durchquere ${n} bewegte Lücken`, en: `Fly through ${n} moving gaps` }), stat: 'moving', per: 'day', goals: [4, 8, 14], minBest: 10 },
   { id: 'star', text: (n) => ({ de: `Fliege als Regenbogen durch ${n} Reihen`, en: `Pass ${n} rows as a rainbow` }), stat: 'starRows', per: 'day', goals: [3, 6, 10], minBest: 12 },
 ];

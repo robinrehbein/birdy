@@ -115,7 +115,7 @@ function noiseHit({ at, dur, vol, cutoff, dest }) {
 }
 
 // --- Music: chiptune song with sections and a theme per zone ----------------
-// Tempo stays at 124 BPM in every theme so the piranha plants stay on beat.
+// Tempo stays at 124 BPM in every theme so the cacti stay on beat.
 const BPM = 124;
 const STEP = 60 / BPM / 4; // 16th note
 const TRIADS = {

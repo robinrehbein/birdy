@@ -725,7 +725,7 @@ function tutorialSpec() {
   return null;
 }
 
-// Build one row of pipes. Later rows add moving gaps and piranha plants.
+// Build one row of pipes. Later rows add moving gaps and spiky cacti.
 function gateSpec() {
   if (tut.active) {
     const t = tutorialSpec();
@@ -777,7 +777,7 @@ function gateSpec() {
       g.speed = (1.2 + Math.random() * 1.2) * (zone === 2 ? 1.25 : 1);
       g.phase = Math.random() * Math.PI * 2;
     } else if (state.score >= 10 && Math.random() < (0.25 + 0.25 * d) * plantBoost) {
-      // Piranha plant: pops out of the lower pipe in time with the music.
+      // Spiky cactus: pops out of the lower pipe in time with the music.
       g.plant = true;
       g.plantOffset = Math.random() < 0.5 ? 0 : 2;
     }
@@ -1530,7 +1530,6 @@ function updatePlaying(dt) {
     gate.update(state.time, state.beat, dt);
     if (!gate.passed && gz > PIPE_RADIUS + r) {
       gate.passed = true;
-      gate.popTime = 0;
       addScore(gate);
       if (state.mode === 'playing' && !invincible() && gate.minClear !== undefined && gate.minClear < NEAR_MISS) nearMiss();
       else state.nearChain = 0;
@@ -1557,17 +1556,6 @@ function updatePlaying(dt) {
     }
   }
   updateMarker(next, r);
-
-  // Rings mark the gaps: the next row glows brighter the closer it gets.
-  for (const gate of gates) {
-    if (!gate.active || gate.passed) continue;
-    const gz = gate.group.position.z;
-    const near = THREE.MathUtils.clamp(1 + gz / 45, 0, 1);
-    // Fade out right in front of the camera instead of filling the screen.
-    const close = THREE.MathUtils.clamp((-gz - 3) / 7, 0, 1);
-    gate.ringMat.color.set(gate === next ? 0xfff176 : 0xffffff);
-    gate.ringMat.opacity = (gate === next ? 0.3 + 0.6 * near : 0.15 * near) * close;
-  }
 
   state.lastGateZ += dz;
   while (state.lastGateZ > -SPAWN_DISTANCE) spawnGate(state.lastGateZ - spacing());

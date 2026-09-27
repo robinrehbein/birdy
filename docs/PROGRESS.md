@@ -1155,3 +1155,18 @@ Die Upgrades waren zum Zeitpunkt des Reviews schon in Arbeit (Iteration 28).
 Bewertung aus Review 5 und 6 (u. a. Namensrisiko, App-ID, kein Gerätetest). Das Ziel „überall ≥ 8“
 ist nicht erreicht. Die fehlenden Punkte hängen an Tests mit Menschen und echten Geräten und an
 deinen Entscheidungen (Name, App-ID), nicht an weiterem Code.
+
+### Nachtrag – Stachelkaktus statt Piranha-Pflanze, Lückenringe entfernt (deine Entscheidung)
+
+- Die Piranha-Pflanze ist durch einen eigenen **grimmigen Stachelkaktus** ersetzt:
+  - Aussehen: Stacheln rundherum, freies Gesicht mit Augen, Brauen und kleinen Hauern, pinke Blüte oben.
+  - Bewegung: Er springt im selben Takt aus der Röhre und plustert sich oben auf.
+  - Trefferzone und Timing sind unverändert.
+  - Technik: in eine Geometrie gebacken, also ein Draw Call pro Kaktus statt rund 16.
+- Die hellen Ringe in den Lücken sind entfernt; der kleine grüne/rote Höhen-Marker bleibt.
+- Texte angepasst (Mission, Erfolg „Gärtner“, README, Store). Das Markenrisiko zur Pflanze in
+  `docs/STORE.md` ist erledigt.
+- **Beleg:**
+  - Kaktus im Spiel (`cactus0–2.png`) und als Nahaufnahme (`cactus-close.png`).
+  - Tutorial-E2E ✓, Bot-Playtest: Anfänger 15,9 s, Geübt 38,9 s, Profi 96 % Überlebende.
+  - 127 statt 151 Draw Calls, keine Fehler.
