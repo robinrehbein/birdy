@@ -181,6 +181,14 @@ function renderStart() {
   const ms = $('missions-start');
   ms.classList.toggle('hidden', firstRuns);
   ms.innerHTML = '<h3>Tagesmissionen</h3>' + progress.missions().map((m) => missionHTML(m)).join('');
+  // Daily gift (from the second run on, so the first launch stays simple).
+  const giftBtn = $('gift-btn');
+  const streakEl = $('streak');
+  const gift = !firstRuns && progress.giftAvailable();
+  giftBtn.classList.toggle('hidden', !gift);
+  if (gift) giftBtn.textContent = `🎁 Tagesgeschenk · +${progress.giftAmount(progress.streak + 1)}`;
+  streakEl.classList.toggle('hidden', gift || progress.streak === 0);
+  streakEl.textContent = `🔥 Serie: Tag ${progress.streak} · morgen +${progress.giftAmount(progress.streak + 1)}`;
   renderWallet();
 }
 
@@ -240,6 +248,16 @@ shopAction.addEventListener('click', () => {
   renderShop();
 });
 $('shop-btn').addEventListener('click', () => { startAudio(); openShop(true); });
+$('gift-btn').addEventListener('click', () => {
+  startAudio();
+  const res = progress.claimGift();
+  if (!res) return;
+  sfx.powerup();
+  for (let i = 0; i < 5; i++) setTimeout(() => sfx.coin(), 120 + i * 70);
+  particles.emit(bird.group.position, { count: 36, colors: [0xfff176, 0xffd400, 0xffffff], speed: 7, size: 0.13, life: 0.9, gravity: -5 });
+  renderStart();
+  renderWallet(true);
+});
 $('shop-back').addEventListener('click', () => openShop(false));
 $('menu-btn').addEventListener('click', () => {
   state.mode = 'ready';
@@ -294,6 +312,8 @@ const state = {
   time: 0,
   beat: 0,
   runTime: 0,
+  hold: false,
+  overAt: 0,
   menu: 'start', // start | shop (only while mode is 'ready')
   run: null, // per-run counters for missions
   celebrated: new Set(),
@@ -317,6 +337,7 @@ function spacing() {
 
 function resetGame() {
   state.mode = 'playing';
+  state.hold = true; // "get ready": hover until the first tap
   state.x = 0;
   state.y = 5;
   state.vy = 0;
@@ -358,9 +379,9 @@ function resetGame() {
   bird.setSkin(progress.skin);
   updateLaneDots();
   // Briefly show the three tap zones at the start of every run.
+  // The tap zones stay visible while the bird waits for the first tap.
   zonesEl.classList.remove('show');
-  void zonesEl.offsetWidth;
-  zonesEl.classList.add('show');
+  zonesEl.classList.add('hold');
 }
 
 // Build one row of pipes. Later rows add moving gaps and piranha plants.
@@ -519,8 +540,17 @@ function flap() {
     setPaused(false);
     return;
   }
-  if (state.mode === 'ready') resetGame();
+  if (state.mode === 'ready') {
+    resetGame();
+    return;
+  }
   if (state.mode !== 'playing') return;
+  if (state.hold) {
+    state.hold = false;
+    zonesEl.classList.remove('hold');
+    void zonesEl.offsetWidth;
+    zonesEl.classList.add('show');
+  }
   state.vy = FLAP_VELOCITY;
   state.wingSpeed = 38;
   sfx.flap();
@@ -537,6 +567,7 @@ function birdScreenX() {
 }
 
 function tapDir(dir) {
+  if (state.hold) return flap(); // first tap just starts
   const target = state.lane + dir;
   if (state.mode === 'playing' && !state.paused && dir !== 0 && target >= 0 && target < LANES.length) {
     setLane(target);
@@ -567,10 +598,7 @@ function setLane(lane) {
 }
 
 function tryRestart() {
-  if (state.mode === 'over' && state.deadTimer > 1.0) {
-    resetGame();
-    flap();
-  }
+  if (state.mode === 'over' && performance.now() - state.overAt > 350) resetGame();
 }
 
 window.addEventListener('keydown', (e) => {
@@ -618,9 +646,12 @@ $('play-btn').addEventListener('click', () => {
 });
 pauseEl.addEventListener('pointerdown', () => setPaused(false));
 
-$('retry-btn').addEventListener('click', () => {
+// Game over: tap anywhere (except "Menü") to go again, after a short delay
+// so a panicked tap at the moment of death doesn't skip the screen.
+overEl.addEventListener('pointerdown', (e) => {
   startAudio();
-  resetGame();
+  if (e.target.closest('#menu-btn')) return;
+  if (state.mode === 'over' && performance.now() - state.overAt > 350) resetGame();
 });
 
 function renderMute() {
@@ -674,6 +705,7 @@ function die(cause) {
 
 function showGameOver() {
   state.mode = 'over';
+  state.overAt = performance.now();
   state.run.coins = state.coins;
   state.run.score = state.score;
   const { isBest, completed } = progress.finishRun(state.run);
@@ -762,6 +794,13 @@ function moveWorld(dz) {
 }
 
 function updatePlaying(dt) {
+  if (state.hold) {
+    // Get ready: hover in place, ground and scenery keep scrolling.
+    moveWorld(8 * dt);
+    state.y = 5 + Math.sin(state.time * 3) * 0.35;
+    state.vy = Math.cos(state.time * 3) * 1.05;
+    return;
+  }
   state.runTime += dt;
   const d = difficulty();
   const boost = state.power.star > 0 ? STAR_SPEED_BOOST : 1;

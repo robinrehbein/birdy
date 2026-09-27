@@ -24,8 +24,8 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 | 2 | Game Feel / Juice | 4 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss, Vibration. |
 | 3 | Fairness & Kurve | 6 | Profi-Bot überlebt 94 % der 150-s-Runs dank garantierter Erreichbarkeit. Aber: Der Bot kennt die exakten Lückenhöhen. Die Tiefenwahrnehmung von Menschen ist nicht geprüft, die Kurve endet bei 40 Punkten. |
 | 4 | Abwechslung | 3 | Ab Punkt 10 ist alles freigeschaltet, es gibt nur ein Biom. |
-| 5 | Session-Loop | 5 | Runs im Median: Anfänger 17 s, geübt 42 s ✓. Aber: Nach „Nochmal“ fehlt ein Bereit-Zustand, der Vogel fällt sofort. Kein Neustart per Tippen irgendwo. |
-| 6 | Meta-Progression | 5 | Münzen, 7 Skins, 3 Tagesmissionen. Fehlt: Streak oder Geschenk, Zufalls-Freischaltung. Missionen passen nicht zum Spielerniveau (Pflanzen-Mission bei Rekord < 10). |
+| 5 | Session-Loop | 7 | Runs im Median: Anfänger 16 s, geübt 41 s ✓. Neustart per Tipp irgendwo 0,35 s nach dem Game-Over, danach schwebt der Vogel, bis getippt wird (getestet). „Nur noch X bis zum Rekord“. Offen: Game-Over erscheint erst ca. 1 s nach dem Crash. |
+| 6 | Meta-Progression | 6 | Münzen, 7 Skins, 3 Tagesmissionen passend zum Rekord, Tagesgeschenk mit Serie (20 → 80 Münzen). Fehlt: Zufalls-Freischaltung, Erfolge, zweite Kosmetik-Kategorie. |
 | 7 | Audio | 4 | Korrektur: Der Loop dauert nur 7,7 s (64 Sechzehntel bei 124 BPM), nicht 31 s. Menü und Spiel nutzen denselben Loop, das wiederholt sich stark. |
 | 8 | Performance | 6 | 892 → **165 Draw Calls** (Szenerie und Röhren zusammengefasst, Optik unverändert). Automatische Qualitätsstufen (DPR 2 → 1,5 → 1,25 → 1 → ohne Schatten, mit Ersatz-Schatten). Offen: Messung auf einem echten Gerät (Anzeige: 5× auf den Titel tippen). |
 | 9 | Politur | 5 | Panels sauber. Münzen wirken bräunlich (Metall ohne Umgebungslicht). Der Ring-„Pop“ einer passierten Reihe wird nahe der Kamera riesig. Der Shop zeigt nur Farbpunkte. |
@@ -33,13 +33,11 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 
 ## Backlog (nach Hebel sortiert)
 
-1. Session-Loop: Bereit-Zustand nach „Nochmal“, Neustart per Tippen irgendwo.
-2. Missionen an das Spielerniveau koppeln, dazu tägliches Geschenk oder Streak.
-3. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Vibration.
-4. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
-5. Politur: Münz-Material, Ring-Pop nahe der Kamera, Shop-Vorschau.
-6. Onboarding: Geister-Hand im ersten Run statt Text.
-7. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+1. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Vibration.
+2. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
+3. Politur: Münz-Material, Ring-Pop nahe der Kamera, Shop-Vorschau.
+4. Onboarding: Geister-Hand im ersten Run statt Text.
+5. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -223,3 +221,32 @@ durchlaufen (Software-GPU), ohne Fehler. Auf einem echten Gerät ist nichts geme
   Bots tippen nie daneben und profitieren deshalb nicht vom eigentlichen Gewinn (13,4 % → 0,5 %
   Fehltipps). Der Höhen-Marker hilft nur Menschen; das muss ein Test mit echten Spielern
   zeigen.
+
+### Iteration 6 – Session-Loop: Bereit-Zustand, Tap-Neustart, Tagesgeschenk
+
+**Was:**
+- **Bereit-Zustand:** Nach dem Start und nach jedem Neustart schwebt der Vogel, bis zum ersten
+  Tipp. Die Tipp-Zonen („ausweichen · flattern · ausweichen“) pulsieren in dieser Zeit. Vorher
+  fiel der Vogel nach „Nochmal“ sofort.
+- **Neustart per Tipp irgendwo** auf dem Game-Over-Screen, frühestens nach 0,35 s echter Zeit,
+  damit ein Panik-Tipp den Screen nicht überspringt. „Menü“ bleibt als Ausweg.
+- **Missionen passend zum Niveau:**
+  - Pflanzen erst ab Rekord 14, bewegte Lücken ab 10, Regenbogen ab 12, Power-ups ab 8.
+  - Das Punkteziel für einen Flug richtet sich nach dem Rekord (60 / 90 / 110 %).
+- **Tagesgeschenk mit Serie:** 20 Münzen, an jedem Folgetag 10 mehr (maximal 80). Wird ein Tag
+  ausgelassen, beginnt die Serie von vorn. Das Geschenk erscheint ab dem 2. Run im Startmenü,
+  danach zeigt das Menü „🔥 Serie: Tag N · morgen +X“.
+
+**Warum:** Review-Punkt 3 – kein Bereit-Zustand und kaum Gründe, am nächsten Tag
+wiederzukommen.
+
+**Beleg (Headless-Test `loop.mjs`):**
+
+| Prüfung | Ergebnis |
+|---|---|
+| Missionen bei Rekord 6 | `coins`, `runs`, `rows`, keine Hindernis-Missionen ✓ |
+| Geschenk nach Serie 2 am Vortag | +40, Serie „Tag 3 · morgen +50“ ✓ |
+| Vogel nach Start, ohne Tipp | schwebt nach 2,5 s bei y ≈ 5,2 ✓ |
+| Neustart | Tipp 0,5 s nach dem Game-Over startet neu, Vogel schwebt ✓ |
+
+Regressions-Playtest ohne Änderung: Anfänger 16 s, geübt 41 s. Keine Konsolenfehler.

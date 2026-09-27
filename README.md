@@ -44,7 +44,10 @@ Power-ups schweben in Blasen zwischen den Röhren:
 
 - Gesammelte Münzen werden gespeichert (lokal auf dem Gerät, ohne Account).
 - Unter **🐦 Vögel** schaltest du mit Münzen neue Farben für den Vogel frei (7 Stück, 100–1500 Münzen). Die Auswahl wird direkt am 3D-Vogel angezeigt.
-- Jeden Tag gibt es **3 Tagesmissionen**, z. B. Münzen sammeln oder an Pflanzen vorbeifliegen. Sie bringen +40, +70 bzw. +120 Münzen.
+- Jeden Tag gibt es **3 Tagesmissionen**, z. B. Münzen sammeln oder an Pflanzen vorbeifliegen. Sie bringen +40, +70 bzw. +120 Münzen und passen zu deinem Rekord: Pflanzen-Missionen gibt es erst, wenn du Pflanzen schon gesehen hast.
+- Das **🎁 Tagesgeschenk** bringt 20 Münzen, an jedem Folgetag 10 mehr (bis 80). Die Serie reißt ab, wenn du einen Tag auslässt.
+
+Nach einem Crash **tippst du irgendwo**, um nochmal zu spielen. Der Vogel schwebt, bis du das erste Mal tippst.
 
 ## Sound
 

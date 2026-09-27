@@ -430,3 +430,23 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   border-radius: 4px;
   pointer-events: none;
 }
+#zones.hold { opacity: 1; }
+#zones.hold div { animation: zone-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes zone-pulse { to { background: rgba(255, 255, 255, 0.2); } }
+
+button.gift {
+  display: block;
+  width: 100%;
+  font-size: 20px;
+  padding: 8px 16px;
+  margin-bottom: 12px;
+  background: #fcb800;
+  animation: gift-wiggle 1.6s ease-in-out infinite;
+}
+@keyframes gift-wiggle {
+  0%, 70%, 100% { transform: rotate(0); }
+  76% { transform: rotate(-3deg) scale(1.03); }
+  84% { transform: rotate(3deg) scale(1.03); }
+  92% { transform: rotate(-2deg); }
+}
+.streak { font-size: 16px; margin: -4px 0 10px; color: #f26b1d; }

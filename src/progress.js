@@ -20,18 +20,21 @@ const MISSION_POOL = [
   { id: 'coins', text: (n) => `Sammle ${n} Münzen`, stat: 'coins', per: 'day', goals: [20, 40, 70] },
   { id: 'score', text: (n) => `Erreiche ${n} Punkte in einem Flug`, stat: 'score', per: 'run', goals: [10, 20, 35] },
   { id: 'rows', text: (n) => `Fliege durch ${n} Röhren`, stat: 'score', per: 'day', goals: [30, 60, 100] },
-  { id: 'powers', text: (n) => `Schnapp dir ${n} Power-ups`, stat: 'powerups', per: 'day', goals: [2, 4, 6] },
+  { id: 'powers', text: (n) => `Schnapp dir ${n} Power-ups`, stat: 'powerups', per: 'day', goals: [2, 4, 6], minBest: 8 },
   { id: 'runs', text: (n) => `Spiele ${n} Runden`, stat: 'runs', per: 'day', goals: [3, 5, 8] },
-  { id: 'plants', text: (n) => `Flieg an ${n} Piranha-Pflanzen vorbei`, stat: 'plants', per: 'day', goals: [3, 6, 10] },
-  { id: 'moving', text: (n) => `Durchquere ${n} bewegte Lücken`, stat: 'moving', per: 'day', goals: [4, 8, 14] },
-  { id: 'star', text: (n) => `Fliege als Regenbogen durch ${n} Reihen`, stat: 'starRows', per: 'day', goals: [3, 6, 10] },
+  // Only offered once the player has seen these obstacles (best score).
+  { id: 'plants', text: (n) => `Flieg an ${n} Piranha-Pflanzen vorbei`, stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
+  { id: 'moving', text: (n) => `Durchquere ${n} bewegte Lücken`, stat: 'moving', per: 'day', goals: [4, 8, 14], minBest: 10 },
+  { id: 'star', text: (n) => `Fliege als Regenbogen durch ${n} Reihen`, stat: 'starRows', per: 'day', goals: [3, 6, 10], minBest: 12 },
 ];
 const REWARDS = [40, 70, 120];
 
-function today() {
+function dayKey(offsetDays = 0) {
   const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
+const today = () => dayKey(0);
 
 // Small deterministic RNG so everyone gets the same missions on a day.
 function seeded(str) {
@@ -44,16 +47,26 @@ function seeded(str) {
   };
 }
 
-function dailyMissions(date) {
+// Three missions of rising difficulty, matched to what the player can do:
+// obstacle missions only after they have been reached, and the one-run
+// score goal scales with the record.
+function dailyMissions(date, best) {
   const rnd = seeded(date);
-  const pool = [...MISSION_POOL];
+  const pool = MISSION_POOL.filter((m) => best >= (m.minBest || 0));
   const list = [];
   for (let tier = 0; tier < 3; tier++) {
     const m = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
-    list.push({ id: m.id, goal: m.goals[tier], progress: 0, reward: REWARDS[tier], done: false });
+    let goal = m.goals[tier];
+    if (m.id === 'score') goal = Math.max(5, Math.round(Math.max(8, best) * [0.6, 0.9, 1.1][tier]));
+    list.push({ id: m.id, goal, progress: 0, reward: REWARDS[tier], done: false });
   }
   return { date, list };
 }
+
+// Daily gift with a streak: 20 coins, +10 per consecutive day (max 80).
+const GIFT_BASE = 20;
+const GIFT_STEP = 10;
+const GIFT_MAX_STREAK = 7;
 
 function load() {
   let data = null;
@@ -67,6 +80,7 @@ function load() {
     owned: ['sunny'],
     skin: 'sunny',
     missions: null,
+    gift: { last: '', streak: 0 },
     ...(data || {}),
   };
   // Migrate the old best score.
@@ -86,7 +100,7 @@ function save() {
 
 function missions() {
   if (!data.missions || data.missions.date !== today()) {
-    data.missions = dailyMissions(today());
+    data.missions = dailyMissions(today(), data.best);
     save();
   }
   return data.missions.list;
@@ -120,6 +134,28 @@ export const progress = {
     data.skin = id;
     save();
     return true;
+  },
+
+  // Daily gift: available once per calendar day. Claiming on consecutive
+  // days grows the streak.
+  giftAvailable() {
+    return data.gift.last !== today();
+  },
+  get streak() {
+    const g = data.gift;
+    return g.last === today() || g.last === dayKey(-1) ? g.streak : 0;
+  },
+  giftAmount(streak) {
+    return GIFT_BASE + GIFT_STEP * (Math.min(streak, GIFT_MAX_STREAK) - 1);
+  },
+  claimGift() {
+    if (!this.giftAvailable()) return null;
+    const streak = data.gift.last === dayKey(-1) ? data.gift.streak + 1 : 1;
+    const amount = this.giftAmount(streak);
+    data.gift = { last: today(), streak };
+    data.coins += amount;
+    save();
+    return { amount, streak };
   },
 
   // Called once when a run ends. `run` holds the run's counters.
