@@ -293,6 +293,9 @@ function makePipeSegment(mats) {
 // --- Piranha plant ----------------------------------------------------------
 
 export const PLANT_HEIGHT = 1.8;
+// How far the plant's head reaches into the gap when fully up. Leaves enough
+// room above it for a full flap arc.
+export const PLANT_REACH = 0.9;
 const plantMat = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, flatShading: true });
 const plantMats = {
   stem: plantMat(0x3aa833),
@@ -468,7 +471,7 @@ export function createGate(scene) {
         plant.group.visible = rise > 0;
         if (rise <= 0) continue;
         // Hidden inside the pipe at rise 0; head sticks out of the gap at 1.
-        plant.group.position.y = lane.gapLow - 0.3 - PLANT_HEIGHT * (1 - rise);
+        plant.group.position.y = lane.gapLow + PLANT_REACH + 0.15 - PLANT_HEIGHT * (2 - rise);
         lane.hitLow = Math.max(lane.gapLow, plant.group.position.y + PLANT_HEIGHT - 0.15);
         const chomp = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0.3;
         plant.upper.rotation.x = -0.6 * chomp;

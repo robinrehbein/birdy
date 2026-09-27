@@ -5,14 +5,15 @@ const GRAVITY = 36;
 const FLAP = 11.5;
 const HOP = 6; // a tap on another lane only hops
 const BPM = 124;
+import { PLANT_HEIGHT, PLANT_REACH } from './world.js';
 
 const SKILLS = {
   // First-time player: sees rows late, aims sloppily, sometimes picks badly.
-  novice: { delay: 0.22, anticipate: 0.6, interval: 0.2, noise: 0.9, lookAhead: 30, mistake: 0.12, predict: false, lateSwitch: false, apexCheck: 0.4 },
+  novice: { plan2: false, delay: 0.22, anticipate: 0.6, interval: 0.2, noise: 0.9, lookAhead: 30, mistake: 0.12, predict: false, lateSwitch: false, apexCheck: 0.4 },
   // Casual player after a few runs.
-  good: { delay: 0.15, anticipate: 0.9, interval: 0.12, noise: 0.45, lookAhead: 45, mistake: 0.04, predict: false, lateSwitch: true, apexCheck: 0.85 },
+  good: { plan2: false, delay: 0.15, anticipate: 0.9, interval: 0.12, noise: 0.45, lookAhead: 45, mistake: 0.04, predict: false, lateSwitch: true, apexCheck: 0.85 },
   // Near-perfect play: used to detect rows that are impossible (unfair).
-  pro: { delay: 0, anticipate: 1, interval: 1 / 60, noise: 0, lookAhead: 80, mistake: 0, predict: true, lateSwitch: true, apexCheck: 1 },
+  pro: { plan2: true, delay: 0, anticipate: 1, interval: 1 / 60, noise: 0, lookAhead: 80, mistake: 0, predict: true, lateSwitch: true, apexCheck: 1 },
 };
 
 function plantRise(beat) {
@@ -23,7 +24,7 @@ function plantRise(beat) {
   return 0;
 }
 
-export function createBot({ skill = 'good' } = {}) {
+export function createBot({ skill = 'good', hop = HOP } = {}) {
   const P = SKILLS[skill];
   let cooldown = 0;
   let target = null;
@@ -70,7 +71,7 @@ export function createBot({ skill = 'good' } = {}) {
         // Worst case over the crossing window.
         let rise = 0;
         for (let k = -2; k <= 2; k++) rise = Math.max(rise, plantRise(beat + k * 0.12));
-        if (rise > 0) low = Math.max(low, low - 0.3 - 1.8 * (1 - rise) + 1.8 - 0.15);
+        if (rise > 0) low = Math.max(low, low + PLANT_REACH - PLANT_HEIGHT * (1 - rise));
       }
     } else if (l.hasPlant) {
       low = Math.max(low, l.hitLow);
@@ -85,8 +86,13 @@ export function createBot({ skill = 'good' } = {}) {
     decide(dt, ctx) {
       for (const a of queue) a.t -= dt;
       const due = queue.length && queue[0].t <= 0 ? queue.shift() : null;
-      const act = think(dt, ctx);
-      if (act) queue.push({ ...act, t: P.delay });
+      // The player already "pressed" these; don't decide them again.
+      const pending = queue.length > 0 || !!due;
+      const act = pending ? null : think(dt, ctx);
+      if (act) {
+        if (P.delay > 0) queue.push({ ...act, t: P.delay });
+        else return act;
+      }
       return due && { lane: due.lane };
     },
   };
@@ -94,13 +100,11 @@ export function createBot({ skill = 'good' } = {}) {
   function think(dt, { state, gates }) {
     {
       cooldown -= dt;
-      let next = null;
-      for (const g of gates) {
-        if (!g.active || g.passed) continue;
-        const z = g.group.position.z;
-        if (z < -P.lookAhead) continue;
-        if (!next || z > next.group.position.z) next = g;
-      }
+      const ahead = gates
+        .filter((g) => g.active && !g.passed && g.group.position.z > -P.lookAhead)
+        .sort((a, b) => b.group.position.z - a.group.position.z);
+      const next = ahead[0] || null;
+      const after = ahead[1] || null;
       if (next !== target) {
         target = next;
         if (next) {
@@ -113,7 +117,17 @@ export function createBot({ skill = 'good' } = {}) {
       let ceiling = 13;
       if (target) {
         const [lo, hi] = band(target, state);
-        aim = Math.max(lo, Math.min(hi, (lo + hi) / 2 + aimOffset));
+        let want = (lo + hi) / 2;
+        // Skilled players already line up for the row after this one.
+        if (P.plan2 && after) {
+          const open = after.lanes.filter((l) => !l.blocked);
+          const l2 = after.lanes[lane].blocked ? open[0] : after.lanes[lane];
+          if (l2) want = (l2.gapLow + l2.gapHigh) / 2;
+        }
+        // Keep the flap oscillation (about ±0.9) inside the band.
+        const a = Math.min(lo + 1, (lo + hi) / 2);
+        const b = Math.max(hi - 1, (lo + hi) / 2);
+        aim = Math.max(lo, Math.min(hi, Math.max(a, Math.min(b, want)) + aimOffset));
         ceiling = hi;
       }
       if (cooldown > 0) return null;
@@ -130,9 +144,10 @@ export function createBot({ skill = 'good' } = {}) {
 
       if (wantsSwitch) {
         // Switching lanes costs only a small hop.
-        const hopApex = state.y + (Math.max(state.vy, HOP) ** 2) / (2 * GRAVITY) * (state.vy > 0 || HOP > 0 ? 1 : 0);
+        const v = Math.max(state.vy, hop);
+        const hopApex = state.y + (v > 0 ? (v * v) / (2 * GRAVITY) : 0);
         const hopSafe = hopApex < ceiling + 0.12 || Math.random() > P.apexCheck;
-        if (!P.lateSwitch || close || needFlap || hopSafe) {
+        if (!P.lateSwitch || close || needFlap || hopSafe || state.vy < 0) {
           cooldown = P.interval;
           return { lane };
         }

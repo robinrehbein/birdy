@@ -137,8 +137,13 @@ function difficulty() {
   return Math.min(1, state.score / 40);
 }
 
+// Rows are spaced by time, not distance: faster play keeps enough time to
+// react, switch lanes and climb or drop between two rows.
+function baseSpeed() {
+  return 18 + 16 * difficulty();
+}
 function spacing() {
-  return 32 - 6 * difficulty();
+  return baseSpeed() * (1.7 - 0.6 * difficulty());
 }
 
 function resetGame() {
@@ -225,7 +230,41 @@ function gateSpec() {
       g.plantOffset = Math.random() < 0.5 ? 0 : 2;
     }
   }
+  makeReachable(spec, lo, hi);
   return spec;
+}
+
+// Fairness: from every gap of the previous row at least one gap of this row
+// must be reachable in the time between the rows. Falling is quicker than
+// climbing, and a lane switch costs extra time.
+function makeReachable(spec, lo, hi) {
+  const prev = state.prevGaps;
+  if (!prev) return;
+  const t = spacing() / baseSpeed();
+  const maxDrop = 1 + 3.5 * t;
+  const maxRise = 0.8 + 3 * t;
+  const SWITCH_FACTOR = 0.6;
+  const reach = (from, to, switching) => {
+    const k = switching ? SWITCH_FACTOR : 1;
+    const d = to - from;
+    return d <= maxRise * k && -d <= maxDrop * k;
+  };
+  // A moving gap only counts if its whole travel range is in reach.
+  const fits = (p, g, switching) =>
+    reach(p.center, g.center - (g.amp || 0), switching) && reach(p.center, g.center + (g.amp || 0), switching);
+  prev.forEach((p, j) => {
+    if (!p) return;
+    const open = spec.map((g, i) => (g ? i : -1)).filter((i) => i >= 0);
+    if (open.some((i) => fits(p, spec[i], i !== j))) return;
+    // Pull the closest open lane (same lane preferred) into reach and stop
+    // it from moving.
+    const i = open.sort((a, b) => Math.abs(a - j) - Math.abs(b - j))[0];
+    const g = spec[i];
+    const k = i !== j ? SWITCH_FACTOR : 1;
+    g.amp = 0;
+    g.center = THREE.MathUtils.clamp(g.center, p.center - maxDrop * k * 0.9, p.center + maxRise * k * 0.9);
+    g.center = THREE.MathUtils.clamp(g.center, lo, hi);
+  });
 }
 
 function placeCoin(x, y, z) {
@@ -502,7 +541,7 @@ function updatePlaying(dt) {
   state.runTime += dt;
   const d = difficulty();
   const boost = state.power.star > 0 ? STAR_SPEED_BOOST : 1;
-  state.speed = THREE.MathUtils.lerp(state.speed, (18 + 16 * d) * boost, dt * (boost > 1 ? 3 : 0.8));
+  state.speed = THREE.MathUtils.lerp(state.speed, baseSpeed() * boost, dt * (boost > 1 ? 3 : 0.8));
   const dz = state.speed * dt;
   moveWorld(dz);
   updatePowers(dt);
@@ -732,7 +771,7 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
   const results = [];
   const dt = 1 / 60;
   for (let i = 0; i < runs; i++) {
-    const bot = createBot(botOpts);
+    const bot = createBot({ ...botOpts, hop: SWITCH_HOP });
     lastRun = null;
     resetGame();
     flap();
