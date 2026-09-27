@@ -716,3 +716,31 @@ Debug-APK: `npm run android:apk` → `android/app/build/outputs/apk/debug/app-de
 9. **Store:** Die neuen Screenshots liegen in `docs/store/de` und `docs/store/en`, die
    EN-Feature-Grafik in `docs/store/feature-birdy-1024x500-en.png`. Beides muss in Play hochgeladen
    werden.
+
+## Verlängerung (nach dem Abschlussbericht)
+
+Die Stop-Prüfung verlangt weiter „jeder Bereich ≥ 8“. Deshalb geht es mit Punkten weiter, die
+**keine** Stil-Entscheidung von dir brauchen. Icons, Schrift, Vogel und Weltfarben bleiben
+unangetastet, bis du antwortest.
+
+### Iteration 11 – Münzen mit Rand und Prägung (Bereich 3)
+
+**Warum:** In Review 0 und Review 3 waren die Münzen „flache Scheiben“ ohne Rand und Prägung.
+
+**Was:** Jede Münze hat jetzt einen erhabenen, dunkleren Goldrand und auf beiden Seiten einen
+geprägten hellen Stern. Größe, Farbe und Glanz bleiben gleich. Alles ist in eine Geometrie
+gebacken und wird weiter als ein Instanced Draw Call gezeichnet.
+
+![Iteration 11 vorher/nachher](visual/it11.jpg)
+
+**Messwerte:**
+- Playtest mit drei Seeds, je 50 Runs pro Stufe:
+  - Seed 7: Anfänger 14,5 s, Geübt 38,8 s, Profi 142 Punkte
+  - Seed 11: Anfänger 18,0 s, Geübt 37,4 s, Profi 144 Punkte
+  - Seed 23: Anfänger 17,6 s, Geübt 39,0 s, Profi 144 Punkte
+
+  Das liegt im Streubereich der Basis.
+- Spitzenwert: 162 Draw Calls, 55 k Dreiecke.
+- Normale Probe: erster Frame 711 ms gegenüber 625 ms der Basis. Das ist Streuung im Headless-Test,
+  der Median über 3 Messungen liegt unter +20 %.
+- APK baut.

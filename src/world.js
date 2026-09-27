@@ -984,12 +984,35 @@ export function createGate(scene) {
 
 // --- Coins ------------------------------------------------------------------
 
-const coinGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.12, 20);
-coinGeo.rotateX(Math.PI / 2);
+// A gold coin with a raised darker rim and an embossed star on both faces
+// (baked with vertex colours, same size as before).
+const coinGeo = (() => {
+  const root = new THREE.Group();
+  const m = (hex) => new THREE.MeshBasicMaterial({ color: hex });
+  const face = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.1, 16), m(0xffcf33));
+  face.rotation.x = Math.PI / 2;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.41, 0.055, 4, 16), m(0xf2a100));
+  const star = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 0.09 : 0.21;
+    const a = (i / 10) * Math.PI * 2 + Math.PI / 2;
+    if (i === 0) star.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else star.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const starGeo = new THREE.ExtrudeGeometry(star, { depth: 0.03, bevelEnabled: false });
+  const front = new THREE.Mesh(starGeo, m(0xfff0a0));
+  front.position.z = 0.04;
+  const back = new THREE.Mesh(starGeo, m(0xfff0a0));
+  back.position.z = -0.04;
+  back.rotation.y = Math.PI;
+  root.add(face, rim, front, back);
+  return bakeGroup(root);
+})();
 // Bright gold: little metalness (there is no environment map to reflect,
 // so a metallic coin would look brown) and a warm glow of its own.
 const coinMat = new THREE.MeshStandardMaterial({
-  color: 0xffcf33,
+  vertexColors: true,
+  color: 0xffffff,
   emissive: 0xb07800,
   emissiveIntensity: 0.55,
   metalness: 0.15,
