@@ -53,7 +53,9 @@ Nach einem Crash **tippst du irgendwo**, um nochmal zu spielen. Der Vogel schweb
 
 ## Sound
 
-Musik und Effekte werden live per WebAudio erzeugt (keine Audiodateien): ein Chiptune-Loop mit Bass, Arpeggio, Melodie und Drums, der während des Regenbogens eine zusätzliche Glitzer-Stimme bekommt.
+- Die Musik wird im Code erzeugt (WebAudio, keine Audiodateien). Jede Zone hat ihr eigenes Thema mit eigener Tonart, eigenen Instrumenten und eigenem Groove. Ein Durchlauf ist ein 16-taktiger Song mit A-Teil, B-Teil und Breakdown.
+- Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Piranha-Pflanzen schnappen im Takt der Musik.
+- Soundeffekte gibt es für Flattern, Ausweichen, Punkte, Münzen, „Knapp!“, Power-ups, Zonenwechsel und Crash. Oben links schaltest du den Ton aus (samt Vibration), die Einstellung bleibt gespeichert.
 
 ## Entwicklung
 

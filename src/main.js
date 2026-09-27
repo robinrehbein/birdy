@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import './style.css';
 import { createBird } from './bird.js';
-import { sfx, music, audio } from './audio.js';
+import { sfx, music, audio, renderMusic } from './audio.js';
 import { createParticles } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, SKINS } from './progress.js';
@@ -275,6 +275,7 @@ $('gift-btn').addEventListener('click', () => {
 $('shop-back').addEventListener('click', () => openShop(false));
 $('menu-btn').addEventListener('click', () => {
   state.mode = 'ready';
+  music.setMode('menu');
   overEl.classList.add('hidden');
   startEl.classList.remove('hidden');
   bird.group.rotation.set(0, 0, 0);
@@ -380,6 +381,8 @@ function resetGame() {
   state.rushAt = -1;
   zoneMarks.length = 0;
   if (biomes.index !== 0) biomes.set(0, 1.2);
+  music.setTheme(0);
+  music.setMode('game');
   state.squash = 0;
   state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0 };
   state.celebrated = new Set();
@@ -822,6 +825,7 @@ function die(cause) {
 
 function showGameOver() {
   state.mode = 'over';
+  music.setMode('menu');
   state.overAt = performance.now();
   state.run.coins = state.coins;
   state.run.score = state.score;
@@ -891,6 +895,7 @@ app.appendChild(zoneBanner);
 function enterZone(zone) {
   state.zone = zone;
   const b = biomes.set(zone, 3);
+  music.setTheme(zone);
   zoneBanner.innerHTML = `<small>Zone ${zone + 1}</small>${b.name}`;
   zoneBanner.classList.remove('show');
   void zoneBanner.offsetWidth;
@@ -1224,6 +1229,7 @@ resize();
 
 const clock = new THREE.Clock();
 camera.position.set(0, 6.2, 6.5);
+music.setMode('menu'); // calm version until the first run starts
 renderStart();
 
 // One fixed game-logic step (no rendering). Shared by the render loop and the
@@ -1359,4 +1365,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic };

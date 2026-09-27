@@ -23,24 +23,23 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 | 1 | Onboarding | 7 | Der erste Start geht direkt ins Spiel, mit einem geführten Run: Geister-Hand, Einfrieren vor der blockierten Reihe bis zum Seitentipp, großer pulsierender Zielring. Der Ablauf ist per E2E-Test belegt. Offen: Test mit echten Erstspielern. |
 | 2 | Game Feel / Juice | 6 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Aber: Durchflogene Reihen bleiben als grüne Geister (10 % Deckkraft) im unteren Bildviertel. Nicht auf einem Gerät gefühlt. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Fehlt: Musik pro Zone. |
+| 4 | Abwechslung | 7 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Seit Iteration 10 auch Musik pro Zone. |
 | 5 | Session-Loop | 6 | Bereit-Zustand und Tipp-Neustart funktionieren. Aber: Game-Over erscheint erst 1,5–2 s nach dem Crash (Flappy Bird < 0,5 s). |
 | 6 | Meta-Progression | 5 | Münzen, 7 Skins, Missionen nach Niveau, Tagesgeschenk mit Serie. Aber: Die Shop-Kacheln zeigen nur Farbpunkte ohne Name und Preis, es gibt nur eine Kosmetik-Kategorie. |
-| 7 | Audio | 3 | Unverändert: ein 7,7-s-Loop für Menü und Spiel. |
+| 7 | Audio | 6 | 4 Zonen-Themen (je 16 Takte, 31 s, Songform A–A′–B–Breakdown, also 2 min verschiedene Musik), ruhiger Menü-Modus, Wechsel immer auf dem Taktanfang. Pegel gemessen: Themen innerhalb von 1,5 dB, keine Übersteuerung. Offen: nur Oszillator-Klänge, nicht von Menschen gehört. |
 | 8 | Performance | 5 | 165 Draw Calls, adaptive Qualität. Auf keinem echten Gerät gemessen. |
 | 9 | Politur | 5 | Münzen bräunlich, Geister-Röhren, die oberen Röhren füllen die halbe Bildhöhe. |
 | 10 | Store-Reife | 1 | Debug-APK, keine Zurück-Taste (`@capacitor/app` fehlt). **Markenrisiko:** Icon und README-Wortlaut („Flappy-Bird-Klon“). |
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Audio:** Musik pro Zone (transponiert, Varianten), eigener Menü-Loop, längerer Loop.
-2. **Session-Loop und Bildruhe:**
+1. **Session-Loop und Bildruhe:**
    - Game-Over fest 0,45 s nach dem Crash.
    - Durchflogene Reihen nahe der Kamera ausblenden.
-3. **Store:**
+2. **Store:**
    - Zurück-Taste, eigenes Icon mit dem 3D-Vogel, Wortlaut ohne „Flappy Bird“.
    - Release-Build-Setup, Store-Texte, Datenschutz.
-4. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
+3. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -391,3 +390,38 @@ Stack oder Helix Jump erklären sich wortlos durch Spielen.
 
 Screenshots `t-1-hold`, `t-2-freeze` und `t-3-done`, ohne Konsolenfehler. Ob Erstspieler es
 wirklich verstehen, muss ein Test mit Menschen zeigen.
+
+### Iteration 10 – Audio: Song-Struktur, Zonen-Themen, Menü-Modus
+
+**Was:**
+- **Song statt 7,7-s-Loop,** 16 Takte (31 s) pro Durchlauf:
+  1. A-Teil (C–Am–F–G)
+  2. A-Teil mit Zweitstimme
+  3. B-Teil mit eigener Melodie über F–G–Em–Am
+  4. Breakdown: 2 Takte ohne Schlagzeug, dann setzt die Melodie wieder ein
+- **Ein Thema pro Zone,** gleiches Tempo (124 BPM, damit die Pflanzen im Takt bleiben):
+
+  | Zone | Tonart | Lead | Groove |
+  |---|---|---|---|
+  | Stadtpark | C | Rechteck | Pop-Beat |
+  | Herbstwald | A | weiches Dreieck | Shuffle |
+  | Canyon | G, Moll-Umdeutung des A-Teils | Sägezahn | Tresillo-Beat mit Tom |
+  | Blütenhain | D | Glocken-Sinus eine Oktave höher | leichter Beat, 16tel-Arpeggio |
+
+- **Menü-Modus:** Menü und Game-Over-Screen spielen eine ruhige Fassung ohne Schlagzeug, etwa
+  7 dB leiser. Thema und Modus wechseln immer auf einem Taktanfang, damit es musikalisch bleibt.
+- **`renderMusic()`:** rendert die Musik offline, zur Messung und zum Anhören ohne Spielen.
+
+**Beleg (offline gerendert, je 31 s):**
+
+| Thema | RMS | Spitze |
+|---|---|---|
+| Stadtpark | −32,7 dBFS | 0,42 |
+| Herbstwald | −32,4 dBFS | 0,32 |
+| Canyon | −31,5 dBFS | 0,41 |
+| Blütenhain | −33,0 dBFS | 0,43 |
+| Menü | −39,5 dBFS | 0,11 |
+
+Alle Themen liegen innerhalb von 1,5 dB, keine Übersteuerung. Der Breakdown ist rund 2 dB leiser.
+Beim Messen fiel ein Fehler auf: Ein noch ausstehender Moduswechsel sickerte in das
+Offline-Rendern. Er ist behoben. Die WAV-Dateien liegen im Scratchpad unter `audio/`.
