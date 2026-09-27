@@ -35,7 +35,7 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
-| Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` |
+| Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN), gerendert mit `scripts/render-assets.mjs` |
 | Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Deutsche Bilder in Play zur Prüfung eingereicht. |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |

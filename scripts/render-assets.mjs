@@ -21,9 +21,11 @@ page.on('pageerror', (e) => console.error(e.message));
 await page.goto(`${URL}scripts/assets/render.html`);
 await page.waitForFunction(() => window.artReady, null, { timeout: 60000 });
 
+// `.webp` files are re-encoded lossy (the splash gradients are large as PNG).
 async function art(file, kind, w, h = w, opts = {}, mask = null) {
-  const url = await page.evaluate(([k, ww, hh, o, m]) => window.renderArt(k, ww, hh, o).then((u) => {
-    if (!m) return u;
+  const webp = file.endsWith('.webp');
+  const url = await page.evaluate(([k, ww, hh, o, m, wp]) => window.renderArt(k, ww, hh, o).then((u) => {
+    if (!m && !wp) return u;
     // Legacy launcher icons: rounded square or circle with transparent corners.
     return new Promise((res) => {
       const img = new Image();
@@ -32,6 +34,11 @@ async function art(file, kind, w, h = w, opts = {}, mask = null) {
         c.width = ww;
         c.height = hh;
         const g = c.getContext('2d');
+        if (wp) {
+          g.drawImage(img, 0, 0);
+          res(c.toDataURL('image/webp', 0.9));
+          return;
+        }
         g.beginPath();
         if (m === 'round') g.arc(ww / 2, hh / 2, ww / 2, 0, Math.PI * 2);
         else g.roundRect(0, 0, ww, hh, ww * 0.18);
@@ -41,7 +48,7 @@ async function art(file, kind, w, h = w, opts = {}, mask = null) {
       };
       img.src = u;
     });
-  }), [kind, w, h, opts, mask]);
+  }), [kind, w, h, opts, mask, webp]);
   fs.writeFileSync(file, Buffer.from(url.split(',')[1], 'base64'));
   console.log(file);
 }
@@ -55,10 +62,10 @@ for (const [d, k] of Object.entries(DENSITY)) {
 }
 const SPLASH = { mdpi: [320, 480], hdpi: [480, 800], xhdpi: [720, 1280], xxhdpi: [960, 1600], xxxhdpi: [1280, 1920] };
 for (const [d, [w, h]] of Object.entries(SPLASH)) {
-  await art(`${RES}/drawable-port-${d}/splash.png`, 'splash', w, h);
-  await art(`${RES}/drawable-land-${d}/splash.png`, 'splash', h, w);
+  await art(`${RES}/drawable-port-${d}/splash.webp`, 'splash', w, h);
+  await art(`${RES}/drawable-land-${d}/splash.webp`, 'splash', h, w);
 }
-await art(`${RES}/drawable/splash.png`, 'splash', 480, 320);
+await art(`${RES}/drawable/splash.webp`, 'splash', 480, 320);
 await art('docs/store/icon-512.png', 'icon', 512);
 await art('docs/store/feature-birdy-1024x500.png', 'feature', 1024, 500, { tagline: 'Tippen. Ausweichen. Durchfliegen.' });
 await art('docs/store/feature-birdy-1024x500-en.png', 'feature', 1024, 500, { tagline: 'Tap. Dodge. Fly through.' });

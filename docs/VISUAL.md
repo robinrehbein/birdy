@@ -78,7 +78,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 
 | # | Bereich | Schwere | Mangel | Plan | Status |
 |---|---|---|---|---|---|
-| 1 | 10 | Blocker | Der Splash zeigt „Flapsy“ statt „Birdy“. | Splash neu rendern mit dem Birdy-Schriftzug | offen |
+| 1 | 10 | Blocker | Der Splash zeigt „Flapsy“ statt „Birdy“. | Splash neu rendern mit dem Birdy-Schriftzug | ✅ It. 1 |
 | 2 | 5 | Blocker | Game Over in EN 390×844 ist nach oben verrutscht, unten erscheint ein türkiser Streifen. Ursache: Der App-Container scrollt (`scrollIntoView`). | Container gegen Scrollen sperren, nur die Liste scrollen lassen | offen |
 | 3 | 10 | ~~Blocker~~ | ~~Schwarze Ecken am runden Launcher-Icon~~ | Geprüft: Die Icons sind transparent. Das Schwarz kam vom Übersichtsbild-Werkzeug. Die gezackte Kante wird beim Neurendern mit geglättet. | – |
 | 4 | 9 | hoch | Passierte Röhren und Münzen erscheinen als riesige halbtransparente Geister vor der Kamera und verdecken den Vogel. | Schneller und vollständig ausblenden, sobald sie hinter dem Vogel sind | offen |
@@ -101,8 +101,8 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 21 | 2 | mittel | Die Stadt besteht aus grauen Quadern, die im Shop riesig wirken. | Fenster, Dächer, Pastelltöne | offen |
 | 22 | 7 | mittel | Das Regenbogen-Power-up zeigt nur Farbe, der Magnet ist unsichtbar, die Speed-Lines sind schwach. | Regenbogen-Band, Magnet-Ring, kräftigere Linien | offen |
 | 23 | 3 | niedrig | Münzen ohne Rand und Prägung. | Rand und Prägung, Glanz | offen |
-| 24 | 10 | niedrig | Im Icon ist der Vogel angeschnitten, der Schnabel wirkt wie Lippen. | Vogel vollständig, mit Outline | offen |
-| 25 | 10 | niedrig | Die Feature-Grafik ist leer, und das Logo ist anders gefärbt als im Menü. | Logo wie im Menü, Vogel vollständig | offen |
+| 24 | 10 | niedrig | Im Icon ist der Vogel angeschnitten, der Schnabel wirkt wie Lippen. | Vogel vollständig, mit Outline | ✅ It. 1 |
+| 25 | 10 | niedrig | Die Feature-Grafik ist leer, und das Logo ist anders gefärbt als im Menü. | Logo wie im Menü, Vogel vollständig | ✅ It. 1 |
 | 26 | 4 | niedrig | Nur Blob-Schatten; der Horizont ist flach. | Kontaktschatten unter Röhren, Horizont staffeln | offen |
 | 27 | 5 | niedrig | Die Spurpunkte unten wirken wie ein Karussell. | Spuranzeige neu | offen |
 | 28 | 6 | niedrig | Das Logo wirkt unausgewogen. | – (Logo bleibt, Markenzeichen) | offen |
@@ -184,3 +184,39 @@ Jede Iteration behebt die größte sichtbare Schwäche und wird so belegt:
 - Playtest mit 50 Runs je Stufe
 - Perf-Messung
 - APK-Build
+
+### Iteration 1 – Store-Assets: Splash, Launcher-Icons, Feature-Grafik (Bereich 10)
+
+**Warum:** Der Splash zeigte beim Start jeder App noch „Flapsy“ (Blocker 1). Bereich 10 war mit
+3/10 der schwächste.
+
+**Was:**
+- Neues Render-Werkzeug `scripts/render-assets.mjs` (Szene in `scripts/assets/`). Es rendert
+  den echten Spielvogel und legt alles in 2D zusammen:
+  - Himmelsverlauf, Sonnenstrahlen, Regenbogen und Wolken mit Plum-Kontur wie in der UI
+  - „Birdy“-Schriftzug in Lilita One, Farben wie im Menü
+- Vogel:
+  - leicht von oben, Flügel halb gehoben, damit man ihre Fläche sieht statt „Stäbchen“
+  - vollständig im Bild, mit Aufkleber-Kontur für die Lesbarkeit bei 48 px
+- Neu gerendert:
+  - Launcher-Icons (Legacy eckig und rund mit geglätteten Kanten)
+  - adaptive Ebenen: Vogel im sicheren Bereich, Hintergrund mit Regenbogen
+  - Splash hoch und quer: Regenbogen auf zwei Wolken, Vogel, Schriftzug „Birdy“
+  - Store-Icon 512
+  - Feature-Grafik DE, neu auch EN („Tap. Dodge. Fly through.“)
+- Splash als WebP statt PNG, denn die Verläufe hätten die APK um 4,6 MB vergrößert. Die APK bleibt
+  bei 7,2 MB.
+- Die Hintergrundfarbe des Android-12-Splashs passt jetzt zum neuen Himmel (`#5AA9E6`).
+
+![Iteration 1 vorher/nachher: Icon, adaptiv, Splash](visual/it1-a.jpg)
+![Iteration 1 vorher/nachher: Feature-Grafik](visual/it1-b.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`, 50 Runs je Stufe): identisch mit der Basis. Anfänger 17,4 s / 9 Punkte,
+  Geübt 40,2 s / 23, Profi 180 s / 144. Keine Fehler.
+- Perf: erster Frame 686 ms (Median aus 3, Budget 782 ms), 130–143 Draw Calls, 42 k Dreiecke.
+  Am Spielcode hat sich nichts geändert; die Abweichung zur Basis ist Messrauschen.
+- APK baut (7,2 MB).
+
+**Neue Einschätzung:** Store-Assets 3 → 5. Der Blocker ist behoben, Icon und Splash sind
+eigenständig und markentreu. Es fehlen noch gestaltete Store-Screenshots mit Rahmen und Claim.

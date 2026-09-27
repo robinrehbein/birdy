@@ -24,12 +24,21 @@ scene.add(rim);
 const bird = createBird();
 bird.setSkin(SKINS[0]);
 bird.setLook({ pattern: 'plain', hat: 'none', eyes: 'normal', beak: 'round' });
-bird.animateWings(Math.PI / 2 + 0.25); // wings raised
-bird.group.rotation.set(0.28, Math.PI + 0.38, 0.08); // head-on, turned a little
+bird.animateWings(2.4); // wings half raised, their tops facing the viewer
+bird.group.rotation.set(0.2, Math.PI + 0.26, 0.05); // head-on, turned a little
 scene.add(bird.group);
 const cam = new THREE.PerspectiveCamera(26, 1, 0.1, 50);
-cam.position.set(0, 0.25, 6.2);
+cam.position.set(0, 1.5, Math.sqrt(38.5 - 1.5 * 1.5)); // a little from above
 cam.lookAt(0, 0.05, 0);
+// Pose tweaks while designing (scripts may call this before rendering).
+window.setPose = ({ rx, ry, rz, wing, camY } = {}) => {
+  if (wing !== undefined) bird.animateWings(wing);
+  bird.group.rotation.set(rx ?? bird.group.rotation.x, ry ?? bird.group.rotation.y, rz ?? bird.group.rotation.z);
+  if (camY !== undefined) {
+    cam.position.set(0, camY, Math.sqrt(Math.max(1, 38.5 - camY * camY)));
+    cam.lookAt(0, 0.05, 0);
+  }
+};
 
 function birdCanvas(size) {
   renderer.setPixelRatio(1);
@@ -187,27 +196,33 @@ window.renderArt = async (kind, w, h = w, opts = {}) => {
   }
   if (kind === 'icon' || kind === 'icon-fg') {
     // Adaptive icons get cropped to the inner 66/108: keep the bird inside.
-    const k = kind === 'icon' ? 1.04 : 0.72;
+    const k = kind === 'icon' ? 0.9 : 0.58;
     const size = Math.round(s * k);
     const b = outlined(birdCanvas(size), Math.max(2, size * 0.014));
     g.drawImage(b, (w - size) / 2, (h - size) / 2 + s * 0.02);
   }
   if (kind === 'splash') {
-    sky(g, w, h, w / 2, h * 0.42);
-    cloud(g, w * 0.16, h * 0.14, s * 0.06);
-    cloud(g, w * 0.86, h * 0.24, s * 0.045);
-    rainbow(g, w / 2, h * 0.5, s * 0.36, s * 0.036);
-    const size = Math.round(s * 0.62);
-    g.drawImage(outlined(birdCanvas(size), size * 0.012), (w - size) / 2, h * 0.42 - size * 0.55);
-    wordmark(g, w / 2, h * 0.42 + s * 0.36, s * 0.2);
+    // Portrait and landscape: bird over the rainbow, wordmark underneath.
+    const cy = h * (w < h ? 0.4 : 0.36);
+    sky(g, w, h, w / 2, cy);
+    cloud(g, w * 0.14, h * 0.12, s * 0.06);
+    cloud(g, w * 0.86, h * 0.2, s * 0.045);
+    // A rainbow standing on two clouds.
+    const R = s * (w < h ? 0.38 : 0.44);
+    const band = s * 0.034;
+    rainbow(g, w / 2, cy + s * 0.16, R, band);
+    for (const side of [-1, 1]) cloud(g, w / 2 + side * (R - band * 2.5), cy + s * 0.17, s * 0.075);
+    const size = Math.round(s * 0.74);
+    g.drawImage(outlined(birdCanvas(size), size * 0.012), (w - size) / 2, cy - size * 0.5);
+    wordmark(g, w / 2, cy + s * 0.52, s * 0.22);
   }
   if (kind === 'feature') {
     sky(g, w, h, w * 0.72, h * 0.5);
     cloud(g, w * 0.08, h * 0.16, h * 0.07);
     cloud(g, w * 0.46, h * 0.1, h * 0.05);
     rainbow(g, w * 0.72, h * 1.02, h * 0.62, h * 0.06);
-    const size = Math.round(h * 0.95);
-    g.drawImage(outlined(birdCanvas(size), size * 0.012), w * 0.72 - size / 2, h * 0.02);
+    const size = Math.round(h * 0.9);
+    g.drawImage(outlined(birdCanvas(size), size * 0.012), w * 0.71 - size / 2, h * 0.04);
     wordmark(g, w * 0.3, h * 0.52, h * 0.3);
     tagline(g, opts.tagline || '', w * 0.3, h * 0.72, h * 0.075);
   }
