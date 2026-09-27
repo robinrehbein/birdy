@@ -26,7 +26,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung (zwei Läufe à 100 Runs): Zone 2 erreichen 33–47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59–63 % (vorher 26 %), Zone 4 zu 23–25 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
 | 5 | Session-Loop | 8 | 0,8 s vom Crash zum nächsten Run. Game-Over zeigt das nächste Ziel (Münzen bis zum nächsten Vogel oder zur nächsten Spur; wenn freischaltbar, führt ein Tipp direkt in den Shop), alle Tagesmissionen mit Balken und die erreichte Zone. „🏆 Neuer Rekord!“ erscheint schon während des Runs. |
 | 6 | Meta-Progression | 7 | 7 Vogel-Farben und 7 Flugspuren, Tagesmissionen, Tagesgeschenk mit Serie, 14 Erfolge mit Münzbelohnung und Fortschrittsbalken, nächstes Ziel beim Game-Over. Offen: Ökonomie mit echten Spielern tunen. |
-| 7 | Audio | 5 | 4 Zonen-Themen, Menü-Modus, Pegel gemessen. Nur Oszillator-Klänge, von keinem Menschen gehört. |
+| 7 | Audio | 6 | 4 Zonen-Themen, Menü-Modus, Mischkette mit Tiefpass, Raumhall und Kompressor (Höhenanteil −40 %, keine Übersteuerung), variierter Flügelschlag, Münz-Kombo. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 6 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Offen: Die oberen Röhren nehmen viel Bildfläche ein (bewusst belassen, siehe Iteration 15). |
 | 10 | Store-Reife | 6 | AAB signierbar, Texte DE/EN, Datenschutz, eigenständiges Icon, Zurück-Taste. 6 Screenshots aus einem echten Run ohne HUD-Manipulation (Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop). Offen: App-ID und Schlüssel (deine Entscheidung). |
@@ -739,3 +739,29 @@ Screenshots von Übersicht und Menü, keine Fehler. Regressions-Playtest unauff�
 
 Ob es sich „tip top“ anfühlt, zeigt nur das Handy. Konkrete Hinweise, was stört (Flattern zu
 stark oder schwach? Wechsel? Zonen?), helfen beim nächsten Schritt.
+
+### Iteration 19 – Audio: Mischkette, Raum, weniger Wiederholung
+
+**Was:**
+- **Mischkette** (`buildGraph()` in `src/audio.js`), gleich für das Spiel und fürs
+  Offline-Rendern:
+  - Musik über einen sanften Tiefpass bei 6,5 kHz, der den Rechteckwellen die Härte nimmt.
+  - Kurzer erzeugter Raumhall als Send: Musik 22 %, Effekte 12 %.
+  - Kompressor auf der Summe.
+- **Flügelschlag** mit zufälliger Tonhöhe von ±6 %, damit schnelles Flattern nicht nach
+  Maschinengewehr klingt.
+- **Münz-Kombo:** Münzen kurz hintereinander (innerhalb von 0,7 s) klingen jeweils einen
+  Halbton höher, bis zu einer Quinte.
+
+**Messung (offline gerendert, je 20 s, vorher → nachher):**
+
+| Thema | RMS | Spitze | Anteil über 5 kHz |
+|---|---|---|---|
+| Stadtpark | −32,1 → −29,1 dBFS | 0,42 → 0,55 | 1,7 → 1,0 % |
+| Herbstwald | −31,9 → −28,8 dBFS | 0,32 → 0,45 | 1,5 → 0,8 % |
+| Canyon | −31,0 → −28,0 dBFS | 0,42 → 0,55 | 0,5 → 0,3 % |
+| Blütenhain | −32,5 → −29,5 dBFS | 0,43 → 0,57 | 1,1 → 0,9 % |
+
+Der Klang ist voller und weicher, ohne Übersteuerung; die Themen bleiben innerhalb von 1,5 dB.
+Das Spiel läuft ohne Audiofehler (Juice-Test). Die WAVs liegen zum Anhören im Scratchpad
+unter `audio2/`.

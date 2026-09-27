@@ -14,22 +14,63 @@ function loadMuted() {
 }
 let muted = loadMuted();
 
+// Mixing chain shared by the live context and offline rendering:
+// music → gentle low-pass (takes the edge off square waves) ─┐
+// sfx ──────────────────────────────────────────────────────┼→ compressor → master
+// both → short generated room reverb (send) ────────────────┘
+function buildGraph(ac, masterGain) {
+  const comp = ac.createDynamicsCompressor();
+  comp.threshold.value = -14;
+  comp.knee.value = 12;
+  comp.ratio.value = 3;
+  comp.attack.value = 0.005;
+  comp.release.value = 0.2;
+  const out = ac.createGain();
+  out.gain.value = masterGain;
+  comp.connect(out);
+  out.connect(ac.destination);
+
+  // Small room: 1.2 s of decaying noise as impulse response.
+  const len = Math.floor(ac.sampleRate * 1.2);
+  const ir = ac.createBuffer(1, len, ac.sampleRate);
+  const d = ir.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  const reverb = ac.createConvolver();
+  reverb.buffer = ir;
+  const wet = ac.createGain();
+  wet.gain.value = 0.35;
+  reverb.connect(wet).connect(comp);
+
+  const music = ac.createGain();
+  music.gain.value = MUSIC_VOLUME;
+  const tone = ac.createBiquadFilter();
+  tone.type = 'lowpass';
+  tone.frequency.value = 6500;
+  tone.Q.value = 0.5;
+  music.connect(tone);
+  tone.connect(comp);
+  const musicSend = ac.createGain();
+  musicSend.gain.value = 0.22;
+  tone.connect(musicSend).connect(reverb);
+
+  const sfx = ac.createGain();
+  sfx.connect(comp);
+  const sfxSend = ac.createGain();
+  sfxSend.gain.value = 0.12;
+  sfx.connect(sfxSend).connect(reverb);
+
+  const nz = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+  const nd = nz.getChannelData(0);
+  for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  return { master: out, musicBus: music, sfxBus: sfx, noise: nz };
+}
+
 function ensure() {
   if (!ctx) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
     ctx = new AC();
-    master = ctx.createGain();
-    master.gain.value = muted ? 0 : 1;
-    master.connect(ctx.destination);
-    musicBus = ctx.createGain();
-    musicBus.gain.value = MUSIC_VOLUME;
-    musicBus.connect(master);
-    sfxBus = ctx.createGain();
-    sfxBus.connect(master);
-    noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
-    const data = noise.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    ({ master, musicBus, sfxBus, noise } = buildGraph(ctx, muted ? 0 : 1));
   }
   if (ctx.state === 'suspended' && !suspended && !offline) ctx.resume();
   return ctx;
@@ -252,16 +293,7 @@ export async function renderMusic({ seconds = 31, themeIndex = 0, calm = false }
   const off = new OfflineAudioContext(1, Math.ceil(rate * seconds), rate);
   ctx = off;
   offline = true;
-  master = off.createGain();
-  master.connect(off.destination);
-  musicBus = off.createGain();
-  musicBus.gain.value = MUSIC_VOLUME;
-  musicBus.connect(master);
-  sfxBus = off.createGain();
-  sfxBus.connect(master);
-  noise = off.createBuffer(1, rate, rate);
-  const data = noise.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  ({ master, musicBus, sfxBus, noise } = buildGraph(off, 1));
   theme = THEMES[themeIndex];
   mode = calm ? 'menu' : 'game';
   hype = false;
@@ -292,9 +324,14 @@ export const audio = {
   },
 };
 
+let coinCombo = 0;
+let lastCoin = 0;
+
 export const sfx = {
   flap: () => {
-    tone({ freq: 380, to: 620, dur: 0.09, type: 'triangle', vol: 0.18 });
+    // Slight random pitch so rapid flapping doesn't sound like a machine gun.
+    const k = 0.94 + Math.random() * 0.12;
+    tone({ freq: 380 * k, to: 620 * k, dur: 0.09, type: 'triangle', vol: 0.18 });
     const ac = ensure();
     if (ac) noiseHit({ at: ac.currentTime, dur: 0.06, vol: 0.05, cutoff: 3000 });
   },
@@ -306,9 +343,14 @@ export const sfx = {
     tone({ freq: 988, dur: 0.08, type: 'square', vol: 0.06 });
     tone({ freq: 1319, dur: 0.16, type: 'square', vol: 0.06, delay: 0.07 });
   },
+  // Coins in quick succession climb in pitch (up to a fifth), then reset.
   coin: () => {
-    tone({ freq: 1568, dur: 0.06, type: 'square', vol: 0.05 });
-    tone({ freq: 2093, dur: 0.12, type: 'square', vol: 0.05, delay: 0.05 });
+    const now = performance.now();
+    coinCombo = now - lastCoin < 700 ? Math.min(coinCombo + 1, 7) : 0;
+    lastCoin = now;
+    const k = Math.pow(2, coinCombo / 12);
+    tone({ freq: 1568 * k, dur: 0.06, type: 'square', vol: 0.05 });
+    tone({ freq: 2093 * k, dur: 0.12, type: 'square', vol: 0.05, delay: 0.05 });
   },
   powerup: () => {
     [60, 64, 67, 72, 76, 79, 84].forEach((n, i) =>
