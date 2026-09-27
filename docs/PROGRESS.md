@@ -21,10 +21,10 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
 | 1 | Onboarding | 7 | Der erste Start geht direkt ins Spiel, mit einem geführten Run: Geister-Hand, Einfrieren vor der blockierten Reihe bis zum Seitentipp, großer pulsierender Zielring. Der Ablauf ist per E2E-Test belegt. Offen: Test mit echten Erstspielern. |
-| 2 | Game Feel / Juice | 6 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Aber: Durchflogene Reihen bleiben als grüne Geister (10 % Deckkraft) im unteren Bildviertel. Nicht auf einem Gerät gefühlt. |
+| 2 | Game Feel / Juice | 7 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Durchflogene Reihen blenden vollständig aus, also keine Geister-Röhren mehr. Nicht auf einem Gerät gefühlt. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 7 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Seit Iteration 10 auch Musik pro Zone. |
-| 5 | Session-Loop | 6 | Bereit-Zustand und Tipp-Neustart funktionieren. Aber: Game-Over erscheint erst 1,5–2 s nach dem Crash (Flappy Bird < 0,5 s). |
+| 5 | Session-Loop | 8 | Game-Over 0,46 s nach dem Crash (gemessen, vorher 1,4–2 s), Neustart per Tipp nach weiteren 0,35 s, also rund 0,8 s vom Crash zum neuen Run. Bereit-Zustand, „Nur noch X bis zum Rekord“, Missionen und Geschenk. Runs im Median: geübt ~38 s ✓. |
 | 6 | Meta-Progression | 5 | Münzen, 7 Skins, Missionen nach Niveau, Tagesgeschenk mit Serie. Aber: Die Shop-Kacheln zeigen nur Farbpunkte ohne Name und Preis, es gibt nur eine Kosmetik-Kategorie. |
 | 7 | Audio | 6 | 4 Zonen-Themen (je 16 Takte, 31 s, Songform A–A′–B–Breakdown, also 2 min verschiedene Musik), ruhiger Menü-Modus, Wechsel immer auf dem Taktanfang. Pegel gemessen: Themen innerhalb von 1,5 dB, keine Übersteuerung. Offen: nur Oszillator-Klänge, nicht von Menschen gehört. |
 | 8 | Performance | 5 | 165 Draw Calls, adaptive Qualität. Auf keinem echten Gerät gemessen. |
@@ -33,13 +33,10 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Session-Loop und Bildruhe:**
-   - Game-Over fest 0,45 s nach dem Crash.
-   - Durchflogene Reihen nahe der Kamera ausblenden.
-2. **Store:**
+1. **Store:**
    - Zurück-Taste, eigenes Icon mit dem 3D-Vogel, Wortlaut ohne „Flappy Bird“.
    - Release-Build-Setup, Store-Texte, Datenschutz.
-3. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
+2. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -425,3 +422,20 @@ wirklich verstehen, muss ein Test mit Menschen zeigen.
 Alle Themen liegen innerhalb von 1,5 dB, keine Übersteuerung. Der Breakdown ist rund 2 dB leiser.
 Beim Messen fiel ein Fehler auf: Ein noch ausstehender Moduswechsel sickerte in das
 Offline-Rendern. Er ist behoben. Die WAV-Dateien liegen im Scratchpad unter `audio/`.
+
+### Iteration 11 – Schnelleres Game-Over, keine Geister-Röhren
+
+**Was:**
+- Der Game-Over-Screen erscheint fest 0,45 s nach dem Crash. Der Fall des Vogels läuft hinter
+  dem Panel weiter. Vorher wartete das Spiel, bis der Vogel am Boden lag, plus 0,7 s.
+- Durchflogene Reihen blenden auf 0 aus und werden dann unsichtbar geschaltet (vorher 10 %
+  Deckkraft). Damit ist auch dein ursprünglicher Wunsch „durchflogene Säulen transparent“
+  konsequent umgesetzt.
+
+**Messung (Headless, Crash auf Höhe 8,6):**
+
+| Wert | vorher | nachher |
+|---|---|---|
+| Crash bis Game-Over (Spielzeit) | ≈ 0,67 s Fall + 0,7 s = **1,4 s** | **0,46 s** |
+
+Mit der Tipp-Sperre von 0,35 s ist ein neuer Run rund 0,8 s nach dem Crash möglich. Keine Fehler.

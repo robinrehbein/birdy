@@ -1034,7 +1034,9 @@ function updatePlaying(dt) {
       gate.minClear = undefined;
     }
     // Passed rows fade out so they don't hide what's coming next.
-    gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0.1 : 1, Math.min(1, dt * 12)));
+    // Passed rows fade out completely so nothing blocks the view ahead.
+    gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0 : 1, Math.min(1, dt * 12)));
+    if (gate.passed && gate.opacity < 0.03) gate.group.visible = false;
     if (!gate.passed && (!next || gz > next.group.position.z)) next = gate;
 
     if (!invincible() && Math.abs(gz) < PIPE_RADIUS + 0.25 + r) {
@@ -1137,9 +1139,9 @@ function updateDead(dt) {
     state.vy = Math.max(MAX_FALL, state.vy - GRAVITY * dt);
     state.y = Math.max(state.radius, state.y + state.vy * dt);
     bird.group.rotation.z += dt * 6;
-  } else if (state.mode === 'dead' && state.deadTimer > 0.7) {
-    showGameOver();
   }
+  // Game over comes quickly; the fall keeps playing behind the panel.
+  if (state.mode === 'dead' && state.deadTimer > 0.45) showGameOver();
   for (const gate of gates) if (gate.active) gate.update(state.time, state.beat, dt);
 }
 
