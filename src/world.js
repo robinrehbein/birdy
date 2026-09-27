@@ -161,7 +161,9 @@ export function createGround(scene) {
 // Bake all meshes below `root` into one geometry with vertex colours, so a
 // whole group of static parts renders with a single draw call. The look is
 // unchanged: same shapes, same colours, same flat shading.
-export function bakeGroup(root) {
+// `spikes`: also bake a "spike" attribute: the tip vertices of meshes with
+// userData.spikeDir get that direction (for the cactus bristling in a shader).
+export function bakeGroup(root, spikes = false) {
   root.updateMatrixWorld(true);
   const inv = root.matrixWorld.clone().invert();
   const geos = [];
@@ -169,14 +171,25 @@ export function bakeGroup(root) {
   root.traverse((o) => {
     if (!o.isMesh) return;
     const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    if (spikes) g.userData.local = g.attributes.position.clone();
     g.applyMatrix4(m.multiplyMatrices(inv, o.matrixWorld));
     const c = o.material.color;
     const n = g.attributes.position.count;
     const col = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    if (spikes) {
+      const dir = o.userData.spikeDir;
+      const sp = new Float32Array(n * 3);
+      if (dir) {
+        // Local (untransformed) positions: the cone's tip is its top vertex.
+        const local = g.userData.local;
+        for (let i = 0; i < n; i++) if (local.getY(i) > 0.01) sp.set([dir.x, dir.y, dir.z], i * 3);
+      }
+      g.setAttribute('spike', new THREE.BufferAttribute(sp, 3));
+    }
     for (const key of Object.keys(g.attributes)) {
-      if (key !== 'position' && key !== 'normal' && key !== 'color') g.deleteAttribute(key);
+      if (key !== 'position' && key !== 'normal' && key !== 'color' && key !== 'spike') g.deleteAttribute(key);
     }
     geos.push(g);
   });
@@ -675,8 +688,9 @@ function buildCactusGeometry() {
     const phi = Math.acos(1 - (2 * (i + 0.5)) / 46);
     d.setFromSphericalCoords(1, phi, i * 2.399);
     const face = d.z > 0.3 && d.y > -0.6 && Math.abs(d.x) < 0.8; // face and forehead stay clear
-    if (face || d.y > 0.88 || d.y < -0.6) continue;
-    place(new THREE.Mesh(spikeGeo, m(CACTUS.spike)), d.clone(), 0.1);
+    if (face || d.y > 0.8 || d.y < -0.6) continue;
+    const spike = place(new THREE.Mesh(spikeGeo, m(CACTUS.spike)), d.clone(), 0.1);
+    spike.userData.spikeDir = new THREE.Vector3(0, 1, 0).applyQuaternion(spike.quaternion);
   }
   // Face: eyes set into the body, pupils squinting inwards, angry brows
   // resting on the skin just above them, and a small frown with two teeth.
@@ -711,19 +725,35 @@ function buildCactusGeometry() {
   const pollen = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 4), m(CACTUS.pollen));
   pollen.position.y = top + 0.06;
   root.add(pollen);
-  return bakeGroup(root);
+  return bakeGroup(root, true);
 }
 let cactusGeo = null;
-const cactusMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, flatShading: true });
+// Each cactus has its own material (same shader program) so it can bristle
+// on its own: `bristle` pushes the spike tips outwards along the spike.
+const BRISTLE_LENGTH = 0.22;
+function cactusMaterial() {
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, flatShading: true });
+  const bristle = { value: 0 };
+  mat.userData.bristle = bristle;
+  mat.customProgramCacheKey = () => 'cactus';
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.bristle = bristle;
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute vec3 spike;\nuniform float bristle;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\ntransformed += spike * bristle * ${BRISTLE_LENGTH.toFixed(2)};`);
+  };
+  return mat;
+}
 
 function createPlant() {
   cactusGeo ??= buildCactusGeometry();
   const group = new THREE.Group();
-  const body = new THREE.Mesh(cactusGeo, cactusMat);
+  const mat = cactusMaterial();
+  const body = new THREE.Mesh(cactusGeo, mat);
   body.castShadow = true;
   group.add(body);
   group.visible = false;
-  return { group, body };
+  return { group, body, bristle: mat.userData.bristle };
 }
 
 // Gap size factor for breathing gaps: open (1) → narrow (0.7) → open, over
@@ -855,6 +885,7 @@ export function createGate(scene) {
           plant.group.position.y = lane.gapLow + 0.12 - (CACTUS_Y + CACTUS_R.y);
           plant.group.rotation.z = Math.sin(time * 22) * 0.1;
           plant.body.scale.set(1, 1, 1);
+          plant.bristle.value = 0;
           continue;
         }
         plant.group.rotation.z = 0;
@@ -866,7 +897,8 @@ export function createGate(scene) {
         // Fully up: it puffs itself up and down (wider, a little shorter), so
         // the top of the hitbox stays where it is.
         const puff = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0;
-        plant.body.scale.set(1 + 0.12 * puff, 1 - 0.04 * puff, 1 + 0.12 * puff);
+        plant.body.scale.set(1 + 0.08 * puff, 1 - 0.03 * puff, 1 + 0.08 * puff);
+        plant.bristle.value = puff; // spikes stand up (looks only, same hitbox)
       }
     },
     setOpacity(o) {

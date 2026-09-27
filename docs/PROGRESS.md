@@ -1175,3 +1175,9 @@ deinen Entscheidungen (Name, App-ID), nicht an weiterem Code.
   - Einen Takt vor dem Hochspringen schauen Blüte, Stirn und Augen wackelnd aus der Röhre, als
     Vorwarnung ohne Trefferzone.
   - Beleg: `mont-peekc.png`, Tutorial-E2E ✓, Playtest Anfänger 17,0 s / Geübt 38,8 s / Profi 96 %.
+- **Stacheln aufstellen (deine Freigabe):** Beim Aufplustern werden die Stacheln im Shader bis zu
+  0,22 Einheiten länger. Jeder Kaktus hat dafür ein eigenes Material mit demselben Shader-Programm,
+  weiterhin ein Draw Call pro Kaktus. Die Trefferzone bleibt gleich, die Stacheln sind nur Optik.
+  - Beleg: `bristle2.png` (Ruhe / halb / voll), Tutorial-E2E ✓
+  - Playtest: Anfänger 20,4 s / Geübt 41,2 s / Profi 96 %
+  - 128 Draw Calls, keine Fehler
