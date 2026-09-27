@@ -20,7 +20,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt. Offen: Test mit Menschen. |
+| 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt; Seitentipps im Tutorial flattern nur (Iteration 25). Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie, Tageszeit, Musik und Spezialität. Aber: Anfänger sehen meist 1–2 Zonen (Zone 3 nur ~2 %), ab Reihe 40 wiederholen sich die Zonen (Review 4). |
@@ -29,7 +29,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 7 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Die oberen Röhren blenden seit Iteration 23 in den Himmel aus, der obere Bildteil ist offen. |
-| 10 | Store-Reife | 5 | AAB, Texte, Datenschutz, neues Icon. Aber: englisches Listing zu einer rein deutschen App. Offen: App-ID, Name. |
+| 10 | Store-Reife | 4 | AAB, Texte DE/EN passend zur zweisprachigen App, Datenschutz, neues Icon. Aber: Namensrisiko „Flapsy“ (Review 5), App-ID offen. |
 
 ## Backlog (nach Hebel sortiert)
 
@@ -964,3 +964,29 @@ Neue Fehler aus meinen Iterationen 22 und 23:
 gleichen Namens. Store-Note 4 wegen dieses Risikos.
 
 Als überhöht bewertet: Politur, Fairness, Onboarding, jeweils um einen Punkt.
+
+### Iteration 25 – Fixes aus Review 5 und Wischen
+
+**Was:**
+1. **Tutorial:** Bis zur Ausweich-Lektion flattert jeder Tipp, auch auf einer Seitenbahn. Ein
+   Erstspieler kann dort nicht mehr in eine Röhre wechseln.
+2. **Ein Tipp = eine Bahn:** Ein Tipp auf die entfernte Bahn wechselt nur eine Bahn weit. Der
+   Sprung über zwei Bahnen hat die Röhre der Mittelbahn gestreift.
+3. **Tipp-Grenzen:** Die aufgemalten Bodenlinien sind weg, sie lagen perspektivisch falsch.
+   Stattdessen bleiben die Trennlinien der Tipp-Zonen während des ganzen Runs dezent sichtbar
+   (gestrichelt, 20 % Deckkraft, eigene Bahn leicht gelb getönt).
+4. **Dunst ohne Raster:** Die oberen Röhren gehen jetzt per Farbverlauf in die Himmelsfarbe
+   über (gleiche Uniforms wie der Himmel, Höhe 15 → 26), ohne Dither-Muster und Flimmern.
+5. **Wischen (dein Vorschlag):** Wischen nach links/rechts wechselt ebenfalls eine Bahn. Tippen
+   bleibt die Hauptsteuerung. Ein Wisch, der mit einem Bahnwechsel-Tipp beginnt, wechselt
+   nicht doppelt; senkrechtes Ziehen tut nichts.
+
+**Beleg:**
+- `lanes.mjs`: Tipp links → Bahn 0, Tipp auf den rutschenden Vogel → bleibt 0, Tipp ganz
+  rechts → Bahn 1 (ein Schritt) ✓.
+- `swipe.mjs`: Wisch rechts → 2, Wisch links → 1, langer Wisch → nur eine Bahn, Tipp + Wisch
+  → kein Doppelwechsel, senkrecht → keine Änderung ✓.
+- Tutorial-E2E ✓; `haze0–3.png` zeigen weiche Übergänge in den Himmel.
+- Bot-Playtest (150 Runs): Anfänger 17,5 s, Geübt 29,1 s (vorher 36,1 s; zwei Bahnen brauchen
+  jetzt zwei Tipps, der Bot ist darauf nicht optimiert), Profi 88 % Überlebende.
+- 161 Draw Calls, keine Fehler.

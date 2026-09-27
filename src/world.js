@@ -87,11 +87,6 @@ function makeGroundTexture() {
     g.lineTo(x1, i + 128);
     g.stroke();
   }
-  // Lane markings between the three lanes (x = ±1.5 in world units).
-  g.fillStyle = 'rgba(255, 250, 225, 0.85)';
-  for (const lx of [256 - 29.5, 256 + 29.5]) {
-    for (let y = 0; y < 128; y += 64) g.fillRect(lx - 2.5, y, 5, 38);
-  }
   // track borders
   g.fillStyle = '#9ce659';
   g.fillRect(x0 - 10, 0, 10, 128);
@@ -422,26 +417,28 @@ stripeGeo.translate(0, 0.5, 0);
 const ringGeo = new THREE.TorusGeometry(1, 0.07, 6, 32);
 
 // The upper pipes fade into the sky with height, so the tall towers don't
-// fill the top of the screen. A 4x4 ordered dither discards pixels instead of
-// real transparency: the pipes stay opaque (no sorting problems) and on a
-// phone display it reads as a soft fade.
-export const HAZE_START = 16;
-export const HAZE_END = 27;
-function addSkyHaze(mat) {
+// fill the top of the screen: above HAZE_START the pipe colour blends into
+// the sky colour seen behind it (same gradient maths as the sky dome, same
+// uniforms, so it follows every zone's sky). No transparency, no dithering.
+export const HAZE_START = 15;
+export const HAZE_END = 26;
+function addSkyHaze(mat, sky) {
   mat.onBeforeCompile = (shader) => {
+    shader.uniforms.skyTop = sky.top;
+    shader.uniforms.skyHorizon = sky.horizon;
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying float vHazeY;')
-      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvHazeY = (modelMatrix * vec4(transformed, 1.0)).y;');
+      .replace('#include <common>', '#include <common>\nvarying vec3 vHazePos;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvHazePos = (modelMatrix * vec4(transformed, 1.0)).xyz;');
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>
-varying float vHazeY;
-float bayer4(vec2 p) {
-  ivec2 i = ivec2(mod(p, 4.0));
-  const float m[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
-  return (m[i.x + i.y * 4] + 0.5) / 16.0;
-}`)
-      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
-if (1.0 - smoothstep(${HAZE_START.toFixed(1)}, ${HAZE_END.toFixed(1)}, vHazeY) < bayer4(gl_FragCoord.xy)) discard;`);
+      .replace('#include <common>', '#include <common>\nvarying vec3 vHazePos;\nuniform vec3 skyTop;\nuniform vec3 skyHorizon;')
+      .replace('#include <tonemapping_fragment>', `
+{
+  vec3 dir = normalize(vHazePos - cameraPosition);
+  vec3 skyCol = mix(skyHorizon, skyTop, pow(clamp(dir.y * 1.8, 0.0, 1.0), 0.7));
+  float haze = smoothstep(${HAZE_START.toFixed(1)}, ${HAZE_END.toFixed(1)}, vHazePos.y);
+  gl_FragColor.rgb = mix(gl_FragColor.rgb, skyCol, haze);
+}
+#include <tonemapping_fragment>`);
   };
 }
 
@@ -560,7 +557,7 @@ export function createGate(scene) {
   const mats = {
     pipe: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }),
   };
-  addSkyHaze(mats.pipe);
+  addSkyHaze(mats.pipe, scene.userData.env.sky);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);

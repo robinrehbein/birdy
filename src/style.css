@@ -241,15 +241,30 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
   gap: 6px;
   font-size: 20px;
   text-shadow: 0 2px 0 #543847, 2px 0 0 #543847, -2px 0 0 #543847, 0 -2px 0 #543847;
-  background: rgba(255, 255, 255, 0.12);
   border-right: 2px dashed rgba(255, 255, 255, 0.5);
 }
 #zones div:last-child { border-right: none; }
 #zones b { font-size: 34px; font-weight: normal; }
-#zones.show { animation: zones 2.6s ease-out forwards; }
-@keyframes zones {
+/* After the flash the dividers stay faintly visible for the whole run, so the
+   tap boundaries are always where the player sees them. */
+#zones.show { opacity: 1; }
+#zones div::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.12);
+}
+#zones div { position: relative; }
+#zones.show div { animation: zone-border 2.6s ease-out forwards; }
+#zones.show div::before, #zones.show b, #zones.show span { animation: zone-fade 2.6s ease-out forwards; }
+#zones.show div.own { background: rgba(255, 241, 118, 0.07); }
+@keyframes zone-fade {
   0%, 60% { opacity: 1; }
   100% { opacity: 0; }
+}
+@keyframes zone-border {
+  0%, 60% { border-right-color: rgba(255, 255, 255, 0.5); }
+  100% { border-right-color: rgba(255, 255, 255, 0.2); }
 }
 
 /* Current lane indicator. */
@@ -440,7 +455,7 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
 }
 #zones.hold { opacity: 1; }
 #zones.hold div { animation: zone-pulse 1.2s ease-in-out infinite alternate; }
-@keyframes zone-pulse { to { background: rgba(255, 255, 255, 0.2); } }
+@keyframes zone-pulse { to { background: rgba(255, 255, 255, 0.08); } }
 
 button.gift {
   display: block;
@@ -667,3 +682,4 @@ button.gift {
   color: #543847;
   text-shadow: none;
 }
+#zones b, #zones span { position: relative; }

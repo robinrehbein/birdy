@@ -801,13 +801,17 @@ function tapFx(x, y, dir) {
 // Tap on a lane: the own lane flaps, another lane moves there with a hop.
 function tapLane(lane) {
   if (state.hold) return flap(); // first tap just starts
+  // Tutorial: until the dodge lesson every tap flaps (the first rows only
+  // have a middle gap, a stray side tap must not kill a first-time player).
+  if (tut.active && (tut.step === 'flap' || tut.step === 'fly')) return flap();
   if (tut.step === 'switch') {
     if (lane === state.lane) return; // frozen until the player taps another lane
     tut.step = 'go';
     showHand(null);
   }
   if (state.mode === 'playing' && !state.paused && lane !== state.lane) {
-    setLane(lane);
+    // One lane per tap: a two-lane jump would sweep through the middle pipe.
+    setLane(state.lane + Math.sign(lane - state.lane));
     state.vy = Math.max(state.vy, SWITCH_HOP);
     state.wingSpeed = 26;
     state.squash = 0.5;
@@ -864,6 +868,14 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
+// Swiping sideways also switches lanes (one lane per swipe), for players who
+// prefer a gesture over aiming at a lane. A swipe that starts with a lane-change
+// tap does not move a second time.
+const swipe = { id: -1, x: 0, y: 0, done: true };
+function laneFx(from, rect) {
+  tmpProj.set(LANES[state.lane], state.y, 0).project(camera);
+  tapFx(((tmpProj.x + 1) / 2) * rect.width, ((1 - tmpProj.y) / 2) * rect.height, Math.sign(state.lane - from));
+}
 canvas.addEventListener('pointerdown', (e) => {
   startAudio();
   if (state.paused) return setPaused(false);
@@ -872,12 +884,29 @@ canvas.addEventListener('pointerdown', (e) => {
   const lane = laneAtScreen((e.clientX - rect.left) / rect.width);
   const wasPlaying = state.mode === 'playing' && !state.hold;
   tapLane(lane);
-  if (wasPlaying) {
-    // Feedback at the lane the bird goes to (the finger would hide it).
-    tmpProj.set(LANES[lane], state.y, 0).project(camera);
-    tapFx(((tmpProj.x + 1) / 2) * rect.width, ((1 - tmpProj.y) / 2) * rect.height, Math.sign(lane - from));
-  }
+  // Feedback at the lane the bird goes to (the finger would hide it).
+  if (wasPlaying) laneFx(from, rect);
+  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, done: !wasPlaying || state.lane !== from });
 });
+canvas.addEventListener('pointermove', (e) => {
+  if (swipe.done || e.pointerId !== swipe.id) return;
+  const dx = e.clientX - swipe.x;
+  const dy = e.clientY - swipe.y;
+  const rect = canvas.getBoundingClientRect();
+  if (Math.abs(dx) < Math.max(24, rect.width * 0.06) || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  swipe.done = true;
+  if (state.mode !== 'playing' || state.paused || state.hold || tut.active) return;
+  const from = state.lane;
+  setLane(state.lane + Math.sign(dx));
+  if (state.lane === from) return;
+  state.vy = Math.max(state.vy, SWITCH_HOP * 0.6);
+  state.wingSpeed = 26;
+  state.squash = 0.5;
+  laneFx(from, rect);
+});
+const endSwipe = (e) => { if (e.pointerId === swipe.id) swipe.done = true; };
+canvas.addEventListener('pointerup', endSwipe);
+canvas.addEventListener('pointercancel', endSwipe);
 // Tapping the free area of the start screen starts right away; the panel's
 // buttons do their own thing.
 startEl.addEventListener('pointerdown', (e) => {
@@ -997,6 +1026,7 @@ function die(cause) {
   state.mode = 'dead';
   marker.visible = false;
   showHand(null);
+  zonesEl.classList.remove('show');
   state.hitStop = HIT_STOP;
   buzz(70);
   lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause, zone: state.zone };
@@ -1238,6 +1268,8 @@ function updatePlaying(dt) {
       progress.finishTutorial();
       toast(t('tutDone'));
       sfx.powerup();
+      zonesKey = '';
+      zonesEl.classList.add('show');
     }
   }
   state.runTime += dt;
