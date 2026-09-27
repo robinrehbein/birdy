@@ -711,3 +711,16 @@ button.gift {
 .skins.more { -webkit-mask-image: linear-gradient(#000 78%, transparent); mask-image: linear-gradient(#000 78%, transparent); }
 .skin .dot { width: 70%; }
 .skin .dot.thumb { width: 86%; border-radius: 28%; }
+
+button.surprise {
+  display: block;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 5px 10px;
+  font-size: 16px;
+  background: #7a6fc9;
+  color: #fff;
+  box-shadow: 0 3px 0 #543847;
+}
+button.surprise:disabled { opacity: 0.55; }
+.panel button.surprise + button { margin-top: 0; }

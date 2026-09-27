@@ -20,7 +20,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 6 | Geführter erster Run, per E2E-Test belegt. Aber (Review 6): Wischen und die Tipp-Linien werden nicht erklärt. Offen: Test mit Menschen. |
+| 1 | Onboarding | 7 | Geführter erster Run (E2E-Test); ab der Ausweich-Lektion sind die Tipp-Linien sichtbar, im 2. und 4. Run kommt ein Wisch-Hinweis (Iteration 30). Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
 | 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
@@ -604,7 +604,7 @@ bereit ist. Die übrigen Lücken lassen sich nur mit echten Geräten und Mensche
 
 | # | Bereich | vorher | nachher | Was fehlt noch zur 8 |
 |---|---|---|---|---|
-| 1 | Onboarding | 6 | Geführter erster Run, per E2E-Test belegt. Aber (Review 6): Wischen und die Tipp-Linien werden nicht erklärt. Offen: Test mit Menschen. |
+| 1 | Onboarding | 7 | Geführter erster Run (E2E-Test); ab der Ausweich-Lektion sind die Tipp-Linien sichtbar, im 2. und 4. Run kommt ein Wisch-Hinweis (Iteration 30). Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 4 | **6** | Auf dem Gerät fühlen (Vibration, Hit-Stop). Die oberen Röhren dominieren das Bild. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
 | 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
@@ -1119,3 +1119,29 @@ Die Upgrades waren zum Zeitpunkt des Reviews schon in Arbeit (Iteration 28).
 - `shop2.mjs` bei 360×640 und 390×844: Reiter 292/292 px sichtbar (vorher 300 von 473),
   Verlauf aktiv, keine Fehler. Bilder `mont-s3.png`, `dots2.png` (Regenbogen-Spur im Run).
 - Tutorial-E2E ✓, Bahn-Test ✓, 151 Draw Calls.
+
+### Iteration 30 – Onboarding-Lücken, Überraschungs-Kauf, Store DE/EN
+
+**Was:**
+1. **Tutorial:** Ab der Ausweich-Lektion sind die Tipp-Linien eingeblendet, wie später im
+   normalen Spiel.
+2. **Wisch-Hinweis:** Im 2. und 4. Run erscheint kurz „👆 Tipp: Du kannst auch nach
+   links/rechts wischen“.
+3. **🎁 Überraschung (150 Münzen):** Schaltet einen zufälligen, noch nicht gekauften Artikel bis
+   900 Münzen frei (Farbe, Muster, Kopf, Augen, Schnabel, Spur oder Röhre) und legt ihn gleich
+   an.
+   - Antwort auf Review 6 (Wirtschaft): Schon nach wenigen Runs gibt es wieder etwas Neues.
+   - Alles bleibt ohne Echtgeld und ohne Werbung.
+4. **Store:**
+   - Screenshots neu, getrennt nach `docs/store/de/` und `docs/store/en/`, jetzt mit
+     Vogel-Werkstatt und Welten.
+   - Englische Feature-Grafik.
+   - Store-Texte um Werkstatt, Welten und Upgrades ergänzt.
+
+**Beleg:**
+- `surp.mjs` (360×640):
+  - Überraschung gekauft → 150 Münzen abgezogen, neuer Artikel besessen und angelegt, Toast „Neu: …“ ✓
+  - Wisch-Hinweis im 2. Run ✓
+- `swipe2.mjs` ✓.
+- Bot-Playtest (150 Runs): Anfänger 17,4 s und 7 Münzen/Run, Geübt 37,8 s und 27 Münzen/Run,
+  Profi 96 % Überlebende.

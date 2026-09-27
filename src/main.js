@@ -321,6 +321,7 @@ function renderUpgrades() {
     return `<button class="${cls.join(' ')}" data-id="${u.id}" aria-label="${L(u.name)}"><span class="dot" style="background:#fff6d5">${u.icon}</span><span class="pips">${pips}</span></button>`;
   }).join('');
   updateGridFade();
+  renderSurprise();
   const u = UPGRADES.find((x) => x.id === shopSel) || UPGRADES[0];
   const lvl = progress.level(u.id);
   const price = progress.upgradePrice(u.id);
@@ -366,6 +367,7 @@ function renderShop() {
   const item = list.find((k) => k.id === shopSel) || list[0];
   skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   updateGridFade();
+  renderSurprise();
   shopName.textContent = L(item.name);
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
@@ -396,6 +398,36 @@ function previewWorld(world) {
   biomes.set(0, 0.5, world);
   scenery.setTheme(world.scenery, true);
 }
+
+// Surprise: a random cosmetic (up to SURPRISE_MAX coins) for SURPRISE_PRICE,
+// so there is something new to unlock every few runs.
+const SURPRISE_PRICE = 150;
+const SURPRISE_MAX = 900;
+const SURPRISE_KINDS = ['skin', 'pattern', 'hat', 'eyes', 'beak', 'trail', 'pipe'];
+const surpriseBtn = $('shop-surprise');
+const surprisePool = () => SURPRISE_KINDS.flatMap((kind) => CATALOG[kind]
+  .filter((k) => k.price > 0 && k.price <= SURPRISE_MAX && !progress.owns(kind, k.id))
+  .map((k) => ({ kind, item: k })));
+function renderSurprise() {
+  const pool = surprisePool();
+  surpriseBtn.classList.toggle('hidden', !pool.length);
+  const missing = SURPRISE_PRICE - progress.coins;
+  surpriseBtn.textContent = missing > 0 ? `${t('surprise', { n: SURPRISE_PRICE })} · ${t('needMore', { n: missing })}` : t('surprise', { n: SURPRISE_PRICE });
+  surpriseBtn.disabled = missing > 0;
+}
+surpriseBtn.addEventListener('click', () => {
+  const pool = surprisePool();
+  if (!pool.length || !progress.buySurprise(SURPRISE_PRICE)) return;
+  const { kind, item } = pool[Math.floor(Math.random() * pool.length)];
+  progress.grant(kind, item.id);
+  shopTab = kind;
+  shopSel = item.id;
+  sfx.powerup();
+  particles.emit(bird.group.position, { count: 40, colors: [0xff5a8a, 0x5ad1ff, 0xffd84a, 0x7be07b, 0xffffff], speed: 7, size: 0.13, life: 0.9, gravity: -4 });
+  toast(t('surpriseGot', { name: L(item.name) }));
+  setTimeout(celebrateMenuAchievements, 400);
+  renderShop();
+});
 
 // A fade at the bottom of the item grid while more items are below.
 function updateGridFade() {
@@ -591,6 +623,8 @@ function spacing() {
 }
 
 function resetGame() {
+  // Second and fourth run: point out the swipe alternative once more.
+  if (progress.runs === 1 || progress.runs === 3) setTimeout(() => toast(t('swipeHint')), 900);
   state.mode = 'playing';
   state.hold = true; // "get ready": hover until the first tap
   state.x = 0;
@@ -1432,6 +1466,9 @@ function updatePlaying(dt) {
         tut.step = 'switch';
         tut.freezeY = state.y;
         showHand('side');
+        // From the dodge lesson on, the tap boundaries are shown as in normal runs.
+        zonesKey = '';
+        zonesEl.classList.add('show');
       } else {
         tut.step = 'go'; // already dodged on their own
       }

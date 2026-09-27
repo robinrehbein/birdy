@@ -192,6 +192,18 @@ export const progress = {
     save();
     return true;
   },
+  // Surprise purchase: pay, then grant() the randomly picked item.
+  buySurprise(price) {
+    if (data.coins < price) return false;
+    data.coins -= price;
+    save();
+    return true;
+  },
+  grant(kind, id) {
+    if (!data.items[kind].includes(id)) data.items[kind].push(id);
+    data.equip[kind] = id;
+    save();
+  },
   // Upgrade levels 0..UPGRADE_MAX.
   level: (id) => data.upgrades[id] || 0,
   upgradePrice(id) {
