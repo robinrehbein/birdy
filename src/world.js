@@ -64,7 +64,7 @@ export function createScene() {
   return scene;
 }
 
-// Flappy-Bird style ground: sandy track with diagonal stripes, grass edges.
+// Ground: sandy track with diagonal stripes and borders.
 function makeGroundTexture() {
   const c = document.createElement('canvas');
   c.width = 512;

@@ -213,7 +213,8 @@ function renderShop() {
     if (k.id === shopSel) cls.push('sel');
     if (k.id === progress.skin.id) cls.push('equipped');
     const hex = `#${k.body.toString(16).padStart(6, '0')}`;
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${hex}"></span></button>`;
+    const price = progress.owns(k.id) ? '' : `<span class="price">${k.price}</span>`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${hex}"></span>${price}</button>`;
   }).join('');
   const skin = SKINS.find((k) => k.id === shopSel);
   shopName.textContent = skin.name;
@@ -273,15 +274,7 @@ $('gift-btn').addEventListener('click', () => {
   renderWallet(true);
 });
 $('shop-back').addEventListener('click', () => openShop(false));
-$('menu-btn').addEventListener('click', () => {
-  state.mode = 'ready';
-  music.setMode('menu');
-  overEl.classList.add('hidden');
-  startEl.classList.remove('hidden');
-  bird.group.rotation.set(0, 0, 0);
-  state.y = 5;
-  renderStart();
-});
+$('menu-btn').addEventListener('click', () => goToMenu());
 
 let toastTimer = 0;
 const toastQueue = [];
@@ -340,7 +333,8 @@ const state = {
 };
 let lastRun = null;
 
-const invincible = () => state.power.star > 0 || state.grace > 0;
+// `god` is only set by the store-screenshot script.
+const invincible = () => state.power.star > 0 || state.grace > 0 || state.god;
 
 function difficulty() {
   return Math.min(1, state.score / 40);
@@ -782,6 +776,44 @@ muteBtn.addEventListener('click', () => {
   renderMute();
 });
 renderMute();
+
+// Android back button: pause a run, leave a paused run / shop / game over
+// to the menu, and close the app from the menu.
+function goToMenu() {
+  setPaused(false);
+  state.mode = 'ready';
+  state.hold = false;
+  music.setMode('menu');
+  hud.classList.add('hidden');
+  overEl.classList.add('hidden');
+  shopEl.classList.add('hidden');
+  startEl.classList.remove('hidden');
+  walletEl.classList.remove('hidden');
+  zonesEl.classList.remove('hold', 'show');
+  marker.visible = false;
+  showHand(null);
+  bird.group.rotation.set(0, 0, 0);
+  bird.group.visible = true;
+  state.y = 5;
+  state.menu = 'start';
+  bird.setSkin(progress.skin);
+  // Clear the track so the menu shows only the bird and scenery.
+  for (const g of gates) { g.active = false; g.group.visible = false; }
+  for (const c of coins) { c.active = false; c.mesh.visible = false; }
+  for (const pu of pickups) { pu.active = false; pu.group.visible = false; }
+  renderStart();
+}
+function handleBack(exitApp) {
+  if (state.mode === 'playing' && !state.paused) setPaused(true);
+  else if (state.paused || state.mode === 'over' || state.mode === 'dead') goToMenu();
+  else if (state.menu === 'shop') openShop(false);
+  else exitApp();
+}
+if (window.Capacitor?.isNativePlatform?.()) {
+  import('@capacitor/app').then(({ App }) => {
+    App.addListener('backButton', () => handleBack(() => App.exitApp()));
+  });
+}
 
 // Pause when the app goes to the background (e.g. home button on Android).
 document.addEventListener('visibilitychange', () => {
@@ -1367,4 +1399,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop };

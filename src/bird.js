@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-// Low-poly Flappy-style bird built from primitives. Faces -Z.
+// Low-poly bird built from primitives. Faces -Z.
 export function createBird() {
   const group = new THREE.Group();
 
@@ -27,7 +27,7 @@ export function createBird() {
     group.add(pupil);
   }
 
-  // Beak: two rounded mandibles like Flappy's lips, faceted like the body.
+  // Beak: two rounded mandibles, faceted like the body.
   const beakMat = mat(0xf57c21);
   const beakLowMat = mat(0xe0521b);
   const beakTop = new THREE.Mesh(new THREE.SphereGeometry(0.26, 10, 7), beakMat);

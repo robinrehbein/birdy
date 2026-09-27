@@ -25,18 +25,17 @@ Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wu
 | 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 7 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Seit Iteration 10 auch Musik pro Zone. |
 | 5 | Session-Loop | 8 | Game-Over 0,46 s nach dem Crash (gemessen, vorher 1,4–2 s), Neustart per Tipp nach weiteren 0,35 s, also rund 0,8 s vom Crash zum neuen Run. Bereit-Zustand, „Nur noch X bis zum Rekord“, Missionen und Geschenk. Runs im Median: geübt ~38 s ✓. |
-| 6 | Meta-Progression | 5 | Münzen, 7 Skins, Missionen nach Niveau, Tagesgeschenk mit Serie. Aber: Die Shop-Kacheln zeigen nur Farbpunkte ohne Name und Preis, es gibt nur eine Kosmetik-Kategorie. |
+| 6 | Meta-Progression | 6 | Münzen, 7 Skins (Kacheln mit Preis, Name über dem Vogel, Live-Vorschau), Missionen nach Niveau, Tagesgeschenk mit Serie, Münz-Rausch pro Zone. Fehlt: zweite Kosmetik-Kategorie, Erfolge. |
 | 7 | Audio | 6 | 4 Zonen-Themen (je 16 Takte, 31 s, Songform A–A′–B–Breakdown, also 2 min verschiedene Musik), ruhiger Menü-Modus, Wechsel immer auf dem Taktanfang. Pegel gemessen: Themen innerhalb von 1,5 dB, keine Übersteuerung. Offen: nur Oszillator-Klänge, nicht von Menschen gehört. |
 | 8 | Performance | 5 | 165 Draw Calls, adaptive Qualität. Auf keinem echten Gerät gemessen. |
 | 9 | Politur | 5 | Münzen bräunlich, Geister-Röhren, die oberen Röhren füllen die halbe Bildhöhe. |
-| 10 | Store-Reife | 1 | Debug-APK, keine Zurück-Taste (`@capacitor/app` fehlt). **Markenrisiko:** Icon und README-Wortlaut („Flappy-Bird-Klon“). |
+| 10 | Store-Reife | 6 | Signiertes AAB (per Test-Schlüssel verifiziert), Versionierung, Zurück-Taste, eigenständiges Icon, Feature-Grafik, 6 Screenshots, Store-Texte DE/EN, Datenschutz und Datensicherheit (`docs/STORE.md`). Offen (deine Entscheidungen): App-ID, eigener Schlüssel, Datenschutz-URL, Piranha-Pflanzen-Design (IP-Risiko). |
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Store:**
-   - Zurück-Taste, eigenes Icon mit dem 3D-Vogel, Wortlaut ohne „Flappy Bird“.
-   - Release-Build-Setup, Store-Texte, Datenschutz.
-2. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
+1. **Politur:** Münz-Material (wirkt bräunlich), Shop-Kamera auf schmalen Displays zu nah.
+2. **Meta:** zweite Kosmetik-Kategorie (z. B. Flug-Spuren), Erfolge.
+3. **Store (Entscheidungen von dir):** App-ID, Schlüssel, Datenschutz-URL, Pflanzen-Design.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -439,3 +438,35 @@ Offline-Rendern. Er ist behoben. Die WAV-Dateien liegen im Scratchpad unter `aud
 | Crash bis Game-Over (Spielzeit) | ≈ 0,67 s Fall + 0,7 s = **1,4 s** | **0,46 s** |
 
 Mit der Tipp-Sperre von 0,35 s ist ein neuer Run rund 0,8 s nach dem Crash möglich. Keine Fehler.
+
+### Iteration 12 – Store-Reife
+
+**Was:**
+- **Zurück-Taste** (`@capacitor/app`):
+  - Im Spiel pausiert sie, aus Pause, Shop und Game-Over geht es ins Menü, im Menü schließt
+    sich die App.
+  - Beim Weg ins Menü wird die Strecke geräumt.
+- **Release-Build:**
+  - Signing über `android/keystore.properties` (steht in `.gitignore`), `npm run android:aab`.
+  - Version 1.0.0 / Code 1.
+  - Mit einem Wegwerf-Schlüssel gebaut: AAB 4,1 MB, `jarsigner`: „jar verified“.
+- **Eigenständiges Icon:** Der Reviewer sah im alten Icon einen Flappy-Bird-Lookalike (gelber
+  Vogel im Profil vor türkisem Himmel mit grünem Boden). Neu: derselbe 3D-Vogel von vorn mit
+  erhobenen Flügeln im gelben Zielring vor einem Himmelsverlauf. Launcher-Icons, adaptives
+  Icon, Splash und Store-Icon sind neu gerendert.
+- **Store-Grafiken:**
+  - Feature-Grafik 1024×500.
+  - 6 Screenshots in 1080×1920 aus echten Spielszenen: Menü, Park, Herbstwald-Banner, Canyon,
+    Blütenhain, Shop (`scripts/store-shots.mjs`).
+- **`docs/STORE.md`:**
+  - Checkliste und Anleitung zum Signieren.
+  - Store-Texte auf Deutsch und Englisch.
+  - Datenschutzerklärung und Antworten zur Datensicherheit.
+  - Erwartete Einstufung USK 0 / PEGI 3.
+  - Rechte-Risiken und offene Entscheidungen.
+- **Wortlaut:** „Flappy“ aus README und Code-Kommentaren entfernt.
+- **Shop-Kacheln** zeigen den Preis mit Schloss; die Farbpunkte sind nicht mehr entsättigt.
+
+**Nicht ohne dich entschieden** (siehe `docs/STORE.md`): App-ID, Store-Name bzw.
+Markenrecherche, Datenschutz-URL und Kontakt. Das Piranha-Pflanzen-Design ist das größte
+Rechte-Risiko; es war ausdrücklich „wie Mario“ gewünscht, deshalb ändere ich es nicht ungefragt.

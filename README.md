@@ -1,11 +1,11 @@
 # Birdy 3D
 
-Ein Flappy-Bird-Klon in 3D-Optik im Stil von Endless-Runnern wie Subway Surfers oder Temple Run – gebaut mit [Three.js](https://threejs.org) und [Vite](https://vite.dev).
+Ein Ein-Tipp-Arcade-Flieger in Low-Poly-3D: Flattere durch Röhren-Lücken, weiche über drei Spuren aus und fliege durch wechselnde Zonen – gebaut mit [Three.js](https://threejs.org) und [Vite](https://vite.dev).
 
 ## Spielprinzip
 
 - Der Vogel fliegt automatisch vorwärts, die Kamera folgt von hinten.
-- Wie bei Flappy Bird zieht die Schwerkraft nach unten – mit jedem Flügelschlag geht's nach oben.
+- Die Schwerkraft zieht nach unten – mit jedem Flügelschlag geht's nach oben.
 - Es gibt **drei Spuren**. Jede Röhren-Reihe hat pro Spur eine eigene Lücke (unterschiedlich hoch); ab 3 Punkten sind manche Spuren komplett blockiert.
 - Pro durchflogener Röhren-Reihe gibt es einen Punkt, Münzen sind Bonus.
 - Leuchtende Ringe markieren die Lücken, die nächste Reihe leuchtet gelb. Durchflogene Reihen werden durchsichtig, damit sie die Sicht nicht verdecken.
@@ -75,7 +75,8 @@ Die Android-App wird mit [Capacitor](https://capacitorjs.com) gebaut: Das Spiel 
 - Hochformat fest, Vollbild ohne Status- und Navigationsleiste
 - Bildschirm bleibt beim Spielen an
 - Beim Wechsel in den Hintergrund pausiert das Spiel
-- App-Icon und Splash-Screen zeigen den 3D-Vogel
+- App-Icon und Splash-Screen zeigen den 3D-Vogel von vorn im Zielring
+- Die Zurück-Taste pausiert im Spiel, führt aus Pause, Shop und Game-Over ins Menü und schließt im Menü die App
 
 Voraussetzungen: Node.js, JDK 21 und das Android SDK (z. B. über Android Studio).
 
@@ -83,9 +84,10 @@ Voraussetzungen: Node.js, JDK 21 und das Android SDK (z. B. über Android Studio
 npm run android:sync   # Web-Build erzeugen und in das Android-Projekt kopieren
 npm run android:open   # Projekt in Android Studio öffnen (Emulator/Gerät starten)
 npm run android:apk    # Debug-APK bauen -> android/app/build/outputs/apk/debug/app-debug.apk
+npm run android:aab    # signiertes Release-Bundle für den Play Store (siehe docs/STORE.md)
 ```
 
-Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus unbekannten Quellen erlauben). Für den Play Store braucht es einen eigenen Signatur-Schlüssel und ein Release-Bundle (`./gradlew bundleRelease`). Die App-ID `app.birdy.game` in `capacitor.config.json` und `android/app/build.gradle` sollte vorher auf eine eigene Domain geändert werden, da sie nach der Veröffentlichung nicht mehr änderbar ist.
+Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus unbekannten Quellen erlauben). Alles für den Play Store – Signatur-Schlüssel, Store-Texte, Datenschutz, Grafiken und offene Entscheidungen – steht in [`docs/STORE.md`](docs/STORE.md).
 
 ## Struktur
 
@@ -98,6 +100,8 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 - `src/bot.js` – Playtest-Bots (Anfänger / geübt / Profi) für die Headless-Simulation
 - `scripts/playtest.mjs`, `scripts/perf.mjs` – automatischer Bot-Playtest und Render-Budget-Messung
 - `docs/PROGRESS.md` – Bewertungsbogen und Iterations-Log
+- `docs/STORE.md`, `docs/store/` – Play-Store-Vorbereitung: Texte, Datenschutz, Grafiken, Signieren
+- `scripts/store-shots.mjs` – rendert die Store-Screenshots aus echten Spielszenen
 - `src/effects.js` – Partikel (Münz-Funken, Federn, Regenbogen-Spur)
 - `src/style.css` – HUD und Menüs
 - `android/` – natives Android-Projekt (Capacitor), inkl. Icons, Splash und `MainActivity`

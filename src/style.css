@@ -383,13 +383,20 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   justify-content: center;
 }
 .skin .dot {
-  width: 60%;
+  width: 52%;
   aspect-ratio: 1;
   border-radius: 50%;
   border: 2px solid #543847;
 }
-.skin.locked .dot { filter: saturate(0.35) brightness(0.8); }
-.skin.locked::after { content: '🔒'; position: absolute; right: 2px; bottom: 0; font-size: 14px; }
+.skin { flex-direction: column; gap: 2px; }
+.skin.locked .dot { opacity: 0.75; }
+.skin .price {
+  font-size: 13px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 1px 0 #543847, 1px 0 0 #543847, -1px 0 0 #543847, 0 -1px 0 #543847;
+}
+.skin .price::before { content: '🔒 '; font-size: 10px; }
 .skin.sel { background: #fcb800; transform: translateY(-2px); }
 .skin.equipped::before { content: '✓'; position: absolute; left: 5px; top: 1px; font-size: 14px; color: #fff; text-shadow: 0 1px 0 #543847; }
 #shop-action.buy { background: #fcb800; }
