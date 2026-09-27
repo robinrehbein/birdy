@@ -1184,6 +1184,11 @@ function goToMenu() {
   setPaused(false);
   state.mode = 'ready';
   state.hold = false;
+  // Leaving a run with a power-up active: no rainbow glow or mini bird in the menu.
+  for (const k of Object.keys(state.power)) state.power[k] = 0;
+  state.grace = 0;
+  bird.setGlow(null);
+  music.setHype(false);
   music.setMode('menu');
   hud.classList.add('hidden');
   overEl.classList.add('hidden');
