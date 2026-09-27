@@ -20,16 +20,16 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt; Seitentipps im Tutorial flattern nur (Iteration 25). Offen: Test mit Menschen. |
+| 1 | Onboarding | 6 | Geführter erster Run, per E2E-Test belegt. Aber (Review 6): Wischen und die Tipp-Linien werden nicht erklärt. Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
-| 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie, Tageszeit, Musik und Spezialität. Aber: Anfänger sehen meist 1–2 Zonen (Zone 3 nur ~2 %), ab Reihe 40 wiederholen sich die Zonen (Review 4). |
+| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
+| 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
 | 5 | Session-Loop | 7 | 0,8 s vom Crash zum Neustart, nächstes Ziel, Missionen, Erfolge. Das Game-Over auf kleinen Displays ist entschlackt (Iteration 20). |
-| 6 | Meta-Progression | 7 | Vogel-Werkstatt mit 13 Farben, 6 Mustern, 9 Kopfbedeckungen, 6 Augen/Brillen, 4 Schnäbeln, 12 Spuren (Iteration 26); Missionen, Geschenk, 14 Erfolge. Offen: Wirtschaft mit echten Spielern prüfen. |
+| 6 | Meta-Progression | 7 | Vogel-Werkstatt, Welten, Röhren, Upgrades (rund 90 Artikel/Stufen), 3D-Vorschaubilder im Shop. Aber: Gesichts-Teile sieht man im Spiel von hinten kaum; Preiskurve ab 1000 steil (Review 6). |
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
-| 9 | Politur | 7 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Die oberen Röhren blenden seit Iteration 23 in den Himmel aus, der obere Bildteil ist offen. |
-| 10 | Store-Reife | 4 | AAB, Texte DE/EN passend zur zweisprachigen App, Datenschutz, neues Icon. Aber: Namensrisiko „Flapsy“ (Review 5), App-ID offen. |
+| 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. Aber: Namensrisiko, App-ID `app.birdy.game`, kein Gerätetest. |
 
 ## Backlog (nach Hebel sortiert)
 
@@ -604,16 +604,16 @@ bereit ist. Die übrigen Lücken lassen sich nur mit echten Geräten und Mensche
 
 | # | Bereich | vorher | nachher | Was fehlt noch zur 8 |
 |---|---|---|---|---|
-| 1 | Onboarding | 4 | **7** | Test mit 5–10 Erstspielern: Verstehen sie die Regeln ohne Hilfe? |
+| 1 | Onboarding | 6 | Geführter erster Run, per E2E-Test belegt. Aber (Review 6): Wischen und die Tipp-Linien werden nicht erklärt. Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 4 | **6** | Auf dem Gerät fühlen (Vibration, Hit-Stop). Die oberen Röhren dominieren das Bild. |
-| 3 | Fairness & Kurve | 5 | **7** | Todesursachen echter Spieler; Tiefenwahrnehmung. |
-| 4 | Abwechslung | 3 | **7** | Mehr Mechaniken nach der 4. Zone; Bestätigung durch echte Spieler. |
+| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
+| 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
 | 5 | Session-Loop | 5 | **8** | – |
-| 6 | Meta-Progression | 1 | **6** | Erfolge und Langzeitziele; die Ökonomie mit echten Daten tunen. |
+| 6 | Meta-Progression | 7 | Vogel-Werkstatt, Welten, Röhren, Upgrades (rund 90 Artikel/Stufen), 3D-Vorschaubilder im Shop. Aber: Gesichts-Teile sieht man im Spiel von hinten kaum; Preiskurve ab 1000 steil (Review 6). |
 | 7 | Audio | 3 | **5** | Von Menschen gehört? Eventuell echte Samples oder Instrumente. |
 | 8 | Performance | 3 | **5** | fps auf einem Mittelklasse-Android messen (Anzeige: 5× auf den Titel tippen). |
-| 9 | Politur | 5 | **6** | Feinschliff nach Gerätetest. |
-| 10 | Store-Reife | 1 | **6** | App-ID, eigener Schlüssel, Datenschutz-URL, Pflanzen-Design (Rechte). |
+| 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. Aber: Namensrisiko, App-ID `app.birdy.game`, kein Gerätetest. |
 
 ### Endmessung (Stand nach Iteration 15)
 
@@ -1076,3 +1076,46 @@ Dein Wunsch: deutlich mehr Shop-Optionen, Vögel bauen wie bei Crossy Road.
 **Shop gesamt:** rund 90 Artikel und Stufen für zusammen etwa 65.000 Münzen. Bei 19 Münzen pro
 Run plus Missionen, Geschenk und Erfolgen reicht das für Monate. Die ersten Artikel (100–150)
 kosten weniger als eine Sitzung.
+
+## Review 6 (nach Iteration 26) – Publisher-Subagent
+
+Urteil: **kein Soft Launch, interner Test-Track ja.**
+
+| Rang | Einstufung | Kritik |
+|---|---|---|
+| 1 | Blocker | Wischen geht in die falsche Richtung, wenn der Wisch in einer anderen Zone beginnt; ein Wisch auf der eigenen Bahn flattert zusätzlich |
+| 2 | wichtig | Kosmetik aus der Spielkamera kaum lesbar (Spuren 3–5 px, Brillen/Schnäbel von hinten unsichtbar) |
+| 3 | wichtig | Shop: Tabs und teuerste Artikel abgeschnitten, kein Scroll-Hinweis |
+| 4 | wichtig | Emoji-Kacheln passen nicht zu den Artikeln; grauer Knopf ohne „Noch X“ |
+| 5 | wichtig | Wirtschaft: ab 1000 Münzen sehr lange Wege; Upgrades ohne Wirkung (damals noch nicht eingebaut) |
+| 6 | klein | Tutorial erklärt Wischen und Tipp-Linien nicht; Schatten liegt in der Nachbarbahn |
+
+Nicht übernommen: Analytics und Werbung (Rewarded Ads) – beides schließen deine Vorgaben aus.
+Die Upgrades waren zum Zeitpunkt des Reviews schon in Arbeit (Iteration 28).
+
+### Iteration 29 – Fixes aus Review 6: Wischen, Shop, Sichtbarkeit
+
+**Was:**
+1. **Wischen korrekt:** Eine Berührung wirkt weiterhin sofort (keine Verzögerung beim Tippen).
+   Wird daraus ein Wisch, gewinnt der Wisch: Ziel ist die Nachbarbahn der Startbahn in
+   Wischrichtung, ein Flattern vom Aufsetzen wird zurückgenommen.
+2. **Schatten:** Der Vogel wirft keinen Sonnenschatten mehr (der fiel schräg in die Nachbarbahn).
+   Der runde Schatten liegt immer genau unter ihm.
+3. **Shop-Layout:**
+   - alle 10 Reiter in zwei Reihen sichtbar
+   - Artikel-Raster höher, mit Verlauf nach unten, solange noch Artikel folgen
+   - Knopf zeigt „Noch 480 🪙“ statt nur grau
+   - Würfel zieht jetzt auch Spuren und ist ausgegraut, solange es nichts zu kombinieren gibt
+4. **Echte Vorschaubilder:** Kacheln für Muster, Kopf, Augen und Schnabel zeigen kleine
+   3D-Renderings des Vogels mit dem Teil, in der aktuellen Farbe. Spur-Kacheln zeigen bunte
+   Punkte statt blasser Verläufe.
+5. **Spuren sichtbarer:** Partikel doppelt so groß, 50 statt 30 pro Sekunde, etwas länger sichtbar.
+
+**Beleg:**
+- `swipe2.mjs` (Touch):
+  - Wisch rechts aus der linken Zone → Bahn 2 ✓ (vorher 0)
+  - Wisch links aus der rechten Zone → Bahn 0 ✓ (vorher 2)
+  - Wische vom Vogel ✓, Wisch gegen den Rand ✓
+- `shop2.mjs` bei 360×640 und 390×844: Reiter 292/292 px sichtbar (vorher 300 von 473),
+  Verlauf aktiv, keine Fehler. Bilder `mont-s3.png`, `dots2.png` (Regenbogen-Spur im Run).
+- Tutorial-E2E ✓, Bahn-Test ✓, 151 Draw Calls.

@@ -85,22 +85,19 @@ const zoneBiome = (zone) => (zone % BIOMES.length === 0 ? progress.equipped('wor
 biomes.set(0, 0, zoneBiome(0));
 setPipeStyle(progress.equipped('pipe'));
 
-// Simple blob shadow under the bird, used when real shadows are off (lowest
-// quality level) so the flight height stays readable.
+// Blob shadow straight under the bird: shows its lane and height exactly.
+// The bird itself casts no sun shadow (that one fell into the next lane).
 const blob = new THREE.Mesh(
   new THREE.CircleGeometry(0.7, 20),
   new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false })
 );
 blob.rotation.x = -Math.PI / 2;
 blob.position.y = 0.03;
-blob.visible = false;
 scene.add(blob);
 function setShadows(on) {
   renderer.shadowMap.enabled = on;
-  blob.visible = !on;
   scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; });
 }
-if (!renderer.shadowMap.enabled) blob.visible = true;
 
 // Height marker: a small ring at the next row, in the bird's lane and at the
 // bird's current height. Green = would pass right now, red = would hit.
@@ -131,6 +128,7 @@ function updateMarker(next, r) {
 }
 
 const bird = createBird();
+bird.group.traverse((o) => { o.castShadow = false; });
 bird.group.scale.setScalar(BIRD_SCALE);
 bird.setSkin(progress.skin);
 scene.add(bird.group);
@@ -254,15 +252,62 @@ tabsEl.innerHTML = SHOP_TABS.map((tb) => `<button class="tab" data-tab="${tb.kin
   + `<button class="tab dice" id="shop-dice"><span>🎲</span><small data-i18n="tab_dice"></small></button>`;
 applyI18n(tabsEl);
 
+// Tiles for bird parts show the real part: small 3D renders of a bird wearing
+// it (in the current colour), made once on demand with a separate renderer.
+const THUMB_VIEW = {
+  pattern: { cam: [1.9, 1.4, 2.4], look: [0, 0.05, 0.1], fov: 30 },
+  hat: { cam: [1.5, 1.4, -2.3], look: [0, 0.62, -0.12], fov: 24 },
+  eyes: { cam: [1.1, 0.5, -2.5], look: [0.1, 0.24, -0.4], fov: 22 },
+  beak: { cam: [2.3, 0.4, -1.7], look: [0, -0.02, -0.75], fov: 26 },
+};
+const thumbCache = new Map();
+let thumbKit = null;
+function thumbUrl(kind, id) {
+  const key = `${kind}:${id}:${progress.skin.id}`;
+  if (thumbCache.has(key)) return thumbCache.get(key);
+  if (!thumbKit) {
+    const r = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+    r.setSize(112, 112, false);
+    const sc = new THREE.Scene();
+    sc.add(new THREE.HemisphereLight(0xffffff, 0x998866, 1.9));
+    const sun = new THREE.DirectionalLight(0xffffff, 2.2);
+    sun.position.set(2, 5, 1);
+    sc.add(sun);
+    const b = createBird();
+    b.animateWings(1.2);
+    sc.add(b.group);
+    thumbKit = { r, sc, b, cam: new THREE.PerspectiveCamera(34, 1, 0.1, 30) };
+  }
+  const { r, sc, b, cam } = thumbKit;
+  const v = THUMB_VIEW[kind];
+  b.setSkin(progress.skin);
+  b.setLook({ ...equippedLook(), pattern: 'plain', hat: 'none', eyes: 'normal', beak: 'round', [kind]: id });
+  cam.fov = v.fov;
+  cam.updateProjectionMatrix();
+  cam.position.set(...v.cam);
+  cam.lookAt(...v.look);
+  r.render(sc, cam);
+  const url = r.domElement.toDataURL('image/png');
+  thumbCache.set(key, url);
+  return url;
+}
+
 function tileBg(kind, k) {
   if (kind === 'skin') return hexColor(k.body);
-  if (kind === 'trail') return k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
+  if (kind === 'trail') {
+    if (!k.colors.length) return '#cbb968';
+    // Dots in the trail's colours on a sky blue background.
+    const dots = [[25, 30], [55, 22], [75, 50], [40, 60], [62, 78], [22, 70]];
+    return dots.map(([x, y], i) => `radial-gradient(circle at ${x}% ${y}%, ${hexColor(k.colors[i % k.colors.length])} 0 11%, transparent 12%)`).join(', ') + ', #6fb8e6';
+  }
+  if (THUMB_VIEW[kind]) return `url(${thumbUrl(kind, k.id)}) center / cover no-repeat, #bfe6f5`;
   if (kind === 'world') return `linear-gradient(${hexColor(k.top)}, ${hexColor(k.horizon)} 55%, ${hexColor(k.grass)} 56%)`;
   if (kind === 'pipe') return `linear-gradient(90deg, ${hexColor(k.pipe)} 20%, ${hexColor(k.light)} 20% 36%, ${hexColor(k.pipe)} 36% 66%, ${hexColor(k.dark)} 66% 80%, ${hexColor(k.pipe)} 80%)`;
   return '#fff6d5';
 }
 function tileInner(kind, k) {
   if (kind === 'trail') return k.colors.length ? '' : '✕';
+  if (THUMB_VIEW[kind]) return k.id === CATALOG[kind][0].id && kind === 'hat' ? '✕' : '';
   return k.icon || '';
 }
 
@@ -275,6 +320,7 @@ function renderUpgrades() {
     if (u.id === shopSel) cls.push('sel');
     return `<button class="${cls.join(' ')}" data-id="${u.id}" aria-label="${L(u.name)}"><span class="dot" style="background:#fff6d5">${u.icon}</span><span class="pips">${pips}</span></button>`;
   }).join('');
+  updateGridFade();
   const u = UPGRADES.find((x) => x.id === shopSel) || UPGRADES[0];
   const lvl = progress.level(u.id);
   const price = progress.upgradePrice(u.id);
@@ -285,7 +331,7 @@ function renderUpgrades() {
     shopAction.textContent = t('maxed');
     shopAction.disabled = true;
   } else {
-    shopAction.innerHTML = `${t('upgrade', { n: price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+    shopAction.innerHTML = `${progress.coins < price ? t('needMore', { n: price - progress.coins }) : t('upgrade', { n: price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
     shopAction.classList.add('buy');
     shopAction.disabled = progress.coins < price;
   }
@@ -298,6 +344,8 @@ function renderUpgrades() {
 }
 
 function renderShop() {
+  // The dice only makes sense once there is something to combine.
+  $('shop-dice').disabled = ['skin', ...LOOK_KINDS, 'trail'].every((k) => CATALOG[k].filter((x) => progress.owns(k, x.id)).length < 2);
   for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
   tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   shopDesc.textContent = '';
@@ -312,17 +360,20 @@ function renderShop() {
     if (k.id === shopSel) cls.push('sel');
     if (k.id === equipped) cls.push('equipped');
     const price = owned ? '' : `<span class="price">${k.price}</span>`;
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="dot" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
+    const dot = THUMB_VIEW[kind] ? 'dot thumb' : 'dot';
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
   skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  updateGridFade();
   shopName.textContent = L(item.name);
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
   if (!progress.owns(kind, item.id)) {
-    shopAction.innerHTML = `${t('buy', { n: item.price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+    const missing = item.price - progress.coins;
+    shopAction.innerHTML = `${missing > 0 ? t('needMore', { n: missing }) : t('buy', { n: item.price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
     shopAction.classList.add('buy');
-    shopAction.disabled = progress.coins < item.price;
+    shopAction.disabled = missing > 0;
   } else if (item.id === equipped) {
     shopAction.textContent = t('selected');
     shopAction.disabled = true;
@@ -346,6 +397,12 @@ function previewWorld(world) {
   scenery.setTheme(world.scenery, true);
 }
 
+// A fade at the bottom of the item grid while more items are below.
+function updateGridFade() {
+  skinsEl.classList.toggle('more', skinsEl.scrollTop + skinsEl.clientHeight < skinsEl.scrollHeight - 4);
+}
+skinsEl.addEventListener('scroll', updateGridFade, { passive: true });
+
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
   shopSel = defaultSel();
@@ -367,7 +424,7 @@ tabsEl.addEventListener('click', (e) => {
   if (!tb) return;
   if (tb.id === 'shop-dice') {
     // Random outfit from what the player owns.
-    for (const kind of ['skin', ...LOOK_KINDS]) {
+    for (const kind of ['skin', ...LOOK_KINDS, 'trail']) {
       const owned = CATALOG[kind].filter((k) => progress.owns(kind, k.id));
       progress.select(kind, owned[Math.floor(Math.random() * owned.length)].id);
     }
@@ -980,10 +1037,11 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Swiping sideways also switches lanes (one lane per swipe), for players who
-// prefer a gesture over aiming at a lane. A swipe that starts with a lane-change
-// tap does not move a second time.
-const swipe = { id: -1, x: 0, y: 0, done: true };
+// Swiping sideways also switches lanes. A touch acts at once (no delay for
+// taps); if it then turns into a sideways swipe, the swipe wins: the lane is
+// the one next to where the gesture started, in the swipe's direction, and a
+// flap from the touch is taken back.
+const swipe = { id: -1, x: 0, y: 0, done: true, lane: 0, vy: 0 };
 function laneFx(from, rect) {
   tmpProj.set(LANES[state.lane], state.y, 0).project(camera);
   tapFx(((tmpProj.x + 1) / 2) * rect.width, ((1 - tmpProj.y) / 2) * rect.height, Math.sign(state.lane - from));
@@ -993,28 +1051,31 @@ canvas.addEventListener('pointerdown', (e) => {
   if (state.paused) return setPaused(false);
   const rect = canvas.getBoundingClientRect();
   const from = state.lane;
+  const vy = state.vy;
   const lane = laneAtScreen((e.clientX - rect.left) / rect.width);
   const wasPlaying = state.mode === 'playing' && !state.hold;
   tapLane(lane);
   // Feedback at the lane the bird goes to (the finger would hide it).
   if (wasPlaying) laneFx(from, rect);
-  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, done: !wasPlaying || state.lane !== from });
+  Object.assign(swipe, { id: e.pointerId, x: e.clientX, y: e.clientY, done: !wasPlaying || tut.active, lane: from, vy });
 });
 canvas.addEventListener('pointermove', (e) => {
   if (swipe.done || e.pointerId !== swipe.id) return;
   const dx = e.clientX - swipe.x;
   const dy = e.clientY - swipe.y;
   const rect = canvas.getBoundingClientRect();
-  if (Math.abs(dx) < Math.max(24, rect.width * 0.06) || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+  if (Math.abs(dx) < Math.max(18, rect.width * 0.05) || Math.abs(dx) < Math.abs(dy) * 1.2) return;
   swipe.done = true;
   if (state.mode !== 'playing' || state.paused || state.hold || tut.active) return;
-  const from = state.lane;
-  setLane(state.lane + Math.sign(dx));
-  if (state.lane === from) return;
-  state.vy = Math.max(state.vy, SWITCH_HOP * 0.6);
+  const before = state.lane;
+  const target = THREE.MathUtils.clamp(swipe.lane + Math.sign(dx), 0, LANES.length - 1);
+  if (target === swipe.lane && before === swipe.lane) return; // swipe into the edge: keep the tap
+  setLane(target);
+  // Undo the touch's flap: a swipe only hops like a lane change.
+  state.vy = target !== swipe.lane ? Math.max(swipe.vy, SWITCH_HOP) : swipe.vy;
   state.wingSpeed = 26;
   state.squash = 0.5;
-  laneFx(from, rect);
+  if (state.lane !== before) laneFx(before, rect);
 });
 const endSwipe = (e) => { if (e.pointerId === swipe.id) swipe.done = true; };
 canvas.addEventListener('pointerup', endSwipe);
@@ -1582,12 +1643,12 @@ function updateBirdVisual(dt) {
   const trail = state.mode === 'playing' && !state.hold && state.power.star <= 0 ? progress.trail
     : state.mode === 'ready' && state.menu === 'shop' ? previewTrail : null;
   if (trail && trail.colors.length) {
-    state.trailAcc = (state.trailAcc || 0) + dt * 30;
+    state.trailAcc = (state.trailAcc || 0) + dt * 50;
     const drift = state.mode === 'playing' ? 0 : 6; // the world stands still in the shop
     trailPos.set(state.x, state.y - 0.1, 0.45);
     while (state.trailAcc >= 1) {
       state.trailAcc -= 1;
-      particles.emit(trailPos, { count: 1, colors: trail.colors, speed: trail.speed, size: trail.size, life: trail.life, gravity: trail.gravity, drag: 1, drift });
+      particles.emit(trailPos, { count: 1, colors: trail.colors, speed: trail.speed, size: trail.size * 2, life: trail.life * 1.2, gravity: trail.gravity, drag: 1, drift });
     }
   }
   // Blink during the grace period after the rainbow ends.
