@@ -470,3 +470,29 @@ button.gift {
   70% { opacity: 1; transform: translate(-50%, -110%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
 }
+
+/* Zone banner when the time of day changes. */
+#zone-banner {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  z-index: 4;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  text-align: center;
+  font-size: 40px;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 4px 0 #543847, 3px 0 0 #543847, -3px 0 0 #543847, 0 -3px 0 #543847;
+  opacity: 0;
+  white-space: nowrap;
+}
+#zone-banner small { display: block; font-size: 20px; color: #fcb800; margin-bottom: 4px; }
+#zone-banner.show { animation: zone-in 2.4s ease-out forwards; }
+@keyframes zone-in {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  20% { transform: translate(-50%, -50%) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
+}

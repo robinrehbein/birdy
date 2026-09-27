@@ -61,6 +61,12 @@ export function createBot({ skill = 'good', hop = HOP } = {}) {
     let high = l.gapHigh;
     if (P.predict) {
       const t = Math.max(0, -gate.group.position.z / Math.max(1, state.speed));
+      if (l.pulse) {
+        // Plan for the narrowest point of a breathing gap.
+        const c = (l.gapLow + l.gapHigh) / 2;
+        low = Math.max(low, c - l.size * 0.35);
+        high = Math.min(high, c + l.size * 0.35);
+      }
       if (l.amp) {
         const c = l.center + Math.sin((state.time + t) * l.speed + l.phase) * l.amp;
         low = c - l.size / 2;

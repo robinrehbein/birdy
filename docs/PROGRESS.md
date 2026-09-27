@@ -16,27 +16,36 @@ Bot-Werte sind Näherungen an echte Spieler, keine Messung an Menschen.
 
 ## Bewertungsbogen (aktuell)
 
-Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrigiert.
+Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wurden gesenkt.
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 5 | Anfänger-Bot: erster Tod im Median bei 17,4 s. Aber: Die Erklärung steht nur als Text im Menü. Die Steuerung ist jetzt einfacher erklärbar („beim Vogel = flattern, daneben = ausweichen“), der Zielring zeigt die Höhe. Bot-Überlebenszeit ist kein Beleg für Verständnis. |
-| 2 | Game Feel / Juice | 7 | Jede Spieleraktion hat visuelles und akustisches Feedback, die wichtigen zusätzlich Vibration (Tabelle in Iteration 7). Squash & Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Tempo-Kick. Offen: nicht auf einem Gerät gefühlt; keine Tempo-Linien, keine Kamera-Neigung. |
-| 3 | Fairness & Kurve | 6 | Profi-Bot überlebt 94 % der 150-s-Runs dank garantierter Erreichbarkeit. Aber: Der Bot kennt die exakten Lückenhöhen. Die Tiefenwahrnehmung von Menschen ist nicht geprüft, die Kurve endet bei 40 Punkten. |
-| 4 | Abwechslung | 3 | Ab Punkt 10 ist alles freigeschaltet, es gibt nur ein Biom. |
-| 5 | Session-Loop | 7 | Runs im Median: Anfänger 16 s, geübt 41 s ✓. Neustart per Tipp irgendwo 0,35 s nach dem Game-Over, danach schwebt der Vogel, bis getippt wird (getestet). „Nur noch X bis zum Rekord“. Offen: Game-Over erscheint erst ca. 1 s nach dem Crash. |
-| 6 | Meta-Progression | 6 | Münzen, 7 Skins, 3 Tagesmissionen passend zum Rekord, Tagesgeschenk mit Serie (20 → 80 Münzen). Fehlt: Zufalls-Freischaltung, Erfolge, zweite Kosmetik-Kategorie. |
-| 7 | Audio | 4 | Korrektur: Der Loop dauert nur 7,7 s (64 Sechzehntel bei 124 BPM), nicht 31 s. Menü und Spiel nutzen denselben Loop, das wiederholt sich stark. |
-| 8 | Performance | 6 | 892 → **165 Draw Calls** (Szenerie und Röhren zusammengefasst, Optik unverändert). Automatische Qualitätsstufen (DPR 2 → 1,5 → 1,25 → 1 → ohne Schatten, mit Ersatz-Schatten). Offen: Messung auf einem echten Gerät (Anzeige: 5× auf den Titel tippen). |
-| 9 | Politur | 5 | Panels sauber. Münzen wirken bräunlich (Metall ohne Umgebungslicht). Der Ring-„Pop“ einer passierten Reihe wird nahe der Kamera riesig. Der Shop zeigt nur Farbpunkte. |
-| 10 | Store-Reife | 1 | Debug-APK, Platzhalter-App-ID, kein Release-Signing, kein Datenschutztext. Die Android-Zurück-Taste wird nicht behandelt. |
+| 1 | Onboarding | 5 | Bereit-Zustand mit pulsierenden Zonen, Zielring, relative Steuerung. Aber: Die Regel steht weiter als Text im Menü, es gibt kein geführtes Tutorial. |
+| 2 | Game Feel / Juice | 6 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Aber: Durchflogene Reihen bleiben als grüne Geister (10 % Deckkraft) im unteren Bildviertel. Nicht auf einem Gerät gefühlt. |
+| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
+| 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Fehlt: Musik pro Zone. |
+| 5 | Session-Loop | 6 | Bereit-Zustand und Tipp-Neustart funktionieren. Aber: Game-Over erscheint erst 1,5–2 s nach dem Crash (Flappy Bird < 0,5 s). |
+| 6 | Meta-Progression | 5 | Münzen, 7 Skins, Missionen nach Niveau, Tagesgeschenk mit Serie. Aber: Die Shop-Kacheln zeigen nur Farbpunkte ohne Name und Preis, es gibt nur eine Kosmetik-Kategorie. |
+| 7 | Audio | 3 | Unverändert: ein 7,7-s-Loop für Menü und Spiel. |
+| 8 | Performance | 5 | 165 Draw Calls, adaptive Qualität. Auf keinem echten Gerät gemessen. |
+| 9 | Politur | 5 | Münzen bräunlich, Geister-Röhren, die oberen Röhren füllen die halbe Bildhöhe. |
+| 10 | Store-Reife | 1 | Debug-APK, keine Zurück-Taste (`@capacitor/app` fehlt). **Markenrisiko:** Icon und README-Wortlaut („Flappy-Bird-Klon“). |
 
 ## Backlog (nach Hebel sortiert)
 
-1. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
-2. Politur: Münz-Material, Shop-Vorschau.
-3. Onboarding: Geister-Hand im ersten Run statt Text.
-4. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+1. **Onboarding (Review 2, Blocker 2):**
+   - Erster Start direkt ins Spiel.
+   - Geführter erster Run mit Geister-Hand, gezielt blockierter Reihe und Einfrieren, bis
+     richtig getippt wird.
+   - Größerer, pulsierender Marker im ersten Run.
+2. **Audio:** Musik pro Zone (transponiert, Varianten), eigener Menü-Loop, längerer Loop.
+3. **Session-Loop und Bildruhe:**
+   - Game-Over fest 0,45 s nach dem Crash.
+   - Durchflogene Reihen nahe der Kamera ausblenden.
+4. **Store:**
+   - Zurück-Taste, eigenes Icon mit dem 3D-Vogel, Wortlaut ohne „Flappy Bird“.
+   - Release-Build-Setup, Store-Texte, Datenschutz.
+5. **Politur:** Münz-Material, Shop-Kacheln mit Name und Preis, eine zweite Kosmetik-Kategorie.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -49,6 +58,26 @@ Urteil: Soft Launch „heute nein“. Die drei wichtigsten Kritikpunkte:
 | 3 | wichtig | Neustart ohne Bereit-Zustand; kaum Grund, am nächsten Tag wiederzukommen |
 
 Der Reviewer fand die Noten für Audio, Fairness, Onboarding, Session-Loop und Meta überhöht. Ich habe sie oben korrigiert.
+
+## Review 2 (nach Iteration 7) – Publisher-Subagent
+
+Urteil: Soft Launch weiter „nein“.
+
+Zu den Punkten aus Review 1:
+- **Bereit-Zustand und Rückkehr-Gründe:** erledigt.
+- **Lesbarkeit:** technisch gelöst, aber der Zielring ist in der Ferne zu klein.
+- **Performance:** gute Architektur, auf keinem Gerät belegt.
+
+Die neuen Top 3:
+
+| Rang | Einstufung | Kritik |
+|---|---|---|
+| 1 | Blocker | Nach Run 2 nichts Neues: ein Biom, Kurve endet bei 40, ein Musik-Loop |
+| 2 | Blocker | Onboarding hängt am Text |
+| 3 | wichtig | Zeit vom Crash bis zum nächsten Run; Geister-Röhren; Zurück-Taste und eigenes Icon als Pflicht vor dem Store |
+
+Als überhöht bewertet: Game Feel, Session-Loop, Meta, Audio und Performance, jeweils um einen
+Punkt. Oben korrigiert.
 
 ## Iterations-Log
 
@@ -293,3 +322,47 @@ Regressions-Playtest ohne Änderung: Anfänger 16 s, geübt 41 s. Keine Konsolen
 
 **Regression:** Anfänger 16,0 s, geübt 39,9 s im Median (100 Runs). Das liegt im Rahmen der
 Streuung.
+
+### Iteration 8 – Abwechslung: 4 Zonen, Münz-Rausch, atmende Lücken (Review-2-Blocker 1)
+
+**Was:**
+- **4 Zonen,** die sich im Kreis wiederholen; jede ist ein Ort zu einer Tageszeit:
+
+  | Zone | Tageszeit | Szenerie |
+  |---|---|---|
+  | Stadtpark | Tag | Büsche, Bäume, Hochhäuser |
+  | Herbstwald | Sonnenuntergang | Orange und rote Bäume, Tannen, Hügel |
+  | Canyon | violette Dämmerung | Felsen, Kakteen, Tafelberge, Sandboden |
+  | Blütenhain | Morgen | Rosa Blütenbäume, blühende Büsche, Häuschen mit Dächern |
+
+  Himmel, Nebel, Licht, Wolken und Boden blenden in 3 s über. Die neue Szenerie strömt vom
+  Horizont herein, weil jeder Block beim Zurückspringen im neuen Stil gebaut wird. Es gibt
+  keinen harten Schnitt.
+- **Zonenwechsel alle 15 Reihen:**
+  - Ein röhrenfreier Abschnitt mit einer Münz-Welle über die Spuren, als Verschnaufpause
+    und Belohnung.
+  - Ein Banner „Zone N · Name“ und ein Sound.
+- **Spezialität je Zone:**
+  - Herbstwald: neue Mechanik **atmende Lücken**, die im Takt der Musik auf 70 % schrumpfen
+    und wieder aufgehen.
+  - Canyon: 1,6× mehr und 25 % schnellere bewegte Lücken.
+  - Blütenhain: 1,8× mehr Pflanzen.
+  - Ab der zweiten Runde durch alle Zonen: atmende Lücken überall.
+- **Tempo nach 40 Punkten:** Es steigt langsam weiter, um bis zu +8. Der Abstand zwischen den
+  Reihen bleibt zeitbasiert, damit es fair bleibt.
+- **Grasränder:** Sie sind jetzt Teil einer einfärbbaren gestreiften Grasfläche statt der
+  Streckentextur. So nimmt auch der Boden die Zonenfarbe an, am Tag sieht er aus wie vorher.
+
+**Beleg:**
+- Screenshots aller Zonen (Herbst, Canyon, Blütenhain) inklusive Banner, ohne
+  Konsolenfehler. Der Tag sieht unverändert aus.
+- Bot-Playtest (100 Runs):
+
+  | Bot | Überlebenszeit (Median) | Punkte (Median) | Münzen/Run vorher → nachher | Profi-Überlebensrate |
+  |---|---|---|---|---|
+  | Anfänger | 17,4 s | 9 | – | – |
+  | Geübt | 37,6 s | 23 | 24 → 28 | – |
+  | Profi | – | – | – | **91 %** |
+
+  Mehr als die Hälfte der geübten Runs erreicht den Herbstwald (15 Punkte), etwa 25 % den
+  Canyon.

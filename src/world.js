@@ -45,7 +45,8 @@ export function createScene() {
   sky.renderOrder = -1;
   scene.add(sky);
 
-  scene.add(new THREE.HemisphereLight(0xdff6ff, 0x6a8f3a, 1.4));
+  const hemi = new THREE.HemisphereLight(0xdff6ff, 0x6a8f3a, 1.4);
+  scene.add(hemi);
 
   const sun = new THREE.DirectionalLight(0xfff4d6, 2.2);
   sun.position.set(12, 30, 10);
@@ -58,6 +59,8 @@ export function createScene() {
   sun.shadow.bias = -0.0005;
   scene.add(sun, sun.target);
 
+  // Handles for the biome/time-of-day blending (see biomes.js).
+  scene.userData.env = { sky: sky.material.uniforms, hemi, sun };
   return scene;
 }
 
@@ -68,11 +71,9 @@ function makeGroundTexture() {
   c.height = 128;
   const g = c.getContext('2d');
 
-  g.fillStyle = '#73bf2e';
-  g.fillRect(0, 0, 512, 128);
-  // grass stripes
-  g.fillStyle = '#65ad26';
-  for (let y = 0; y < 128; y += 32) g.fillRect(0, y, 512, 16);
+  // The grass beside the track is transparent here: it comes from the grass
+  // plane below, whose colour changes with the zone.
+  g.clearRect(0, 0, 512, 128);
 
   // sand track across the lanes (center ~ 40% of the width)
   const x0 = 150, x1 = 362;
@@ -102,6 +103,25 @@ function makeGroundTexture() {
   return tex;
 }
 
+// Grass stripes in greys; the grass material's colour tints them (so the
+// default green gives the original #73bf2e / #65ad26 stripes).
+function makeGrassTexture() {
+  const c = document.createElement('canvas');
+  c.width = 4;
+  c.height = 128;
+  const g = c.getContext('2d');
+  g.fillStyle = '#ffffff';
+  g.fillRect(0, 0, 4, 128);
+  g.fillStyle = '#e0e6d8';
+  for (let y = 0; y < 128; y += 32) g.fillRect(0, y, 4, 16);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.anisotropy = 8;
+  return tex;
+}
+
 export function createGround(scene) {
   const width = 26; // texture track (x0..x1) maps to ~ -5.3..5.3
   const length = 400;
@@ -109,17 +129,19 @@ export function createGround(scene) {
   tex.repeat.set(1, length / GROUND_TILE);
   const track = new THREE.Mesh(
     new THREE.PlaneGeometry(width, length),
-    new THREE.MeshStandardMaterial({ map: tex, roughness: 1 })
+    new THREE.MeshStandardMaterial({ map: tex, roughness: 1, alphaTest: 0.5 })
   );
   track.rotation.x = -Math.PI / 2;
   track.position.z = -length / 2 + 30;
   track.receiveShadow = true;
   scene.add(track);
 
-  // Wide grass plane underneath to fill the horizon.
+  // Wide striped grass plane underneath, also filling the horizon.
+  const grassTex = makeGrassTexture();
+  grassTex.repeat.set(1, 600 / GROUND_TILE);
   const grass = new THREE.Mesh(
     new THREE.PlaneGeometry(600, 600),
-    new THREE.MeshStandardMaterial({ color: 0x73bf2e, roughness: 1 })
+    new THREE.MeshStandardMaterial({ map: grassTex, color: 0x73bf2e, roughness: 1 })
   );
   grass.rotation.x = -Math.PI / 2;
   grass.position.y = -0.02;
@@ -127,8 +149,11 @@ export function createGround(scene) {
   scene.add(grass);
 
   return {
+    trackMat: track.material,
+    grassMat: grass.material,
     update(distance) {
       tex.offset.y = (distance / GROUND_TILE) % 1;
+      grassTex.offset.y = tex.offset.y;
     },
   };
 }
@@ -163,107 +188,184 @@ export function bakeGroup(root) {
 const SCENERY_CHUNK = 25;
 const SCENERY_SPAN = 225;
 
-// Trees, bushes and Flappy-like city blocks along both sides of the track.
-export function createScenery(scene) {
-  const items = [];
-  const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8b5a2b, flatShading: true });
-  const leafMats = [0x5cb338, 0x4a9e2c, 0x7ccf45].map(
-    (c) => new THREE.MeshStandardMaterial({ color: c, flatShading: true })
-  );
-  const buildingMats = [0xd7eef0, 0xc4e3e6, 0xe9f5f2].map(
-    (c) => new THREE.MeshStandardMaterial({ color: c, flatShading: true })
-  );
-  const windowMat = new THREE.MeshStandardMaterial({ color: 0x9ad4dc, flatShading: true });
+// Scenery along both sides of the track, in themes (park, autumn forest,
+// canyon, blossom grove). Everything is low-poly and flat-shaded like the
+// rest of the world.
+const matCache = new Map();
+function sceneryMat(color) {
+  if (!matCache.has(color)) matCache.set(color, new THREE.MeshStandardMaterial({ color, flatShading: true }));
+  return matCache.get(color);
+}
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const rand = (a, b) => a + Math.random() * (b - a);
 
-  const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 2, 6);
-  const leafGeo = new THREE.IcosahedronGeometry(1.8, 0);
-  const boxGeo = new THREE.BoxGeometry(1, 1, 1);
+const G = {
+  trunk: new THREE.CylinderGeometry(0.3, 0.4, 2, 6),
+  leaf: new THREE.IcosahedronGeometry(1.8, 0),
+  box: new THREE.BoxGeometry(1, 1, 1),
+  bush: new THREE.IcosahedronGeometry(0.8, 0),
+  rock: new THREE.DodecahedronGeometry(0.9, 0),
+  cactus: new THREE.CylinderGeometry(0.35, 0.4, 1, 7),
+  cone: new THREE.ConeGeometry(1, 1, 4),
+  pine: new THREE.ConeGeometry(1.5, 3.2, 7),
+  hill: new THREE.IcosahedronGeometry(1, 1),
+  flower: new THREE.IcosahedronGeometry(0.22, 0),
+};
 
-  function makeTree() {
-    const t = new THREE.Group();
-    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-    trunk.position.y = 1;
-    const leaves = new THREE.Mesh(leafGeo, leafMats[Math.floor(Math.random() * leafMats.length)]);
-    leaves.position.y = 3.2;
-    leaves.scale.setScalar(0.8 + Math.random() * 0.6);
-    t.add(trunk, leaves);
-    return t;
+function mesh(geo, color, x = 0, y = 0, z = 0, sx = 1, sy = sx, sz = sx) {
+  const m = new THREE.Mesh(geo, sceneryMat(color));
+  m.position.set(x, y, z);
+  m.scale.set(sx, sy, sz);
+  return m;
+}
+
+function tree(leafColors, trunk = 0x8b5a2b) {
+  const t = new THREE.Group();
+  t.add(mesh(G.trunk, trunk, 0, 1));
+  t.add(mesh(G.leaf, pick(leafColors), 0, 3.2, 0, rand(0.8, 1.4)));
+  return t;
+}
+function bush(colors, flowers) {
+  const b = new THREE.Group();
+  const n = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < n; i++) {
+    const x = (i - n / 2) * 0.8;
+    const y = rand(0.3, 0.6);
+    const z = Math.random() * 0.6;
+    const s = rand(0.7, 1.2);
+    b.add(mesh(G.bush, pick(colors), x, y, z, s));
+    if (flowers) b.add(mesh(G.flower, pick(flowers), x + rand(-0.3, 0.3), y + 0.6 * s, z + rand(-0.2, 0.3)));
   }
-
-  function makeBuilding() {
-    const b = new THREE.Group();
-    const w = 4 + Math.random() * 4;
-    const h = 6 + Math.random() * 14;
-    const d = 4 + Math.random() * 4;
-    const body = new THREE.Mesh(boxGeo, buildingMats[Math.floor(Math.random() * buildingMats.length)]);
-    body.scale.set(w, h, d);
-    body.position.y = h / 2;
-    b.add(body);
-    for (let y = 2; y < h - 1; y += 2.5) {
-      const win = new THREE.Mesh(boxGeo, windowMat);
-      win.scale.set(w * 0.8, 0.8, d + 0.1);
-      win.position.y = y;
-      b.add(win);
-    }
-    return b;
+  return b;
+}
+function building(colors, windowColor, roof) {
+  const b = new THREE.Group();
+  const w = rand(4, 8);
+  const h = roof ? rand(4, 8) : rand(6, 20);
+  const d = rand(4, 8);
+  b.add(mesh(G.box, pick(colors), 0, h / 2, 0, w, h, d));
+  for (let y = 2; y < h - 1; y += 2.5) b.add(mesh(G.box, windowColor, 0, y, 0, w * 0.8, 0.8, d + 0.1));
+  if (roof) {
+    const r = mesh(G.cone, roof, 0, h + 1.4, 0, w * 0.78, 2.8, d * 0.78);
+    r.rotation.y = Math.PI / 4;
+    b.add(r);
   }
-
-  const bushGeo = new THREE.IcosahedronGeometry(0.8, 0);
-  function makeBush() {
-    const b = new THREE.Group();
-    const n = 2 + Math.floor(Math.random() * 3);
-    for (let i = 0; i < n; i++) {
-      const puff = new THREE.Mesh(bushGeo, leafMats[Math.floor(Math.random() * leafMats.length)]);
-      puff.position.set((i - n / 2) * 0.8, 0.3 + Math.random() * 0.3, Math.random() * 0.6);
-      puff.scale.setScalar(0.7 + Math.random() * 0.5);
-      b.add(puff);
-    }
-    return b;
-  }
-
+  return b;
+}
+function cactus() {
+  const c = new THREE.Group();
+  const h = rand(2.2, 3.6);
+  const green = pick([0x4f9d3a, 0x5cae45, 0x3f8a33]);
+  c.add(mesh(G.cactus, green, 0, h / 2, 0, 1, h, 1));
   for (const side of [-1, 1]) {
-    for (let z = 0; z < SCENERY_SPAN; z += 5) {
-      const bush = makeBush();
-      bush.position.set(side * (6.8 + Math.random() * 0.8), 0, 20 - z - Math.random() * 2);
-      items.push(bush);
-    }
-    for (let z = 0; z < SCENERY_SPAN; z += 7) {
-      const tree = makeTree();
-      tree.position.set(side * (9 + Math.random() * 4), 0, 20 - z - Math.random() * 3);
-      items.push(tree);
-    }
-    for (let z = 0; z < SCENERY_SPAN; z += 12) {
-      const b = makeBuilding();
-      b.position.set(side * (22 + Math.random() * 12), 0, 20 - z);
-      items.push(b);
-    }
+    if (Math.random() < 0.3) continue;
+    const ah = rand(0.8, 1.4);
+    const y = rand(h * 0.4, h * 0.7);
+    c.add(mesh(G.cactus, green, side * 0.55, y, 0, 0.45, 0.35, 0.45).rotateZ(Math.PI / 2));
+    c.add(mesh(G.cactus, green, side * 0.8, y + ah / 2, 0, 0.5, ah, 0.5));
   }
+  return c;
+}
+function mesa() {
+  const m = new THREE.Group();
+  const w = rand(6, 11);
+  const d = rand(6, 10);
+  let y = 0;
+  const layers = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < layers; i++) {
+    const h = rand(2.5, 5);
+    const k = 1 - i * 0.12;
+    m.add(mesh(G.box, pick([0xd9774a, 0xe8915a, 0xc9653f, 0xf0b27a]), 0, y + h / 2, 0, w * k, h, d * k));
+    y += h;
+  }
+  return m;
+}
+function hill(colors) {
+  const s = rand(4, 7);
+  return mesh(G.hill, pick(colors), 0, s * 0.25, 0, s * 1.4, s * 0.8, s);
+}
 
-  // Bake the scenery into a few chunks along the track (one draw call each)
-  // that leapfrog to the far end once they are behind the camera.
+const THEMES = {
+  park: {
+    near: () => bush([0x5cb338, 0x4a9e2c, 0x7ccf45]),
+    mid: () => tree([0x5cb338, 0x4a9e2c, 0x7ccf45]),
+    far: () => building([0xd7eef0, 0xc4e3e6, 0xe9f5f2], 0x9ad4dc),
+  },
+  autumn: {
+    near: () => bush([0xe8772e, 0xf2a93b, 0xd9492f, 0x9fb33a]),
+    mid: () => (Math.random() < 0.25
+      ? mesh(G.pine, pick([0x3f7f3a, 0x4a8a3f]), 0, 2.6, 0).add(mesh(G.trunk, 0x7a4a24, 0, -1.9, 0, 0.8, 0.5, 0.8))
+      : tree([0xe8772e, 0xf2a93b, 0xd9492f, 0xf5c542], 0x7a4a24)),
+    far: () => hill([0xc9a23a, 0xb5892f, 0x9aa83a]),
+  },
+  canyon: {
+    near: () => mesh(G.rock, pick([0xc9774f, 0xb5653f, 0xd98c5f]), 0, 0.4, 0, rand(0.6, 1.2), rand(0.5, 0.9), rand(0.6, 1.2)),
+    mid: () => (Math.random() < 0.7 ? cactus() : mesh(G.rock, pick([0xc9774f, 0xe0a070]), 0, 0.8, 0, rand(1.4, 2.2))),
+    far: () => mesa(),
+  },
+  blossom: {
+    near: () => bush([0x6cc04a, 0x5cb338], [0xffffff, 0xffb7d5, 0xffe066]),
+    mid: () => tree([0xffb7d5, 0xffcfe3, 0xf78fb3, 0xffffff], 0x7a4f3a),
+    far: () => building([0xfff3e0, 0xffe6ea, 0xeaf6ff], 0xbfe3ea, pick([0xe0584f, 0xd9534f, 0x6a8fd0])),
+  },
+};
+
+// Items for one chunk, in chunk-local z (0 .. -SCENERY_CHUNK).
+function buildChunkGroup(theme) {
+  const t = THEMES[theme];
+  const root = new THREE.Group();
+  const place = (item, x, z, turn) => {
+    item.position.x = x;
+    item.position.z = z;
+    // Plants and rocks at any angle; buildings and mesas stay square.
+    item.rotation.y = turn ? Math.random() * Math.PI * 2 : 0;
+    root.add(item);
+  };
+  for (const side of [-1, 1]) {
+    for (let z = 0; z < SCENERY_CHUNK; z += 5) place(t.near(), side * rand(6.8, 7.6), -z - Math.random() * 2, true);
+    for (let z = rand(0, 3); z < SCENERY_CHUNK; z += 7) place(t.mid(), side * rand(9, 13), -z - Math.random() * 3, true);
+    for (let z = rand(0, 6); z < SCENERY_CHUNK; z += 12) place(t.far(), side * rand(22, 34), -z, false);
+  }
+  return root;
+}
+
+export function createScenery(scene) {
+  // Baked into chunks along the track (one draw call each) that leapfrog to
+  // the far end once they are behind the camera. A chunk is rebuilt in the
+  // current theme when it wraps, so a new theme streams in from the horizon.
   const chunkMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true });
   const chunks = [];
+  let theme = 'park';
+  function rebuild(c) {
+    const geo = bakeGroup(buildChunkGroup(theme));
+    c.geometry.dispose();
+    c.geometry = geo;
+    c.userData.theme = theme;
+  }
   for (let k = 0; k < SCENERY_SPAN / SCENERY_CHUNK; k++) {
-    const top = 20 - k * SCENERY_CHUNK;
-    const root = new THREE.Group();
-    for (const it of items) {
-      const z = it.position.z;
-      if (z <= top && (z > top - SCENERY_CHUNK || (k === SCENERY_SPAN / SCENERY_CHUNK - 1 && z <= top))) root.add(it);
-    }
-    const mesh = new THREE.Mesh(bakeGroup(root), chunkMat);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    mesh.userData.front = top - SCENERY_CHUNK; // nearest-to-horizon edge
-    scene.add(mesh);
-    chunks.push(mesh);
+    const c = new THREE.Mesh(new THREE.BufferGeometry(), chunkMat);
+    c.position.z = 20 - k * SCENERY_CHUNK;
+    c.castShadow = true;
+    c.receiveShadow = true;
+    rebuild(c);
+    scene.add(c);
+    chunks.push(c);
   }
 
   return {
+    material: chunkMat,
+    setTheme(name, instant = false) {
+      theme = name;
+      if (instant) for (const c of chunks) if (c.userData.theme !== theme) rebuild(c);
+    },
     update(dz) {
       for (const c of chunks) {
         c.position.z += dz;
-        // Fully behind the camera: move it to the far end.
-        if (c.position.z + c.userData.front > 25) c.position.z -= SCENERY_SPAN;
+        // Fully behind the camera: move it to the far end (in the current theme).
+        if (c.position.z - SCENERY_CHUNK > 25) {
+          c.position.z -= SCENERY_SPAN;
+          if (c.userData.theme !== theme) rebuild(c);
+        }
       }
     },
   };
@@ -290,6 +392,7 @@ export function createClouds(scene) {
     scene.add(c);
   }
   return {
+    material: bakedMat,
     update(dz) {
       for (const c of clouds) {
         c.position.z += dz * c.userData.speed;
@@ -405,6 +508,12 @@ function createPlant() {
   return { group, upper, lower };
 }
 
+// Gap size factor for breathing gaps: open (1) → narrow (0.7) → open, over
+// two beats.
+export function pulseScale(beat) {
+  return 0.85 + 0.15 * Math.cos(beat * Math.PI);
+}
+
 // Rise amount (0..1) over a 4-beat cycle: hidden, pop up, chomp, retreat.
 function plantRise(beat) {
   const p = ((beat % 4) + 4) % 4;
@@ -436,7 +545,7 @@ export function createGate(scene) {
     return {
       x, bottom, top, ring, plant,
       blocked: false, center: 0, size: 0, amp: 0, speed: 0, phase: 0,
-      hasPlant: false, plantOffset: 0,
+      hasPlant: false, plantOffset: 0, pulse: false,
       gapLow: 0, gapHigh: 0, hitLow: 0, hitHigh: 0,
     };
   });
@@ -450,13 +559,13 @@ export function createGate(scene) {
     if (lipAt !== null) seg.lip.position.y = lipAt - from;
   }
 
-  function setGap(lane, center) {
-    lane.gapLow = center - lane.size / 2;
-    lane.gapHigh = center + lane.size / 2;
+  function setGap(lane, center, size = lane.size) {
+    lane.gapLow = center - size / 2;
+    lane.gapHigh = center + size / 2;
     setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4);
     setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4);
     lane.ring.position.y = center;
-    lane.ring.scale.set(0.95, lane.size / 2 - 0.15, 1);
+    lane.ring.scale.set(0.95, size / 2 - 0.15, 1);
   }
 
   let opacity = 1;
@@ -496,6 +605,7 @@ export function createGate(scene) {
         lane.speed = gap.speed || 0;
         lane.phase = gap.phase || 0;
         lane.hasPlant = !!gap.plant;
+        lane.pulse = !!gap.pulse;
         lane.plantOffset = gap.plantOffset || 0;
         setGap(lane, gap.center);
         lane.hitLow = lane.gapLow;
@@ -507,7 +617,13 @@ export function createGate(scene) {
     update(time, beat, dt) {
       for (const lane of lanes) {
         if (lane.blocked) continue;
-        if (lane.amp) setGap(lane, lane.center + Math.sin(time * lane.speed + lane.phase) * lane.amp);
+        const center = lane.amp ? lane.center + Math.sin(time * lane.speed + lane.phase) * lane.amp : lane.center;
+        if (lane.pulse) {
+          // "Breathing" gap: narrows and opens again on every second beat.
+          setGap(lane, center, lane.size * pulseScale(beat + lane.plantOffset));
+        } else if (lane.amp) {
+          setGap(lane, center);
+        }
         lane.hitLow = lane.gapLow;
         lane.hitHigh = lane.gapHigh;
         if (!lane.hasPlant) continue;

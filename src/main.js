@@ -5,6 +5,7 @@ import { sfx, music, audio } from './audio.js';
 import { createParticles } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, SKINS } from './progress.js';
+import { BIOMES, createBiomeBlender } from './biomes.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -35,6 +36,7 @@ const MAGNET_RANGE = 9;
 const STAR_SPEED_BOOST = 1.35;
 const GRACE_TIME = 1.2; // invulnerable blinking after the rainbow ends
 const FALLBACK_BPM = 124;
+const ZONE_ROWS = 15; // a new zone (time of day) every 15 rows, opened by a coin rush
 const NEAR_MISS = 0.45; // gap clearance below which a pass counts as "Knapp!"
 const HIT_STOP = 0.14; // freeze-frame on impact (s)
 
@@ -67,6 +69,8 @@ const ground = createGround(scene);
 const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 const particles = createParticles(scene);
+const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
+const zoneMarks = []; // { z, zone } – where the next zone begins
 
 // Simple blob shadow under the bird, used when real shadows are off (lowest
 // quality level) so the flight height stays readable.
@@ -322,6 +326,8 @@ const state = {
   runTime: 0,
   hold: false,
   overAt: 0,
+  zone: 0,
+  rushAt: -1,
   squash: 0, // 1 right after a flap, decays (squash & stretch)
   hitStop: 0,
   nearChain: 0,
@@ -340,7 +346,9 @@ function difficulty() {
 // Rows are spaced by time, not distance: faster play keeps enough time to
 // react, switch lanes and climb or drop between two rows.
 function baseSpeed() {
-  return 18 + 16 * difficulty();
+  // After the main curve (40 points) the pace keeps creeping up slowly.
+  const over = Math.max(0, state.score - 40);
+  return 18 + 16 * difficulty() + 8 * (1 - Math.exp(-over / 50));
 }
 function spacing() {
   return baseSpeed() * (1.7 - 0.6 * difficulty());
@@ -366,6 +374,10 @@ function resetGame() {
   state.shake = 0;
   state.runTime = 0;
   state.nearChain = 0;
+  state.zone = 0;
+  state.rushAt = -1;
+  zoneMarks.length = 0;
+  if (biomes.index !== 0) biomes.set(0, 1.2);
   state.squash = 0;
   state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0 };
   state.celebrated = new Set();
@@ -421,19 +433,30 @@ function gateSpec() {
     }
   }
 
+  // Each zone has a speciality (the zone this row will be in).
+  const zone = Math.floor(state.gatesSpawned / ZONE_ROWS) % BIOMES.length;
+  const moveBoost = zone === 2 ? 1.6 : 1;
+  const plantBoost = zone === 3 ? 1.8 : 1;
+  const pulseChance = zone === 1 ? 0.45 : state.gatesSpawned > ZONE_ROWS * BIOMES.length ? 0.15 : 0;
+
   const open = spec.map((g, i) => (g ? i : -1)).filter((i) => i >= 0);
   // Keep one open lane "easy" (no plant, no movement).
   const easy = open[Math.floor(Math.random() * open.length)];
   for (const i of open) {
     if (i === easy && open.length > 1) continue;
     const g = spec[i];
-    if (state.score >= 6 && Math.random() < 0.25 + 0.3 * d) {
+    if (pulseChance && Math.random() < pulseChance) {
+      // Breathing gap (Herbstwald): opens and narrows with the beat.
+      g.pulse = true;
+      g.size = Math.max(g.size, 4.6);
+      g.plantOffset = Math.random() < 0.5 ? 0 : 1;
+    } else if (state.score >= 6 && Math.random() < (0.25 + 0.3 * d) * moveBoost) {
       // Moving gap: slides up and down within the playable range.
       g.amp = Math.min(1.2 + Math.random() * 1.3, (hi - lo) / 2);
       g.center = THREE.MathUtils.clamp(g.center, lo + g.amp, hi - g.amp);
-      g.speed = 1.2 + Math.random() * 1.2;
+      g.speed = (1.2 + Math.random() * 1.2) * (zone === 2 ? 1.25 : 1);
       g.phase = Math.random() * Math.PI * 2;
-    } else if (state.score >= 10 && Math.random() < 0.25 + 0.25 * d) {
+    } else if (state.score >= 10 && Math.random() < (0.25 + 0.25 * d) * plantBoost) {
       // Piranha plant: pops out of the lower pipe in time with the music.
       g.plant = true;
       g.plantOffset = Math.random() < 0.5 ? 0 : 2;
@@ -495,8 +518,26 @@ function placePickup(x, y, z) {
   return true;
 }
 
+// Zone change: a pipe-free stretch with a wave of coins across the lanes,
+// then the sky blends into the next time of day.
+function spawnRush(z) {
+  const gap = spacing();
+  const pattern = [1, 1, 0, 0, 1, 2, 2, 1, 1];
+  pattern.forEach((lane, k) => {
+    const t = k / (pattern.length - 1);
+    placeCoin(LANES[lane], 5 + Math.sin(t * Math.PI * 2) * 1.6, z + gap * 0.45 - t * gap * 0.9);
+  });
+  zoneMarks.push({ z: z + gap * 0.45, zone: state.zone + zoneMarks.length + 1 });
+  state.prevGaps = null; // plenty of time after the rush: no reach limit
+}
+
 function spawnGate(z) {
   state.lastGateZ = z; // always advance, even if the pool is exhausted
+  if (state.gatesSpawned > 0 && state.gatesSpawned % ZONE_ROWS === 0 && state.rushAt !== state.gatesSpawned) {
+    state.rushAt = state.gatesSpawned;
+    spawnRush(z);
+    return;
+  }
   const gate = gates.find((g) => !g.active);
   if (!gate) return;
   const spec = gateSpec();
@@ -785,6 +826,20 @@ function nearMiss() {
   checkMissions();
 }
 
+const zoneBanner = document.createElement('div');
+zoneBanner.id = 'zone-banner';
+app.appendChild(zoneBanner);
+function enterZone(zone) {
+  state.zone = zone;
+  const b = biomes.set(zone, 3);
+  zoneBanner.innerHTML = `<small>Zone ${zone + 1}</small>${b.name}`;
+  zoneBanner.classList.remove('show');
+  void zoneBanner.offsetWidth;
+  zoneBanner.classList.add('show');
+  sfx.zone();
+  if (state.run) state.run.zones = Math.max(state.run.zones || 0, zone);
+}
+
 // Celebrate a daily mission the moment it is reached.
 function checkMissions() {
   const run = { ...state.run, coins: state.coins, score: state.score };
@@ -921,6 +976,15 @@ function updatePlaying(dt) {
 
   state.lastGateZ += dz;
   while (state.lastGateZ > -SPAWN_DISTANCE) spawnGate(state.lastGateZ - spacing());
+
+  for (let i = zoneMarks.length - 1; i >= 0; i--) {
+    const m = zoneMarks[i];
+    m.z += dz;
+    if (m.z > 0) {
+      zoneMarks.splice(i, 1);
+      enterZone(m.zone);
+    }
+  }
 
   // Coins (pulled in by the magnet).
   const magnet = state.power.magnet > 0;
@@ -1171,6 +1235,7 @@ function tick() {
   step(dt, music.beat());
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   updateToast(dt);
+  biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
   renderer.render(scene, camera);
@@ -1203,4 +1268,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone };

@@ -213,6 +213,11 @@ export const sfx = {
     const base = 76 + Math.min(chain, 6) * 2;
     [0, 4, 7, 12].forEach((d, i) => tone({ freq: midi(base + d), dur: 0.07, type: 'square', vol: 0.05, delay: i * 0.035 }));
   },
+  // New zone: rising sweep plus a sparkly major arpeggio.
+  zone: () => {
+    tone({ freq: 300, to: 900, dur: 0.35, type: 'triangle', vol: 0.12 });
+    [72, 76, 79, 84, 88].forEach((n, i) => tone({ freq: midi(n), dur: 0.14, type: 'square', vol: 0.05, delay: 0.2 + i * 0.07 }));
+  },
   bounce: () => tone({ freq: 200, to: 500, dur: 0.15, type: 'triangle', vol: 0.2 }),
   hit: () => {
     tone({ freq: 220, to: 60, dur: 0.35, type: 'sawtooth', vol: 0.18 });
