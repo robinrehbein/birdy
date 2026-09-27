@@ -725,3 +725,11 @@ button.surprise {
 }
 button.surprise:disabled { opacity: 0.55; }
 .panel button.surprise + button { margin-top: 0; }
+
+/* Pause and game over: dim the game behind the panel (style guide scrim). */
+#pause, #gameover { background: rgba(43, 30, 46, 0.45); animation: scrim-in 0.25s ease-out; }
+@keyframes scrim-in { from { background: rgba(43, 30, 46, 0); } }
+/* "Ready to unlock" glows instead of growing past the panel edges. */
+.next-unlock.ready { animation: unlock-glow 0.9s ease-in-out infinite alternate; }
+@keyframes unlock-glow { to { box-shadow: 0 0 0 3px #fff6d5, 0 0 16px 4px rgba(255, 214, 64, 0.9); } }
+.ach-list.more { -webkit-mask-image: linear-gradient(#000 82%, transparent); mask-image: linear-gradient(#000 82%, transparent); }

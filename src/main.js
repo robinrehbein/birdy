@@ -348,7 +348,6 @@ function renderShop() {
   // The dice only makes sense once there is something to combine.
   $('shop-dice').disabled = ['skin', ...LOOK_KINDS, 'trail'].every((k) => CATALOG[k].filter((x) => progress.owns(k, x.id)).length < 2);
   for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
-  tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   shopDesc.textContent = '';
   if (shopTab === 'upgrade') return renderUpgrades();
   const kind = shopTab;
@@ -365,7 +364,7 @@ function renderShop() {
     return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
-  skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  reveal(skinsEl.querySelector('.sel'), skinsEl);
   updateGridFade();
   renderSurprise();
   shopName.textContent = L(item.name);
@@ -429,11 +428,24 @@ surpriseBtn.addEventListener('click', () => {
   renderShop();
 });
 
-// A fade at the bottom of the item grid while more items are below.
+// A fade at the bottom of a scrolling list while more items are below.
+const listFade = (el) => el.classList.toggle('more', el.scrollTop + el.clientHeight < el.scrollHeight - 4);
 function updateGridFade() {
-  skinsEl.classList.toggle('more', skinsEl.scrollTop + skinsEl.clientHeight < skinsEl.scrollHeight - 4);
+  listFade(skinsEl);
 }
 skinsEl.addEventListener('scroll', updateGridFade, { passive: true });
+
+// Scroll only `box` so that `el` is visible. (scrollIntoView would also
+// scroll the whole app container, which shifted the screens upwards.)
+function reveal(el, box) {
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const b = box.getBoundingClientRect();
+  if (r.top < b.top) box.scrollTop -= b.top - r.top + 4;
+  else if (r.bottom > b.bottom) box.scrollTop += r.bottom - b.bottom + 4;
+}
+// The app container never scrolls (focus or content can't push it).
+app.addEventListener('scroll', () => { app.scrollTop = 0; app.scrollLeft = 0; });
 
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
@@ -514,7 +526,10 @@ function renderAchievements() {
         <span class="bar"><i style="width:${pct}%"></i></span></span>
       <span class="reward">${a.done ? '✓' : `+${a.reward}`}</span></div>`;
   }).join('');
+  requestAnimationFrame(() => listFade(achList));
 }
+const achList = $('ach-list');
+achList.addEventListener('scroll', () => listFade(achList), { passive: true });
 function openAchievements(open) {
   state.menu = open ? 'achievements' : 'start';
   achEl.classList.toggle('hidden', !open);

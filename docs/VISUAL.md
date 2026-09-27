@@ -79,7 +79,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | # | Bereich | Schwere | Mangel | Plan | Status |
 |---|---|---|---|---|---|
 | 1 | 10 | Blocker | Der Splash zeigt „Flapsy“ statt „Birdy“. | Splash neu rendern mit dem Birdy-Schriftzug | ✅ It. 1 |
-| 2 | 5 | Blocker | Game Over in EN 390×844 ist nach oben verrutscht, unten erscheint ein türkiser Streifen. Ursache: Der App-Container scrollt (`scrollIntoView`). | Container gegen Scrollen sperren, nur die Liste scrollen lassen | offen |
+| 2 | 5 | Blocker | Game Over in EN 390×844 ist nach oben verrutscht, unten erscheint ein türkiser Streifen. Ursache: Der App-Container scrollt (`scrollIntoView`). | Container gegen Scrollen sperren, nur die Liste scrollen lassen | ✅ It. 3 |
 | 3 | 10 | ~~Blocker~~ | ~~Schwarze Ecken am runden Launcher-Icon~~ | Geprüft: Die Icons sind transparent. Das Schwarz kam vom Übersichtsbild-Werkzeug. Die gezackte Kante wird beim Neurendern mit geglättet. | – |
 | 4 | 9 | hoch | Passierte Röhren und Münzen erscheinen als riesige halbtransparente Geister vor der Kamera und verdecken den Vogel. | Schneller und vollständig ausblenden, sobald sie hinter dem Vogel sind | ✅ It. 2 |
 | 5 | 10 | hoch | Store-Screenshots ohne Rahmen, Hintergrund und Claim. | Gestaltete Screens DE/EN mit Claim | offen |
@@ -92,11 +92,11 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 12 | 1 | mittel | Die Flügel sind blass und stäbchenartig. | Flügel in Körpernähe kräftiger | ⏸ Vogel (Rückfrage) |
 | 13 | 1 | mittel | Von hinten ist der Vogel eine Kugel. | Scheitelbüschel und Schwanz lesbarer | ⏸ Vogel (Rückfrage) |
 | 14 | 1/5 | mittel | Shop-Vorschaubilder sind klein; gesperrte Artikel sind schlecht erkennbar. | Größere Kacheln, Preisleiste, gesperrte Artikel entsättigen | offen |
-| 15 | 5 | mittel | Listen enden mitten in einer Zeile, ohne Scroll-Hinweis. | Fade-Masken, ganze Zeilen | offen |
-| 16 | 5 | mittel | Das Unlock-Banner ragt über den Panelrand (360 px). | In Panelbreite halten, Text kürzen | offen |
+| 15 | 5 | mittel | Listen enden mitten in einer Zeile, ohne Scroll-Hinweis. | Fade-Masken, ganze Zeilen | ✅ It. 3 (Fade) |
+| 16 | 5 | mittel | Das Unlock-Banner ragt über den Panelrand (360 px). | In Panelbreite halten, Text kürzen | ✅ It. 3 |
 | 17 | 9 | mittel | Die gestrichelten Spurlinien laufen durch Himmel und HUD. | Linien nur auf dem Boden | offen |
 | 18 | 8 | mittel | Get-Ready-Pfeile bleiben halbtransparent stehen; „hierhin“ sagt wenig. | Sauber ausblenden, Text „Spur wechseln“ | offen |
-| 19 | 5/8 | mittel | Pause und Game Over dunkeln das Spiel nicht ab. | Scrim und Scale-In | offen |
+| 19 | 5/8 | mittel | Pause und Game Over dunkeln das Spiel nicht ab. | Scrim und Scale-In | ✅ It. 3 (Scrim) |
 | 20 | 9 | mittel | Toasts und Zonenbanner liegen auf den Hindernissen. | Toast kompakt unter dem HUD, Banner kürzer und höher | offen |
 | 21 | 2 | mittel | Die Stadt besteht aus grauen Quadern, die im Shop riesig wirken. | Fenster, Dächer, Pastelltöne | offen |
 | 22 | 7 | mittel | Das Regenbogen-Power-up zeigt nur Farbe, der Magnet ist unsichtbar, die Speed-Lines sind schwach. | Regenbogen-Band, Magnet-Ring, kräftigere Linien | offen |
@@ -247,3 +247,35 @@ verdeckte den Vogel (Mangel 4, „hoch“).
 
 **Neue Einschätzung:** Lesbarkeit 5 → 6. Offen bleiben Spurlinien im Himmel sowie Toasts und
 Banner über den Hindernissen.
+
+### Iteration 3 – UI-Layout: nichts verrutscht, nichts ragt heraus (Bereich 5)
+
+**Warum:**
+- Der Game-Over-Screen war bei EN 390×844 nach oben verrutscht: Ton, Sprache und Münzen waren
+  abgeschnitten, unten erschien ein türkiser Streifen (Blocker 2).
+- Das Unlock-Banner ragte über den Panelrand hinaus.
+- Pause und Game Over hoben sich nicht vom Spiel ab.
+- Die Erfolgsliste endete mitten in einer Zeile.
+
+**Ursache des Blockers:** `scrollIntoView()` im Shop scrollte nicht nur das Artikel-Raster,
+sondern auch den ganzen App-Container. Dieser ist `overflow: hidden`, lässt sich per Skript aber
+trotzdem scrollen. Der Versatz blieb bis zum nächsten Bildschirm stehen.
+
+**Was:**
+- Das Raster scrollt jetzt gezielt selbst (`reveal`). Der App-Container setzt jede
+  Scroll-Verschiebung sofort auf 0 zurück.
+- Pause und Game Over liegen auf einem Scrim in Plum (45 %, blendet in 0,25 s ein).
+- „Jetzt freischaltbar“ leuchtet, statt auf 112 % zu wachsen, und bleibt so im Panel.
+- Die Erfolgsliste blendet unten weich aus, solange weitere Einträge folgen (wie das
+  Shop-Raster).
+
+![Iteration 3 vorher/nachher](visual/it3.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`, 50 Runs je Stufe): identisch mit der Basis.
+- Perf: erster Frame 687 ms gegenüber 645 ms der Basis, im direkten Wechsel gemessen (Budget
+  +20 %). 130–143 Draw Calls, 42 k Dreiecke.
+- APK baut.
+
+**Neue Einschätzung:** UI-System 6 → 7. Offen sind die Titelzeile, die bei 360 px mit der
+Münzanzeige kollidiert, Kacheln und Preise im Shop sowie die Icons (Rückfrage läuft).
