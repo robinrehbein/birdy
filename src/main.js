@@ -1308,16 +1308,17 @@ const camTarget = new THREE.Vector3();
 const camLook = new THREE.Vector3();
 const camLookCur = new THREE.Vector3(0, 0.5, -9.5);
 function updateCamera(dt) {
+  const menuFrame = state.mode === 'ready' ? measureMenuFrame() : null;
   if (state.mode === 'ready' && state.menu === 'shop') {
-    // Shop: look the bird in the face so the skin preview is visible above
-    // the panel.
-    const far = baseFov < 70 ? 1.2 : 1; // narrower lens on wider screens
+    // Shop: side view of the bird, pulled back when little space is free.
+    const far = menuFrame.far * (baseFov < 70 ? 1.15 : 1);
     camTarget.set(5.6 * far, state.y + 0.9, -2.1 * far);
-    camLook.set(0, state.y - 1.2, 0);
+    camLook.set(0, state.y - 0.3, 0);
   } else if (state.mode === 'ready') {
-    // Start menu: closer, bird centred between title and panel.
-    camTarget.set(0, state.y + 1.2, 6.5);
-    camLook.set(0, state.y - 4.5, -9.5);
+    // Start menu: behind the bird, pulled back when little space is free.
+    const far = menuFrame.far;
+    camTarget.set(0, state.y + 1.2 * far, 6.5 * far);
+    camLook.set(0, state.y - 0.6, -9.5);
   } else {
     // Camera sits above and behind the bird so it stays in the lower third
     // and the gaps ahead remain visible (Temple Run / Subway Surfers style).
@@ -1334,12 +1335,51 @@ function updateCamera(dt) {
     camera.position.y += (Math.random() - 0.5) * s;
   }
   camera.lookAt(camLookCur);
+  frameBird(menuFrame);
   // Speed kick: the view widens while the rainbow boost is active.
   const fov = baseFov + (state.mode === 'playing' && state.power.star > 0 ? 8 : 0);
   if (Math.abs(camera.fov - fov) > 0.05) {
     camera.fov = THREE.MathUtils.lerp(camera.fov, fov, Math.min(1, dt * 4));
     camera.updateProjectionMatrix();
   }
+}
+
+// Menus: find the free space between the title and the panel so the bird
+// is framed there on every screen size (small phones included).
+function measureMenuFrame() {
+  const wrap = state.menu === 'shop' ? shopEl : startEl;
+  const title = wrap.querySelector('.menu-title');
+  const panel = wrap.querySelector('.panel');
+  const box = app.getBoundingClientRect();
+  if (!title || !panel || !box.height) return { center: 0.4, far: 1 };
+  const top = title.getBoundingClientRect().bottom - box.top;
+  const bottom = panel.getBoundingClientRect().top - box.top;
+  const free = Math.max(0.12, (bottom - top) / box.height);
+  return { center: (top + bottom) / 2 / box.height, far: THREE.MathUtils.clamp(0.4 / free, 1, 2.4) };
+}
+
+// Shift the rendered view so the bird sits at the free-space centre.
+let viewShift = 0;
+function frameBird(frame) {
+  if (!frame) {
+    // Leaving the menu: ease the shift back to zero instead of jumping.
+    if (viewShift === 0) return;
+    viewShift = THREE.MathUtils.lerp(viewShift, 0, 0.15);
+    if (Math.abs(viewShift) < 0.5) {
+      viewShift = 0;
+      camera.clearViewOffset();
+    } else {
+      camera.setViewOffset(app.clientWidth, app.clientHeight, 0, viewShift, app.clientWidth, app.clientHeight);
+    }
+    return;
+  }
+  camera.clearViewOffset();
+  camera.updateMatrixWorld();
+  tmpProj.set(state.x, state.y, 0).project(camera);
+  const h = app.clientHeight;
+  const want = ((1 - tmpProj.y) / 2 - frame.center) * h;
+  viewShift = THREE.MathUtils.lerp(viewShift, want, 0.25);
+  camera.setViewOffset(app.clientWidth, h, 0, viewShift, app.clientWidth, h);
 }
 
 let baseFov = 68;
@@ -1494,4 +1534,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera };
+window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera };

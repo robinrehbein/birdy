@@ -14,7 +14,7 @@ brauchst du die Entscheidungen unten.
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel von vorn im Zielring) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-1024x500.png` |
-| Screenshots 1080×1920 | ✅ `docs/store/screenshot-1…6` (aus echten Spielszenen, `scripts/store-shots.mjs`) |
+| Screenshots 1080×1920 | ✅ `docs/store/screenshot-1…6` aus einem echten Run (`scripts/store-shots.mjs`): Menü, Park, Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ Text unten; muss unter einer öffentlichen URL liegen |
 | Angaben zur Datensicherheit | ✅ unten |

@@ -1,4 +1,7 @@
-// Store screenshots (1080x1920) from real gameplay scenes.
+// Store screenshots (1080x1920) from one real run. Nothing in the HUD is
+// faked: an autopilot with invincibility ("god", test-only flag) keeps the
+// bird alive and the script waits until each scene actually happens
+// (zone banner, piranha plants in the canyon, rainbow power-up).
 //   npm run build && npx vite preview --port 4173 &  node scripts/store-shots.mjs
 import { createRequire } from 'node:module';
 import { execSync } from 'node:child_process';
@@ -15,57 +18,63 @@ const OUT = 'docs/store';
 fs.mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const page = await browser.newPage({ viewport: { width: 360, height: 640 }, deviceScaleFactor: 3 });
-await page.goto('http://localhost:4173/');
-await page.evaluate(() => localStorage.setItem('birdy-progress', JSON.stringify({
+await page.addInitScript(() => localStorage.setItem('birdy-progress', JSON.stringify({
   coins: 640, best: 32, runs: 6, owned: ['sunny', 'sky', 'cardinal'], skin: 'sunny', tutorialDone: true,
 })));
-await page.reload();
-await page.waitForTimeout(2500);
+await page.goto('http://localhost:4173/');
+await page.waitForTimeout(4000);
 await page.screenshot({ path: `${OUT}/screenshot-1-menu.png` });
+const until = (fn, arg, timeout = 400000) => page.waitForFunction(fn, arg, { timeout, polling: 100 });
 
-// Autopilot for clean gameplay shots: fly through the gap of an open lane.
-async function play() {
-  await page.click('#play-btn');
-  await page.waitForTimeout(300);
-  await page.mouse.click(180, 400);
-  await page.evaluate(() => {
-    const B = window.__birdy;
-    B.state.god = true;
-    setInterval(() => {
-      const s = B.state;
-      if (s.mode !== 'playing' || s.hold) return;
-      const nx = B.gates.filter((g) => g.active && !g.passed).sort((a, b) => b.group.position.z - a.group.position.z)[0];
-      if (!nx) return;
-      if (nx.lanes[s.lane].blocked) s.lane = nx.lanes.findIndex((l) => !l.blocked);
-      const L = nx.lanes[s.lane];
-      const aim = (L.gapLow + L.gapHigh) / 2;
-      if (s.y < aim - 0.7 && s.vy < 2) { s.vy = 11.5; s.squash = 1; }
-    }, 30);
-  });
-}
-await play();
-await page.waitForTimeout(14000);
-// A believable mid-run HUD for the listing.
+await page.click('#play-btn');
+await page.waitForTimeout(300);
+await page.mouse.click(180, 400);
 await page.evaluate(() => {
   const B = window.__birdy;
-  B.state.score = 17;
-  B.state.coins = 12;
-  document.getElementById('score').textContent = '17';
-  document.getElementById('coin-count').textContent = '12';
+  B.state.god = true;
+  setInterval(() => {
+    const s = B.state;
+    if (s.mode !== 'playing' || s.hold) return;
+    const nx = B.gates.filter((g) => g.active && !g.passed).sort((a, b) => b.group.position.z - a.group.position.z)[0];
+    if (!nx) { if (s.y < 5 && s.vy < 2) s.vy = 11.5; return; }
+    if (nx.lanes[s.lane].blocked) s.lane = nx.lanes.findIndex((l) => !l.blocked);
+    const L = nx.lanes[s.lane];
+    const aim = (L.gapLow + L.gapHigh) / 2 + (L.hasPlant ? 0.6 : 0);
+    if (s.y < aim - 0.7 && s.vy < 2) { s.vy = 11.5; s.squash = 1; }
+  }, 30);
 });
+
+await until(() => window.__birdy.state.score >= 6);
 await page.screenshot({ path: `${OUT}/screenshot-2-park.png` });
-for (const [zone, name] of [[1, 'herbstwald'], [2, 'canyon'], [3, 'bluetenhain']]) {
-  await page.evaluate((z) => { window.__birdy.state.gatesSpawned = z * 15 + 1; window.__birdy.enterZone(z); }, zone);
-  // Let the new scenery stream in completely (headless runs slowly).
-  await page.waitForTimeout(zone === 1 ? 1400 : 60000);
-  await page.screenshot({ path: `${OUT}/screenshot-${2 + zone}-${name}.png` });
-}
-await page.evaluate(() => window.__birdy.handleBack(() => {}));
-await page.evaluate(() => window.__birdy.handleBack(() => {}));
-await page.waitForTimeout(800);
-await page.evaluate(() => window.__birdy.openShop(true));
-await page.click('.skin[data-id="flamingo"]');
+
+await until(() => window.__birdy.state.zone >= 1);
+await page.waitForTimeout(700);
+await page.screenshot({ path: `${OUT}/screenshot-3-herbstwald.png` });
+
+// A snapping piranha plant close enough to see (canyon or later).
+await until(() => window.__birdy.state.zone >= 2);
+await until(() => {
+  const B = window.__birdy;
+  const plantNear = B.gates.some((g) => g.active && !g.passed && g.group.position.z > -24 && g.group.position.z < -10
+    && g.lanes.some((l) => l.hasPlant && l.plant.group.visible && l.plant.group.position.y > l.gapLow - 1.2));
+  // No coin right in front of the camera hiding the bird.
+  const coinInFront = B.coins.some((c) => c.active && c.mesh.position.z > -9 && Math.abs(c.mesh.position.x - B.state.x) < 2);
+  return plantNear && !coinInFront && B.state.power.mini <= 0;
+});
+await page.screenshot({ path: `${OUT}/screenshot-4-pflanze.png` });
+
+// Rainbow power-up (the real effect, triggered as if picked up).
+await page.evaluate(() => window.__birdy.activatePower('star'));
 await page.waitForTimeout(2500);
+await page.screenshot({ path: `${OUT}/screenshot-5-regenbogen.png` });
+
+// Shop, trails tab with a preview.
+await page.evaluate(() => { window.__birdy.handleBack(() => {}); window.__birdy.handleBack(() => {}); });
+await page.waitForTimeout(800);
+await page.click('#shop-btn');
+await page.click('.tab[data-tab="trails"]');
+await page.click('.skin[data-id="confetti"]');
+await page.waitForTimeout(6000);
 await page.screenshot({ path: `${OUT}/screenshot-6-shop.png` });
 await browser.close();
 console.log('done');

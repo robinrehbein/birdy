@@ -23,18 +23,17 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt. Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung: Zone 2 erreichen 47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59 % (vorher 26 %), Zone 4 zu 23 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
+| 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung (zwei Läufe à 100 Runs): Zone 2 erreichen 33–47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59–63 % (vorher 26 %), Zone 4 zu 23–25 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
 | 5 | Session-Loop | 8 | 0,8 s vom Crash zum nächsten Run. Game-Over zeigt das nächste Ziel (Münzen bis zum nächsten Vogel oder zur nächsten Spur; wenn freischaltbar, führt ein Tipp direkt in den Shop), alle Tagesmissionen mit Balken und die erreichte Zone. „🏆 Neuer Rekord!“ erscheint schon während des Runs. |
 | 6 | Meta-Progression | 6 | 7 Vogel-Farben und 7 Flugspuren (zwei Kategorien, Reiter im Shop, Live-Vorschau), Missionen, Tagesgeschenk. Fehlt: nächstes Ziel sichtbar machen. |
 | 7 | Audio | 5 | 4 Zonen-Themen, Menü-Modus, Pegel gemessen. Nur Oszillator-Klänge, von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
-| 9 | Politur | 5 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis. Aber: Das Menü-Panel verdeckt den Vogel, die Shop-Kamera ist auf manchen Displays zu nah. |
-| 10 | Store-Reife | 5 | AAB signierbar, Texte, Datenschutz, Icon. Aber: Die Screenshots zeigen keine Mechaniken (Pflanzen, Power-ups, „Knapp!“), und die Zonen-Bilder sind inszeniert. Offen: App-ID (deine Entscheidung). |
+| 9 | Politur | 6 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Offen: Die oberen Röhren nehmen viel Bildfläche ein (bewusst belassen, siehe Iteration 15). |
+| 10 | Store-Reife | 6 | AAB signierbar, Texte DE/EN, Datenschutz, eigenständiges Icon, Zurück-Taste. 6 Screenshots aus einem echten Run ohne HUD-Manipulation (Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop). Offen: App-ID und Schlüssel (deine Entscheidung). |
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Bildaufteilung:** Menü-Panel und Vogel, Shop-Kamera je nach Seitenverhältnis, Höhe der oberen Röhren.
-2. **Store-Screenshots mit Mechaniken,** ohne Inszenierung.
+Ab hier braucht es echte Geräte und echte Spieler, siehe Abschlussbericht.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -543,3 +542,110 @@ Rechte-Risiko; es war ausdrücklich „wie Mario“ gewünscht, deshalb ändere 
 Die Schwierigkeit bleibt dabei gleich, die Überlebenszeiten sind praktisch unverändert.
 Screenshots: Beim Banner „Zone 2 · Herbstwald“ steht der Herbstwald schon komplett. Der
 Game-Over-Screen zeigt Rekord, Zone, nächstes Ziel und Missionen. Keine Fehler.
+
+### Iteration 15 – Bildaufteilung und ehrliche Store-Screenshots (Review-3-Punkt 3)
+
+**Was:**
+- **Menü und Shop rahmen den Vogel auf jedem Display:**
+  - Die Kamera misst den freien Platz zwischen Titel und Panel, verschiebt den Bildausschnitt
+    (`setViewOffset`), damit der Vogel genau dort sitzt, und geht bei wenig Platz weiter zurück.
+  - Beim Spielstart gleitet die Verschiebung weich zurück.
+  - Auf niedrigen Displays (bis 720 px Höhe) sind die Menüs kompakter.
+  - Vorher war der Vogel auf 360×640 im Menü und im Shop komplett verdeckt.
+- **Store-Screenshots aus einem echten Run:**
+  - Punkte und Münzen sind echt. Ein Autopilot mit Unverwundbarkeits-Flag (nur für Tests) hält
+    den Vogel am Leben, und das Skript wartet, bis die Szenen wirklich eintreten.
+  - Motive: Menü, Park, Herbstwald-Banner bei 10 Punkten, ausgefahrene Piranha-Pflanze (bei 45 Punkten),
+    Regenbogen, Spuren-Shop mit Konfetti-Vorschau.
+- **Bewusst nicht geändert:** die Höhe der oberen Röhren. Kürzere Röhren würden in der Ferne als
+  schwebende Enden im Himmel sichtbar. Eine andere Kamera würde den Look verändern, den du
+  ausdrücklich behalten wolltest.
+
+**Beleg:**
+- Screenshots für Menü und Shop auf 360×640 und 390×844: Der Vogel ist jeweils zwischen Titel
+  und Panel sichtbar.
+- Regressionen ohne Fehler: Perf 165 Draw Calls, Bot-Playtest, Tutorial-E2E-Test (relative Tipps
+  mit Bildverschiebung).
+
+---
+
+## Abschlussbericht (Stopp: 15 Iterationen erreicht)
+
+**Das Ziel „alle Bereiche ≥ 8 mit Belegen“ ist nicht erreicht.** Erreicht ist: ein spielbares,
+messbar faireres und deutlich reicheres Spiel, das für einen internen Test über die Play Console
+bereit ist. Die übrigen Lücken lassen sich nur mit echten Geräten und Menschen schließen.
+
+### Bewertungsbogen vorher → nachher
+
+„Vorher“ ist der Stand vor Iteration 1, nach den Korrekturen durch Review 1.
+
+| # | Bereich | vorher | nachher | Was fehlt noch zur 8 |
+|---|---|---|---|---|
+| 1 | Onboarding | 4 | **7** | Test mit 5–10 Erstspielern: Verstehen sie die Regeln ohne Hilfe? |
+| 2 | Game Feel / Juice | 4 | **6** | Auf dem Gerät fühlen (Vibration, Hit-Stop). Die oberen Röhren dominieren das Bild. |
+| 3 | Fairness & Kurve | 5 | **7** | Todesursachen echter Spieler; Tiefenwahrnehmung. |
+| 4 | Abwechslung | 3 | **7** | Mehr Mechaniken nach der 4. Zone; Bestätigung durch echte Spieler. |
+| 5 | Session-Loop | 5 | **8** | – |
+| 6 | Meta-Progression | 1 | **6** | Erfolge und Langzeitziele; die Ökonomie mit echten Daten tunen. |
+| 7 | Audio | 3 | **5** | Von Menschen gehört? Eventuell echte Samples oder Instrumente. |
+| 8 | Performance | 3 | **5** | fps auf einem Mittelklasse-Android messen (Anzeige: 5× auf den Titel tippen). |
+| 9 | Politur | 5 | **6** | Feinschliff nach Gerätetest. |
+| 10 | Store-Reife | 1 | **6** | App-ID, eigener Schlüssel, Datenschutz-URL, Pflanzen-Design (Rechte). |
+
+### Endmessung (Stand nach Iteration 15)
+
+**Bot-Playtest, 100 Runs je Bot, 150 s Limit:**
+
+| Bot | Überlebenszeit Median | 10 % der Runs enden vor … | Punkte Median | Münzen/Run | Zone 2 / 3 / 4 erreicht |
+|---|---|---|---|---|---|
+| Anfänger | 14,5 s | 9,9 s | 7 | 7 | 33 % / 1 % / 0 % |
+| Geübt | 40,2 s | 21,9 s | 23 | 26 | 100 % / 63 % / 25 % |
+| Profi | 88 % der Runs bis zum Limit | 136,9 s | 117 | 116 | 100 % / 100 % / 99 % |
+
+Der Anfänger-Bot streut zwischen Messungen um etwa ±3 s und ±15 Prozentpunkte. Kleine
+Unterschiede sind also Rauschen.
+
+**Render-Budget:** 162 Draw Calls, 49k Dreiecke, erster Frame nach 0,83 s (Headless-Software-GPU).
+
+**Konsolenfehler:** keine, in allen Testskripten.
+
+### Die 5 wichtigsten Änderungen
+
+1. **Fairness per Konstruktion:**
+   - Jede Reihe ist von der vorherigen aus erreichbar, der Abstand zwischen Reihen ist zeitbasiert.
+   - Profi-Bot: vorher starb er in 100 % der Runs, jetzt überlebt er rund 90 % der 150-s-Runs.
+2. **Steuerung relativ zum Vogel plus Zielring:**
+   - Modellierte Fehltipps sinken von 13,4 % auf 0,5 %.
+   - Der Spurwechsel ist nur ein kleiner Hüpfer, dazu kommt der geführte erste Run.
+3. **4 Zonen mit eigener Szenerie, Tageszeit, Musik und Mechanik:**
+   - Der Münz-Rausch leitet jede Zone ein.
+   - Geübte Spieler erreichen Zone 4 jetzt in 23 % statt 1 % der Runs.
+4. **Meta-Schleife:**
+   - Münzen, 7 Vögel und 7 Spuren.
+   - Tagesmissionen passend zum Niveau, Tagesgeschenk mit Serie.
+   - Game-Over mit nächstem Ziel.
+5. **Performance und Store:**
+   - 892 → 165 Draw Calls, adaptive Qualität.
+   - Signierbares AAB, Zurück-Taste, eigenständiges Icon, Store-Paket.
+
+### Was nur echte Spieler und Geräte klären können – Testplan
+
+1. **Geräte-Test (1 Tag, ihr drei):**
+   - Debug-APK auf 3 Handys installieren: eines alt, eines Mittelklasse, eines neu.
+   - Je 10 Minuten spielen, dabei die fps-Anzeige einschalten (5× auf den Titel tippen).
+   - Ziel: stabile ~60 fps auf der Mittelklasse, keine automatische Qualitätsstufe unter Q2.
+   - Außerdem prüfen: Vibration, Ton, Zurück-Taste, Pause beim App-Wechsel.
+2. **Erstspieler-Test (5–10 Personen, die das Spiel nicht kennen):**
+   - Wortlos das Handy geben, nur zuschauen und notieren:
+     - Verstehen sie Flattern und Ausweichen im Tutorial?
+     - Woran sterben sie? Lesen sie den Zielring?
+     - Spielen sie freiwillig eine zweite Runde?
+   - Ziel: 8 von 10 schaffen das Tutorial ohne Hilfe, und der Median des ersten Runs liegt
+     über 20 s.
+3. **Interner Test-Track (Play Console, 20–50 Personen, 2 Wochen):**
+   - Vorher App-ID festlegen und Schlüssel erzeugen (`docs/STORE.md`).
+   - Da die App bewusst kein Tracking hat, D1- und D7-Rückkehr per kurzer Umfrage oder
+     über die Play-Console-Statistik („Aktive Nutzer“) abschätzen.
+   - Richtwerte für Casual-Top-Titel: D1 ≥ 35–40 %, D7 ≥ 12–15 %.
+4. **Danach tunen:** Tempo und Lückengröße (`gateSpec()` und `baseSpeed()` in `src/main.js`)
+   und die Münz-Ökonomie (`progress.js`) anhand der Beobachtungen anpassen.

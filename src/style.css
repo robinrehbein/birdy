@@ -569,3 +569,17 @@ button.gift {
 .next-unlock .bar i { display: block; height: 100%; background: #fff; }
 #gameover .missions { margin-bottom: 12px; }
 .next-unlock.ready { cursor: pointer; animation: pulse 0.9s infinite alternate; }
+
+/* Short screens: tighter menus so the bird stays visible. */
+@media (max-height: 720px) {
+  .menu-title h1 { font-size: 44px; }
+  .panel { padding: 14px 14px 16px; }
+  .missions { gap: 4px; margin-bottom: 10px; }
+  .missions h3 { font-size: 16px; }
+  .mission { padding: 4px 8px; font-size: 12px; }
+  button.gift { font-size: 17px; padding: 6px 12px; margin-bottom: 8px; }
+  #play-btn { font-size: 22px; padding: 8px 20px; }
+  button.secondary { font-size: 17px; padding: 5px 16px; }
+  .skins { gap: 6px; margin-bottom: 10px; }
+  .tabs { margin-bottom: 8px; }
+}
