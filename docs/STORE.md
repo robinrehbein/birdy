@@ -1,10 +1,8 @@
 # Play-Store-Vorbereitung
 
-Stand: 27. September 2026. Version 1.0.3 (versionCode 4) ist im internen Test verfügbar.
-Das Update für den geschlossenen Alpha-Test ist zur Prüfung eingereicht. Die aktualisierten
-deutschen und englischen Store-Texte sowie sieben neue deutsche Screenshots sind gespeichert,
-aber noch nicht zur Prüfung gesendet: Eine zusätzliche Einreichung würde die bereits laufende
-Alpha-Prüfung neu starten.
+Stand: 27. September 2026. Version 1.0.3 (versionCode 4) ist im internen und im geschlossenen
+Alpha-Test verfügbar. Die aktualisierten deutschen und englischen Store-Texte sowie sieben neue
+deutsche Screenshots sind zur Prüfung eingereicht.
 
 ## Play Console
 
@@ -17,8 +15,8 @@ Alpha-Prüfung neu starten.
   angemeldete Tester im geschlossenen Test über 14 Tage.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
 - Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die neuen
-  deutschen Screenshots sind gespeichert; Englisch nutzt aktuell die deutschen Grafiken als
-  Fallback.
+  deutschen Screenshots sind zur Prüfung eingereicht; Englisch nutzt aktuell die deutschen
+  Grafiken als Fallback.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
 - Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Datensicherheit: keine Datenerhebung
@@ -38,7 +36,7 @@ Alpha-Prüfung neu starten.
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` |
-| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Deutsche Bilder in Play gespeichert, Einreichung noch offen. |
+| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Deutsche Bilder in Play zur Prüfung eingereicht. |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit | ✅ unten |
@@ -56,7 +54,7 @@ Alpha-Prüfung neu starten.
 3. **Zielgruppe:** 13 Jahre und älter wurde bestätigt und in der Play Console gespeichert.
 4. **Datenschutz-URL:** Die App-spezifische GitHub-Pages-Seite ist veröffentlicht und in der
    Play Console sowie in Version 1.0.2 der App verlinkt.
-5. **Geschlossener Test:** Google muss das Update auf 1.0.3 prüfen. Für den späteren
+5. **Geschlossener Test:** Version 1.0.3 wird an Tester ausgeliefert. Für den späteren
    Produktionszugriff fehlen noch mindestens 12 angemeldete Tester über 14 Tage; derzeit
    stehen vier Personen auf der Tester-Liste und es sind noch keine Beitritte erfasst.
 
