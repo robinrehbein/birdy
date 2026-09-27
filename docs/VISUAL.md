@@ -86,7 +86,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 6 | 6 | hoch | Emoji als Icons: Shop-Reiter, Schlösser, Toasts, Hand, Ton, Geschenk. | Eigenes SVG-Icon-Set | ⏸ Varianten zur Wahl |
 | 7 | 6 | hoch | Fließtexte in System-Schrift statt Hausschrift. | Einheitliche Schrift | ⏸ Varianten zur Wahl |
 | 8 | 7/8 | hoch | Beim Crash ist keine Rückmeldung sichtbar. | Treffer-Stern, Federn, Flash, Squash | ✅ It. 4 |
-| 9 | 3 | hoch | Die Röhren blenden nach oben zu „grünen Lichtsäulen“ aus. | Röhren oben sauber enden lassen oder in den Himmel ausblenden | offen |
+| 9 | 3 | hoch | Die Röhren blenden nach oben zu „grünen Lichtsäulen“ aus. | Röhren oben sauber enden lassen oder in den Himmel ausblenden | ✅ It. 5 (Wolkenbank) |
 | 10 | 2/3 | hoch | Alle Kaufwelten haben denselben beigen Weg und denselben Rand. | Weg-Palette je Welt | ⏸ Farbwelt (Rückfrage) |
 | 11 | 3 | hoch | Der Kaktus ist nicht erkennbar, Power-up-Blasen sind in der Ferne winzig. | Silhouette, Kontrast, Halo | offen |
 | 12 | 1 | mittel | Die Flügel sind blass und stäbchenartig. | Flügel in Körpernähe kräftiger | ⏸ Vogel (Rückfrage) |
@@ -342,3 +342,34 @@ Wichtigste neue oder bestätigte Punkte (Rangfolge des Reviewers):
 7. Der Mini-Vogel ist fast unsichtbar.
 
 „Was bringt jeden Bereich auf 8“ ist im Review aufgeführt und fließt in die nächsten Iterationen ein.
+
+### Iteration 5 – Röhren hängen aus einer Wolkenbank (Bereich 3)
+
+**Warum:** Laut Review 1 ist das ein Blocker. Die oberen Röhren liefen über zehn Einheiten
+halbtransparent in den Himmel aus und wirkten wie grüne Lichtsäulen oder ein Renderfehler.
+
+**Was:**
+- Jede Röhrenreihe hat oben eine Bank aus flachen Low-Poly-Wolken auf Höhe 16. Die oberen Röhren
+  kommen sichtbar aus den Wolken, die Ausblendung ist auf 15–19 verkürzt und liegt jetzt
+  innerhalb der Bank.
+- Die Bank hat dieselbe Tönung wie die Himmelswolken der Zone und ist leicht von innen
+  aufgehellt. So wirken die Unterseiten von unten weich statt steingrau.
+- Drei gebackene Varianten mit eigenem kleinem Zufallsgenerator, ein Draw Call pro Reihe.
+- Die Trefferzonen bleiben unverändert: Die Röhren sind weiterhin 40 Einheiten hoch.
+
+![Iteration 5 vorher/nachher](visual/it5.jpg)
+
+**Messwerte:**
+- **Playtest:** Drei.js vergibt beim Anlegen neuer Objekte Zufalls-IDs. Deshalb ändert jede neue
+  Geometrie die gesäte Zufallsfolge, und der Vergleich läuft über drei Seeds (Basis → neu):
+  - Seed 7: Anfänger 17,4 → 15,9 s, Geübt 40,2 → 37,8 s, Profi 144 → 144 Punkte
+  - Seed 11: 15,9 → 17,4 s, 38,8 → 36,1 s, 141 → 144
+  - Seed 23: 15,9 → 17,4 s, 35,0 → 36,9 s, 141 → 142
+
+  Die Abweichungen gehen in beide Richtungen und liegen im Rauschen.
+- **Perf:** Im direkten Wechsel gemessen: erster Frame 721 ms gegenüber 648 ms der Basis
+  (+11 %, Budget +20 %). Bis zu 152 Draw Calls (Budget 170), bis zu 46,7 k Dreiecke (Budget 90 k).
+- **APK:** baut.
+
+**Neue Einschätzung:** Hindernisse 4 → 5. Die Röhren haben jetzt einen echten Abschluss. Offen
+bleiben die Größe der Pickups, die Silhouette des Kaktus und die Münzen.

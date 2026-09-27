@@ -496,11 +496,15 @@ export function createScenery(scene) {
   };
 }
 
+// Shared by the sky clouds and the cloud banks the pipes hang from, so the
+// zone tint (biomes.js) colours both.
+const cloudMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true });
+
 export function createClouds(scene) {
   const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, flatShading: true, fog: true });
   const geo = new THREE.IcosahedronGeometry(1, 1);
   const clouds = [];
-  const bakedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true });
+  const bakedMat = cloudMat;
   for (let i = 0; i < 18; i++) {
     const g = new THREE.Group();
     const n = 3 + Math.floor(Math.random() * 3);
@@ -545,7 +549,7 @@ stripeGeo.translate(0, 0.5, 0);
 // the sky colour seen behind it (same gradient maths as the sky dome, same
 // uniforms, so it follows every zone's sky). No transparency, no dithering.
 export const HAZE_START = 15;
-export const HAZE_END = 26;
+export const HAZE_END = 19; // inside the cloud bank
 function addSkyHaze(mat, sky) {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.skyTop = sky.top;
@@ -648,6 +652,41 @@ function makePipeSegment(mat, capGeo) {
   g.add(body, lip);
   return { g, body, lip };
 }
+
+// --- Cloud banks -------------------------------------------------------------
+// The upper pipes disappear into a bank of puffy clouds instead of fading
+// out into the sky. A few baked variants (own small RNG, so the game's random
+// sequence is untouched), one draw call per row.
+export const BANK_Y = 16;
+function makeBankGeometry(seed) {
+  let h = seed * 9301 + 49297;
+  const rnd = () => ((h = (h * 9301 + 49297) % 233280) / 233280);
+  const root = new THREE.Group();
+  const puff = new THREE.IcosahedronGeometry(1, 1);
+  const white = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const shade = new THREE.MeshBasicMaterial({ color: 0xe9eef5 });
+  for (let x = -6.5; x <= 6.5; x += 1.6 + rnd() * 0.5) {
+    const s = 1.5 + rnd() * 0.9;
+    const m = new THREE.Mesh(puff, rnd() < 0.3 ? shade : white);
+    m.position.set(x, BANK_Y + rnd() * 0.9, (rnd() - 0.5) * 1.6);
+    m.scale.set(s * 1.2, s * 0.62, s);
+    root.add(m);
+  }
+  // A lower row of smaller puffs right where the pipes enter the bank.
+  for (const x of LANES) {
+    const m = new THREE.Mesh(puff, white);
+    m.position.set(x + (rnd() - 0.5), BANK_Y - 0.9, 0.9 + rnd() * 0.4);
+    m.scale.set(1.2 + rnd() * 0.3, 0.7, 1.1);
+    root.add(m);
+  }
+  return bakeGroup(root);
+}
+const bankGeos = [1, 2, 3].map(makeBankGeometry);
+// Same zone tint as the sky clouds (shared colour), lit from within a little so
+// the undersides seen from below stay soft instead of rock-grey.
+const bankMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true, emissive: 0xffffff, emissiveIntensity: 0.32 });
+bankMat.color = cloudMat.color;
+let gateCount = 0;
 
 // --- Spiky cactus (obstacle) ------------------------------------------------
 
@@ -803,6 +842,8 @@ export function createGate(scene) {
       gapLow: 0, gapHigh: 0, hitLow: 0, hitHigh: 0,
     };
   });
+  const bank = new THREE.Mesh(bankGeos[gateCount++ % bankGeos.length], bankMat);
+  group.add(bank);
   scene.add(group);
 
   function setSegment(seg, from, to, lipAt) {
