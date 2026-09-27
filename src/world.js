@@ -529,9 +529,10 @@ export function createGate(scene) {
       if (this.popTime >= 0) {
         // Ring "pop" feedback right after passing the gate.
         this.popTime += dt;
-        const t = Math.min(1, this.popTime / 0.35);
-        for (const lane of lanes) lane.ring.scale.x = 0.95 * (1 + t * 0.6);
-        ringMat.opacity = 0.9 * (1 - t);
+        // Short and small: the row is already right next to the camera.
+        const t = Math.min(1, this.popTime / 0.22);
+        for (const lane of lanes) lane.ring.scale.x = 0.95 * (1 + t * 0.25);
+        ringMat.opacity = 0.7 * (1 - t) * (1 - t);
         if (t >= 1) {
           for (const lane of lanes) lane.ring.visible = false;
           this.popTime = -1;

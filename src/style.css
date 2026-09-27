@@ -450,3 +450,23 @@ button.gift {
   92% { transform: rotate(-2deg); }
 }
 .streak { font-size: 16px; margin: -4px 0 10px; color: #f26b1d; }
+
+/* Floating "Knapp!" label above the bird. */
+#popup {
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  color: #fff176;
+  text-shadow: 0 3px 0 #543847, 2px 0 0 #543847, -2px 0 0 #543847, 0 -2px 0 #543847;
+  opacity: 0;
+  white-space: nowrap;
+}
+#popup.show { animation: popup 0.8s ease-out forwards; }
+@keyframes popup {
+  0% { opacity: 0; transform: translate(-50%, -30%) scale(0.6); }
+  15% { opacity: 1; transform: translate(-50%, -60%) scale(1.15); }
+  70% { opacity: 1; transform: translate(-50%, -110%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
+}

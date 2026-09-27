@@ -35,6 +35,14 @@ const MAGNET_RANGE = 9;
 const STAR_SPEED_BOOST = 1.35;
 const GRACE_TIME = 1.2; // invulnerable blinking after the rainbow ends
 const FALLBACK_BPM = 124;
+const NEAR_MISS = 0.45; // gap clearance below which a pass counts as "Knapp!"
+const HIT_STOP = 0.14; // freeze-frame on impact (s)
+
+// Short haptic pulses (Android); silently ignored where unsupported.
+function buzz(ms) {
+  if (audio.muted) return;
+  try { navigator.vibrate?.(ms); } catch { /* ignore */ }
+}
 
 // --- Setup ------------------------------------------------------------------
 const canvas = document.getElementById('game');
@@ -314,6 +322,9 @@ const state = {
   runTime: 0,
   hold: false,
   overAt: 0,
+  squash: 0, // 1 right after a flap, decays (squash & stretch)
+  hitStop: 0,
+  nearChain: 0,
   menu: 'start', // start | shop (only while mode is 'ready')
   run: null, // per-run counters for missions
   celebrated: new Set(),
@@ -354,6 +365,8 @@ function resetGame() {
   state.deadTimer = 0;
   state.shake = 0;
   state.runTime = 0;
+  state.nearChain = 0;
+  state.squash = 0;
   state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0 };
   state.celebrated = new Set();
   bird.group.rotation.set(0, 0, 0);
@@ -553,6 +566,7 @@ function flap() {
   }
   state.vy = FLAP_VELOCITY;
   state.wingSpeed = 38;
+  state.squash = 1;
   sfx.flap();
 }
 
@@ -573,6 +587,7 @@ function tapDir(dir) {
     setLane(target);
     state.vy = Math.max(state.vy, SWITCH_HOP);
     state.wingSpeed = 26;
+    state.squash = 0.5;
     return;
   }
   flap();
@@ -684,6 +699,8 @@ function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
   marker.visible = false;
+  state.hitStop = HIT_STOP;
+  buzz(70);
   lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause };
   state.deadTimer = 0;
   state.shake = 0.5;
@@ -713,6 +730,11 @@ function showGameOver() {
   $('final-coins').textContent = state.coins;
   $('final-best').textContent = progress.best;
   $('new-best').classList.toggle('hidden', !isBest);
+  if (isBest && state.score > 0) {
+    // Record fanfare.
+    setTimeout(() => sfx.powerup(), 250);
+    buzz(30);
+  }
   const toBest = $('to-best');
   const missing = progress.best - state.score;
   toBest.classList.toggle('hidden', isBest || missing > 15 || progress.best < 5);
@@ -736,6 +758,31 @@ function addScore(gate) {
   void scoreEl.offsetWidth; // restart the CSS animation
   scoreEl.classList.add('pop');
   sfx.point();
+}
+
+// Close call: reward with a coin, a chirp that climbs with each consecutive
+// close call, a tiny buzz and a floating "Knapp!" label.
+const popupEl = document.createElement('div');
+popupEl.id = 'popup';
+app.appendChild(popupEl);
+function popup(text) {
+  tmpProj.set(state.x, state.y + 1.2, 0).project(camera);
+  popupEl.style.left = `${((tmpProj.x + 1) / 2) * 100}%`;
+  popupEl.style.top = `${((1 - tmpProj.y) / 2) * 100}%`;
+  popupEl.textContent = text;
+  popupEl.classList.remove('show');
+  void popupEl.offsetWidth;
+  popupEl.classList.add('show');
+}
+function nearMiss() {
+  state.nearChain++;
+  state.coins++;
+  coinCountEl.textContent = state.coins;
+  sfx.near(state.nearChain - 1);
+  buzz(15);
+  popup(state.nearChain > 1 ? `Knapp! ×${state.nearChain}` : 'Knapp!');
+  particles.emit(birdPos, { count: 10, colors: [0xffffff, 0xfff176], speed: 5, size: 0.09, life: 0.4, gravity: 0 });
+  checkMissions();
 }
 
 // Celebrate a daily mission the moment it is reached.
@@ -839,6 +886,9 @@ function updatePlaying(dt) {
       gate.passed = true;
       gate.popTime = 0;
       addScore(gate);
+      if (state.mode === 'playing' && !invincible() && gate.minClear !== undefined && gate.minClear < NEAR_MISS) nearMiss();
+      else state.nearChain = 0;
+      gate.minClear = undefined;
     }
     // Passed rows fade out so they don't hide what's coming next.
     gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0.1 : 1, Math.min(1, dt * 12)));
@@ -847,6 +897,11 @@ function updatePlaying(dt) {
     if (!invincible() && Math.abs(gz) < PIPE_RADIUS + 0.25 + r) {
       for (const lane of gate.lanes) {
         if (Math.hypot(state.x - lane.x, gz) > PIPE_RADIUS + 0.15 + r) continue;
+        if (!lane.blocked) {
+          // Track the tightest clearance while inside the pipe (for "Knapp!").
+          const clear = Math.min(state.y - r * 0.8 - lane.hitLow, lane.hitHigh - (state.y + r * 0.8));
+          gate.minClear = Math.min(gate.minClear ?? Infinity, clear);
+        }
         if (lane.blocked) die('blocked');
         else if (state.y + r * 0.8 >= lane.hitHigh) die('pipe-top');
         else if (state.y - r * 0.8 <= lane.hitLow) die(lane.hitLow > lane.gapLow + 0.01 ? 'plant' : 'pipe-bottom');
@@ -957,7 +1012,11 @@ function updateBirdVisual(dt) {
     bird.animateWings(state.wingPhase);
   }
   const scale = state.power.mini > 0 ? MINI_SCALE : BIRD_SCALE;
-  g.scale.setScalar(THREE.MathUtils.lerp(g.scale.x, scale, Math.min(1, dt * 8)));
+  state.baseScale = THREE.MathUtils.lerp(state.baseScale ?? BIRD_SCALE, scale, Math.min(1, dt * 8));
+  // Squash & stretch: stretched tall right after a flap, springing back.
+  state.squash = Math.max(0, state.squash - dt * 6);
+  const q = Math.sin(state.squash * Math.PI) * 0.5 + state.squash * 0.2;
+  g.scale.set(state.baseScale * (1 - 0.14 * q), state.baseScale * (1 + 0.24 * q), state.baseScale * (1 - 0.1 * q));
   if (state.mode === 'playing' && state.power.star > 0) {
     bird.setGlow(tmpColor.setHSL((state.time * 1.5) % 1, 1, 0.5), 0.7);
   }
@@ -994,15 +1053,23 @@ function updateCamera(dt) {
     camera.position.y += (Math.random() - 0.5) * s;
   }
   camera.lookAt(camLookCur);
+  // Speed kick: the view widens while the rainbow boost is active.
+  const fov = baseFov + (state.mode === 'playing' && state.power.star > 0 ? 8 : 0);
+  if (Math.abs(camera.fov - fov) > 0.05) {
+    camera.fov = THREE.MathUtils.lerp(camera.fov, fov, Math.min(1, dt * 4));
+    camera.updateProjectionMatrix();
+  }
 }
 
+let baseFov = 68;
 function resize() {
   const w = app.clientWidth;
   const h = app.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
   // Narrow portrait screens need a wider vertical FOV to still see all lanes.
-  camera.fov = camera.aspect < 0.5 ? 74 : 68;
+  baseFov = camera.aspect < 0.5 ? 74 : 68;
+  camera.fov = baseFov;
   camera.updateProjectionMatrix();
 }
 window.addEventListener('resize', resize);
@@ -1089,6 +1156,14 @@ function tick() {
   const dt = Math.min(rawDt, 1 / 30);
   adaptQuality(rawDt);
   if (landscapeTouch.matches || state.paused) {
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+    return;
+  }
+  if (state.hitStop > 0) {
+    // Freeze-frame on impact; only the camera shake keeps going.
+    state.hitStop -= rawDt;
+    updateCamera(dt);
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
     return;

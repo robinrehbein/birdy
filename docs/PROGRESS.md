@@ -21,7 +21,7 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
 | 1 | Onboarding | 5 | Anfänger-Bot: erster Tod im Median bei 17,4 s. Aber: Die Erklärung steht nur als Text im Menü. Die Steuerung ist jetzt einfacher erklärbar („beim Vogel = flattern, daneben = ausweichen“), der Zielring zeigt die Höhe. Bot-Überlebenszeit ist kein Beleg für Verständnis. |
-| 2 | Game Feel / Juice | 4 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss, Vibration. |
+| 2 | Game Feel / Juice | 7 | Jede Spieleraktion hat visuelles und akustisches Feedback, die wichtigen zusätzlich Vibration (Tabelle in Iteration 7). Squash & Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Tempo-Kick. Offen: nicht auf einem Gerät gefühlt; keine Tempo-Linien, keine Kamera-Neigung. |
 | 3 | Fairness & Kurve | 6 | Profi-Bot überlebt 94 % der 150-s-Runs dank garantierter Erreichbarkeit. Aber: Der Bot kennt die exakten Lückenhöhen. Die Tiefenwahrnehmung von Menschen ist nicht geprüft, die Kurve endet bei 40 Punkten. |
 | 4 | Abwechslung | 3 | Ab Punkt 10 ist alles freigeschaltet, es gibt nur ein Biom. |
 | 5 | Session-Loop | 7 | Runs im Median: Anfänger 16 s, geübt 41 s ✓. Neustart per Tipp irgendwo 0,35 s nach dem Game-Over, danach schwebt der Vogel, bis getippt wird (getestet). „Nur noch X bis zum Rekord“. Offen: Game-Over erscheint erst ca. 1 s nach dem Crash. |
@@ -33,11 +33,10 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 
 ## Backlog (nach Hebel sortiert)
 
-1. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Vibration.
-2. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
-3. Politur: Münz-Material, Ring-Pop nahe der Kamera, Shop-Vorschau.
-4. Onboarding: Geister-Hand im ersten Run statt Text.
-5. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+1. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
+2. Politur: Münz-Material, Shop-Vorschau.
+3. Onboarding: Geister-Hand im ersten Run statt Text.
+4. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -250,3 +249,47 @@ wiederzukommen.
 | Neustart | Tipp 0,5 s nach dem Game-Over startet neu, Vogel schwebt ✓ |
 
 Regressions-Playtest ohne Änderung: Anfänger 16 s, geübt 41 s. Keine Konsolenfehler.
+
+### Iteration 7 – Game Feel / Juice
+
+**Was:**
+- **Squash & Stretch:** Nach einem Flügelschlag streckt sich der Vogel kurz in die Höhe und
+  federt zurück, beim Spurwechsel etwas schwächer.
+- **Hit-Stop:** Beim Crash friert das Bild 0,14 s ein (nur die Kamera wackelt), danach folgen
+  Blitz, Federn und Fall.
+- **„Knapp!“:**
+  - Zählt, wenn beim Durchflug weniger als 0,45 Einheiten Abstand zur Röhre bleiben.
+  - Belohnung: +1 Münze, schwebendes „Knapp!“-Label, Funken, heller Akkord und 15 ms
+    Vibration.
+  - Weitere knappe Durchflüge in Folge ergeben „Knapp! ×N“, der Akkord klingt jedes Mal
+    höher. Ein normaler Durchflug setzt die Serie zurück.
+- **Vibration:** 70 ms beim Crash, 15 ms bei „Knapp!“, 30 ms bei neuem Rekord. Ist der Ton
+  stummgeschaltet, bleibt auch die Vibration aus. Die Android-Berechtigung `VIBRATE` ist
+  ergänzt.
+- **Tempo-Kick:** Im Regenbogen weitet sich das Sichtfeld um 8°.
+- **Rekord-Fanfare** auf dem Game-Over-Screen.
+- **Ring-Pop beruhigt:** Er dauert jetzt 0,22 s statt 0,35 s, wird um 25 % statt 60 % größer
+  und blendet schneller aus. Vorher füllte er nahe der Kamera den halben Bildschirm.
+
+**Feedback-Abdeckung (Beleg):**
+
+| Aktion | Visuell | Audio | Haptik |
+|---|---|---|---|
+| Flattern | Flügel schneller, Stretch | Flatter-Sound | – |
+| Spurwechsel | Rollen, kleiner Stretch, Spur-Punkte | Swoosh | – |
+| Reihe passiert | Punkte-Pop, Ring-Pop | Punkt-Sound | – |
+| Knapp! | Label, Funken, +1 Münze | Akkord (steigt in Serie) | 15 ms |
+| Münze | Funken, Zähler | Münz-Sound | – |
+| Power-up | Funken, Anzeige, Leuchten, Tempo-Kick | Arpeggio, Musik-Hype | – |
+| Crash | Hit-Stop, Shake, Blitz, Federn | Crash, Musik-Ducking | 70 ms |
+| Mission erfüllt | Einblendung | Arpeggio | – |
+| Neuer Rekord | pulsierender Text | Fanfare | 30 ms |
+| Skin gekauft / Geschenk | Konfetti | Arpeggio / Münzregen | – |
+
+**Test:** Headless mit einem Autopiloten, der knapp über der unteren Röhre fliegt.
+- „Knapp!“ wurde angezeigt, dabei +1 Münze gutgeschrieben und `navigator.vibrate(15)` 2× ausgelöst.
+- Stretch ist im Screenshot sichtbar.
+- Keine Konsolenfehler.
+
+**Regression:** Anfänger 16,0 s, geübt 39,9 s im Median (100 Runs). Das liegt im Rahmen der
+Streuung.

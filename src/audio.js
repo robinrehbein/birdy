@@ -208,6 +208,11 @@ export const sfx = {
   powerdown: () => {
     [79, 74, 67, 62].forEach((n, i) => tone({ freq: midi(n), dur: 0.1, type: 'triangle', vol: 0.12, delay: i * 0.06 }));
   },
+  // Close call: bright upward chirp, pitched up for chains of close calls.
+  near: (chain = 0) => {
+    const base = 76 + Math.min(chain, 6) * 2;
+    [0, 4, 7, 12].forEach((d, i) => tone({ freq: midi(base + d), dur: 0.07, type: 'square', vol: 0.05, delay: i * 0.035 }));
+  },
   bounce: () => tone({ freq: 200, to: 500, dur: 0.15, type: 'triangle', vol: 0.2 }),
   hit: () => {
     tone({ freq: 220, to: 60, dur: 0.35, type: 'sawtooth', vol: 0.18 });
