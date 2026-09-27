@@ -20,26 +20,26 @@ erreichen. Die Reviews sehen nur Screenshots, keinen Code.
 - Playtest mit `SEED=7`, 50 Runs je Stufe:
 
   | Stufe | Median Zeit | Median Punkte | Münzen/Run | Zonen 2/3/4 |
-  |---|---|---|---|---|---|
+  |---|---|---|---|---|---|---|
   | Anfänger | 17,4 s | 9 | 8 | 46 / 2 / 0 % |
   | Geübt | 40,2 s | 23 | 23 | 100 / 64 / 22 % |
   | Profi | 180 s (Zeitlimit) | 144 | 138 | 100 / 100 / 100 % |
 
 ## Visual-Scorecard
 
-| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) |
+| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) | Review 2 (nach It. 6) |
 |---|---|---|
-| 1 | Vogel & Kosmetik | 6 | 5 |
-| 2 | Welten & Szenerie | 6 | 6 |
-| 3 | Hindernisse & Pickups | 5 | 4 |
-| 4 | Licht, Farbe & Atmosphäre | 6 | 6 |
-| 5 | UI-System | 6 | 6 |
-| 6 | Typografie & Icons | 4 | 5 |
-| 7 | Effekte & Partikel | 4 | 4 |
-| 8 | Animation & Übergänge | 5 | 5 |
-| 9 | Lesbarkeit im Spiel | 5 | 5 |
-| 10 | Store-Assets | 3 | 4 |
-| | **Schnitt** | **5,0** | **5,0** |
+| 1 | Vogel & Kosmetik | 6 | 5 | 6 |
+| 2 | Welten & Szenerie | 6 | 6 | 6 |
+| 3 | Hindernisse & Pickups | 5 | 4 | 4 |
+| 4 | Licht, Farbe & Atmosphäre | 6 | 6 | 6 |
+| 5 | UI-System | 6 | 6 | 6 |
+| 6 | Typografie & Icons | 4 | 5 | 5 |
+| 7 | Effekte & Partikel | 4 | 4 | 5 |
+| 8 | Animation & Übergänge | 5 | 5 | 5 |
+| 9 | Lesbarkeit im Spiel | 5 | 5 | 5 |
+| 10 | Store-Assets | 3 | 4 | 4 |
+| | **Schnitt** | **5,0** | **5,0** | **5,2** |
 
 Begründungen aus Review 0 (Art-Director-Subagent, nur Screenshots):
 
@@ -480,3 +480,46 @@ Rahmen, Hintergrund und Claim, und darin standen noch Spurpunkte und der Sprachk
 - APK baut.
 
 **Neue Einschätzung:** Store-Assets 5 → 7.
+
+## Review 2 (nach Iteration 6) – neuer Art-Director-Subagent, nur Screenshots
+
+Schnitt **5,2**. Die Noten sind so übernommen, wie der Reviewer sie vergeben hat.
+
+Einordnung der Hauptpunkte:
+
+1. **Store-Screenshots roh (Blocker):** Der Review sah noch die alten Bilder. Seit Iteration 8
+   erledigt.
+2. **Kaktus nicht erkennbar (Blocker):** In der Nahaufnahme des Review-Builds schaute der Kaktus
+   nur mit der Blüte heraus. Der Takt folgte dort noch der Audio-Uhr statt der Spielzeit. Seit
+   Iteration 8 zeigt der Katalog den aufgerichteten Kaktus mit Kontur.
+3. **Halbtransparente Säulen über den Wolken (hoch):** Das war echt. Die oberen Röhren liefen bis
+   Höhe 40 und schimmerten über der Wolkenbank durch. Behoben in Iteration 9.
+4. **Spurlinien im Himmel und Seitenpunkte (hoch):** Der Review sah den Stand vor Iteration 7. Dort
+   erledigt.
+5. **Weiter offen:**
+   - überall dieselben Röhren
+   - Emoji-Icons und System-Schrift (Rückfrage läuft)
+   - Vogel im Menü nur von hinten (Rückfrage läuft)
+   - leeres Pause-Panel
+   - kaum Power-up-Effekte
+   - graue Stadtblöcke
+
+### Iteration 9 – Röhren enden in der Wolkenbank (Bereich 9)
+
+**Warum:** Oberhalb der Wolkenbank schimmerten die bis Höhe 40 reichenden Röhren als blasse
+Säulen durch (Review 2, hoch). Die Himmelsfarbe im Röhren-Shader passt nicht exakt zum
+Himmelsdom.
+
+**Was:** Die oberen Röhren und die gesperrten Spuren enden jetzt auf Höhe 17,4, also innerhalb
+der Wolkenbank. Das ist reine Optik: Die Kollision nutzt die Lückenkanten und die Markierung
+„gesperrt“, nicht die Röhrenhöhe. Oberhalb der Wolken ist der Himmel jetzt frei.
+
+![Iteration 9 vorher/nachher](visual/it9.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 6–8.
+- Perf im direkten Wechsel gemessen: erster Frame 616 ms gegenüber 624 ms der Basis. Bis zu
+  144 Draw Calls, bis zu 46 k Dreiecke. Die kürzeren Röhren sparen Pixel.
+- APK baut.
+
+**Neue Einschätzung:** Lesbarkeit 7 → 7, Hindernisse 6 → 6.

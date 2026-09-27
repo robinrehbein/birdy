@@ -3,7 +3,9 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 
 export const LANES = [-3, 0, 3];
 export const PIPE_RADIUS = 1.1;
-export const PIPE_TOP = 40; // pipes extend well above the visible sky
+// Pipes end inside the cloud bank (BANK_Y). Looks only: collisions use the
+// gap edges and the `blocked` flag, not this height.
+export const PIPE_TOP = 17.4;
 export const GROUND_TILE = 10; // world units per ground texture repeat
 
 const SKY_TOP = 0x2a9bd0;
