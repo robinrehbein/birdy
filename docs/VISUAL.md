@@ -229,8 +229,7 @@ verdeckte den Vogel (Mangel 4, „hoch“).
 
 **Was:**
 - Eine passierte Reihe verschwindet jetzt über 1,5 Einheiten hinter dem Vogel. Die Deckkraft
-  hängt am Abstand statt an der Zeit, bei Spieltempo dauert das etwa 0,06 s. Ab 60 Punkten, wenn
-  auch die Kamera weiter wegrückt, bleibt es genauso sauber.
+  hängt am Abstand statt an der Zeit, bei Spieltempo dauert das etwa 0,06 s.
 - Verpasste Münzen und Power-ups schrumpfen 1,5–3 Einheiten hinter dem Vogel auf null.
 - Nur die Optik ändert sich: Kollision, Punktevergabe und Magnet laufen wie vorher. Münzen
   bleiben einsammelbar, denn der Magnet kann sie noch zurückziehen.
