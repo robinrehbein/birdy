@@ -285,7 +285,119 @@ function hill(colors) {
   return mesh(G.hill, pick(colors), 0, s * 0.25, 0, s * 1.4, s * 0.8, s);
 }
 
+function snowman() {
+  const g = new THREE.Group();
+  g.add(mesh(G.hill, 0xffffff, 0, 0.7, 0, 0.8), mesh(G.hill, 0xffffff, 0, 1.75, 0, 0.55), mesh(G.hill, 0xffffff, 0, 2.5, 0, 0.38));
+  g.add(mesh(G.cone, 0xff8a1f, 0, 2.5, 0.45, 0.1, 0.4, 0.1).rotateX(Math.PI / 2));
+  for (const x of [-0.13, 0.13]) g.add(mesh(G.flower, 0x2e2530, x, 2.62, 0.33, 0.25));
+  g.add(mesh(G.cactus, 0xe8453c, 0, 2.08, 0, 1.25, 0.22, 1.25));
+  return g;
+}
+function snowyPine() {
+  const g = new THREE.Group();
+  const s = rand(0.9, 1.4);
+  g.add(mesh(G.trunk, 0x7a4a24, 0, 0.5, 0, 0.7, 0.5, 0.7));
+  g.add(mesh(G.pine, pick([0x2f6b4a, 0x3a7a55]), 0, 2.4 * s, 0, s));
+  g.add(mesh(G.pine, 0xffffff, 0, 3.4 * s, 0, s * 0.62, s * 0.5, s * 0.62));
+  return g;
+}
+function snowPeak() {
+  const g = new THREE.Group();
+  const w = rand(7, 12);
+  const h = rand(9, 16);
+  g.add(mesh(G.cone, pick([0x9fb4c8, 0xa9bfd6, 0x8fa6bd]), 0, h / 2, 0, w, h, w));
+  g.add(mesh(G.cone, 0xffffff, 0, h * 0.8, 0, w * 0.42, h * 0.4, w * 0.42));
+  return g;
+}
+function palm() {
+  const g = new THREE.Group();
+  const lean = rand(-0.25, 0.25);
+  let x = 0;
+  for (let i = 0; i < 5; i++) {
+    g.add(mesh(G.trunk, i % 2 ? 0xa8733f : 0x9a6835, x, 0.5 + i * 0.95, 0, 0.8 - i * 0.07, 0.5, 0.8 - i * 0.07));
+    x += lean;
+  }
+  const top = 4.9;
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const leaf = mesh(G.leaf, pick([0x3fae3a, 0x55c244]), x + Math.cos(a) * 1.3, top - 0.35, Math.sin(a) * 1.3, 0.9, 0.12, 0.35);
+    leaf.rotation.y = -a;
+    leaf.rotation.z = -0.35;
+    g.add(leaf);
+  }
+  for (let i = 0; i < 3; i++) g.add(mesh(G.flower, 0x6b4423, x + rand(-0.3, 0.3), top - 0.5, rand(-0.3, 0.3), 1.1));
+  return g;
+}
+function lighthouse() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 6; i++) g.add(mesh(G.cactus, i % 2 ? 0xffffff : 0xe8453c, 0, 1 + i * 2, 0, 3.2 - i * 0.2, 2, 3.2 - i * 0.2));
+  g.add(mesh(G.box, 0xfff3a0, 0, 12.8, 0, 1.4, 1.4, 1.4), mesh(G.cone, 0xe8453c, 0, 14.3, 0, 1.4, 1.6, 1.4));
+  return g;
+}
+function lollipop() {
+  const g = new THREE.Group();
+  const h = rand(2.4, 3.6);
+  g.add(mesh(G.cactus, 0xffffff, 0, h / 2, 0, 0.3, h, 0.3));
+  const disc = mesh(G.cactus, pick([0xff6fa8, 0x7ee0ff, 0xb07eff, 0xffd84a]), 0, h + 1, 0, 3.4, 0.35, 3.4);
+  disc.rotation.x = Math.PI / 2;
+  const inner = mesh(G.cactus, 0xffffff, 0, h + 1, 0.05, 1.8, 0.4, 1.8);
+  inner.rotation.x = Math.PI / 2;
+  g.add(disc, inner);
+  return g;
+}
+function candyCane() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 6; i++) g.add(mesh(G.cactus, i % 2 ? 0xffffff : 0xe8453c, 0, 0.25 + i * 0.5, 0, 0.45, 0.5, 0.45));
+  g.add(mesh(G.hill, 0xe8453c, 0.3, 3.1, 0, 0.35));
+  return g;
+}
+function gumdrops() {
+  const g = new THREE.Group();
+  const n = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < n; i++) g.add(mesh(G.cone, pick([0xff7eb6, 0x7ee0ff, 0xfff07e, 0xb07eff, 0x8ff0a0]), (i - n / 2) * 0.9, 0.4, rand(0, 0.6), rand(0.6, 0.9), 0.8, rand(0.6, 0.9)));
+  return g;
+}
+function iceCreamHill() {
+  const s = rand(4, 7);
+  const g = new THREE.Group();
+  g.add(mesh(G.hill, pick([0xffc2dc, 0xc8f5dc, 0xfff1c8, 0xd9c8ff]), 0, s * 0.25, 0, s * 1.4, s * 0.8, s));
+  g.add(mesh(G.hill, 0xe8453c, 0, s * 0.95, 0, 0.8));
+  return g;
+}
+function mushroom(big) {
+  const g = new THREE.Group();
+  const s = big ? rand(1.4, 2.2) : rand(0.35, 0.6);
+  const cap = pick([0x7b6cff, 0x3fb7ff, 0xff9f43, 0x2fc6a8]);
+  g.add(mesh(G.cactus, 0xfff3de, 0, 1.2 * s, 0, 0.9 * s, 2.4 * s, 0.9 * s));
+  g.add(mesh(G.hill, cap, 0, 2.5 * s, 0, 1.5 * s, 0.75 * s, 1.5 * s));
+  if (big) for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + 0.4;
+    g.add(mesh(G.flower, 0xfff6e8, Math.cos(a) * 1.05 * s, 2.95 * s, Math.sin(a) * 1.05 * s, 1.4 * s));
+  }
+  return g;
+}
+
 const THEMES = {
+  winter: {
+    near: () => (Math.random() < 0.18 ? snowman() : bush([0xf4f8ff, 0xe3eefa, 0xd6e4f3])),
+    mid: () => snowyPine(),
+    far: () => snowPeak(),
+  },
+  beach: {
+    near: () => (Math.random() < 0.5 ? bush([0x9fc94a, 0x7fb83a]) : mesh(G.rock, pick([0xd9c49a, 0xc9b080]), 0, 0.3, 0, rand(0.5, 0.9), rand(0.4, 0.7), rand(0.5, 0.9))),
+    mid: () => palm(),
+    far: () => (Math.random() < 0.2 ? lighthouse() : hill([0x5fb84a, 0x6fc45a, 0x4fa83f])),
+  },
+  candy: {
+    near: () => (Math.random() < 0.3 ? candyCane() : gumdrops()),
+    mid: () => lollipop(),
+    far: () => iceCreamHill(),
+  },
+  mushroom: {
+    near: () => (Math.random() < 0.5 ? mushroom(false) : bush([0x4fa83f, 0x5fb84a, 0x3f8f36])),
+    mid: () => mushroom(true),
+    far: () => hill([0x3f8f6a, 0x4a9e76, 0x357f5c]),
+  },
   park: {
     near: () => bush([0x5cb338, 0x4a9e2c, 0x7ccf45]),
     mid: () => tree([0x5cb338, 0x4a9e2c, 0x7ccf45]),
@@ -463,6 +575,56 @@ const pipeBodyGeo = bakeParts([
 const capBelowGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, -0.4]]);
 const capAboveGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, 0.4]]);
 
+// Pipe designs (see PIPES in catalog.js): the shared pipe geometries are
+// recoloured in place, so every gate changes at once.
+const pipeMats = [];
+export function setPipeStyle(style) {
+  const recolor = (geo, parts) => {
+    const fresh = bakeParts(parts);
+    geo.attributes.color.array.set(fresh.attributes.color.array);
+    geo.attributes.color.needsUpdate = true;
+    fresh.dispose();
+  };
+  recolor(pipeBodyGeo, [
+    [pipeGeo, style.pipe],
+    [stripeGeo, style.light, -PIPE_RADIUS * 0.57, 0, PIPE_RADIUS * 0.8],
+    [stripeGeo, style.dark, PIPE_RADIUS * 0.64, 0, PIPE_RADIUS * 0.75],
+  ]);
+  recolor(capBelowGeo, [[lipGeo, style.pipe], [bandGeo, style.dark, 0, -0.4]]);
+  recolor(capAboveGeo, [[lipGeo, style.pipe], [bandGeo, style.dark, 0, 0.4]]);
+  pipeStyle = style;
+  for (const m of pipeMats) applyPipeMat(m);
+}
+let pipeStyle = null;
+
+// A bottom and a top pipe framing a gap, shown next to the bird in the shop.
+export function createPipePreview(scene) {
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true });
+  pipeMats.push(mat);
+  applyPipeMat(mat);
+  const group = new THREE.Group();
+  const bottom = makePipeSegment(mat, capBelowGeo);
+  const top = makePipeSegment(mat, capAboveGeo);
+  group.add(bottom.g, top.g);
+  group.visible = false;
+  scene.add(group);
+  return {
+    group,
+    // Gap between y0 and y1 (world units).
+    setGap(y0, y1) {
+      bottom.body.scale.y = y0;
+      bottom.lip.position.y = y0 - 0.4;
+      top.g.position.y = y1;
+      top.body.scale.y = 12;
+      top.lip.position.y = 0.4;
+    },
+  };
+}
+function applyPipeMat(m) {
+  m.metalness = pipeStyle?.metal ? 0.5 : 0;
+  m.roughness = pipeStyle?.metal ? 0.3 : 0.45;
+}
+
 function makePipeSegment(mat, capGeo) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(pipeBodyGeo, mat);
@@ -558,6 +720,8 @@ export function createGate(scene) {
     pipe: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }),
   };
   addSkyHaze(mats.pipe, scene.userData.env.sky);
+  pipeMats.push(mats.pipe);
+  applyPipeMat(mats.pipe);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);

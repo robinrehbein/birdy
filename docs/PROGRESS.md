@@ -1019,3 +1019,34 @@ Dein Wunsch: deutlich mehr Shop-Optionen, Vögel bauen wie bei Crossy Road.
   Spielstart mit Outfit ✓, keine Konsolenfehler.
 - `gallery.png`: 8 Kombinationen von vorn und hinten.
 - Perf: 159 Draw Calls, Tutorial- und Bahn-Tests ✓.
+
+### Iteration 27 – Welten und Röhren-Designs (Shop, Teil 2)
+
+**Was:**
+- **4 kaufbare Welten**, jede mit eigener Landschaft, eigenem Himmel und Boden:
+  - ⛄ **Winterland:** verschneite Tannen, Schneemänner, Schneegipfel
+  - 🏝️ **Südsee:** Palmen, Sandboden, Leuchtturm, grüne Inseln
+  - 🍭 **Zuckerland:** Lollipop-Bäume, Zuckerstangen, Gummibärchen-Hügel, Eiscreme-Berge
+  - 🍄 **Pilzwald:** Riesenpilze in Lila, Blau, Orange und Türkis (bewusst keine roten Pilze mit
+    weißen Punkten)
+- Die gewählte Welt ist Zone 1 jedes Runs (und jede vierte Zone danach). Danach geht es wie
+  bisher durch Herbstwald, Canyon und Blütenhain. So sieht man seine Welt in jedem Run, auch als
+  Anfänger.
+- Das Menü zeigt die gewählte Welt; im Shop wechselt die Welt beim Antippen als Vorschau.
+- **10 Röhren-Designs:** Klassisch, Himmelblau, Orange, Lila, Holz, Stein, Bonbon, Eis, Lava,
+  Gold. Im Shop steht eine Röhre als Vorschau neben dem Vogel. Umgefärbt werden die gemeinsamen
+  Geometrien, es kostet also keine zusätzlichen Draw Calls.
+
+**Beleg:**
+- `worlds.mjs`: jede Welt und jedes Design im Shop angeklickt, gekauft, Spielstart ✓, keine
+  Konsolenfehler.
+- Bilder `mont-worlds.png` und `mont-pipes.png`.
+- Leistung pro Welt im Run (Draw Calls / Dreiecke inkl. Schatten):
+
+| Welt | Draw Calls | Dreiecke |
+|---|---|---|
+| Stadtpark | 158 | 51k |
+| Winterland | 164 | 61k |
+| Südsee | 175 | 82k |
+| Zuckerland | 161 | 64k |
+| Pilzwald | 170 | 73k |

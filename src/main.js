@@ -17,6 +17,8 @@ import {
   createClouds,
   createGate,
   createCoin,
+  setPipeStyle,
+  createPipePreview,
 } from './world.js';
 
 // --- Tuning -----------------------------------------------------------------
@@ -74,6 +76,10 @@ const particles = createParticles(scene);
 const speedLines = createSpeedLines(scene);
 const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
 const zoneMarks = []; // { z, zone } – where the next zone begins
+// The first zone (and every fourth) is the world chosen in the shop.
+const zoneBiome = (zone) => (zone % BIOMES.length === 0 ? progress.equipped('world') : BIOMES[zone % BIOMES.length]);
+biomes.set(0, 0, zoneBiome(0));
+setPipeStyle(progress.equipped('pipe'));
 
 // Simple blob shadow under the bird, used when real shadows are off (lowest
 // quality level) so the flight height stays readable.
@@ -220,7 +226,12 @@ const SHOP_TABS = [
   { kind: 'eyes', icon: '🕶️' },
   { kind: 'beak', icon: '🐤' },
   { kind: 'trail', icon: '✨' },
+  { kind: 'world', icon: '🌍' },
+  { kind: 'pipe', icon: '🟢' },
 ];
+const pipePreview = createPipePreview(scene);
+pipePreview.group.position.set(-2.4, 0, 2.6); // beside the bird as seen by the shop camera
+pipePreview.setGap(3.3, 6.7);
 let shopTab = 'skin';
 let previewTrail = null; // trail shown on the hovering bird in the shop
 const hexColor = (c) => `#${c.toString(16).padStart(6, '0')}`;
@@ -239,6 +250,8 @@ applyI18n(tabsEl);
 function tileBg(kind, k) {
   if (kind === 'skin') return hexColor(k.body);
   if (kind === 'trail') return k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
+  if (kind === 'world') return `linear-gradient(${hexColor(k.top)}, ${hexColor(k.horizon)} 55%, ${hexColor(k.grass)} 56%)`;
+  if (kind === 'pipe') return `linear-gradient(90deg, ${hexColor(k.pipe)} 20%, ${hexColor(k.light)} 20% 36%, ${hexColor(k.pipe)} 36% 66%, ${hexColor(k.dark)} 66% 80%, ${hexColor(k.pipe)} 80%)`;
   return '#fff6d5';
 }
 function tileInner(kind, k) {
@@ -280,7 +293,17 @@ function renderShop() {
   bird.setSkin(kind === 'skin' ? item : progress.skin);
   bird.setLook(LOOK_KINDS.includes(kind) ? { ...equippedLook(), [kind]: item.id } : equippedLook());
   previewTrail = kind === 'trail' ? item : progress.trail;
+  previewWorld(kind === 'world' ? item : progress.equipped('world'));
+  setPipeStyle(kind === 'pipe' ? item : progress.equipped('pipe'));
+  pipePreview.group.visible = kind === 'pipe';
   renderWallet();
+}
+
+// Worlds are previewed around the menu bird (sky, light and scenery).
+function previewWorld(world) {
+  if (biomes.current === world) return;
+  biomes.set(0, 0.5, world);
+  scenery.setTheme(world.scenery, true);
 }
 
 function openShop(open) {
@@ -292,6 +315,9 @@ function openShop(open) {
   else {
     previewTrail = null;
     applyBird();
+    previewWorld(progress.equipped('world'));
+    setPipeStyle(progress.equipped('pipe'));
+    pipePreview.group.visible = false;
     renderStart();
   }
 }
@@ -482,7 +508,7 @@ function resetGame() {
   state.zone = 0;
   state.rushAt = -1;
   zoneMarks.length = 0;
-  if (biomes.index !== 0) biomes.set(0, 1.2);
+  if (biomes.current !== zoneBiome(0)) biomes.set(0, 1.2, zoneBiome(0));
   music.setTheme(0);
   music.setMode('game');
   state.squash = 0;
@@ -685,7 +711,7 @@ function spawnRush(z) {
   zoneMarks.push({ z: z + gap * 0.45, zone });
   // Switch the scenery now: chunks wrapping from here on are built in the new
   // theme, so the new place starts right where the banner appears.
-  scenery.setTheme(BIOMES[zone % BIOMES.length].scenery);
+  scenery.setTheme(zoneBiome(zone).scenery);
   state.prevGaps = null; // plenty of time after the rush: no reach limit
 }
 
@@ -1118,7 +1144,7 @@ function showGameOver() {
     progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
   const zoneLine = $('zone-reached');
   zoneLine.classList.toggle('hidden', state.zone === 0);
-  zoneLine.textContent = t('zoneReached', { n: state.zone + 1, name: L(BIOMES[state.zone % BIOMES.length].name) });
+  zoneLine.textContent = t('zoneReached', { n: state.zone + 1, name: L(zoneBiome(state.zone).name) });
   renderNextUnlock();
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
@@ -1206,7 +1232,7 @@ zoneBanner.id = 'zone-banner';
 app.appendChild(zoneBanner);
 function enterZone(zone) {
   state.zone = zone;
-  const b = biomes.set(zone, 3);
+  const b = biomes.set(zone, 3, zoneBiome(zone));
   music.setTheme(zone);
   zoneBanner.innerHTML = `<small>${t('zone', { n: zone + 1 })}</small>${L(b.name)}`;
   zoneBanner.classList.remove('show');

@@ -77,6 +77,41 @@ export const TRAILS = [
   { id: 'goldrain', name: { de: 'Goldregen', en: 'Gold Rain' }, price: 1800, colors: [0xffd400, 0xffe57a, 0xfff6c4], size: 0.1, life: 0.8, gravity: -5, speed: 1 },
 ];
 
+// Worlds: the place of the first zone (and every fourth after it). The run
+// still moves on through autumn forest, canyon and blossom grove. Colours
+// for sky, light and ground as in biomes.js; `scenery` is a theme in world.js.
+export const WORLDS = [
+  { id: 'park', icon: '🌳', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
+    top: 0x2a9bd0, horizon: 0xa6e4ea, hemiSky: 0xdff6ff, hemiGround: 0x6a8f3a, hemiI: 1.4, sun: 0xfff4d6, sunI: 2.2,
+    tint: 0xffffff, clouds: 0xffffff, grass: 0x73bf2e, track: 0xffffff },
+  { id: 'winter', icon: '⛄', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
+    top: 0x5aa9e6, horizon: 0xe3f2ff, hemiSky: 0xffffff, hemiGround: 0x9fb4c8, hemiI: 1.45, sun: 0xfff6e8, sunI: 2.0,
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8 },
+  { id: 'beach', icon: '🏝️', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
+    top: 0x1fa5e0, horizon: 0xbff3f0, hemiSky: 0xe8fbff, hemiGround: 0xc9b27a, hemiI: 1.45, sun: 0xfff4d6, sunI: 2.3,
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff },
+  { id: 'candy', icon: '🍭', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
+    top: 0xf07ab8, horizon: 0xffe3f1, hemiSky: 0xfff0f8, hemiGround: 0xc98fb8, hemiI: 1.45, sun: 0xfff0f6, sunI: 2.0,
+    tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6 },
+  { id: 'mushroom', icon: '🍄', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
+    top: 0x4a6fd0, horizon: 0xc8f0d8, hemiSky: 0xeafff2, hemiGround: 0x5a8a5a, hemiI: 1.4, sun: 0xfff0c8, sunI: 2.1,
+    tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0 },
+];
+
+// Pipe designs: body, highlight stripe and shadow stripe/band.
+export const PIPES = [
+  { id: 'green', name: { de: 'Klassisch', en: 'Classic' }, price: 0, pipe: 0x73bf2e, light: 0xb2ea6c, dark: 0x4f8a1f },
+  { id: 'blue', name: { de: 'Himmelblau', en: 'Sky Blue' }, price: 250, pipe: 0x3f9be0, light: 0x9fd6ff, dark: 0x2a6fb0 },
+  { id: 'orange', name: { de: 'Orange', en: 'Orange' }, price: 400, pipe: 0xf28a2e, light: 0xffc27a, dark: 0xc4611a },
+  { id: 'purple', name: { de: 'Lila', en: 'Purple' }, price: 550, pipe: 0x8f63d6, light: 0xc6a8ff, dark: 0x6440a8 },
+  { id: 'wood', name: { de: 'Holz', en: 'Wood' }, price: 700, pipe: 0xa8733f, light: 0xd9a86a, dark: 0x7a4f2a },
+  { id: 'stone', name: { de: 'Stein', en: 'Stone' }, price: 900, pipe: 0x9aa3ad, light: 0xd0d7de, dark: 0x6a737d },
+  { id: 'candy', name: { de: 'Bonbon', en: 'Candy' }, price: 1100, pipe: 0xff6fa8, light: 0xffffff, dark: 0xd9407c },
+  { id: 'ice', name: { de: 'Eis', en: 'Ice' }, price: 1300, pipe: 0x5fc6e6, light: 0xe6fbff, dark: 0x3a93b8 },
+  { id: 'lava', name: { de: 'Lava', en: 'Lava' }, price: 1600, pipe: 0xe0452e, light: 0xffc93c, dark: 0x8f2418 },
+  { id: 'gold', name: { de: 'Gold', en: 'Gold' }, price: 2200, pipe: 0xffc629, light: 0xfff1b0, dark: 0xd99a00 },
+];
+
 export const CATALOG = {
   skin: SKINS,
   pattern: PATTERNS,
@@ -84,6 +119,8 @@ export const CATALOG = {
   eyes: EYES,
   beak: BEAKS,
   trail: TRAILS,
+  world: WORLDS,
+  pipe: PIPES,
 };
 export const KINDS = Object.keys(CATALOG);
 
