@@ -74,3 +74,38 @@ export function createParticles(scene, max = 300) {
 
   return { emit, emitColor, update, clear };
 }
+
+// Speed streaks: thin light lines beside and above the track that rush past
+// the camera. Their opacity follows how fast the run is.
+export function createSpeedLines(scene, count = 28) {
+  const geo = new THREE.BoxGeometry(0.07, 0.07, 3.6);
+  const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false });
+  const mesh = new THREE.InstancedMesh(geo, mat, count);
+  mesh.frustumCulled = false;
+  scene.add(mesh);
+  const dummy = new THREE.Object3D();
+  const lines = Array.from({ length: count }, () => ({ pos: new THREE.Vector3() }));
+  function place(l, z) {
+    // Around the track: left/right of the lanes and above the pipes' gaps.
+    const side = Math.random() < 0.5 ? -1 : 1;
+    l.pos.set(side * (4.2 + Math.random() * 5), 1 + Math.random() * 11, z);
+  }
+  for (const l of lines) place(l, -Math.random() * 60);
+  return {
+    // amount 0..1; dz = world movement this frame.
+    update(dz, amount) {
+      mat.opacity = 0.7 * amount;
+      mesh.visible = amount > 0.01;
+      if (!mesh.visible) return;
+      lines.forEach((l, i) => {
+        l.pos.z += dz * 1.6; // a bit faster than the world for a rush
+        if (l.pos.z > 12) place(l, -50 - Math.random() * 15);
+        dummy.position.copy(l.pos);
+        dummy.scale.set(1, 1, 0.6 + amount);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(i, dummy.matrix);
+      });
+      mesh.instanceMatrix.needsUpdate = true;
+    },
+  };
+}

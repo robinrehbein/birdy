@@ -65,7 +65,12 @@ function buildGraph(ac, masterGain) {
   return { master: out, musicBus: music, sfxBus: sfx, noise: nz };
 }
 
+// Browsers only allow audio after a user gesture; sounds requested before
+// the first tap (e.g. a menu celebration at launch) are simply skipped.
+let unlocked = false;
+
 function ensure() {
+  if (!ctx && !offline && !unlocked) return null;
   if (!ctx) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
@@ -306,7 +311,10 @@ export async function renderMusic({ seconds = 31, themeIndex = 0, calm = false }
 }
 
 export const audio = {
-  unlock: ensure,
+  unlock() {
+    unlocked = true;
+    return ensure();
+  },
   get muted() {
     return muted;
   },

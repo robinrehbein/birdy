@@ -12,7 +12,7 @@ brauchst du die Entscheidungen unten.
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
-| App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel von vorn im Zielring) |
+| App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-1024x500.png` |
 | Screenshots 1080×1920 | ✅ `docs/store/screenshot-1…6` aus einem echten Run (`scripts/store-shots.mjs`): Menü, Park, Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop |
 | Store-Texte DE/EN | ✅ unten |
@@ -161,7 +161,7 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 |---|---|---|
 | **Piranha-Pflanze** | Rot mit weißen Punkten und Röhren-Kontext. Das erinnert stark an Nintendos Piranha-Pflanze, sie war ja auch ausdrücklich so gewünscht („aka Mario“). **Größtes Risiko.** Empfehlung: eigenes Design, z. B. violette Venusfliegenfalle mit Zähnen und ohne weiße Punkte. | offen – deine Entscheidung |
 | Grüne Röhren | Generisches Motiv, in vielen Spielen verbreitet. In Kombination mit der Pflanze aber näher an Mario. | niedrig |
-| Vogel-Design | Gelber Vogel mit großen Augen und orangem Schnabel, ähnlich wie Flappy Bird. Im Spiel bleibt er (Vorgabe). Das Store-Icon zeigt ihn jetzt in 3D-Frontansicht im Zielring statt im Profil vor türkisem Himmel. | reduziert |
+| Vogel-Design | Gelber Vogel mit großen Augen und orangem Schnabel, ähnlich wie Flappy Bird. Im Spiel bleibt er (Vorgabe). Das Store-Icon zeigt ihn jetzt in 3D-Frontansicht vor Regenbogen und Sonnenuntergangshimmel statt im Profil vor türkisem Himmel. | reduziert |
 | Wortlaut | „Flappy“ kommt in Store-Texten, README und Code nicht mehr vor. | erledigt |
 | Schrift „Lilita One“ | SIL Open Font License, kommerziell nutzbar. | ok |
 | Musik und Sounds | im Code erzeugt, keine fremden Samples | ok |

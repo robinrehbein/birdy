@@ -23,13 +23,13 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt. Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung (zwei Läufe à 100 Runs): Zone 2 erreichen 33–47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59–63 % (vorher 26 %), Zone 4 zu 23–25 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
-| 5 | Session-Loop | 8 | 0,8 s vom Crash zum nächsten Run. Game-Over zeigt das nächste Ziel (Münzen bis zum nächsten Vogel oder zur nächsten Spur; wenn freischaltbar, führt ein Tipp direkt in den Shop), alle Tagesmissionen mit Balken und die erreichte Zone. „🏆 Neuer Rekord!“ erscheint schon während des Runs. |
-| 6 | Meta-Progression | 7 | 7 Vogel-Farben und 7 Flugspuren, Tagesmissionen, Tagesgeschenk mit Serie, 14 Erfolge mit Münzbelohnung und Fortschrittsbalken, nächstes Ziel beim Game-Over. Offen: Ökonomie mit echten Spielern tunen. |
-| 7 | Audio | 6 | 4 Zonen-Themen, Menü-Modus, Mischkette mit Tiefpass, Raumhall und Kompressor (Höhenanteil −40 %, keine Übersteuerung), variierter Flügelschlag, Münz-Kombo. Von keinem Menschen gehört. |
+| 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie, Tageszeit, Musik und Spezialität. Aber: Anfänger sehen meist 1–2 Zonen (Zone 3 nur ~2 %), ab Reihe 40 wiederholen sich die Zonen (Review 4). |
+| 5 | Session-Loop | 7 | 0,8 s vom Crash zum Neustart, nächstes Ziel, Missionen, Erfolge. Das Game-Over auf kleinen Displays ist entschlackt (Iteration 20). |
+| 6 | Meta-Progression | 6 | Farben, Spuren, Missionen, Geschenk, 14 Erfolge. Aber: Vögel sind nur Umfärbungen. |
+| 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 6 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Offen: Die oberen Röhren nehmen viel Bildfläche ein (bewusst belassen, siehe Iteration 15). |
-| 10 | Store-Reife | 6 | AAB signierbar, Texte DE/EN, Datenschutz, eigenständiges Icon, Zurück-Taste. 6 Screenshots aus einem echten Run ohne HUD-Manipulation (Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop). Offen: App-ID und Schlüssel (deine Entscheidung). |
+| 10 | Store-Reife | 5 | AAB, Texte, Datenschutz, neues Icon. Aber: englisches Listing zu einer rein deutschen App. Offen: App-ID, Name. |
 
 ## Backlog (nach Hebel sortiert)
 
@@ -88,6 +88,29 @@ Die neuen Top 3:
 Außerdem gefunden: `scripts/perf.mjs` war seit dem Tutorial kaputt, und die Store-Screenshots
 waren inszeniert. Als überhöht bewertet: Session-Loop, Abwechslung, Game Feel, Audio und
 Store-Reife. Oben korrigiert.
+
+## Review 4 (nach Iteration 18) – Publisher-Subagent
+
+Urteil: **interner Test-Track ja, öffentlicher Soft Launch nein.**
+
+- **Erledigt:** das nächste Ziel beim Game-Over.
+- **Halb erledigt:**
+  - Zonen: Anfänger sehen meist nur 1–2.
+  - Bildaufteilung: Menü und Shop sind gelöst, aber der Röhrenturm füllt weiter rund 40 % des
+    Bildes.
+- **Blocker:**
+  - Englisches Store-Listing, obwohl die App nur Deutsch spricht.
+  - Der Röhrenturm dominiert die Screenshots.
+- **Kleine Fehler:**
+  - Erfolge alter Spielstände.
+  - Einblendungen bleiben nach dem Neustart in der Warteschlange.
+  - Tipp-Feedback unter dem Daumen.
+  - Überladenes Game-Over auf 360×640.
+  - Veraltete `STORE.md`.
+
+  Alle sind in Iteration 20 behoben.
+- **Als überhöht bewertet:** Audio, Meta, Session-Loop, Abwechslung und Store, jeweils um einen
+  Punkt. Oben korrigiert.
 
 ## Iterations-Log
 
@@ -765,3 +788,54 @@ stark oder schwach? Wechsel? Zonen?), helfen beim nächsten Schritt.
 Der Klang ist voller und weicher, ohne Übersteuerung; die Themen bleiben innerhalb von 1,5 dB.
 Live-Spieltest mit Musik und Effekten (`audiolive.mjs`): keine Fehler, der Takt läuft mit. Nebenbei sind die letzten Three.js-Warnungen behoben (`Timer` statt des veralteten `Clock`, `PCFShadowMap`), die Konsole ist jetzt leer. Die WAVs liegen zum Anhören im Scratchpad
 unter `audio2/`.
+
+### Iteration 20 – Tempo-Gefühl und Fehler aus Review 4
+
+**Was:**
+- **Tempo-Streifen:**
+  - Feine helle Linien neben und über der Strecke rauschen an der Kamera vorbei.
+  - Sie werden ab etwa 22 Einheiten/s sichtbar und stärker, je schneller es wird, am
+    stärksten im Regenbogen.
+  - Technisch 1 Instanced Mesh, also 1 Draw Call.
+- **Sichtfeld:** wird mit dem Tempo bis zu 4° weiter, im Regenbogen zusätzlich 8°.
+- **Behoben aus Review 4:**
+  - Erfolge alter Spielstände werden beim Start ausgezahlt, statt nach dem nächsten Run falsch
+    angezeigt zu werden.
+  - Die Warteschlange der Einblendungen wird beim Neustart geleert.
+  - Das Tipp-Feedback erscheint am Vogel, statt unter dem Daumen.
+  - „Zone 1 erreicht“ ist ausgeblendet.
+  - Auf niedrigen Displays ist das Game-Over kompakter und ohne Münzanzeige, die den Titel
+    überdeckt hat.
+  - `STORE.md` beschreibt jetzt das aktuelle Icon.
+- **Eigener Fehler behoben:** Die Erfolgs-Fanfare beim Start erzeugte den Audio-Kontext vor der
+  ersten Berührung. Der Browser blockierte das und warnte bei jedem Ton. Jetzt werden Töne erst
+  nach dem ersten Tipp erzeugt.
+
+**Beleg:**
+
+| Test | Ergebnis |
+|---|---|
+| `fix4.mjs` (alter Spielstand: Rekord 26, 60 Runs) | Beim Start 3 Erfolge ausgezahlt (+190) ✓; Übersicht konsistent; Game-Over auf 360×640 ohne Überlappung ✓ |
+| Live-Audiotest, Tutorial-E2E, Musikmessung | unverändert grün, Konsole ohne Fehler und Warnungen |
+
+---
+
+## Bericht der zweiten Runde (Iterationen 16–20)
+
+Geliefert:
+- Erfolge (16)
+- neues App-Icon (17)
+- feinere Steuerung (18)
+- Audio mit Raum und Variation (19)
+- Tempo-Gefühl und Review-Fehler (20)
+
+**Das Ziel „alle ≥ 8“ ist weiterhin nicht erreicht.** Die Noten liegen bei 5–7; der Reviewer
+sieht das Spiel bereit für den internen Test-Track.
+
+**Deine Entscheidungen, bevor es sinnvoll weitergeht:**
+1. **Name** (Recherche-Ergebnisse im Chat).
+2. **Röhrentürme:** die oberen Röhren nach oben in den Himmel ausblenden. Das ändert die Optik
+   leicht, der Reviewer hält es für einen Blocker.
+3. **Sprache:** Englisch einbauen oder nur in DE/AT/CH starten.
+4. **Steuerung:** Was genau fühlt sich nicht „tip top“ an? (Flattern zu stark oder schwach,
+   Wechsel, Zonen, Verzögerung?)

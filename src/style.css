@@ -643,3 +643,11 @@ button.gift {
   0% { opacity: 0.95; transform: scale(0.5); }
   100% { opacity: 0; transform: scale(1.25); }
 }
+
+/* Small screens: the game-over panel needs the room of the wallet chip. */
+@media (max-height: 720px) {
+  .wallet.over { display: none; }
+  #gameover .panel { padding: 14px 14px 16px; }
+  #gameover h2 { font-size: 38px; margin-bottom: 10px; }
+  #gameover .stats strong { font-size: 26px; }
+}

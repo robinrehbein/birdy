@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
-import { createParticles } from './effects.js';
+import { createParticles, createSpeedLines } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, SKINS, TRAILS, ACHIEVEMENTS } from './progress.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
@@ -69,6 +69,7 @@ const ground = createGround(scene);
 const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 const particles = createParticles(scene);
+const speedLines = createSpeedLines(scene);
 const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
 const zoneMarks = []; // { z, zone } – where the next zone begins
 
@@ -439,6 +440,7 @@ function resetGame() {
   state.shake = 0;
   state.runTime = 0;
   state.nearChain = 0;
+  toastQueue.length = 0; // no leftovers from the menu or the last run
   state.zone = 0;
   state.rushAt = -1;
   zoneMarks.length = 0;
@@ -467,6 +469,7 @@ function resetGame() {
   shopEl.classList.add('hidden');
   overEl.classList.add('hidden');
   walletEl.classList.add('hidden');
+  walletEl.classList.remove('over');
   state.menu = 'start';
   bird.setSkin(progress.skin);
   updateLaneDots();
@@ -856,7 +859,13 @@ canvas.addEventListener('pointerdown', (e) => {
   const dir = Math.abs(d) <= OWN_ZONE ? 0 : Math.sign(d);
   const wasPlaying = state.mode === 'playing' && !state.hold;
   tapDir(dir);
-  if (wasPlaying) tapFx(e.clientX - rect.left, e.clientY - rect.top, dir);
+  if (wasPlaying) {
+    // Show it at the bird (the finger would hide it), nudged in the direction.
+    tmpProj.set(state.x, state.y, 0).project(camera);
+    const bx = ((tmpProj.x + 1) / 2) * rect.width;
+    const by = ((1 - tmpProj.y) / 2) * rect.height;
+    tapFx(bx + dir * rect.width * 0.14, by, dir);
+  }
 });
 // Tapping the free area of the start screen starts right away; the panel's
 // buttons do their own thing.
@@ -909,7 +918,7 @@ function goToMenu() {
   shopEl.classList.add('hidden');
   achEl.classList.add('hidden');
   startEl.classList.remove('hidden');
-  walletEl.classList.remove('hidden');
+  walletEl.classList.remove('hidden', 'over');
   zonesEl.classList.remove('hold', 'show');
   marker.visible = false;
   showHand(null);
@@ -1003,11 +1012,14 @@ function showGameOver() {
   $('missions-done').innerHTML =
     achievements.map((a) => `<div class="mission done new achievement"><span class="text">${a.icon} Erfolg: ${a.name}</span><span class="reward">+${a.reward}</span></div>`).join('') +
     progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
-  $('zone-reached').textContent = `Zone ${state.zone + 1} erreicht: ${BIOMES[state.zone % BIOMES.length].name}`;
+  const zoneLine = $('zone-reached');
+  zoneLine.classList.toggle('hidden', state.zone === 0);
+  zoneLine.textContent = `Zone ${state.zone + 1} erreicht: ${BIOMES[state.zone % BIOMES.length].name}`;
   renderNextUnlock();
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
   walletEl.classList.remove('hidden');
+  walletEl.classList.add('over');
   renderWallet(completed.length > 0 || achievements.length > 0 || state.coins > 0);
 }
 
@@ -1431,7 +1443,9 @@ function updateCamera(dt) {
   camera.lookAt(camLookCur);
   frameBird(menuFrame);
   // Speed kick: the view widens while the rainbow boost is active.
-  const fov = baseFov + (state.mode === 'playing' && state.power.star > 0 ? 8 : 0);
+  // Speed kick: slightly wider view as the pace rises, more in the rainbow.
+  const pace = state.mode === 'playing' ? THREE.MathUtils.clamp((state.speed - 18) / 18, 0, 1) : 0;
+  const fov = baseFov + pace * 4 + (state.mode === 'playing' && state.power.star > 0 ? 8 : 0);
   if (Math.abs(camera.fov - fov) > 0.05) {
     camera.fov = THREE.MathUtils.lerp(camera.fov, fov, Math.min(1, dt * 4));
     camera.updateProjectionMatrix();
@@ -1493,6 +1507,8 @@ resize();
 const timer = new THREE.Timer();
 camera.position.set(0, 6.2, 6.5);
 music.setMode('menu'); // calm version until the first run starts
+// Existing saves: pay out achievements already earned before they existed.
+if (progress.tutorialDone) setTimeout(celebrateMenuAchievements, 800);
 renderStart();
 
 // One fixed game-logic step (no rendering). Shared by the render loop and the
@@ -1587,6 +1603,10 @@ function tick() {
   }
   step(dt, music.beat());
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
+  // Speed feel: streaks fade in from ~24 units/s and are strongest in the rainbow.
+  const rush = state.mode === 'playing' && !state.hold
+    ? Math.min(1, Math.max(0, (state.speed - 22) / 14) + (state.power.star > 0 ? 0.6 : 0)) : 0;
+  speedLines.update(state.mode === 'playing' ? state.speed * dt : 0, rush);
   updateToast(dt);
   updateHand();
   updateZonesOverlay();
