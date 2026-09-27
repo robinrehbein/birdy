@@ -174,6 +174,9 @@ for (const lang of LANGS) {
         B.progress.select('world', w);
         B.handleBack(() => {});
         B.handleBack(() => {});
+        // As after choosing it in the shop: the menu shows the world at once.
+        B.openShop(true);
+        B.openShop(false);
       }, id);
       await page.click('#play-btn');
       await page.mouse.click(size[0] / 2, size[1] * 0.6);

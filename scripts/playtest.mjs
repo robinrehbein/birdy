@@ -26,6 +26,18 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
+// SEED=<n>: seeded Math.random, so two builds can be compared run for run.
+if (process.env.SEED) {
+  await page.addInitScript((seed) => {
+    let s = seed;
+    Math.random = () => {
+      s = (s + 0x6d2b79f5) | 0;
+      let t = Math.imul(s ^ (s >>> 15), 1 | s);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }, Number(process.env.SEED));
+}
 await page.goto(`${url}?sim`);
 await page.waitForFunction(() => window.__birdy?.simulate);
 
