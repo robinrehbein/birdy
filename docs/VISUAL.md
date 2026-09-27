@@ -20,26 +20,26 @@ erreichen. Die Reviews sehen nur Screenshots, keinen Code.
 - Playtest mit `SEED=7`, 50 Runs je Stufe:
 
   | Stufe | Median Zeit | Median Punkte | Münzen/Run | Zonen 2/3/4 |
-  |---|---|---|---|---|---|---|
+  |---|---|---|---|---|---|---|---|
   | Anfänger | 17,4 s | 9 | 8 | 46 / 2 / 0 % |
   | Geübt | 40,2 s | 23 | 23 | 100 / 64 / 22 % |
   | Profi | 180 s (Zeitlimit) | 144 | 138 | 100 / 100 / 100 % |
 
 ## Visual-Scorecard
 
-| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) | Review 2 (nach It. 6) |
+| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) | Review 2 (nach It. 6) | Review 3 (Ende, nach It. 10) |
 |---|---|---|
-| 1 | Vogel & Kosmetik | 6 | 5 | 6 |
-| 2 | Welten & Szenerie | 6 | 6 | 6 |
-| 3 | Hindernisse & Pickups | 5 | 4 | 4 |
-| 4 | Licht, Farbe & Atmosphäre | 6 | 6 | 6 |
-| 5 | UI-System | 6 | 6 | 6 |
-| 6 | Typografie & Icons | 4 | 5 | 5 |
-| 7 | Effekte & Partikel | 4 | 4 | 5 |
-| 8 | Animation & Übergänge | 5 | 5 | 5 |
-| 9 | Lesbarkeit im Spiel | 5 | 5 | 5 |
-| 10 | Store-Assets | 3 | 4 | 4 |
-| | **Schnitt** | **5,0** | **5,0** | **5,2** |
+| 1 | Vogel & Kosmetik | 6 | 5 | 6 | 5 |
+| 2 | Welten & Szenerie | 6 | 6 | 6 | 6 |
+| 3 | Hindernisse & Pickups | 5 | 4 | 4 | 5 |
+| 4 | Licht, Farbe & Atmosphäre | 6 | 6 | 6 | 6 |
+| 5 | UI-System | 6 | 6 | 6 | 6 |
+| 6 | Typografie & Icons | 4 | 5 | 5 | 5 |
+| 7 | Effekte & Partikel | 4 | 4 | 5 | 4 |
+| 8 | Animation & Übergänge | 5 | 5 | 5 | 5 |
+| 9 | Lesbarkeit im Spiel | 5 | 5 | 5 | 5 |
+| 10 | Store-Assets | 3 | 4 | 4 | 6 |
+| | **Schnitt** | **5,0** | **5,0** | **5,2** | **5,3** |
 
 Begründungen aus Review 0 (Art-Director-Subagent, nur Screenshots):
 
@@ -568,3 +568,151 @@ wirkten wie Kratzer.
 - APK baut.
 
 **Neue Einschätzung:** Effekte 5 → 6.
+
+## Abschluss nach 10 Iterationen
+
+Die Stopp-Regel greift: 10 Iterationen sind erreicht. Das Ziel „jeder Bereich ≥ 8“ ist **nicht
+erreicht**.
+
+Die unabhängigen Reviews bewerten streng und jedes Mal neu. Die Noten sind nie angehoben worden,
+auch nicht dort, wo ein Reviewer Stände vor der jeweiligen Iteration sah. Die vollständigen
+Reviews liegen in `docs/visual/review0.md` bis `review3.md`.
+
+### Scorecard vorher / nachher (unabhängige Reviews, nur Screenshots)
+
+| # | Bereich | Start (Review 0) | Ende (Review 3) |
+|---|---|---|---|
+| 1 | Vogel & Kosmetik | 6 | 5 |
+| 2 | Welten & Szenerie | 6 | 6 |
+| 3 | Hindernisse & Pickups | 5 | 5 |
+| 4 | Licht, Farbe & Atmosphäre | 6 | 6 |
+| 5 | UI-System | 6 | 6 |
+| 6 | Typografie & Icons | 4 | 5 |
+| 7 | Effekte & Partikel | 4 | 4 |
+| 8 | Animation & Übergänge | 5 | 5 |
+| 9 | Lesbarkeit im Spiel | 5 | 5 |
+| 10 | Store-Assets | 3 | 6 |
+| | **Schnitt** | **5,0** | **5,3** |
+
+**Ehrliche Einordnung:**
+- Die Blocker aus Review 0 sind behoben: Splash „Flapsy“, verrutschtes Game Over, Geisterbilder
+  vor der Kamera, rohe Store-Bilder und Röhren als Lichtsäulen. Die Noten sind trotzdem kaum
+  gestiegen.
+- Die Reviewer werten vor allem die Punkte ab, die noch offen sind und bei jedem Blick ins Auge
+  fallen:
+  - Vogel nur von hinten
+  - Emoji-Icons und System-Schrift
+  - gleiche Röhren und Wege in allen Welten
+- Drei dieser vier Punkte hängen an deinen Stil-Entscheidungen (Vogel, Icons, Schrift, Farbwelt
+  einer Zone). Dafür verlangt deine Vorgabe eine Rückfrage, und sie ist noch offen.
+- Zwei Aussagen aus Review 3 sind durch Standbilder verzerrt:
+  - Beim „Crash ohne Feedback“ ist der Hit-Stop mit Stern, Stauchung, Federn und Blitz im Spiel
+    vorhanden, im Standbild aber nur als Stern sichtbar.
+  - „Regenbogen ohne Regenbogen“: Die Aura wechselt ständig die Farbe, das Bild zeigt nur einen
+    Moment.
+
+  Das ändert nichts an den Noten, zeigt aber, wo Videos oder Animationen im Katalog helfen würden.
+
+### Die 5 größten sichtbaren Verbesserungen
+
+1. **Splash, Icons und Feature-Grafik:** „Birdy“ statt „Flapsy“, der Vogel vollständig und mit
+   Kontur. Iteration 1.
+   ![](visual/it1-a.jpg)
+2. **Keine Geisterbilder mehr vor der Kamera:** Passierte Röhren und Münzen verschwinden hinter
+   dem Vogel. Iteration 2.
+   ![](visual/it2.jpg)
+3. **Röhren hängen aus einer Wolkenbank:** statt grüner Lichtsäulen, darüber freier Himmel.
+   Iterationen 5 und 9.
+   ![](visual/it5.jpg)
+   ![](visual/it9.jpg)
+4. **Gestaltete Store-Screenshots mit Claim, DE und EN:** Iteration 8.
+   ![](visual/it8.jpg)
+5. **Power-ups und Kaktus sichtbar:** Blasen mit Rand, Kaktus mit Kontur, Auren für Regenbogen,
+   Magnet und Mini. Iterationen 6 und 10.
+   ![](visual/it6.jpg)
+   ![](visual/it10.jpg)
+
+Weitere Iterationen: das UI-Layout mit Scrim und dem Verrutsch-Fehler (Iteration 3,
+`visual/it3.jpg`), Treffer-Feedback (Iteration 4, `visual/it4.jpg`) sowie Spurlinien und
+Spuranzeige (Iteration 7, `visual/it7.jpg`).
+
+### Neue Store-Screenshots
+
+`docs/store/de/*.png` und `docs/store/en/*.png` (1080×1920). Übersicht:
+
+![](visual/store-de.jpg)
+![](visual/store-en.jpg)
+
+### Budget am Ende
+
+- **Draw Calls:** höchstens 150 in der normalen Probe (Anfang eines Runs). Im ungünstigsten Fall
+  167–168; die Basis lag dort bei 209.
+- **Dreiecke:** höchstens 53 k.
+- **Erster Frame:** im Rahmen der Basis (±5 %, headless).
+- **Qualität:** Die adaptive Qualitätsstufe ist unverändert.
+- **APK:** baut.
+
+### Offene Punkte
+
+**Warten auf deine Entscheidung**, siehe `docs/visual/choice-*.jpg`:
+1. **Icon-Stil** für ein eigenes SVG-Icon-Set statt Emoji: A Sticker / B weiße Glyphe /
+   C Abzeichen. Empfehlung A. Das Icon-Set liegt als Entwurf in `src/icons.js` und ist noch
+   nicht eingebaut.
+2. **Fließtext-Schrift:** A nur Lilita One / B Nunito ExtraBold / C Fredoka SemiBold.
+   Empfehlung B. B und C sind fremde Assets (OFL) und kämen mit Lizenz in `docs/ASSETS.md`.
+3. **Vogel von hinten:** A so lassen / B gelbe Flügel und größerer Schwanz / C wie B plus
+   Federschopf. Empfehlung B.
+
+Diese drei Punkte betreffen die schwächsten Bereiche 1 und 6 und sind ohne deine Wahl nicht
+lösbar.
+
+**Weitere offene Mängel** (aus Review 3 und der Mängelliste):
+- Röhren sind in jeder Welt gleich grün. Eine Standardfarbe je Welt würde deine Röhren-Designs
+  im Shop berühren, deshalb ist das eine Rückfrage.
+- Weg und Randstreifen sind in allen Welten gleich. Das ist die Farbwelt einer Zone, also
+  ebenfalls eine Rückfrage.
+- Graue Stadtquader im Park und im Shop-Hintergrund.
+- Das Pause-Panel ist leer.
+- Übergänge: Panels, Banner und Toasts haben einfache Animationen.
+- Shop: zehn enge Reiter, die Beschriftung ist bei 360 px klein.
+- Münzen ohne Rand und Prägung. Nur Blob-Schatten, keine Kontaktschatten unter den Röhren.
+- Die Messwerkzeuge laufen headless mit Software-Rendering. Werte auf echten Geräten fehlen
+  noch.
+
+### Testplan für dein Handy
+
+Debug-APK: `npm run android:apk` → `android/app/build/outputs/apk/debug/app-debug.apk`
+
+1. **Start:**
+   - Der Splash zeigt „Birdy“ mit Vogel und Regenbogen, nicht mehr „Flapsy“.
+   - Das Launcher-Icon passt bei runder und eckiger Maske, der Vogel wird nicht abgeschnitten.
+2. **Erststart:** App-Daten löschen, dann durch das Tutorial spielen. Die Hand erscheint, die
+   Spurlinien sind nur unten sichtbar, und auf dem Boden stehen die Spurstriche.
+3. **Run in Zone 1–4:**
+   - Die Röhren hängen aus einer Wolkenbank, darüber ist freier Himmel.
+   - Passierte Röhren und Münzen verschwinden sofort hinter dem Vogel und verdecken nichts.
+4. **Power-ups:** Einsammeln muss sich genauso anfühlen wie vorher, also derselbe Abstand, obwohl
+   die Blase größer ist. Aura-Farben:
+   - Regenbogen: bunter Ring
+   - Magnet: rote Wellen
+   - Mini: lila Ring
+5. **Kaktus:** Ab 10 Punkten ist er mit dunkler Kontur deutlich zu sehen. Die Trefferzone muss
+   sich wie vorher anfühlen, besonders an der Oberkante.
+6. **Crash:**
+   - Der „Bonk“-Stern erscheint an der Trefferseite, der Vogel wird gestaucht.
+   - Die Federn haben die Farbe des gewählten Vogels.
+   - Der weiße Blitz ist weicher.
+7. **Game Over und Pause:**
+   - Beides ist abgedunkelt.
+   - Das „freischaltbar“-Banner leuchtet und bleibt im Panel.
+   - Zum Prüfen des Verrutsch-Fehlers: im Shop durch die Artikel scrollen, einen Run spielen und
+     sterben. Oben dürfen Ton- und Sprachknopf nicht abgeschnitten sein, unten darf kein
+     türkiser Streifen erscheinen.
+8. **Leistung:**
+   - Auf einem älteren Handy mit `?fps` im Browser prüfen, oder in der App fünfmal auf den Titel
+     tippen. Das Overlay zeigt fps und Draw Calls.
+   - Erwartet werden höchstens etwa 170 Draw Calls, auch spät im Run.
+   - Die Qualitätsstufe (Q) darf wie bisher automatisch sinken.
+9. **Store:** Die neuen Screenshots liegen in `docs/store/de` und `docs/store/en`, die
+   EN-Feature-Grafik in `docs/store/feature-birdy-1024x500-en.png`. Beides muss in Play hochgeladen
+   werden.
