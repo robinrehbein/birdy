@@ -703,3 +703,9 @@ button.gift {
 .tabs .tab.dice { background: #7a6fc9; }
 .skin .dot { font-size: 20px; }
 .skins { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-height: 142px; overflow-x: hidden; overflow-y: auto; touch-action: pan-y; padding: 4px 3px 5px; }
+
+.shop-desc { margin: -6px 0 10px; font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; min-height: 0; }
+.shop-desc:empty { display: none; }
+.skin.upgrade .pips { display: flex; gap: 3px; }
+.skin.upgrade .pips i { width: 8px; height: 8px; border-radius: 50%; background: rgba(84, 56, 71, 0.3); }
+.skin.upgrade .pips i.on { background: #7be07b; box-shadow: 0 0 0 1px #543847; }

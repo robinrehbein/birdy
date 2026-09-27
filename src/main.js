@@ -5,7 +5,7 @@ import { sfx, music, audio, renderMusic } from './audio.js';
 import { createParticles, createSpeedLines } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, ACHIEVEMENTS } from './progress.js';
-import { CATALOG, KINDS } from './catalog.js';
+import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import { t, L, applyI18n, getLang, setLang } from './i18n.js';
 import {
@@ -37,6 +37,10 @@ const SPAWN_DISTANCE = 170;
 const FIRST_GATE_Z = -60;
 const COIN_RADIUS = 1.1;
 const MAGNET_RANGE = 9;
+// Shop upgrades: extra power-up time per level, wider magnet, more power-ups.
+const UPGRADE_BONUS = { star: 1.5, magnet: 3, mini: 3 };
+const powerDuration = (type) => POWERUPS[type].duration + UPGRADE_BONUS[type] * progress.level(type);
+const magnetRange = () => MAGNET_RANGE + 2 * progress.level('magnet');
 const STAR_SPEED_BOOST = 1.35;
 const GRACE_TIME = 1.2; // invulnerable blinking after the rainbow ends
 const FALLBACK_BPM = 124;
@@ -178,6 +182,7 @@ const shopEl = $('shop');
 const skinsEl = $('skins');
 const shopName = $('shop-name');
 const shopAction = $('shop-action');
+const shopDesc = $('shop-desc');
 const toastEl = $('toast');
 let shopSel = progress.skin.id;
 
@@ -228,12 +233,14 @@ const SHOP_TABS = [
   { kind: 'trail', icon: '✨' },
   { kind: 'world', icon: '🌍' },
   { kind: 'pipe', icon: '🟢' },
+  { kind: 'upgrade', icon: '⚡' },
 ];
 const pipePreview = createPipePreview(scene);
 pipePreview.group.position.set(-2.4, 0, 2.6); // beside the bird as seen by the shop camera
 pipePreview.setGap(3.3, 6.7);
 let shopTab = 'skin';
 let previewTrail = null; // trail shown on the hovering bird in the shop
+const defaultSel = () => (shopTab === 'upgrade' ? UPGRADES[0].id : progress.equipped(shopTab).id);
 const hexColor = (c) => `#${c.toString(16).padStart(6, '0')}`;
 const equippedLook = () => Object.fromEntries(LOOK_KINDS.map((k) => [k, progress.equipped(k).id]));
 function applyBird() {
@@ -259,11 +266,45 @@ function tileInner(kind, k) {
   return k.icon || '';
 }
 
+// Upgrades tab: one tile per power-up with its level, bought step by step.
+function renderUpgrades() {
+  skinsEl.innerHTML = UPGRADES.map((u) => {
+    const lvl = progress.level(u.id);
+    const pips = Array.from({ length: UPGRADE_MAX }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
+    const cls = ['skin', 'upgrade'];
+    if (u.id === shopSel) cls.push('sel');
+    return `<button class="${cls.join(' ')}" data-id="${u.id}" aria-label="${L(u.name)}"><span class="dot" style="background:#fff6d5">${u.icon}</span><span class="pips">${pips}</span></button>`;
+  }).join('');
+  const u = UPGRADES.find((x) => x.id === shopSel) || UPGRADES[0];
+  const lvl = progress.level(u.id);
+  const price = progress.upgradePrice(u.id);
+  shopName.textContent = L(u.name);
+  shopDesc.textContent = `${L(u.text)} · ${t('level', { n: lvl, max: UPGRADE_MAX })}`;
+  shopAction.classList.remove('buy');
+  if (price === null) {
+    shopAction.textContent = t('maxed');
+    shopAction.disabled = true;
+  } else {
+    shopAction.innerHTML = `${t('upgrade', { n: price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+    shopAction.classList.add('buy');
+    shopAction.disabled = progress.coins < price;
+  }
+  applyBird();
+  previewTrail = progress.trail;
+  previewWorld(progress.equipped('world'));
+  setPipeStyle(progress.equipped('pipe'));
+  pipePreview.group.visible = false;
+  renderWallet();
+}
+
 function renderShop() {
+  for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
+  tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  shopDesc.textContent = '';
+  if (shopTab === 'upgrade') return renderUpgrades();
   const kind = shopTab;
   const list = CATALOG[kind];
   const equipped = progress.equipped(kind).id;
-  for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
   skinsEl.innerHTML = list.map((k) => {
     const owned = progress.owns(kind, k.id);
     const cls = ['skin'];
@@ -274,7 +315,6 @@ function renderShop() {
     return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="dot" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
-  tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   shopName.textContent = L(item.name);
   shopAction.classList.remove('buy');
@@ -308,7 +348,7 @@ function previewWorld(world) {
 
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
-  shopSel = progress.equipped(shopTab).id;
+  shopSel = defaultSel();
   shopEl.classList.toggle('hidden', !open);
   startEl.classList.toggle('hidden', open);
   if (open) renderShop();
@@ -333,12 +373,12 @@ tabsEl.addEventListener('click', (e) => {
     }
     sfx.powerup();
     particles.emit(bird.group.position, { count: 20, colors: [progress.skin.body, 0xffffff, 0xfff176], speed: 5, size: 0.1, life: 0.6, gravity: -3 });
-    shopSel = progress.equipped(shopTab).id;
+    shopSel = defaultSel();
     renderShop();
     return;
   }
   shopTab = tb.dataset.tab;
-  shopSel = progress.equipped(shopTab).id;
+  shopSel = defaultSel();
   sfx.swoosh();
   renderShop();
 });
@@ -350,6 +390,15 @@ skinsEl.addEventListener('click', (e) => {
   renderShop();
 });
 shopAction.addEventListener('click', () => {
+  if (shopTab === 'upgrade') {
+    if (progress.buyUpgrade(shopSel)) {
+      setTimeout(celebrateMenuAchievements, 400);
+      sfx.powerup();
+      particles.emit(bird.group.position, { count: 30, colors: [POWERUPS[shopSel]?.color ?? 0x7be07b, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
+    }
+    renderShop();
+    return;
+  }
   const kind = shopTab;
   const item = CATALOG[kind].find((k) => k.id === shopSel);
   if (progress.owns(kind, item.id)) progress.select(kind, item.id);
@@ -497,7 +546,7 @@ function resetGame() {
   state.coins = 0;
   state.prevGaps = null;
   state.gatesSpawned = 0;
-  state.gatesToPower = 5 + Math.floor(Math.random() * 3);
+  state.gatesToPower = 5 + Math.floor(Math.random() * 3) - progress.level('luck');
   state.power = { star: 0, magnet: 0, mini: 0 };
   state.grace = 0;
   state.deadTimer = 0;
@@ -743,7 +792,7 @@ function spawnGate(z) {
   if (--state.gatesToPower <= 0 && calm.length) {
     const i = calm[Math.floor(Math.random() * calm.length)];
     pickupPlaced = placePickup(LANES[i], (prev[i].center + spec[i].center) / 2, z + spacing() / 2);
-    state.gatesToPower = 6 + Math.floor(Math.random() * 4);
+    state.gatesToPower = 6 + Math.floor(Math.random() * 4) - progress.level('luck');
   }
 
   // A guiding trail of coins leading from the previous row into this one.
@@ -1266,7 +1315,7 @@ function checkMissions() {
 }
 
 function activatePower(type) {
-  state.power[type] = POWERUPS[type].duration;
+  state.power[type] = powerDuration(type);
   if (state.run) {
     state.run.powerups++;
     checkMissions();
@@ -1286,7 +1335,7 @@ function updatePowers(dt) {
     chip.classList.toggle('hidden', left <= 0);
     if (left <= 0) continue;
     state.power[type] = Math.max(0, left - dt);
-    fill.style.width = `${(state.power[type] / POWERUPS[type].duration) * 100}%`;
+    fill.style.width = `${(state.power[type] / powerDuration(type)) * 100}%`;
     chip.classList.toggle('ending', state.power[type] < 1.5);
     if (state.power[type] === 0) {
       sfx.powerdown();
@@ -1436,7 +1485,7 @@ function updatePlaying(dt) {
     const p = c.mesh.position;
     p.z += dz;
     c.mesh.rotation.y += dt * 4;
-    if (magnet && p.distanceTo(birdPos) < MAGNET_RANGE && p.z > -MAGNET_RANGE) {
+    if (magnet && p.distanceTo(birdPos) < magnetRange() && p.z > -magnetRange()) {
       p.lerp(birdPos, Math.min(1, dt * 7));
     }
     if (p.z > 15) {

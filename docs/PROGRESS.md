@@ -1050,3 +1050,29 @@ Dein Wunsch: deutlich mehr Shop-Optionen, Vögel bauen wie bei Crossy Road.
 | Südsee | 175 | 82k |
 | Zuckerland | 161 | 64k |
 | Pilzwald | 170 | 73k |
+
+### Iteration 28 – Power-up-Upgrades (Shop, Teil 3)
+
+**Was:**
+- Neuer Shop-Reiter ⚡ **Power** mit vier Upgrades in je drei Stufen:
+
+| Upgrade | Wirkung pro Stufe | Preise |
+|---|---|---|
+| 🌈 Regenbogen | +1,5 s unverwundbar | 300 / 800 / 1800 |
+| 🧲 Magnet | +3 s und +2 Reichweite | 300 / 800 / 1800 |
+| 🍄 Mini-Vogel | +3 s klein | 300 / 800 / 1800 |
+| 🍀 Glückspilz | Power-ups eine Reihe früher | 500 / 1200 / 2500 |
+
+- Kacheln zeigen die Stufe als Punkte; darunter steht die Wirkung und die aktuelle Stufe.
+- Die Laufleiste des Power-ups im Spiel rechnet mit der verlängerten Dauer.
+- Upgrades zählen für den Erfolg „Sammler“ mit.
+
+**Beleg (`upg.mjs`, 360×640):**
+- Regenbogen zweimal verbessert → 9 s statt 6 s im Run.
+- Magnet Stufe 1 → Knopf „Verbessern · 800“, Münzen korrekt abgezogen, keine Fehler.
+- Bot-Playtest (150 Runs): Anfänger 20,5 s und 7 Münzen/Run, Geübt 30,8 s und 19 Münzen/Run,
+  Profi 96 % Überlebende.
+
+**Shop gesamt:** rund 90 Artikel und Stufen für zusammen etwa 65.000 Münzen. Bei 19 Münzen pro
+Run plus Missionen, Geschenk und Erfolgen reicht das für Monate. Die ersten Artikel (100–150)
+kosten weniger als eine Sitzung.
