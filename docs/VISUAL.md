@@ -20,26 +20,26 @@ erreichen. Die Reviews sehen nur Screenshots, keinen Code.
 - Playtest mit `SEED=7`, 50 Runs je Stufe:
 
   | Stufe | Median Zeit | Median Punkte | Münzen/Run | Zonen 2/3/4 |
-  |---|---|---|---|---|---|---|---|
+  |---|---|---|---|---|---|---|---|---|
   | Anfänger | 17,4 s | 9 | 8 | 46 / 2 / 0 % |
   | Geübt | 40,2 s | 23 | 23 | 100 / 64 / 22 % |
   | Profi | 180 s (Zeitlimit) | 144 | 138 | 100 / 100 / 100 % |
 
 ## Visual-Scorecard
 
-| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) | Review 2 (nach It. 6) | Review 3 (Ende, nach It. 10) |
+| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) | Review 2 (nach It. 6) | Review 3 (nach It. 10) | Review 4 (nach It. 13) |
 |---|---|---|
-| 1 | Vogel & Kosmetik | 6 | 5 | 6 | 5 |
-| 2 | Welten & Szenerie | 6 | 6 | 6 | 6 |
-| 3 | Hindernisse & Pickups | 5 | 4 | 4 | 5 |
-| 4 | Licht, Farbe & Atmosphäre | 6 | 6 | 6 | 6 |
-| 5 | UI-System | 6 | 6 | 6 | 6 |
-| 6 | Typografie & Icons | 4 | 5 | 5 | 5 |
-| 7 | Effekte & Partikel | 4 | 4 | 5 | 4 |
-| 8 | Animation & Übergänge | 5 | 5 | 5 | 5 |
-| 9 | Lesbarkeit im Spiel | 5 | 5 | 5 | 5 |
-| 10 | Store-Assets | 3 | 4 | 4 | 6 |
-| | **Schnitt** | **5,0** | **5,0** | **5,2** | **5,3** |
+| 1 | Vogel & Kosmetik | 6 | 5 | 6 | 5 | 6 |
+| 2 | Welten & Szenerie | 6 | 6 | 6 | 6 | 6 |
+| 3 | Hindernisse & Pickups | 5 | 4 | 4 | 5 | 5 |
+| 4 | Licht, Farbe & Atmosphäre | 6 | 6 | 6 | 6 | 6 |
+| 5 | UI-System | 6 | 6 | 6 | 6 | 6 |
+| 6 | Typografie & Icons | 4 | 5 | 5 | 5 | 5 |
+| 7 | Effekte & Partikel | 4 | 4 | 5 | 4 | 5 |
+| 8 | Animation & Übergänge | 5 | 5 | 5 | 5 | 5 |
+| 9 | Lesbarkeit im Spiel | 5 | 5 | 5 | 5 | 5 |
+| 10 | Store-Assets | 3 | 4 | 4 | 6 | 6 |
+| | **Schnitt** | **5,0** | **5,0** | **5,2** | **5,3** | **5,5** |
 
 Begründungen aus Review 0 (Art-Director-Subagent, nur Screenshots):
 
@@ -789,4 +789,37 @@ schmutzig“.
 - Playtest (`SEED=7`): identisch mit Iteration 11 und 12.
 - Perf, erster Frame im direkten Wechsel: 626 ms gegenüber 617 ms der Basis. Bis zu 126 Draw
   Calls.
+- APK baut.
+
+## Review 4 (nach Iteration 13) – neuer Art-Director-Subagent, nur Screenshots
+
+Schnitt **5,5**, siehe `docs/visual/review4.md`. Die fünf wichtigsten Punkte:
+1. Vogel nur von hinten
+2. Wolkenkappen „wie Pilze“, nahe obere Röhren verdecken das obere Drittel
+3. Emoji-Icons
+4. Fließtext-Schrift und Umbrüche in den Missionen
+5. gleiche Straße und Röhren in allen Welten
+
+Punkt 1, 3, 4 (Schrift) und 5 warten auf deine Entscheidung. Punkt 2 und die Missionstexte sind
+ohne Rückfrage lösbar und folgen in Iteration 14.
+
+### Iteration 14 – Wolkenbank ohne „Pilzkappen“, Missionen einzeilig (Bereiche 3 und 5)
+
+**Was:**
+- **Wolkenbank:** Die untere Reihe kleiner Wolken direkt auf den Röhrenköpfen ist entfernt. Sie
+  las sich wie Pilzhüte. Die Röhren verschwinden jetzt in einer durchgehenden Wolkendecke.
+- **Missionstexte (DE):** einheitlich und kürzer, dadurch einzeilig. Das Panel wird niedriger,
+  und der Vogel im Menü bekommt mehr Platz.
+  - „Flieg durch N Röhren“
+  - „Flieg an N Kakteen vorbei“
+  - „Als Regenbogen durch N Reihen“
+
+![Iteration 14 vorher/nachher](visual/it14.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`, 50 Runs je Stufe): Anfänger 16,1 s / 9 Punkte, Geübt 33,4 s / 19,
+  Profi 141. Neue Geometrie verschiebt die Zufallsfolge; die Werte liegen im Streubereich der
+  Basis (Geübt 33,6–40,3 s).
+- Spitzenwert: 170 Draw Calls (am Budget), 56 k Dreiecke.
+- Normale Probe, im direkten Wechsel gemessen: erster Frame 642 ms gegenüber 619 ms der Basis.
 - APK baut.

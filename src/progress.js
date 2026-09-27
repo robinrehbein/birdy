@@ -33,13 +33,13 @@ const RUN_SUM_STATS = { nearTotal: 'near', plantsTotal: 'plants', coinsTotal: 'c
 const MISSION_POOL = [
   { id: 'coins', text: (n) => ({ de: `Sammle ${n} Münzen`, en: `Collect ${n} coins` }), stat: 'coins', per: 'day', goals: [20, 40, 70] },
   { id: 'score', text: (n) => ({ de: `Erreiche ${n} Punkte in einem Flug`, en: `Score ${n} in one flight` }), stat: 'score', per: 'run', goals: [10, 20, 35] },
-  { id: 'rows', text: (n) => ({ de: `Fliege durch ${n} Röhren`, en: `Fly through ${n} pipes` }), stat: 'score', per: 'day', goals: [30, 60, 100] },
+  { id: 'rows', text: (n) => ({ de: `Flieg durch ${n} Röhren`, en: `Fly through ${n} pipes` }), stat: 'score', per: 'day', goals: [30, 60, 100] },
   { id: 'powers', text: (n) => ({ de: `Schnapp dir ${n} Power-ups`, en: `Grab ${n} power-ups` }), stat: 'powerups', per: 'day', goals: [2, 4, 6], minBest: 8 },
   { id: 'runs', text: (n) => ({ de: `Spiele ${n} Runden`, en: `Play ${n} rounds` }), stat: 'runs', per: 'day', goals: [3, 5, 8] },
   // Only offered once the player has seen these obstacles (best score).
-  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Stachelkakteen vorbei`, en: `Pass ${n} spiky cacti` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
+  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Kakteen vorbei`, en: `Pass ${n} spiky cacti` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
   { id: 'moving', text: (n) => ({ de: `Durchquere ${n} bewegte Lücken`, en: `Fly through ${n} moving gaps` }), stat: 'moving', per: 'day', goals: [4, 8, 14], minBest: 10 },
-  { id: 'star', text: (n) => ({ de: `Fliege als Regenbogen durch ${n} Reihen`, en: `Pass ${n} rows as a rainbow` }), stat: 'starRows', per: 'day', goals: [3, 6, 10], minBest: 12 },
+  { id: 'star', text: (n) => ({ de: `Als Regenbogen durch ${n} Reihen`, en: `Pass ${n} rows as a rainbow` }), stat: 'starRows', per: 'day', goals: [3, 6, 10], minBest: 12 },
 ];
 const REWARDS = [40, 70, 120];
 

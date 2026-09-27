@@ -682,13 +682,6 @@ function makeBankGeometry(seed) {
     m.scale.set(s * 1.2, s * 0.62, s);
     root.add(m);
   }
-  // A lower row of smaller puffs right where the pipes enter the bank.
-  for (const x of LANES) {
-    const m = new THREE.Mesh(puff, white);
-    m.position.set(x + (rnd() - 0.5), BANK_Y - 0.9, 0.9 + rnd() * 0.4);
-    m.scale.set(1.2 + rnd() * 0.3, 0.7, 1.1);
-    root.add(m);
-  }
   return bakeGroup(root);
 }
 const bankGeos = [1, 2, 3].map(makeBankGeometry);
