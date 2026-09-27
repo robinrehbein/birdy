@@ -556,10 +556,25 @@ button.gift {
 #coins.bump .coin-icon { animation: pop-wallet 0.3s ease-out; }
 
 /* Shop tabs. */
-.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+#shop-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 0 -4px 10px;
+  padding: 2px 4px 6px;
+  overflow-x: auto;
+  touch-action: pan-x;
+  scrollbar-width: none;
+}
+#shop-tabs::-webkit-scrollbar { display: none; }
+#shop-tabs .tab { flex: 0 0 60px; }
 .tabs .tab {
-  font-size: 17px;
-  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 20px;
+  line-height: 1.1;
+  padding: 4px 2px 3px;
   background: #cbb968;
   color: #fff;
   box-shadow: 0 3px 0 #543847;
@@ -683,3 +698,8 @@ button.gift {
   text-shadow: none;
 }
 #zones b, #zones span { position: relative; }
+
+.tabs .tab small { font-size: 11px; font-family: system-ui, sans-serif; font-weight: 700; }
+.tabs .tab.dice { background: #7a6fc9; }
+.skin .dot { font-size: 20px; }
+.skins { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-height: 142px; overflow-x: hidden; overflow-y: auto; touch-action: pan-y; padding: 4px 3px 5px; }

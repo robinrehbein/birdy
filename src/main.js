@@ -4,7 +4,8 @@ import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
 import { createParticles, createSpeedLines } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
-import { progress, SKINS, TRAILS, ACHIEVEMENTS } from './progress.js';
+import { progress, ACHIEVEMENTS } from './progress.js';
+import { CATALOG, KINDS } from './catalog.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import { t, L, applyI18n, getLang, setLang } from './i18n.js';
 import {
@@ -209,76 +210,112 @@ function renderStart() {
   renderWallet();
 }
 
-// Shop with two tabs: bird colours and flight trails.
-let shopTab = 'skins';
+// Shop: a tab per category. The bird tabs (colour, pattern, hat, eyes, beak)
+// build the bird like a workshop, with a live preview on the 3D bird.
+const LOOK_KINDS = ['pattern', 'hat', 'eyes', 'beak'];
+const SHOP_TABS = [
+  { kind: 'skin', icon: '🎨' },
+  { kind: 'pattern', icon: '🐾' },
+  { kind: 'hat', icon: '🎩' },
+  { kind: 'eyes', icon: '🕶️' },
+  { kind: 'beak', icon: '🐤' },
+  { kind: 'trail', icon: '✨' },
+];
+let shopTab = 'skin';
 let previewTrail = null; // trail shown on the hovering bird in the shop
-const shopKind = () => (shopTab === 'skins'
-  ? { list: SKINS, owns: progress.owns, equipped: progress.skin.id, buy: (id) => progress.buy(id), select: (id) => progress.select(id) }
-  : { list: TRAILS, owns: progress.ownsTrail, equipped: progress.trail.id, buy: (id) => progress.buyTrail(id), select: (id) => progress.selectTrail(id) });
 const hexColor = (c) => `#${c.toString(16).padStart(6, '0')}`;
+const equippedLook = () => Object.fromEntries(LOOK_KINDS.map((k) => [k, progress.equipped(k).id]));
+function applyBird() {
+  bird.setSkin(progress.skin);
+  bird.setLook(equippedLook());
+}
+applyBird();
+
+const tabsEl = $('shop-tabs');
+tabsEl.innerHTML = SHOP_TABS.map((tb) => `<button class="tab" data-tab="${tb.kind}"><span>${tb.icon}</span><small data-i18n="tab_${tb.kind}"></small></button>`).join('')
+  + `<button class="tab dice" id="shop-dice"><span>🎲</span><small data-i18n="tab_dice"></small></button>`;
+applyI18n(tabsEl);
+
+function tileBg(kind, k) {
+  if (kind === 'skin') return hexColor(k.body);
+  if (kind === 'trail') return k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
+  return '#fff6d5';
+}
+function tileInner(kind, k) {
+  if (kind === 'trail') return k.colors.length ? '' : '✕';
+  return k.icon || '';
+}
 
 function renderShop() {
-  const kind = shopKind();
-  for (const t of document.querySelectorAll('#shop .tab')) t.classList.toggle('on', t.dataset.tab === shopTab);
-  skinsEl.innerHTML = kind.list.map((k) => {
-    const owned = kind.owns(k.id);
+  const kind = shopTab;
+  const list = CATALOG[kind];
+  const equipped = progress.equipped(kind).id;
+  for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
+  skinsEl.innerHTML = list.map((k) => {
+    const owned = progress.owns(kind, k.id);
     const cls = ['skin'];
     if (!owned) cls.push('locked');
     if (k.id === shopSel) cls.push('sel');
-    if (k.id === kind.equipped) cls.push('equipped');
-    const bg = shopTab === 'skins'
-      ? hexColor(k.body)
-      : k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
-    const inner = shopTab === 'trails' && !k.colors.length ? '✕' : '';
+    if (k.id === equipped) cls.push('equipped');
     const price = owned ? '' : `<span class="price">${k.price}</span>`;
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="dot" style="background:${bg}">${inner}</span>${price}</button>`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="dot" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
-  const item = kind.list.find((k) => k.id === shopSel);
+  const item = list.find((k) => k.id === shopSel) || list[0];
+  tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   shopName.textContent = L(item.name);
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
-  if (!kind.owns(item.id)) {
+  if (!progress.owns(kind, item.id)) {
     shopAction.innerHTML = `${t('buy', { n: item.price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
     shopAction.classList.add('buy');
     shopAction.disabled = progress.coins < item.price;
-  } else if (item.id === kind.equipped) {
+  } else if (item.id === equipped) {
     shopAction.textContent = t('selected');
     shopAction.disabled = true;
   } else {
     shopAction.textContent = t('select');
   }
-  // Live preview on the 3D bird.
-  if (shopTab === 'skins') {
-    bird.setSkin(item);
-    previewTrail = progress.trail;
-  } else {
-    bird.setSkin(progress.skin);
-    previewTrail = item;
-  }
+  // Live preview on the 3D bird: the equipped look with this item tried on.
+  bird.setSkin(kind === 'skin' ? item : progress.skin);
+  bird.setLook(LOOK_KINDS.includes(kind) ? { ...equippedLook(), [kind]: item.id } : equippedLook());
+  previewTrail = kind === 'trail' ? item : progress.trail;
   renderWallet();
 }
 
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
-  shopSel = shopKind().equipped;
+  shopSel = progress.equipped(shopTab).id;
   shopEl.classList.toggle('hidden', !open);
   startEl.classList.toggle('hidden', open);
   if (open) renderShop();
   else {
     previewTrail = null;
-    bird.setSkin(progress.skin);
+    applyBird();
     renderStart();
   }
 }
 
-for (const tab of document.querySelectorAll('#shop .tab')) {
-  tab.addEventListener('click', () => {
-    shopTab = tab.dataset.tab;
-    shopSel = shopKind().equipped;
-    sfx.swoosh();
+tabsEl.addEventListener('click', (e) => {
+  const tb = e.target.closest('.tab');
+  if (!tb) return;
+  if (tb.id === 'shop-dice') {
+    // Random outfit from what the player owns.
+    for (const kind of ['skin', ...LOOK_KINDS]) {
+      const owned = CATALOG[kind].filter((k) => progress.owns(kind, k.id));
+      progress.select(kind, owned[Math.floor(Math.random() * owned.length)].id);
+    }
+    sfx.powerup();
+    particles.emit(bird.group.position, { count: 20, colors: [progress.skin.body, 0xffffff, 0xfff176], speed: 5, size: 0.1, life: 0.6, gravity: -3 });
+    shopSel = progress.equipped(shopTab).id;
     renderShop();
-  });
-}
+    return;
+  }
+  shopTab = tb.dataset.tab;
+  shopSel = progress.equipped(shopTab).id;
+  sfx.swoosh();
+  renderShop();
+});
 skinsEl.addEventListener('click', (e) => {
   const btn = e.target.closest('.skin');
   if (!btn) return;
@@ -287,13 +324,13 @@ skinsEl.addEventListener('click', (e) => {
   renderShop();
 });
 shopAction.addEventListener('click', () => {
-  const kind = shopKind();
-  const item = kind.list.find((k) => k.id === shopSel);
-  if (kind.owns(item.id)) kind.select(item.id);
-  else if (kind.buy(item.id)) {
+  const kind = shopTab;
+  const item = CATALOG[kind].find((k) => k.id === shopSel);
+  if (progress.owns(kind, item.id)) progress.select(kind, item.id);
+  else if (progress.buy(kind, item.id)) {
     setTimeout(celebrateMenuAchievements, 400);
     sfx.powerup();
-    const colors = shopTab === 'skins' ? [item.body] : item.colors.length ? item.colors : [0xffffff];
+    const colors = kind === 'skin' ? [item.body] : item.colors?.length ? item.colors : [progress.skin.body];
     particles.emit(bird.group.position, { count: 30, colors: [...colors, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
   }
   renderShop();
@@ -473,7 +510,7 @@ function resetGame() {
   walletEl.classList.remove('over');
   document.getElementById('lang-btn').classList.add('hidden');
   state.menu = 'start';
-  bird.setSkin(progress.skin);
+  applyBird();
   updateLaneDots();
   // Briefly show the three tap zones at the start of every run.
   // The tap zones stay visible while the bird waits for the first tap
@@ -928,7 +965,12 @@ overEl.addEventListener('pointerdown', (e) => {
   if (e.target.closest('#next-unlock.ready')) {
     // Straight to the shop when something can be unlocked.
     goToMenu();
+    if (nextUnlock) shopTab = nextUnlock.shopKind;
     openShop(true);
+    if (nextUnlock) {
+      shopSel = nextUnlock.id;
+      renderShop();
+    }
     return;
   }
   if (state.mode === 'over' && performance.now() - state.overAt > 350) resetGame();
@@ -987,7 +1029,7 @@ function goToMenu() {
   bird.group.visible = true;
   state.y = 5;
   state.menu = 'start';
-  bird.setSkin(progress.skin);
+  applyBird();
   // Clear the track so the menu shows only the bird and scenery.
   for (const g of gates) { g.active = false; g.group.visible = false; }
   for (const c of coins) { c.active = false; c.mesh.visible = false; }
@@ -1087,13 +1129,15 @@ function showGameOver() {
 }
 
 // The cheapest cosmetic not owned yet, as a goal on the game-over screen.
+let nextUnlock = null;
 function renderNextUnlock() {
   const el = $('next-unlock');
-  const items = [
-    ...SKINS.filter((k) => !progress.owns(k.id)).map((k) => ({ ...k, kind: t('kindBird') })),
-    ...TRAILS.filter((x) => !progress.ownsTrail(x.id)).map((x) => ({ ...x, kind: t('kindTrail') })),
-  ].sort((a, b) => a.price - b.price);
+  const items = KINDS.flatMap((kind) => CATALOG[kind]
+    .filter((k) => !progress.owns(kind, k.id))
+    .map((k) => ({ ...k, kind: t(`kind_${kind}`), shopKind: kind })))
+    .sort((a, b) => a.price - b.price);
   const next = items[0];
+  nextUnlock = next;
   el.classList.toggle('hidden', !next);
   if (!next) return;
   const pct = Math.min(100, Math.round((progress.coins / next.price) * 100));

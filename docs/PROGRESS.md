@@ -25,7 +25,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie, Tageszeit, Musik und Spezialität. Aber: Anfänger sehen meist 1–2 Zonen (Zone 3 nur ~2 %), ab Reihe 40 wiederholen sich die Zonen (Review 4). |
 | 5 | Session-Loop | 7 | 0,8 s vom Crash zum Neustart, nächstes Ziel, Missionen, Erfolge. Das Game-Over auf kleinen Displays ist entschlackt (Iteration 20). |
-| 6 | Meta-Progression | 6 | Farben, Spuren, Missionen, Geschenk, 14 Erfolge. Aber: Vögel sind nur Umfärbungen. |
+| 6 | Meta-Progression | 7 | Vogel-Werkstatt mit 13 Farben, 6 Mustern, 9 Kopfbedeckungen, 6 Augen/Brillen, 4 Schnäbeln, 12 Spuren (Iteration 26); Missionen, Geschenk, 14 Erfolge. Offen: Wirtschaft mit echten Spielern prüfen. |
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 7 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Die oberen Röhren blenden seit Iteration 23 in den Himmel aus, der obere Bildteil ist offen. |
@@ -990,3 +990,32 @@ Als überhöht bewertet: Politur, Fairness, Onboarding, jeweils um einen Punkt.
 - Bot-Playtest (150 Runs): Anfänger 17,5 s, Geübt 29,1 s (vorher 36,1 s; zwei Bahnen brauchen
   jetzt zwei Tipps, der Bot ist darauf nicht optimiert), Profi 88 % Überlebende.
 - 161 Draw Calls, keine Fehler.
+
+### Iteration 26 – Vogel-Werkstatt (Shop, Teil 1)
+
+Dein Wunsch: deutlich mehr Shop-Optionen, Vögel bauen wie bei Crossy Road.
+
+**Was:**
+- Neuer Katalog `src/catalog.js`. Jede Kategorie hat einen kostenlosen Grundartikel.
+  - **Farbe:** 13 (neu: Rotkehlchen, Koralle, Papagei, Pinguin, Schneeeule, Pfau)
+  - **Muster:** Schlicht, Bäckchen, Tupfen, Streifen, Räubermaske (mit Knoten am Hinterkopf), Herz am Rücken
+  - **Kopf:** Federschopf, Blume, Partyhut, Propellermütze (Propeller dreht sich), Zylinder,
+    Wikingerhelm, Krone, Heiligenschein (schwebt)
+  - **Augen:** Kulleraugen, Wimpern, Entschlossen (Brauen), Sonnenbrille, Herzbrille, Fliegerbrille
+  - **Schnabel:** Rund, Ente, Adler, Tukan
+  - **Spuren:** 12 (neu: Herzchen, Schneeflocken, Neon, Regenbogen, Goldregen)
+- Die Teile sitzen am bestehenden Vogelmodell und sind im selben Low-Poly-Stil gebaut. Der
+  Grundvogel sieht unverändert aus. Muster und Hüte übernehmen die Farben der gewählten Farbe.
+- Viele Teile sind bewusst von hinten gut sichtbar (Tupfen, Streifen, Herz, Maskenknoten, Hüte),
+  weil man den Vogel im Spiel von hinten sieht.
+- Shop mit waagerecht wischbarer Kategorie-Leiste und 🎲 **Zufall** (würfelt ein Outfit aus
+  deinen gekauften Teilen). Beim Antippen probiert der 3D-Vogel das Teil sofort an.
+- Das Ziel auf dem Game-Over („Noch X 🪙 bis …“) berücksichtigt alle Kategorien und öffnet den
+  Shop direkt beim passenden Artikel.
+- Alte Spielstände werden übernommen (gekaufte Vögel und Spuren bleiben).
+
+**Beleg:**
+- `shop.mjs`: alten Spielstand geladen, in jeder Kategorie alles gekauft, Auswahl und Zufall ✓,
+  Spielstart mit Outfit ✓, keine Konsolenfehler.
+- `gallery.png`: 8 Kombinationen von vorn und hinten.
+- Perf: 159 Draw Calls, Tutorial- und Bahn-Tests ✓.
