@@ -1,8 +1,10 @@
 # Play-Store-Vorbereitung
 
-Stand: 27. September 2026. App in der Play Console angelegt; interner Test mit Version 1.0.2
-veröffentlicht. Geschlossener Alpha-Test mit Version 1.0.2 und Store-Einträgen zur Prüfung
-eingereicht; die schnellen Vorabprüfungen laufen noch.
+Stand: 27. September 2026. Version 1.0.3 (versionCode 4) ist im internen Test verfügbar.
+Das Update für den geschlossenen Alpha-Test ist zur Prüfung eingereicht. Die aktualisierten
+deutschen und englischen Store-Texte sowie sieben neue deutsche Screenshots sind gespeichert,
+aber noch nicht zur Prüfung gesendet: Eine zusätzliche Einreichung würde die bereits laufende
+Alpha-Prüfung neu starten.
 
 ## Play Console
 
@@ -14,8 +16,9 @@ eingereicht; die schnellen Vorabprüfungen laufen noch.
 - Tester-Liste „Tester“: 4 Personen; für Produktionszugriff verlangt Google mindestens 12
   angemeldete Tester im geschlossenen Test über 14 Tage.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
-- Store-Eintrag: Deutsch und Englisch (USA) mit Icon, Vorstellungsgrafik und sechs Screenshots
-  zur Prüfung eingereicht.
+- Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die neuen
+  deutschen Screenshots sind gespeichert; Englisch nutzt aktuell die deutschen Grafiken als
+  Fallback.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
 - Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Datensicherheit: keine Datenerhebung
@@ -28,14 +31,14 @@ eingereicht; die schnellen Vorabprüfungen laufen noch.
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk npm run android:aab` erfolgreich; Bundle 1.0.2 von Google Play angenommen |
+| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk npm run android:aab` erfolgreich; Bundle 1.0.3 von Google Play angenommen |
 | Versionsnummer | ✅ `versionName 1.0.3`, `versionCode 4` (`android/app/build.gradle`); 1.0.2 (versionCode 3) liegt bereits bei Google Play |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` |
-| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Für Version 1.0.3 neu hochladen (Vogel-Werkstatt, Welten, Kaktus). |
+| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Deutsche Bilder in Play gespeichert, Einreichung noch offen. |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit | ✅ unten |
@@ -53,7 +56,7 @@ eingereicht; die schnellen Vorabprüfungen laufen noch.
 3. **Zielgruppe:** 13 Jahre und älter wurde bestätigt und in der Play Console gespeichert.
 4. **Datenschutz-URL:** Die App-spezifische GitHub-Pages-Seite ist veröffentlicht und in der
    Play Console sowie in Version 1.0.2 der App verlinkt.
-5. **Geschlossener Test:** Google muss die eingereichten Änderungen prüfen. Für den späteren
+5. **Geschlossener Test:** Google muss das Update auf 1.0.3 prüfen. Für den späteren
    Produktionszugriff fehlen noch mindestens 12 angemeldete Tester über 14 Tage; derzeit
    stehen vier Personen auf der Tester-Liste und es sind noch keine Beitritte erfasst.
 
@@ -81,7 +84,37 @@ Dann `npm run android:aab`. Das Bundle liegt unter
 `android/app/build/outputs/bundle/release/app-release.aab`. In der Play Console **Play App
 Signing** aktivieren; dann ist dein Schlüssel nur noch der Upload-Schlüssel.
 
-Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gradle` erhöhen.
+Für manuelle Updates `versionCode` (+1) und `versionName` in `android/app/build.gradle` erhöhen.
+Die GitHub-Pipeline vergibt bei jedem Lauf einen eigenen `versionCode` ab 100001.
+
+## Automatischer Release nach einem Merge
+
+`.github/workflows/play-release.yml` baut nach jedem Push auf `main` (also auch nach einem
+Merge) ein signiertes Bundle und veröffentlicht es im internen Test und im geschlossenen
+Alpha-Test. Offener Test und Produktion bleiben ausgeschlossen, solange der Produktionszugriff
+fehlt. Ein manueller Start über GitHub Actions ist ebenfalls möglich. Das Workflow-Job startet
+erst, wenn die Repository-Variable `PLAY_PUBLISH_ENABLED` auf `true` gesetzt wurde.
+
+Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
+Repository-Secrets benötigt:
+
+| Secret | Inhalt |
+|---|---|
+| `UPLOAD_KEYSTORE_BASE64` | Base64-Inhalt von `android/birdy-upload.jks` (ohne Zeilenumbrüche) |
+| `UPLOAD_STORE_PASSWORD` | `storePassword` aus der lokalen `android/keystore.properties` |
+| `UPLOAD_KEY_ALIAS` | `keyAlias` aus der lokalen `android/keystore.properties` |
+| `UPLOAD_KEY_PASSWORD` | `keyPassword` aus der lokalen `android/keystore.properties` |
+| `PLAY_SERVICE_ACCOUNT_JSON` | JSON-Schlüssel eines Dienstkontos mit Zugriff auf Birdy in der Play Console |
+
+Das Google-Cloud-Projekt muss die **Google Play Developer API** aktiviert haben. Das Dienstkonto
+braucht in der Play Console die Berechtigung, Releases für Birdy in den Test-Tracks zu erstellen
+und zu veröffentlichen. Die Variable `PLAY_CLOSED_TRACK` kann den API-Namen des geschlossenen
+Tracks festlegen; Standard ist `alpha`. Vor dem Einschalten mit der API prüfen, ob der Track
+wirklich `alpha` heißt. Der Workflow validiert beide Tracks vor dem Commit und veröffentlicht
+niemals in `production`.
+
+Secrets und Keystore-Dateien bleiben außerhalb von Git. Nach dem Einrichten einmal den
+manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-Tracks prüfen.
 
 ## Store-Eintrag – Deutsch
 

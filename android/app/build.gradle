@@ -15,7 +15,7 @@ android {
         applicationId "de.robinrehbein.birdy"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 4
+        versionCode = (System.getenv('BIRDY_VERSION_CODE') ?: '4').toInteger()
         versionName "1.0.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
