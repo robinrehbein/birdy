@@ -19,7 +19,7 @@ Das Spiel ist für Hochkant ausgelegt. Am Desktop wird es als zentrierte 9:16-Sp
 
 ## Steuerung
 
-Auf dem Handy reicht eine einzige Geste: **Tippe ins linke, mittlere oder rechte Drittel** des Bildschirms – der Vogel fliegt in diese Spur und flattert gleichzeitig. Die drei Zonen werden zu Beginn jeder Runde kurz eingeblendet, unten zeigt eine Punkt-Anzeige die aktuelle Spur.
+Auf dem Handy reicht eine einzige Geste: **Tippe ins linke, mittlere oder rechte Drittel** des Bildschirms. Tippst du in die Spur, in der der Vogel gerade ist, flattert er. Tippst du in eine andere Spur, wechselt er dorthin und macht nur einen kleinen Hüpfer – so knallt man beim Ausweichen nicht oben an die Röhre. Die drei Zonen werden zu Beginn jeder Runde kurz eingeblendet, unten zeigt eine Punkt-Anzeige die aktuelle Spur.
 
 | Aktion | Desktop | Mobil |
 | --- | --- | --- |
@@ -79,6 +79,9 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
 - `src/audio.js` – Musik und Soundeffekte per WebAudio (keine Audiodateien nötig)
 - `src/powerups.js` – Power-up-Definitionen und Modelle
+- `src/bot.js` – Playtest-Bots (Anfänger / geübt / Profi) für die Headless-Simulation
+- `scripts/playtest.mjs`, `scripts/perf.mjs` – automatischer Bot-Playtest und Render-Budget-Messung
+- `docs/PROGRESS.md` – Bewertungsbogen und Iterations-Log
 - `src/effects.js` – Partikel (Münz-Funken, Federn, Regenbogen-Spur)
 - `src/style.css` – HUD und Menüs
 - `android/` – natives Android-Projekt (Capacitor), inkl. Icons, Splash und `MainActivity`

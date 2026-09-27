@@ -18,6 +18,8 @@ import {
 // --- Tuning -----------------------------------------------------------------
 const GRAVITY = 36;
 const FLAP_VELOCITY = 11.5;
+const SWITCH_HOP = 6; // tapping another lane only hops a little (no overshoot)
+const WARMUP_GATES = 6; // first rows are wide and all lanes open
 const MAX_FALL = -22;
 const CEILING = 14;
 const BIRD_RADIUS = 0.5;
@@ -52,7 +54,7 @@ const bird = createBird();
 bird.group.scale.setScalar(BIRD_SCALE);
 scene.add(bird.group);
 
-const gates = Array.from({ length: 8 }, () => {
+const gates = Array.from({ length: 12 }, () => {
   const g = createGate(scene);
   g.group.visible = false;
   g.active = false;
@@ -125,7 +127,9 @@ const state = {
   shake: 0,
   time: 0,
   beat: 0,
+  runTime: 0,
 };
+let lastRun = null;
 
 const invincible = () => state.power.star > 0 || state.grace > 0;
 
@@ -154,6 +158,7 @@ function resetGame() {
   state.grace = 0;
   state.deadTimer = 0;
   state.shake = 0;
+  state.runTime = 0;
   bird.group.rotation.set(0, 0, 0);
   bird.group.visible = true;
   bird.setGlow(null);
@@ -181,13 +186,16 @@ function resetGame() {
 // Build one row of pipes. Later rows add moving gaps and piranha plants.
 function gateSpec() {
   const d = difficulty();
-  const size = 5.2 - 1.4 * d;
-  const lo = size / 2 + 1.2;
-  const hi = CEILING - 2.5 - size / 2;
+  // Warm-up: the first rows are extra wide and near the start height so a
+  // first-time player gets a few easy successes.
+  const warm = Math.max(0, 1 - state.gatesSpawned / WARMUP_GATES);
+  const size = 5.2 - 1.4 * d + 1.8 * warm;
+  const lo = Math.max(size / 2 + 1.2, THREE.MathUtils.lerp(0, 4.2, warm));
+  const hi = Math.max(lo, Math.min(CEILING - 2.5 - size / 2, THREE.MathUtils.lerp(99, 6.5, warm)));
   const spec = LANES.map(() => ({ center: lo + Math.random() * (hi - lo), size }));
 
   // After a short warm-up, block some lanes (always keep at least one open).
-  if (state.score >= 3) {
+  if (state.score >= 3 && state.gatesSpawned >= WARMUP_GATES) {
     const pBlock = 0.2 + 0.3 * d;
     const order = [0, 1, 2].sort(() => Math.random() - 0.5);
     let open = 3;
@@ -239,6 +247,7 @@ function placePickup(x, y, z) {
 }
 
 function spawnGate(z) {
+  state.lastGateZ = z; // always advance, even if the pool is exhausted
   const gate = gates.find((g) => !g.active);
   if (!gate) return;
   const spec = gateSpec();
@@ -302,6 +311,18 @@ function flap() {
   sfx.flap();
 }
 
+// A tap on the current lane flaps; a tap on another lane moves there with a
+// small hop, so dodging sideways never throws the bird into the upper pipe.
+function tap(lane) {
+  if (state.mode === 'playing' && !state.paused && lane !== state.lane) {
+    setLane(lane);
+    state.vy = Math.max(state.vy, SWITCH_HOP);
+    state.wingSpeed = 26;
+    return;
+  }
+  flap();
+}
+
 function updateLaneDots() {
   laneDots.forEach((d, i) => d.classList.toggle('on', i === state.lane));
 }
@@ -351,11 +372,8 @@ window.addEventListener('keydown', (e) => {
 canvas.addEventListener('pointerdown', (e) => {
   startAudio();
   if (state.paused) return setPaused(false);
-  if (state.mode === 'playing') {
-    const rect = canvas.getBoundingClientRect();
-    setLane(Math.floor(((e.clientX - rect.left) / rect.width) * 3));
-  }
-  flap();
+  const rect = canvas.getBoundingClientRect();
+  tap(THREE.MathUtils.clamp(Math.floor(((e.clientX - rect.left) / rect.width) * 3), 0, 2));
 });
 startEl.addEventListener('pointerdown', () => {
   startAudio();
@@ -394,9 +412,10 @@ document.addEventListener('visibilitychange', () => {
 const birdPos = new THREE.Vector3();
 const tmpColor = new THREE.Color();
 
-function die() {
+function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
+  lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause };
   state.deadTimer = 0;
   state.shake = 0.5;
   state.vy = Math.max(state.vy, 6);
@@ -480,6 +499,7 @@ function moveWorld(dz) {
 }
 
 function updatePlaying(dt) {
+  state.runTime += dt;
   const d = difficulty();
   const boost = state.power.star > 0 ? STAR_SPEED_BOOST : 1;
   state.speed = THREE.MathUtils.lerp(state.speed, (18 + 16 * d) * boost, dt * (boost > 1 ? 3 : 0.8));
@@ -525,8 +545,9 @@ function updatePlaying(dt) {
     if (!invincible() && Math.abs(gz) < PIPE_RADIUS + 0.25 + r) {
       for (const lane of gate.lanes) {
         if (Math.hypot(state.x - lane.x, gz) > PIPE_RADIUS + 0.15 + r) continue;
-        const inGap = !lane.blocked && state.y - r * 0.8 > lane.hitLow && state.y + r * 0.8 < lane.hitHigh;
-        if (!inGap) die();
+        if (lane.blocked) die('blocked');
+        else if (state.y + r * 0.8 >= lane.hitHigh) die('pipe-top');
+        else if (state.y - r * 0.8 <= lane.hitLow) die(lane.hitLow > lane.gapLow + 0.01 ? 'plant' : 'pipe-bottom');
       }
     }
   }
@@ -593,7 +614,7 @@ function updatePlaying(dt) {
       state.vy = FLAP_VELOCITY * 0.9;
       sfx.bounce();
     } else {
-      die();
+      die('ground');
     }
   }
 }
@@ -668,16 +689,12 @@ resize();
 const clock = new THREE.Clock();
 camera.position.set(0, 10.5, 14);
 
-function tick() {
-  const dt = Math.min(clock.getDelta(), 1 / 30);
-  if (landscapeTouch.matches || state.paused) {
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-    return;
-  }
+// One fixed game-logic step (no rendering). Shared by the render loop and the
+// headless simulation used for automated playtests.
+function step(dt, beat) {
   state.time += dt;
   // Plants follow the music's beat; without audio fall back to game time.
-  state.beat = music.beat() ?? (state.time * FALLBACK_BPM) / 60;
+  state.beat = beat ?? (state.time * FALLBACK_BPM) / 60;
 
   if (state.mode === 'ready') {
     moveWorld(10 * dt);
@@ -688,14 +705,47 @@ function tick() {
   } else {
     updateDead(dt);
   }
+}
 
+function tick() {
+  const dt = Math.min(clock.getDelta(), 1 / 30);
+  if (landscapeTouch.matches || state.paused) {
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+    return;
+  }
+  step(dt, music.beat());
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   updateBirdVisual(dt);
   updateCamera(dt);
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
-tick();
+
+const SIM = new URLSearchParams(location.search).has('sim');
+if (!SIM) tick();
+
+// Headless playtest: run `runs` games with a bot at a fixed 60 Hz step and
+// return per-run stats. Only used by scripts/playtest.mjs (?sim in the URL).
+async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
+  const { createBot } = await import('./bot.js');
+  const results = [];
+  const dt = 1 / 60;
+  for (let i = 0; i < runs; i++) {
+    const bot = createBot(botOpts);
+    lastRun = null;
+    resetGame();
+    flap();
+    while (state.mode === 'playing' && state.runTime < maxTime) {
+      const act = bot.decide(dt, { state, gates, lanes: LANES, pickups, coins });
+      if (act) tap(act.lane ?? state.lane);
+      step(dt);
+    }
+    results.push(lastRun ?? { score: state.score, coins: state.coins, time: state.runTime, cause: 'timeout' });
+    state.mode = 'over';
+  }
+  return results;
+}
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer };
