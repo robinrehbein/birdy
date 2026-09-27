@@ -29,7 +29,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
-| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. Aber: Namensrisiko, App-ID `app.birdy.game`, kein Gerätetest. |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. App-ID `de.robinrehbein.birdy` festgelegt. Aber: Namensrisiko, kein Gerätetest. |
 
 ## Backlog (nach Hebel sortiert)
 
@@ -613,7 +613,7 @@ bereit ist. Die übrigen Lücken lassen sich nur mit echten Geräten und Mensche
 | 7 | Audio | 3 | **5** | Von Menschen gehört? Eventuell echte Samples oder Instrumente. |
 | 8 | Performance | 3 | **5** | fps auf einem Mittelklasse-Android messen (Anzeige: 5× auf den Titel tippen). |
 | 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
-| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. Aber: Namensrisiko, App-ID `app.birdy.game`, kein Gerätetest. |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. App-ID `de.robinrehbein.birdy` festgelegt. Aber: Namensrisiko, kein Gerätetest. |
 
 ### Endmessung (Stand nach Iteration 15)
 

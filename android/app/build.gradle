@@ -9,10 +9,10 @@ if (keystorePropsFile.exists()) {
 }
 
 android {
-    namespace = "app.birdy.game"
+    namespace = "de.robinrehbein.birdy"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "app.birdy.game"
+        applicationId "de.robinrehbein.birdy"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

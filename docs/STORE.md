@@ -18,21 +18,16 @@ brauchst du die Entscheidungen unten.
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ Text unten; muss unter einer öffentlichen URL liegen |
 | Angaben zur Datensicherheit | ✅ unten |
-| **App-ID** | ⚠️ Entscheidung nötig (siehe unten) |
+| App-ID | ✅ `de.robinrehbein.birdy` |
 | **Signatur-Schlüssel** | ⚠️ Du musst ihn einmalig erzeugen und sicher aufbewahren |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
 | Test auf echten Geräten | ⚠️ noch offen (fps-Anzeige: 5× auf den Titel tippen) |
 
 ## Offene Entscheidungen für dich
 
-1. **App-ID**
-   - Die App-ID `app.birdy.game` ist ein Platzhalter und lässt sich nach der Veröffentlichung
-     nie mehr ändern.
-   - Üblich ist eine umgekehrte Domain, die dir gehört, z. B. `de.deinefirma.birdy`.
-   - Ändern musst du sie an zwei Stellen:
-     - `capacitor.config.json` (`appId`)
-     - `android/app/build.gradle` (`namespace` und `applicationId`)
-   - Außerdem muss der Paketordner von `MainActivity.java` passend umbenannt werden.
+1. **App-ID:** ✅ `de.robinrehbein.birdy` (deine Wahl, eingetragen in `capacitor.config.json`,
+   `android/app/build.gradle` und im Paket von `MainActivity.java`). Sie lässt sich nach der
+   Veröffentlichung nie mehr ändern.
 2. **Name: „Flapsy“ (deine Wahl).** Vor dem Launch unbedingt eine Markenrecherche machen
    (DPMA/EUIPO/WIPO, Klassen 9 und 41). Die Websuche fand:
    - ein Browser-Spiel „Flapsy“ mit Röhren (whop.com/flapsy),

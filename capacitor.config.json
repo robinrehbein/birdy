@@ -1,5 +1,5 @@
 {
-  "appId": "app.birdy.game",
+  "appId": "de.robinrehbein.birdy",
   "appName": "Flapsy",
   "webDir": "dist",
   "android": {
