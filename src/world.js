@@ -694,10 +694,13 @@ export const PLANT_HEIGHT = 1.8;
 // How far the plant's head reaches into the gap when fully up. Leaves enough
 // room above it for a full flap arc.
 export const PLANT_REACH = 0.9;
+// Drawn a little wider than modelled so it reads from afar; width is looks
+// only (the hitbox is the height of its top).
+const PLANT_WIDTH = 1.2;
 // A grumpy spiky cactus that pops up out of the pipe on the beat. Built once
 // and baked into one geometry (one draw call per cactus); the "puff" when it
 // is fully up just scales the whole thing.
-const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a };
+const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a, outline: 0x3a2433 };
 const CACTUS_R = new THREE.Vector3(0.74, 0.8, 0.74); // body radii
 const CACTUS_Y = PLANT_HEIGHT - 0.95; // body centre: the top sits just under PLANT_HEIGHT
 function buildCactusGeometry() {
@@ -721,7 +724,7 @@ function buildCactusGeometry() {
     return mesh;
   };
   // Spikes all around, but none on the face and none on the top (flower).
-  const spikeGeo = new THREE.ConeGeometry(0.045, 0.26, 4);
+  const spikeGeo = new THREE.ConeGeometry(0.05, 0.32, 4);
   const d = new THREE.Vector3();
   for (let i = 0; i < 46; i++) {
     const phi = Math.acos(1 - (2 * (i + 0.5)) / 46);
@@ -764,6 +767,16 @@ function buildCactusGeometry() {
   const pollen = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 4), m(CACTUS.pollen));
   pollen.position.y = top + 0.06;
   root.add(pollen);
+  // Cartoon outline: a slightly bigger body with reversed faces in plum. Only
+  // its far side is drawn, which shows as a dark rim around the silhouette,
+  // so the cactus reads against pipes and scenery. Same draw call.
+  const hullGeo = new THREE.SphereGeometry(1, 10, 7);
+  const idx = hullGeo.index.array;
+  for (let i = 0; i < idx.length; i += 3) [idx[i + 1], idx[i + 2]] = [idx[i + 2], idx[i + 1]];
+  const hull = new THREE.Mesh(hullGeo, m(CACTUS.outline));
+  hull.scale.copy(CACTUS_R).addScalar(0.07);
+  hull.position.y = CACTUS_Y;
+  root.add(hull);
   return bakeGroup(root, true);
 }
 let cactusGeo = null;
@@ -925,7 +938,7 @@ export function createGate(scene) {
           plant.group.visible = true;
           plant.group.position.y = lane.gapLow + 0.12 - (CACTUS_Y + CACTUS_R.y);
           plant.group.rotation.z = Math.sin(time * 22) * 0.1;
-          plant.body.scale.set(1, 1, 1);
+          plant.body.scale.set(PLANT_WIDTH, 1, PLANT_WIDTH);
           plant.bristle.value = 0;
           continue;
         }
@@ -938,7 +951,7 @@ export function createGate(scene) {
         // Fully up: it puffs itself up and down (wider, a little shorter), so
         // the top of the hitbox stays where it is.
         const puff = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0;
-        plant.body.scale.set(1 + 0.08 * puff, 1 - 0.03 * puff, 1 + 0.08 * puff);
+        plant.body.scale.set(PLANT_WIDTH * (1 + 0.08 * puff), 1 - 0.03 * puff, PLANT_WIDTH * (1 + 0.08 * puff));
         plant.bristle.value = puff; // spikes stand up (looks only, same hitbox)
       }
     },

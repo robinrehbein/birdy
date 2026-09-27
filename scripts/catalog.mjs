@@ -177,9 +177,23 @@ for (const lang of LANGS) {
       await run(1.5);
     }
     // A spiky cactus up close.
-    await run(60, `B.gates.some((g) => g.active && !g.passed && g.group.position.z > -22 && g.group.position.z < -12
-      && g.lanes.some((l) => l.hasPlant && l.plant.group.visible && l.plant.group.position.y > l.gapLow - 1.2))`);
+    // (in a lane beside the bird, so the bird doesn't hide it)
+    await run(90, `B.gates.some((g) => g.active && !g.passed && g.group.position.z > -15 && g.group.position.z < -7
+      && g.lanes.some((l, i) => i !== B.state.lane && l.hasPlant && l.plant.group.visible && l.plant.group.position.y > l.gapLow - 1.2))`);
     await shot('15-cactus');
+    // Close-up: a row with a fully risen cactus in the right lane, bird left.
+    await page.evaluate(() => {
+      const B = window.__birdy;
+      const g = B.gates.find((x) => !x.active);
+      g.active = true;
+      g.configure(-8, [{ center: 5, size: 5 }, { center: 5, size: 5 }, { center: 5, size: 5, plant: true, plantOffset: 0 }]);
+      B.state.lane = 0;
+      B.state.x = -3;
+      B.state.y = 5;
+      B.state.time = (2.95 * 60) / 124 + 40 * (240 / 124) - 1 / 30; // beat 2.95: cactus fully up
+      B.advance(1 / 30);
+    });
+    await shot('15b-cactus-close');
 
     // Shop worlds: a fresh run from the menu starts in the chosen world.
     for (const id of ['winter', 'beach', 'candy', 'mushroom']) {

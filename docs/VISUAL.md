@@ -88,7 +88,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 8 | 7/8 | hoch | Beim Crash ist keine Rückmeldung sichtbar. | Treffer-Stern, Federn, Flash, Squash | ✅ It. 4 |
 | 9 | 3 | hoch | Die Röhren blenden nach oben zu „grünen Lichtsäulen“ aus. | Röhren oben sauber enden lassen oder in den Himmel ausblenden | ✅ It. 5 (Wolkenbank) |
 | 10 | 2/3 | hoch | Alle Kaufwelten haben denselben beigen Weg und denselben Rand. | Weg-Palette je Welt | ⏸ Farbwelt (Rückfrage) |
-| 11 | 3 | hoch | Der Kaktus ist nicht erkennbar, Power-up-Blasen sind in der Ferne winzig. | Silhouette, Kontrast, Halo | offen |
+| 11 | 3 | hoch | Der Kaktus ist nicht erkennbar, Power-up-Blasen sind in der Ferne winzig. | Silhouette, Kontrast, Halo | ✅ It. 6 |
 | 12 | 1 | mittel | Die Flügel sind blass und stäbchenartig. | Flügel in Körpernähe kräftiger | ⏸ Vogel (Rückfrage) |
 | 13 | 1 | mittel | Von hinten ist der Vogel eine Kugel. | Scheitelbüschel und Schwanz lesbarer | ⏸ Vogel (Rückfrage) |
 | 14 | 1/5 | mittel | Shop-Vorschaubilder sind klein; gesperrte Artikel sind schlecht erkennbar. | Größere Kacheln, Preisleiste, gesperrte Artikel entsättigen | offen |
@@ -360,7 +360,7 @@ halbtransparent in den Himmel aus und wirkten wie grüne Lichtsäulen oder ein R
 ![Iteration 5 vorher/nachher](visual/it5.jpg)
 
 **Messwerte:**
-- **Playtest:** Drei.js vergibt beim Anlegen neuer Objekte Zufalls-IDs. Deshalb ändert jede neue
+- **Playtest:** Three.js vergibt beim Anlegen neuer Objekte Zufalls-IDs. Deshalb ändert jede neue
   Geometrie die gesäte Zufallsfolge, und der Vergleich läuft über drei Seeds (Basis → neu):
   - Seed 7: Anfänger 17,4 → 15,9 s, Geübt 40,2 → 37,8 s, Profi 144 → 144 Punkte
   - Seed 11: 15,9 → 17,4 s, 38,8 → 36,1 s, 141 → 144
@@ -373,3 +373,39 @@ halbtransparent in den Himmel aus und wirkten wie grüne Lichtsäulen oder ein R
 
 **Neue Einschätzung:** Hindernisse 4 → 5. Die Röhren haben jetzt einen echten Abschluss. Offen
 bleiben die Größe der Pickups, die Silhouette des Kaktus und die Münzen.
+
+### Iteration 6 – Pickups und Kaktus lesbar (Bereiche 3 und 9)
+
+**Warum:** Laut Review 1 waren die Power-up-Blasen in Spieldistanz nur wenige Pixel groß. Der
+Kaktus war ein „kleiner türkiser Klecks“ (hoch).
+
+**Was:**
+- **Power-ups:**
+  - Blase und Symbol sind etwa 1,5× so groß.
+  - Die Blase ist etwas kräftiger gefärbt.
+  - Neu ist ein Rand, der immer zur Kamera zeigt: weißer Ring mit Plum-Kante, wie die UI.
+  - Der Einsammel-Radius bleibt unverändert (1,4), die Blase ist mit 1,15 weiterhin kleiner.
+- **Kaktus:**
+  - Er hat eine Cartoon-Kontur in dunklem Plum: ein etwas größerer Körper mit umgedrehten
+    Flächen, im selben Draw Call.
+  - Die Stacheln sind etwas länger und dicker.
+  - Er ist 20 % breiter gezeichnet.
+  - Die Trefferzone hängt nur an der Höhe seines Kopfes und bleibt gleich.
+  - Die Farbe (türkis) bleibt, denn sie war deine Entscheidung.
+- **Katalog:** Neue Nahaufnahme `15b-cactus-close` mit einem aufgerichteten Kaktus neben dem
+  Vogel.
+
+![Iteration 6: Pickups vorher/nachher, Kaktus nah](visual/it6.jpg)
+
+**Messwerte:**
+- Playtest mit drei Seeds:
+  - Seed 7: Anfänger 15,9 s / 8, Geübt 38,8 s / 22, Profi 142
+  - Seed 11: Anfänger 20,4 s / 10, Geübt 37,4 s / 23, Profi 143
+  - Seed 23: Anfänger 17,4 s / 9, Geübt 40,2 s / 24, Profi 144
+  - Alles im Streubereich der Basis (Anfänger 15,9–17,4 s, Geübt 35–40 s, Profi 141–144). Keine
+    Fehler.
+- Perf, direkt im Wechsel gemessen: erster Frame 673 ms gegenüber 688 ms der Basis. Bis zu
+  147 Draw Calls, bis zu 46 k Dreiecke.
+- APK baut.
+
+**Neue Einschätzung:** Hindernisse 5 → 6, Lesbarkeit 6 → 6.

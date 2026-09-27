@@ -1634,7 +1634,7 @@ function updatePlaying(dt) {
     if (!pu.active) continue;
     const p = pu.group.position;
     p.z += dz;
-    animatePickup(pu, state.time);
+    animatePickup(pu, state.time, camera);
     const k = THREE.MathUtils.clamp(1 - (p.z - 1.5) / 1.5, 0, 1);
     pu.group.scale.setScalar(k);
     pu.group.visible = k > 0;

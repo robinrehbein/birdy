@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 // Power-up definitions. Duration in seconds.
 export const POWERUPS = {
@@ -79,26 +80,43 @@ function buildMushroom() {
   return g;
 }
 
-const bubbleGeo = new THREE.SphereGeometry(0.78, 16, 12);
+// Looks only: the pickup radius (1.4, main.js) stays the same.
+const bubbleGeo = new THREE.SphereGeometry(1.15, 16, 12);
+// A billboard rim (white ring with a plum edge) makes the bubble read from afar.
+const rimGeo = (() => {
+  const outer = new THREE.RingGeometry(1.14, 1.32, 32);
+  const edge = new THREE.RingGeometry(1.32, 1.4, 32);
+  const col = (g, hex) => {
+    const c = new THREE.Color(hex);
+    const a = new Float32Array(g.attributes.position.count * 3);
+    for (let i = 0; i < a.length; i += 3) a.set([c.r, c.g, c.b], i);
+    g.setAttribute('color', new THREE.BufferAttribute(a, 3));
+    return g;
+  };
+  return mergeGeometries([col(outer, 0xffffff), col(edge, 0x543847)]);
+})();
+const rimMat = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9, depthWrite: false, toneMapped: false });
 
 export function createPowerupPickup(scene, type) {
   const group = new THREE.Group();
   const icon = type === 'star' ? buildStar() : type === 'magnet' ? buildMagnet() : buildMushroom();
-  icon.scale.setScalar(1.15);
+  icon.scale.setScalar(1.7);
   const bubble = new THREE.Mesh(
     bubbleGeo,
     new THREE.MeshStandardMaterial({
-      color: POWERUPS[type].color, transparent: true, opacity: 0.22, roughness: 0.1, depthWrite: false,
-      emissive: POWERUPS[type].color, emissiveIntensity: 0.25,
+      color: POWERUPS[type].color, transparent: true, opacity: 0.3, roughness: 0.1, depthWrite: false,
+      emissive: POWERUPS[type].color, emissiveIntensity: 0.35,
     })
   );
-  group.add(icon, bubble);
+  const rim = new THREE.Mesh(rimGeo, rimMat);
+  group.add(icon, bubble, rim);
   group.visible = false;
   scene.add(group);
-  return { type, group, icon, active: false };
+  return { type, group, icon, rim, active: false };
 }
 
-export function animatePickup(p, time) {
+export function animatePickup(p, time, camera) {
+  if (camera) p.rim.quaternion.copy(camera.quaternion);
   p.icon.rotation.y = time * 2.5;
   p.icon.position.y = Math.sin(time * 3) * 0.12;
   const rainbow = p.icon.userData.rainbow;
