@@ -83,8 +83,18 @@ async function session(lang, [w, h], save) {
   const shot = async (name, settleMs = 250) => {
     if (ONLY && !ONLY.test(name)) return;
     await page.waitForTimeout(settleMs); // CSS animations run on real time
+    // Headless frames are slow: put CSS animations at a defined point instead
+    // of wherever real time left them (entrances done, the zone banner at its
+    // fully visible moment, looping ones untouched).
+    await page.evaluate(() => {
+      for (const a of document.getAnimations()) {
+        const name = a.animationName;
+        if (name === 'zone-in') { a.currentTime = 700; a.pause(); } else if (a.effect?.getTiming().iterations !== Infinity) a.finish();
+      }
+    });
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     await page.screenshot({ path: `${dir}/${name}.png` });
+    await page.evaluate(() => document.getAnimations().forEach((a) => { if (a.animationName === 'zone-in') a.finish(); }));
   };
   return { page, run, shot };
 }

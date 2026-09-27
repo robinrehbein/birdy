@@ -20,26 +20,26 @@ erreichen. Die Reviews sehen nur Screenshots, keinen Code.
 - Playtest mit `SEED=7`, 50 Runs je Stufe:
 
   | Stufe | Median Zeit | Median Punkte | Münzen/Run | Zonen 2/3/4 |
-  |---|---|---|---|---|
+  |---|---|---|---|---|---|
   | Anfänger | 17,4 s | 9 | 8 | 46 / 2 / 0 % |
   | Geübt | 40,2 s | 23 | 23 | 100 / 64 / 22 % |
   | Profi | 180 s (Zeitlimit) | 144 | 138 | 100 / 100 / 100 % |
 
 ## Visual-Scorecard
 
-| # | Bereich | Review 0 (Start) |
+| # | Bereich | Review 0 (Start) | Review 1 (nach It. 3) |
 |---|---|---|
-| 1 | Vogel & Kosmetik | 6 |
-| 2 | Welten & Szenerie | 6 |
-| 3 | Hindernisse & Pickups | 5 |
-| 4 | Licht, Farbe & Atmosphäre | 6 |
-| 5 | UI-System | 6 |
-| 6 | Typografie & Icons | 4 |
-| 7 | Effekte & Partikel | 4 |
-| 8 | Animation & Übergänge | 5 |
-| 9 | Lesbarkeit im Spiel | 5 |
-| 10 | Store-Assets | 3 |
-| | **Schnitt** | **5,0** |
+| 1 | Vogel & Kosmetik | 6 | 5 |
+| 2 | Welten & Szenerie | 6 | 6 |
+| 3 | Hindernisse & Pickups | 5 | 4 |
+| 4 | Licht, Farbe & Atmosphäre | 6 | 6 |
+| 5 | UI-System | 6 | 6 |
+| 6 | Typografie & Icons | 4 | 5 |
+| 7 | Effekte & Partikel | 4 | 4 |
+| 8 | Animation & Übergänge | 5 | 5 |
+| 9 | Lesbarkeit im Spiel | 5 | 5 |
+| 10 | Store-Assets | 3 | 4 |
+| | **Schnitt** | **5,0** | **5,0** |
 
 Begründungen aus Review 0 (Art-Director-Subagent, nur Screenshots):
 
@@ -318,3 +318,27 @@ außerdem immer gelb, auch beim roten Kardinal oder beim Pinguin.
 
 **Neue Einschätzung:** Effekte 4 → 5. Offen: Regenbogen-Band, Magnet-Ring, kräftigere
 Speed-Lines, Münz-Effekte.
+
+## Review 1 (nach Iteration 3) – neuer Art-Director-Subagent, nur Screenshots
+
+Schnitt **5,0**. Die Scorecard oben ist übernommen, Noten wurden nicht angehoben. Der Reviewer ist
+strenger als in Runde 0 (Vogel 6 → 5, Hindernisse 5 → 4). Zwei Abzüge gehen auf den Katalog
+zurück, nicht auf das Spiel: Das Erfolge-Panel und die Zonenbanner wurden mitten in der
+Einblend-Animation fotografiert, weil die Seite unter Last zu langsam lief. Seit dieser Runde
+setzt der Katalog CSS-Animationen vor jeder Aufnahme auf einen festen Zeitpunkt. Der Crash im
+Katalog stammt noch von vor Iteration 4.
+
+Wichtigste neue oder bestätigte Punkte (Rangfolge des Reviewers):
+
+1. **Store-Screenshots (Blocker):** rohe Spielbilder ohne Rahmen und Claim, mit Spurpunkten und
+   EN-Knopf.
+2. **Röhren (Blocker):** Sie wirken generisch und laufen oben durchsichtig aus. Sie sind in jeder
+   Welt grün.
+3. **Vogel von hinten (hoch):** Kugel ohne Gesicht, beige Stäbchenflügel. Das ist eine
+   Vogel-Änderung und braucht deine Entscheidung.
+4. **Spurlinien (hoch):** Sie gehen über den ganzen Bildschirm bis in den Himmel.
+5. **Pickups und Kaktus (hoch):** zu klein und zu schwach in der Silhouette.
+6. Die Spurpunkte „○●○“ lesen sich wie Seitenpunkte eines Karussells.
+7. Der Mini-Vogel ist fast unsichtbar.
+
+„Was bringt jeden Bereich auf 8“ ist im Review aufgeführt und fließt in die nächsten Iterationen ein.
