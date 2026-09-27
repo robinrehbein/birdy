@@ -1,4 +1,4 @@
-package app.birdy.game;
+package de.robinrehbein.birdy;
 
 import android.os.Bundle;
 import android.view.WindowManager;

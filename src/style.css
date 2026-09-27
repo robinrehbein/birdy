@@ -604,6 +604,7 @@ button.gift {
 .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .btn-row button { width: 100%; padding-left: 6px; padding-right: 6px; }
 .panel .btn-row button + button { margin-top: 0; }
+.privacy-link { display: block; margin-top: 12px; color: inherit; opacity: 0.75; font: 12px system-ui, sans-serif; text-align: center; }
 
 /* Achievements overview. */
 .ach-list {

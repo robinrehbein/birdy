@@ -1,6 +1,6 @@
 {
-  "appId": "app.birdy.game",
-  "appName": "Flapsy",
+  "appId": "de.robinrehbein.birdy",
+  "appName": "Birdy",
   "webDir": "dist",
   "android": {
     "backgroundColor": "#4ec0ca"

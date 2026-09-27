@@ -1,68 +1,79 @@
 # Play-Store-Vorbereitung
 
-Stand: technisch bereit für einen internen Test über die Play Console. Vor der Veröffentlichung
-brauchst du die Entscheidungen unten.
+Stand: 27. September 2026. App in der Play Console angelegt; interner Test mit Version 1.0.2
+veröffentlicht. Geschlossener Alpha-Test mit Version 1.0.2 und Store-Einträgen zur Prüfung
+eingereicht; die schnellen Vorabprüfungen laufen noch.
+
+## Play Console
+
+- Paket-ID: `de.robinrehbein.birdy`
+- [App-Dashboard](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/app-dashboard)
+- [Interner Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4700770597020690505)
+- [Interner Testbeitritt](https://play.google.com/apps/internaltest/4700770597020690505)
+- [Geschlossener Alpha-Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4699009912977551786)
+- Tester-Liste „Tester“: 4 Personen; für Produktionszugriff verlangt Google mindestens 12
+  angemeldete Tester im geschlossenen Test über 14 Tage.
+- Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
+- Store-Eintrag: Deutsch und Englisch (USA) mit Icon, Vorstellungsgrafik und sechs Screenshots
+  zur Prüfung eingereicht.
+- Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
+  auch im App-Menü von Version 1.0.2 verlinkt.
+- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Datensicherheit: keine Datenerhebung
+  oder Weitergabe angegeben; lokale Speicherung und mögliche Android-Backups sind in der
+  Datenschutzerklärung beschrieben.
+- Google Play Games auf dem PC wurde deaktiviert. Die ausstehende Aktivierung wurde vor der
+  Einreichung aus der Änderungsliste entfernt.
 
 ## Checkliste
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB), signiert | ✅ `npm run android:aab`, getestet mit einem Test-Schlüssel (4,1 MB, `jarsigner` verifiziert) |
-| Versionsnummer | ✅ `versionName 1.0.0`, `versionCode 1` (`android/app/build.gradle`) |
+| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk npm run android:aab` erfolgreich; Bundle 1.0.2 von Google Play angenommen |
+| Versionsnummer | ✅ `versionName 1.0.2`, `versionCode 3` (`android/app/build.gradle`) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
-| Feature-Grafik 1024×500 | ✅ `docs/store/feature-1024x500.png` |
+| Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` |
 | Screenshots 1080×1920 | ✅ `docs/store/screenshot-1…6` aus einem echten Run (`scripts/store-shots.mjs`): Menü, Park, Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop |
 | Store-Texte DE/EN | ✅ unten |
-| Datenschutzerklärung | ✅ Text unten; muss unter einer öffentlichen URL liegen |
+| Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit | ✅ unten |
-| **App-ID** | ⚠️ Entscheidung nötig (siehe unten) |
-| **Signatur-Schlüssel** | ⚠️ Du musst ihn einmalig erzeugen und sicher aufbewahren |
+| **App-ID** | ✅ `de.robinrehbein.birdy` in Capacitor und Android konfiguriert |
+| **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
 | Test auf echten Geräten | ⚠️ noch offen (fps-Anzeige: 5× auf den Titel tippen) |
 
-## Offene Entscheidungen für dich
+## Entscheidungen und verbleibende Schritte
 
-1. **App-ID**
-   - Die App-ID `app.birdy.game` ist ein Platzhalter und lässt sich nach der Veröffentlichung
-     nie mehr ändern.
-   - Üblich ist eine umgekehrte Domain, die dir gehört, z. B. `de.deinefirma.birdy`.
-   - Ändern musst du sie an zwei Stellen:
-     - `capacitor.config.json` (`appId`)
-     - `android/app/build.gradle` (`namespace` und `applicationId`)
-   - Außerdem muss der Paketordner von `MainActivity.java` passend umbenannt werden.
-2. **Name: „Flapsy“ (deine Wahl).** Vor dem Launch unbedingt eine Markenrecherche machen
-   (DPMA/EUIPO/WIPO, Klassen 9 und 41). Die Websuche fand:
-   - ein Browser-Spiel „Flapsy“ mit Röhren (whop.com/flapsy),
-   - einen „Flapsy Bird“-Klon,
-   - die Figur „Flapsy“ aus der Kinderserie *Dino Ranch* (Disney Junior).
-
-   Außerdem ist der Name nah an „Flappy Bird“. Der Name steht zentral in `src/i18n.js`,
-   `index.html`, `capacitor.config.json` und `strings.xml` und ist schnell getauscht.
-3. **Zielgruppe:** Richtest du das Spiel ausdrücklich an Kinder unter 13, gelten die
-   Families-Richtlinien. Die sind erfüllbar, weil die App keine Daten, Werbung oder Käufe hat,
-   bedeuten aber zusätzlichen Prüfaufwand. Einfacher ist die Zielgruppe „13+“.
-4. **Datenschutz-URL:** Der Text unten muss öffentlich erreichbar sein, z. B. als Seite auf
-   eurer Firmen-Website.
+1. **App-ID:** `de.robinrehbein.birdy` ist eingerichtet. Nach dem ersten Play-Upload kann die
+   Paket-ID für diese App nicht mehr geändert werden.
+2. **Name:** Birdy ist als App- und Store-Name vorgesehen. Vor einem öffentlichen Launch
+   sollte eine Markenrecherche (DPMA/EUIPO/WIPO, Klassen 9 und 41) erfolgen.
+3. **Zielgruppe:** 13 Jahre und älter wurde bestätigt und in der Play Console gespeichert.
+4. **Datenschutz-URL:** Die App-spezifische GitHub-Pages-Seite ist veröffentlicht und in der
+   Play Console sowie in Version 1.0.2 der App verlinkt.
+5. **Geschlossener Test:** Google muss die eingereichten Änderungen prüfen. Für den späteren
+   Produktionszugriff fehlen noch mindestens 12 angemeldete Tester über 14 Tage; derzeit
+   stehen vier Personen auf der Tester-Liste und es sind noch keine Beitritte erfasst.
 
 ## Release signieren
 
-Einmalig einen Schlüssel erzeugen. Er bleibt **außerhalb von Git**, und du solltest ein Backup
-machen – ohne ihn gibt es keine Updates mehr, außer über Play App Signing.
+Der Upload-Schlüssel liegt lokal unter `android/birdy-upload.jks`; die Zugangsdaten liegen in
+`android/keystore.properties`. Beide Dateien sind aus Git ausgeschlossen. Erstelle ein sicheres
+Backup außerhalb dieses Projekts. Bei Play App Signing kann ein verlorener Upload-Schlüssel
+zurückgesetzt werden, aber das erfordert ein Verfahren über die Play Console.
 
 ```bash
-keytool -genkeypair -v -keystore ~/birdy-release.jks -alias birdy \
-  -keyalg RSA -keysize 2048 -validity 10000
+keytool -list -keystore android/birdy-upload.jks -alias birdy-upload
 ```
 
-`android/keystore.properties` anlegen (steht in `.gitignore`):
+Die vorhandene `android/keystore.properties` hat dieses Format:
 
 ```properties
-storeFile=/absoluter/pfad/birdy-release.jks
+storeFile=birdy-upload.jks
 storePassword=…
-keyAlias=birdy
+keyAlias=birdy-upload
 keyPassword=…
 ```
 
@@ -74,13 +85,13 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 ## Store-Eintrag – Deutsch
 
-**Titel (max. 30):** Flapsy – Tippen & Fliegen
+**Titel (max. 30):** Birdy – Tippen & Fliegen
 
 **Kurzbeschreibung (max. 80):** Tippen, ausweichen, durchfliegen – ein Ein-Finger-Flieger in Low-Poly-3D.
 
 **Beschreibung:**
 
-> Flieg so weit du kannst! Flapsy ist ein bunter Ein-Finger-Arcade-Flieger in Low-Poly-3D.
+> Flieg so weit du kannst! Birdy ist ein bunter Ein-Finger-Arcade-Flieger in Low-Poly-3D.
 >
 > 👆 **Ein Tipp genügt:** Tippe beim Vogel, um zu flattern – tippe daneben, um auf eine andere
 > Spur auszuweichen. Ein Zielring zeigt dir, ob du durch die nächste Lücke passt.
@@ -100,13 +111,13 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 ## Store listing – English
 
-**Title:** Flapsy – Tap & Fly
+**Title:** Birdy – Tap & Fly
 
 **Short description:** Tap, dodge, fly through – a one-finger low-poly 3D flyer.
 
 **Description:**
 
-> Fly as far as you can! Flapsy is a colourful one-finger arcade flyer in low-poly 3D.
+> Fly as far as you can! Birdy is a colourful one-finger arcade flyer in low-poly 3D.
 >
 > 👆 **One tap is all it takes:** tap the bird to flap, tap beside it to dodge into another
 > lane. A target ring shows whether you'll make the next gap.
@@ -125,13 +136,13 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 > No ads. No in-app purchases. No account. Works completely offline.
 
 **Kategorie:** Spiele → Arcade.
-**Tags:** Arcade, Casual, Einzelspieler, Offline.
+**Tags:** Arcade, Auto-Runner, Casual.
 
 ## Datenschutzerklärung (Text zum Veröffentlichen)
 
-> **Datenschutzerklärung für „Flapsy“**
+> **Datenschutzerklärung für „Birdy“**
 >
-> Flapsy erhebt, speichert oder überträgt keine personenbezogenen Daten.
+> Birdy erhebt oder überträgt keine Nutzerdaten an den Entwickler oder Dritte.
 >
 > - Die App stellt keine Verbindung zu Servern her und enthält keine Werbung, keine
 >   Analyse- oder Tracking-Dienste und keine In-App-Käufe.
@@ -140,9 +151,10 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >   Deinstallieren gelöscht.
 > - Die Berechtigung „Vibration“ wird nur für kurze Vibrationen im Spiel genutzt.
 >
-> Kontakt: [Name / Firma, Anschrift, E-Mail eintragen]
+> Verantwortlicher und Kontakt: Robin Rehbein, Stiegelstraße 26, 71701 Schwieberdingen,
+> Deutschland; hello@robinrehbein.de.
 >
-> Stand: [Datum]
+> Stand: 27. September 2026
 
 ## Angaben zur Datensicherheit (Play Console)
 

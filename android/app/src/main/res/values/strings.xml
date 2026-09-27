@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Flapsy</string>
-    <string name="title_activity_main">Flapsy</string>
-    <string name="package_name">app.birdy.game</string>
-    <string name="custom_url_scheme">app.birdy.game</string>
+    <string name="app_name">Birdy</string>
+    <string name="title_activity_main">Birdy</string>
+    <string name="package_name">de.robinrehbein.birdy</string>
+    <string name="custom_url_scheme">de.robinrehbein.birdy</string>
 </resources>
