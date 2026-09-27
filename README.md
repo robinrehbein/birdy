@@ -8,6 +8,8 @@ Ein Flappy-Bird-Klon in 3D-Optik im Stil von Endless-Runnern wie Subway Surfers 
 - Wie bei Flappy Bird zieht die Schwerkraft nach unten – mit jedem Flügelschlag geht's nach oben.
 - Es gibt **drei Spuren**. Jede Röhren-Reihe hat pro Spur eine eigene Lücke (unterschiedlich hoch); ab 3 Punkten sind manche Spuren komplett blockiert.
 - Pro durchflogener Röhren-Reihe gibt es einen Punkt, Münzen sind Bonus.
+- Leuchtende Ringe markieren die Lücken, die nächste Reihe leuchtet gelb. Durchflogene Reihen werden durchsichtig, damit sie die Sicht nicht verdecken.
+- Ab 6 Punkten bewegen sich manche Lücken auf und ab, ab 10 Punkten schnappen Piranha-Pflanzen im Takt der Musik aus den Röhren. Eine Spur pro Reihe bleibt immer „einfach“.
 - Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher.
 - Der Rekord wird lokal im Browser gespeichert.
 
@@ -17,11 +19,28 @@ Das Spiel ist für Hochkant ausgelegt. Am Desktop wird es als zentrierte 9:16-Sp
 
 ## Steuerung
 
+Auf dem Handy reicht eine einzige Geste: **Tippe ins linke, mittlere oder rechte Drittel** des Bildschirms – der Vogel fliegt in diese Spur und flattert gleichzeitig. Die drei Zonen werden zu Beginn jeder Runde kurz eingeblendet, unten zeigt eine Punkt-Anzeige die aktuelle Spur.
+
 | Aktion | Desktop | Mobil |
 | --- | --- | --- |
 | Flügelschlag | Leertaste / ↑ / W / Klick | Tippen |
-| Spur wechseln | ← → / A D | Nach links/rechts wischen |
+| Spur wechseln | ← → / A D / Klick ins Drittel | Ins linke/mittlere/rechte Drittel tippen |
 | Neustart | Enter / Leertaste | „Nochmal“-Button |
+| Ton an/aus | 🔊-Knopf oben links | 🔊-Knopf oben links |
+
+## Power-ups
+
+Power-ups schweben in Blasen zwischen den Röhren:
+
+| Power-up | Wirkung |
+| --- | --- |
+| 🌈 Regenbogen | 6 s unverwundbar und schneller, Regenbogen-Spur, Boden federt ab |
+| 🧲 Magnet | 9 s lang werden Münzen angezogen |
+| 🍄 Mini | 9 s lang ist der Vogel kleiner und passt leichter durch Lücken |
+
+## Sound
+
+Musik und Effekte werden live per WebAudio erzeugt (keine Audiodateien): ein Chiptune-Loop mit Bass, Arpeggio, Melodie und Drums, der während des Regenbogens eine zusätzliche Glitzer-Stimme bekommt.
 
 ## Entwicklung
 
@@ -56,8 +75,10 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 ## Struktur
 
 - `src/main.js` – Spielschleife, Physik, Kollision, Eingabe, UI-Zustände
-- `src/world.js` – Szene, Licht, Boden, Kulisse, Wolken, Röhren und Münzen
+- `src/world.js` – Szene, Himmel, Boden, Kulisse, Röhren (inkl. Bewegung, Ringe, Piranha-Pflanzen) und Münzen
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
-- `src/audio.js` – Soundeffekte per WebAudio (keine Audiodateien nötig)
+- `src/audio.js` – Musik und Soundeffekte per WebAudio (keine Audiodateien nötig)
+- `src/powerups.js` – Power-up-Definitionen und Modelle
+- `src/effects.js` – Partikel (Münz-Funken, Federn, Regenbogen-Spur)
 - `src/style.css` – HUD und Menüs
 - `android/` – natives Android-Projekt (Capacitor), inkl. Icons, Splash und `MainActivity`

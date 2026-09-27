@@ -13,15 +13,29 @@
     <div id="hud" class="hidden">
       <div id="score">0</div>
       <div id="coins"><span class="coin-icon"></span><span id="coin-count">0</span></div>
+      <div id="powers"></div>
+      <div id="lanes"><span></span><span></span><span></span></div>
+      <div id="zones">
+        <div><b>◀</b>links</div>
+        <div><b>▲</b>Mitte</div>
+        <div><b>▶</b>rechts</div>
+      </div>
     </div>
+
+    <button id="mute" type="button">🔊</button>
 
     <div id="start" class="panel-wrap">
       <div class="panel">
         <h1>Birdy <span>3D</span></h1>
-        <p class="controls">
-          <b>Fliegen:</b> Tippen / Leertaste / ↑<br />
-          <b>Spur wechseln:</b> Wischen / ← →
-        </p>
+        <div class="howto">
+          <div class="howto-zones"><span>◀</span><span>▲</span><span>▶</span></div>
+          <p class="controls">
+            Tippe <b>links</b>, in die <b>Mitte</b> oder <b>rechts</b>:<br />
+            Der Vogel fliegt in diese Spur und flattert.
+          </p>
+          <p class="controls small">Tastatur: Leertaste / ↑ flattern, ← → Spur</p>
+          <p class="powers-legend">🌈 unverwundbar · 🧲 Münz-Magnet · 🍄 Mini-Vogel</p>
+        </div>
         <button id="play-btn">Los geht's</button>
         <p class="best">Rekord: <span id="best-start">0</span></p>
       </div>

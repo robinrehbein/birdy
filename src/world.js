@@ -5,12 +5,44 @@ export const PIPE_RADIUS = 1.1;
 export const PIPE_TOP = 40; // pipes extend well above the visible sky
 export const GROUND_TILE = 10; // world units per ground texture repeat
 
-const SKY = 0x4ec0ca;
+const SKY_TOP = 0x2a9bd0;
+const SKY_HORIZON = 0xa6e4ea;
 
 export function createScene() {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(SKY);
-  scene.fog = new THREE.Fog(SKY, 60, 170);
+  scene.background = new THREE.Color(SKY_HORIZON);
+  scene.fog = new THREE.Fog(SKY_HORIZON, 70, 180);
+
+  // Gradient sky dome: deeper blue overhead, light towards the horizon.
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(300, 24, 12),
+    new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      depthWrite: false,
+      fog: false,
+      uniforms: {
+        top: { value: new THREE.Color(SKY_TOP) },
+        horizon: { value: new THREE.Color(SKY_HORIZON) },
+      },
+      vertexShader: `
+        varying vec3 vDir;
+        void main() {
+          vDir = normalize(position);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }`,
+      fragmentShader: `
+        uniform vec3 top;
+        uniform vec3 horizon;
+        varying vec3 vDir;
+        void main() {
+          float h = clamp(vDir.y * 1.8, 0.0, 1.0);
+          gl_FragColor = vec4(mix(horizon, top, pow(h, 0.7)), 1.0);
+          #include <colorspace_fragment>
+        }`,
+    })
+  );
+  sky.renderOrder = -1;
+  scene.add(sky);
 
   scene.add(new THREE.HemisphereLight(0xdff6ff, 0x6a8f3a, 1.4));
 
@@ -147,7 +179,25 @@ export function createScenery(scene) {
     return b;
   }
 
+  const bushGeo = new THREE.IcosahedronGeometry(0.8, 0);
+  function makeBush() {
+    const b = new THREE.Group();
+    const n = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < n; i++) {
+      const puff = new THREE.Mesh(bushGeo, leafMats[Math.floor(Math.random() * leafMats.length)]);
+      puff.position.set((i - n / 2) * 0.8, 0.3 + Math.random() * 0.3, Math.random() * 0.6);
+      puff.scale.setScalar(0.7 + Math.random() * 0.5);
+      b.add(puff);
+    }
+    return b;
+  }
+
   for (const side of [-1, 1]) {
+    for (let z = 0; z < SCENERY_SPAN; z += 5) {
+      const bush = makeBush();
+      bush.position.set(side * (6.8 + Math.random() * 0.8), 0, 20 - z - Math.random() * 2);
+      items.push(bush);
+    }
     for (let z = 0; z < SCENERY_SPAN; z += 7) {
       const tree = makeTree();
       tree.position.set(side * (9 + Math.random() * 4), 0, 20 - z - Math.random() * 3);
@@ -213,75 +263,244 @@ export function createClouds(scene) {
 
 // --- Pipes ------------------------------------------------------------------
 
-const pipeMat = new THREE.MeshStandardMaterial({ color: 0x73bf2e, roughness: 0.45, flatShading: true });
-const pipeDark = new THREE.MeshStandardMaterial({ color: 0x558c22, roughness: 0.45, flatShading: true });
+const PIPE_COLORS = { pipe: 0x73bf2e, dark: 0x4f8a1f, light: 0xb2ea6c };
 const pipeGeo = new THREE.CylinderGeometry(PIPE_RADIUS, PIPE_RADIUS, 1, 16);
 pipeGeo.translate(0, 0.5, 0); // origin at bottom, scale.y = height
 const lipGeo = new THREE.CylinderGeometry(PIPE_RADIUS + 0.25, PIPE_RADIUS + 0.25, 0.8, 16);
-const stripeGeo = new THREE.BoxGeometry(0.3, 1, 0.3);
+const bandGeo = new THREE.CylinderGeometry(PIPE_RADIUS + 0.28, PIPE_RADIUS + 0.28, 0.14, 16);
+const stripeGeo = new THREE.BoxGeometry(0.28, 1, 0.28);
 stripeGeo.translate(0, 0.5, 0);
+const ringGeo = new THREE.TorusGeometry(1, 0.07, 6, 32);
 
-function makePipeSegment() {
+function makePipeSegment(mats) {
   const g = new THREE.Group();
-  const body = new THREE.Mesh(pipeGeo, pipeMat);
-  const stripe = new THREE.Mesh(stripeGeo, pipeDark);
-  stripe.position.set(-PIPE_RADIUS * 0.55, 0, -PIPE_RADIUS * 0.8);
-  const lip = new THREE.Mesh(lipGeo, pipeMat);
-  for (const m of [body, stripe, lip]) {
+  const body = new THREE.Mesh(pipeGeo, mats.pipe);
+  // Highlight and shadow stripes on the side facing the camera.
+  const light = new THREE.Mesh(stripeGeo, mats.light);
+  light.position.set(-PIPE_RADIUS * 0.57, 0, PIPE_RADIUS * 0.8);
+  const dark = new THREE.Mesh(stripeGeo, mats.dark);
+  dark.position.set(PIPE_RADIUS * 0.64, 0, PIPE_RADIUS * 0.75);
+  const lip = new THREE.Mesh(lipGeo, mats.pipe);
+  const band = new THREE.Mesh(bandGeo, mats.dark);
+  for (const m of [body, light, dark, lip, band]) {
     m.castShadow = true;
     m.receiveShadow = true;
   }
-  g.add(body, stripe, lip);
-  return { g, body, stripe, lip };
+  g.add(body, light, dark, lip, band);
+  return { g, body, light, dark, lip, band };
 }
 
-// A gate is one row of pipes across all three lanes.
+// --- Piranha plant ----------------------------------------------------------
+
+export const PLANT_HEIGHT = 1.8;
+const plantMat = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, flatShading: true });
+const plantMats = {
+  stem: plantMat(0x3aa833),
+  leaf: plantMat(0x2f8f2a),
+  head: plantMat(0xd62f2f),
+  mouth: plantMat(0x5a0a0a),
+  lip: plantMat(0xfff1d6),
+  dot: plantMat(0xffffff),
+};
+const stemGeo = new THREE.CylinderGeometry(0.12, 0.16, 1.2, 6);
+const leafGeo = new THREE.SphereGeometry(0.3, 6, 4);
+const upperJawGeo = new THREE.SphereGeometry(0.5, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+const lowerJawGeo = new THREE.SphereGeometry(0.5, 10, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
+const mouthGeo = new THREE.SphereGeometry(0.42, 8, 6);
+const jawLipGeo = new THREE.TorusGeometry(0.47, 0.07, 5, 14);
+jawLipGeo.rotateX(Math.PI / 2);
+const dotGeo = new THREE.SphereGeometry(0.08, 5, 4);
+
+function createPlant() {
+  const group = new THREE.Group();
+  const stem = new THREE.Mesh(stemGeo, plantMats.stem);
+  stem.position.y = 0.6;
+  group.add(stem);
+  for (const side of [-1, 1]) {
+    const leaf = new THREE.Mesh(leafGeo, plantMats.leaf);
+    leaf.scale.set(1.5, 0.3, 0.8);
+    leaf.position.set(side * 0.32, 0.5, 0);
+    leaf.rotation.z = side * 0.4;
+    group.add(leaf);
+  }
+  const head = new THREE.Group();
+  head.scale.setScalar(1.35);
+  head.position.y = PLANT_HEIGHT - 0.5 * 1.35;
+  head.rotation.x = 0.35; // mouth faces the player
+  const mouth = new THREE.Mesh(mouthGeo, plantMats.mouth);
+  const upper = new THREE.Group();
+  upper.add(new THREE.Mesh(upperJawGeo, plantMats.head), new THREE.Mesh(jawLipGeo, plantMats.lip));
+  for (const [theta, phi] of [[0.3, 0.5], [1.6, 0.8], [2.9, 0.45], [4.2, 0.9], [5.4, 0.55]]) {
+    const dot = new THREE.Mesh(dotGeo, plantMats.dot);
+    dot.position.setFromSphericalCoords(0.49, phi, theta);
+    upper.add(dot);
+  }
+  const lower = new THREE.Group();
+  lower.add(new THREE.Mesh(lowerJawGeo, plantMats.head), new THREE.Mesh(jawLipGeo, plantMats.lip));
+  head.add(mouth, upper, lower);
+  group.add(head);
+  group.traverse((o) => {
+    if (o.isMesh) o.castShadow = true;
+  });
+  group.visible = false;
+  return { group, upper, lower };
+}
+
+// Rise amount (0..1) over a 4-beat cycle: hidden, pop up, chomp, retreat.
+function plantRise(beat) {
+  const p = ((beat % 4) + 4) % 4;
+  if (p < 2) return 0;
+  if (p < 2.4) return THREE.MathUtils.smoothstep(p, 2, 2.4);
+  if (p < 3.5) return 1;
+  if (p < 3.9) return 1 - THREE.MathUtils.smoothstep(p, 3.5, 3.9);
+  return 0;
+}
+
+// A gate is one row of pipes across all three lanes. Each gate owns its
+// materials so it can fade out on its own once the bird has passed.
 export function createGate(scene) {
   const group = new THREE.Group();
+  const mats = {
+    pipe: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.pipe, roughness: 0.45, flatShading: true }),
+    dark: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.dark, roughness: 0.45, flatShading: true }),
+    light: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.light, roughness: 0.4, flatShading: true }),
+  };
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
   const lanes = LANES.map((x) => {
-    const bottom = makePipeSegment();
-    const top = makePipeSegment();
+    const bottom = makePipeSegment(mats);
+    const top = makePipeSegment(mats);
     bottom.g.position.x = x;
     top.g.position.x = x;
-    group.add(bottom.g, top.g);
-    return { x, bottom, top, gapLow: 0, gapHigh: 0, blocked: false };
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.position.x = x;
+    const plant = createPlant();
+    plant.group.position.x = x;
+    group.add(bottom.g, top.g, ring, plant.group);
+    return {
+      x, bottom, top, ring, plant,
+      blocked: false, center: 0, size: 0, amp: 0, speed: 0, phase: 0,
+      hasPlant: false, plantOffset: 0,
+      gapLow: 0, gapHigh: 0, hitLow: 0, hitHigh: 0,
+    };
   });
   scene.add(group);
 
-  function setSegment(seg, from, to, lipAt) {
+  function setSegment(seg, from, to, lipAt, bandAt) {
     const h = Math.max(0.01, to - from);
     seg.g.position.y = from;
     seg.body.scale.y = h;
-    seg.stripe.scale.y = h;
-    seg.lip.position.y = lipAt - from;
-    seg.lip.visible = lipAt !== null;
+    seg.light.scale.y = h;
+    seg.dark.scale.y = h;
+    seg.lip.visible = seg.band.visible = lipAt !== null;
+    if (lipAt !== null) {
+      seg.lip.position.y = lipAt - from;
+      seg.band.position.y = bandAt - from;
+    }
   }
+
+  function setGap(lane, center) {
+    lane.gapLow = center - lane.size / 2;
+    lane.gapHigh = center + lane.size / 2;
+    setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4, lane.gapLow - 0.8);
+    setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4, lane.gapHigh + 0.8);
+    lane.ring.position.y = center;
+    lane.ring.scale.set(0.95, lane.size / 2 - 0.15, 1);
+  }
+
+  let opacity = 1;
 
   return {
     group,
     lanes,
+    ringMat,
     passed: false,
-    // gaps: array per lane of { center, size } or null for a blocked lane
-    configure(z, gaps) {
+    popTime: -1,
+    // spec per lane: null (blocked) or { center, size, amp, speed, phase, plant, plantOffset }
+    configure(z, spec) {
       group.position.z = z;
       group.visible = true;
       this.passed = false;
-      gaps.forEach((gap, i) => {
+      this.popTime = -1;
+      this.setOpacity(1);
+      ringMat.opacity = 0;
+      spec.forEach((gap, i) => {
         const lane = lanes[i];
+        lane.plant.group.visible = false;
         if (!gap) {
           lane.blocked = true;
-          lane.gapLow = lane.gapHigh = 0;
+          lane.hasPlant = false;
+          lane.gapLow = lane.gapHigh = lane.hitLow = lane.hitHigh = 0;
           setSegment(lane.bottom, 0, PIPE_TOP, null);
           lane.top.g.visible = false;
+          lane.ring.visible = false;
           return;
         }
         lane.blocked = false;
         lane.top.g.visible = true;
-        lane.gapLow = gap.center - gap.size / 2;
-        lane.gapHigh = gap.center + gap.size / 2;
-        setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4);
-        setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4);
+        lane.ring.visible = true;
+        lane.center = gap.center;
+        lane.size = gap.size;
+        lane.amp = gap.amp || 0;
+        lane.speed = gap.speed || 0;
+        lane.phase = gap.phase || 0;
+        lane.hasPlant = !!gap.plant;
+        lane.plantOffset = gap.plantOffset || 0;
+        setGap(lane, gap.center);
+        lane.hitLow = lane.gapLow;
+        lane.hitHigh = lane.gapHigh;
       });
+    },
+    // Animate moving gaps and piranha plants. `beat` drives the plants so
+    // they pop up in time with the music.
+    update(time, beat, dt) {
+      for (const lane of lanes) {
+        if (lane.blocked) continue;
+        if (lane.amp) setGap(lane, lane.center + Math.sin(time * lane.speed + lane.phase) * lane.amp);
+        lane.hitLow = lane.gapLow;
+        lane.hitHigh = lane.gapHigh;
+        if (!lane.hasPlant) continue;
+        if (this.passed) {
+          lane.plant.group.visible = false;
+          continue;
+        }
+        const rise = plantRise(beat + lane.plantOffset);
+        const plant = lane.plant;
+        plant.group.visible = rise > 0;
+        if (rise <= 0) continue;
+        // Hidden inside the pipe at rise 0; head sticks out of the gap at 1.
+        plant.group.position.y = lane.gapLow - 0.3 - PLANT_HEIGHT * (1 - rise);
+        lane.hitLow = Math.max(lane.gapLow, plant.group.position.y + PLANT_HEIGHT - 0.15);
+        const chomp = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0.3;
+        plant.upper.rotation.x = -0.6 * chomp;
+        plant.lower.rotation.x = 0.35 * chomp;
+      }
+      if (this.popTime >= 0) {
+        // Ring "pop" feedback right after passing the gate.
+        this.popTime += dt;
+        const t = Math.min(1, this.popTime / 0.35);
+        for (const lane of lanes) lane.ring.scale.x = 0.95 * (1 + t * 0.6);
+        ringMat.opacity = 0.9 * (1 - t);
+        if (t >= 1) {
+          for (const lane of lanes) lane.ring.visible = false;
+          this.popTime = -1;
+        }
+      }
+    },
+    setOpacity(o) {
+      if (Math.abs(o - opacity) < 0.001) return;
+      const fading = o < 0.999;
+      for (const m of Object.values(mats)) {
+        if (m.transparent !== fading) {
+          m.transparent = fading;
+          m.depthWrite = !fading;
+          m.needsUpdate = true;
+        }
+        m.opacity = o;
+      }
+      opacity = o;
+    },
+    get opacity() {
+      return opacity;
     },
   };
 }

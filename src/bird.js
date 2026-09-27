@@ -81,7 +81,19 @@ export function createBird() {
     for (const w of wings) w.rotation.z = w.userData.side * a;
   }
 
-  return { group, animateWings };
+  // Emissive glow used for power-ups (rainbow star); null switches it off.
+  const glowMats = new Set();
+  group.traverse((o) => {
+    if (o.isMesh) glowMats.add(o.material);
+  });
+  function setGlow(color, intensity = 0.6) {
+    for (const m of glowMats) {
+      if (color === null) m.emissive.setRGB(0, 0, 0);
+      else m.emissive.copy(color).multiplyScalar(intensity);
+    }
+  }
+
+  return { group, animateWings, setGlow };
 }
 
 function createWingGeometry() {
