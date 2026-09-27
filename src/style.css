@@ -537,3 +537,17 @@ button.gift {
   45% { transform: translateY(-6px) scale(0.9); }
   55% { transform: translateY(-6px) scale(0.86); }
 }
+#coins.bump .coin-icon { animation: pop-wallet 0.3s ease-out; }
+
+/* Shop tabs. */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.tabs .tab {
+  font-size: 17px;
+  padding: 6px 8px;
+  background: #cbb968;
+  color: #fff;
+  box-shadow: 0 3px 0 #543847;
+}
+.tabs .tab.on { background: #f26b1d; }
+.panel .tabs button + button { margin-top: 0; }
+.skin .dot { display: flex; align-items: center; justify-content: center; color: #543847; font-size: 18px; }

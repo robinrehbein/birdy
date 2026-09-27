@@ -24,7 +24,8 @@ export function createParticles(scene, max = 300) {
     mesh.setColorAt(i, color.set(0xffffff));
   }
 
-  function emit(pos, { count = 10, colors = [0xffffff], speed = 4, size = 0.12, life = 0.6, gravity = -6, drag = 1.5, spread = 1 }) {
+  // `drift` adds a constant velocity along +z (backwards, for trails).
+  function emit(pos, { count = 10, colors = [0xffffff], speed = 4, size = 0.12, life = 0.6, gravity = -6, drag = 1.5, spread = 1, drift = 0 }) {
     for (let n = 0; n < count; n++) {
       const i = cursor;
       cursor = (cursor + 1) % max;
@@ -32,6 +33,7 @@ export function createParticles(scene, max = 300) {
       p.pos.copy(pos);
       p.vel.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize()
         .multiplyScalar(speed * (0.4 + Math.random() * 0.6) * spread);
+      p.vel.z += drift;
       p.life = p.maxLife = life * (0.7 + Math.random() * 0.6);
       p.size = size * (0.6 + Math.random() * 0.8);
       p.gravity = gravity;

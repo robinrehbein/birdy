@@ -678,11 +678,15 @@ export function createGate(scene) {
 
 const coinGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.12, 20);
 coinGeo.rotateX(Math.PI / 2);
+// Bright gold: little metalness (there is no environment map to reflect,
+// so a metallic coin would look brown) and a warm glow of its own.
 const coinMat = new THREE.MeshStandardMaterial({
-  color: 0xf5c518,
-  emissive: 0x6b4a00,
-  metalness: 0.6,
-  roughness: 0.3,
+  color: 0xffcf33,
+  emissive: 0xb07800,
+  emissiveIntensity: 0.55,
+  metalness: 0.15,
+  roughness: 0.35,
+  flatShading: true,
 });
 
 export function createCoin(scene) {

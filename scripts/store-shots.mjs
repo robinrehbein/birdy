@@ -45,10 +45,19 @@ async function play() {
 }
 await play();
 await page.waitForTimeout(14000);
+// A believable mid-run HUD for the listing.
+await page.evaluate(() => {
+  const B = window.__birdy;
+  B.state.score = 17;
+  B.state.coins = 12;
+  document.getElementById('score').textContent = '17';
+  document.getElementById('coin-count').textContent = '12';
+});
 await page.screenshot({ path: `${OUT}/screenshot-2-park.png` });
 for (const [zone, name] of [[1, 'herbstwald'], [2, 'canyon'], [3, 'bluetenhain']]) {
   await page.evaluate((z) => { window.__birdy.state.gatesSpawned = z * 15 + 1; window.__birdy.enterZone(z); }, zone);
-  await page.waitForTimeout(zone === 1 ? 1400 : 26000);
+  // Let the new scenery stream in completely (headless runs slowly).
+  await page.waitForTimeout(zone === 1 ? 1400 : 60000);
   await page.screenshot({ path: `${OUT}/screenshot-${2 + zone}-${name}.png` });
 }
 await page.evaluate(() => window.__birdy.handleBack(() => {}));

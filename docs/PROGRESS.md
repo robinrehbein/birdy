@@ -16,26 +16,33 @@ Bot-Werte sind Näherungen an echte Spieler, keine Messung an Menschen.
 
 ## Bewertungsbogen (aktuell)
 
-Die Noten sind nach Review 2 (nach Iteration 7) korrigiert; überhöhte Werte wurden gesenkt.
+Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte wurden gesenkt.
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 7 | Der erste Start geht direkt ins Spiel, mit einem geführten Run: Geister-Hand, Einfrieren vor der blockierten Reihe bis zum Seitentipp, großer pulsierender Zielring. Der Ablauf ist per E2E-Test belegt. Offen: Test mit echten Erstspielern. |
-| 2 | Game Feel / Juice | 7 | Stretch, Hit-Stop 0,14 s, „Knapp!“-Serien, Vibration, Tempo-Kick. Durchflogene Reihen blenden vollständig aus, also keine Geister-Röhren mehr. Nicht auf einem Gerät gefühlt. |
-| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt 91 % der 150-s-Runs, Erreichbarkeit ist garantiert. Das Tempo steigt nach 40 Punkten weiter. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 7 | 4 Zonen mit eigener Szenerie und Tageszeit, alle 15 Reihen mit Münz-Rausch und Banner, neue Mechanik „atmende Lücken“ und je Zone eine Spezialität. Der geübte Bot erreicht in über der Hälfte der Runs Zone 2. Seit Iteration 10 auch Musik pro Zone. |
-| 5 | Session-Loop | 8 | Game-Over 0,46 s nach dem Crash (gemessen, vorher 1,4–2 s), Neustart per Tipp nach weiteren 0,35 s, also rund 0,8 s vom Crash zum neuen Run. Bereit-Zustand, „Nur noch X bis zum Rekord“, Missionen und Geschenk. Runs im Median: geübt ~38 s ✓. |
-| 6 | Meta-Progression | 6 | Münzen, 7 Skins (Kacheln mit Preis, Name über dem Vogel, Live-Vorschau), Missionen nach Niveau, Tagesgeschenk mit Serie, Münz-Rausch pro Zone. Fehlt: zweite Kosmetik-Kategorie, Erfolge. |
-| 7 | Audio | 6 | 4 Zonen-Themen (je 16 Takte, 31 s, Songform A–A′–B–Breakdown, also 2 min verschiedene Musik), ruhiger Menü-Modus, Wechsel immer auf dem Taktanfang. Pegel gemessen: Themen innerhalb von 1,5 dB, keine Übersteuerung. Offen: nur Oszillator-Klänge, nicht von Menschen gehört. |
-| 8 | Performance | 5 | 165 Draw Calls, adaptive Qualität. Auf keinem echten Gerät gemessen. |
-| 9 | Politur | 5 | Münzen bräunlich, Geister-Röhren, die oberen Röhren füllen die halbe Bildhöhe. |
-| 10 | Store-Reife | 6 | Signiertes AAB (per Test-Schlüssel verifiziert), Versionierung, Zurück-Taste, eigenständiges Icon, Feature-Grafik, 6 Screenshots, Store-Texte DE/EN, Datenschutz und Datensicherheit (`docs/STORE.md`). Offen (deine Entscheidungen): App-ID, eigener Schlüssel, Datenschutz-URL, Piranha-Pflanzen-Design (IP-Risiko). |
+| 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt. Offen: Test mit Menschen. |
+| 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
+| 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
+| 4 | Abwechslung | 5 | 4 Zonen mit eigener Szenerie und Musik, aber: Anfänger sehen Zone 2 selten, Zone 4 erreicht kaum jemand. Die Szenerie kommt ~8 s nach dem Banner an, deshalb mischen sich die Biome. |
+| 5 | Session-Loop | 7 | 0,8 s vom Crash zum nächsten Run. Aber: Der Game-Over-Screen zeigt kein nächstes Ziel. |
+| 6 | Meta-Progression | 6 | 7 Vogel-Farben und 7 Flugspuren (zwei Kategorien, Reiter im Shop, Live-Vorschau), Missionen, Tagesgeschenk. Fehlt: nächstes Ziel sichtbar machen. |
+| 7 | Audio | 5 | 4 Zonen-Themen, Menü-Modus, Pegel gemessen. Nur Oszillator-Klänge, von keinem Menschen gehört. |
+| 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
+| 9 | Politur | 5 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis. Aber: Das Menü-Panel verdeckt den Vogel, die Shop-Kamera ist auf manchen Displays zu nah. |
+| 10 | Store-Reife | 5 | AAB signierbar, Texte, Datenschutz, Icon. Aber: Die Screenshots zeigen keine Mechaniken (Pflanzen, Power-ups, „Knapp!“), und die Zonen-Bilder sind inszeniert. Offen: App-ID (deine Entscheidung). |
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Politur:** Münz-Material (wirkt bräunlich), Shop-Kamera auf schmalen Displays zu nah.
-2. **Meta:** zweite Kosmetik-Kategorie (z. B. Flug-Spuren), Erfolge.
-3. **Store (Entscheidungen von dir):** App-ID, Schlüssel, Datenschutz-URL, Pflanzen-Design.
+1. **Zonen erreichbar und sauber (Review 3, Punkt 1):**
+   - Zonen alle 10 statt 15 Reihen.
+   - Die Szenerie beim Anlegen der Zonen-Marke umstellen, damit sie beim Banner fertig ist.
+2. **Nächstes Ziel auf dem Game-Over-Screen:**
+   - Fortschritt zum nächsten Kauf.
+   - Offene Missionen mit Balken.
+   - Erreichte Zone.
+   - „Neuer Rekord!“ schon während des Runs.
+3. **Bildaufteilung:** Menü-Panel und Vogel, Shop-Kamera je nach Seitenverhältnis, Höhe der oberen Röhren.
+4. **Store-Screenshots mit Mechaniken,** ohne Inszenierung.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -68,6 +75,28 @@ Die neuen Top 3:
 
 Als überhöht bewertet: Game Feel, Session-Loop, Meta, Audio und Performance, jeweils um einen
 Punkt. Oben korrigiert.
+
+## Review 3 (nach Iteration 12) – Publisher-Subagent
+
+Urteil: **interner Test-Track ja, sobald die App-ID steht.** Für einen öffentlichen Soft Launch
+reicht es noch nicht.
+
+Zu den Punkten aus Review 2:
+- **Onboarding, Neustart-Tempo, Geister-Röhren, Zurück-Taste, Icon:** erledigt.
+- **Abwechslung:** nur auf dem Papier erledigt. Anfänger sehen Zone 2 kaum, und die Szenerie
+  kommt verspätet.
+
+Die neuen Top 3:
+
+| Rang | Kritik |
+|---|---|
+| 1 | Zonen erreichbar und sauber machen |
+| 2 | Nächstes Ziel auf dem Game-Over-Screen |
+| 3 | Bildaufteilung (Röhren, Menü-Panel, Shop-Kamera) |
+
+Außerdem gefunden: `scripts/perf.mjs` war seit dem Tutorial kaputt, und die Store-Screenshots
+waren inszeniert. Als überhöht bewertet: Session-Loop, Abwechslung, Game Feel, Audio und
+Store-Reife. Oben korrigiert.
 
 ## Iterations-Log
 
@@ -470,3 +499,26 @@ Mit der Tipp-Sperre von 0,35 s ist ein neuer Run rund 0,8 s nach dem Crash mögl
 **Nicht ohne dich entschieden** (siehe `docs/STORE.md`): App-ID, Store-Name bzw.
 Markenrecherche, Datenschutz-URL und Kontakt. Das Piranha-Pflanzen-Design ist das größte
 Rechte-Risiko; es war ausdrücklich „wie Mario“ gewünscht, deshalb ändere ich es nicht ungefragt.
+
+### Iteration 13 – Politur und Flugspuren
+
+**Was:**
+- **Münzen:** goldgelb statt bräunlich. Weniger Metallanteil (ohne Umgebungsbild wirkte Metall
+  braun), dazu ein eigenes Leuchten.
+- **Zielringe** blenden in den letzten Einheiten vor der Kamera aus, statt den Bildschirm zu
+  füllen.
+- **Münzzähler** hüpft beim Einsammeln.
+- **Flugspuren (zweite Kosmetik-Kategorie):**
+  - Funkeln 150, Blasen 300, Konfetti 500, Herbstlaub 700, Sternenstaub 1000,
+    Feuerschweif 1400.
+  - Sie werden als Partikel hinter dem Vogel dargestellt; während des Regenbogens pausieren sie.
+  - Der Shop hat jetzt die Reiter „🐦 Vögel“ und „✨ Spuren“, mit Live-Vorschau der Spur am
+    schwebenden Vogel.
+- **`scripts/perf.mjs` repariert:** Seit dem Tutorial war mit leerem Speicher der Start-Button
+  unsichtbar. Das Skript belegt den Speicher jetzt vor dem ersten Laden vor. Ein Reload hätte
+  den Abbau der alten Seite mitgemessen (3,2 s statt 0,8 s).
+
+**Beleg:**
+- E2E-Test: Reiter wechseln, Konfetti kaufen (800 → 300 Münzen, ausgewählt), Konfetti-Spur im
+  Spiel sichtbar. Keine Fehler.
+- Perf-Messung: 162 Draw Calls, 49,7k Dreiecke, erster Frame nach 0,79 s.

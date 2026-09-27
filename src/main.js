@@ -4,7 +4,7 @@ import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
 import { createParticles } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
-import { progress, SKINS } from './progress.js';
+import { progress, SKINS, TRAILS } from './progress.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import {
   LANES,
@@ -137,6 +137,7 @@ const app = $('app');
 const hud = $('hud');
 const scoreEl = $('score');
 const coinCountEl = $('coin-count');
+const coinsEl = $('coins');
 const startEl = $('start');
 const overEl = $('gameover');
 const pauseEl = $('pause');
@@ -206,46 +207,76 @@ function renderStart() {
   renderWallet();
 }
 
+// Shop with two tabs: bird colours and flight trails.
+let shopTab = 'skins';
+let previewTrail = null; // trail shown on the hovering bird in the shop
+const shopKind = () => (shopTab === 'skins'
+  ? { list: SKINS, owns: progress.owns, equipped: progress.skin.id, buy: (id) => progress.buy(id), select: (id) => progress.select(id) }
+  : { list: TRAILS, owns: progress.ownsTrail, equipped: progress.trail.id, buy: (id) => progress.buyTrail(id), select: (id) => progress.selectTrail(id) });
+const hexColor = (c) => `#${c.toString(16).padStart(6, '0')}`;
+
 function renderShop() {
-  skinsEl.innerHTML = SKINS.map((k) => {
+  const kind = shopKind();
+  for (const t of document.querySelectorAll('#shop .tab')) t.classList.toggle('on', t.dataset.tab === shopTab);
+  skinsEl.innerHTML = kind.list.map((k) => {
+    const owned = kind.owns(k.id);
     const cls = ['skin'];
-    if (!progress.owns(k.id)) cls.push('locked');
+    if (!owned) cls.push('locked');
     if (k.id === shopSel) cls.push('sel');
-    if (k.id === progress.skin.id) cls.push('equipped');
-    const hex = `#${k.body.toString(16).padStart(6, '0')}`;
-    const price = progress.owns(k.id) ? '' : `<span class="price">${k.price}</span>`;
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${hex}"></span>${price}</button>`;
+    if (k.id === kind.equipped) cls.push('equipped');
+    const bg = shopTab === 'skins'
+      ? hexColor(k.body)
+      : k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
+    const inner = shopTab === 'trails' && !k.colors.length ? '✕' : '';
+    const price = owned ? '' : `<span class="price">${k.price}</span>`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${bg}">${inner}</span>${price}</button>`;
   }).join('');
-  const skin = SKINS.find((k) => k.id === shopSel);
-  shopName.textContent = skin.name;
+  const item = kind.list.find((k) => k.id === shopSel);
+  shopName.textContent = item.name;
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
-  if (!progress.owns(skin.id)) {
-    shopAction.innerHTML = `Kaufen · ${skin.price} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+  if (!kind.owns(item.id)) {
+    shopAction.innerHTML = `Kaufen · ${item.price} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
     shopAction.classList.add('buy');
-    shopAction.disabled = progress.coins < skin.price;
-  } else if (skin.id === progress.skin.id) {
+    shopAction.disabled = progress.coins < item.price;
+  } else if (item.id === kind.equipped) {
     shopAction.textContent = 'Ausgewählt';
     shopAction.disabled = true;
   } else {
     shopAction.textContent = 'Auswählen';
   }
-  bird.setSkin(skin); // live preview on the 3D bird
+  // Live preview on the 3D bird.
+  if (shopTab === 'skins') {
+    bird.setSkin(item);
+    previewTrail = progress.trail;
+  } else {
+    bird.setSkin(progress.skin);
+    previewTrail = item;
+  }
   renderWallet();
 }
 
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
-  shopSel = progress.skin.id;
+  shopSel = shopKind().equipped;
   shopEl.classList.toggle('hidden', !open);
   startEl.classList.toggle('hidden', open);
   if (open) renderShop();
   else {
+    previewTrail = null;
     bird.setSkin(progress.skin);
     renderStart();
   }
 }
 
+for (const tab of document.querySelectorAll('#shop .tab')) {
+  tab.addEventListener('click', () => {
+    shopTab = tab.dataset.tab;
+    shopSel = shopKind().equipped;
+    sfx.swoosh();
+    renderShop();
+  });
+}
 skinsEl.addEventListener('click', (e) => {
   const btn = e.target.closest('.skin');
   if (!btn) return;
@@ -254,11 +285,13 @@ skinsEl.addEventListener('click', (e) => {
   renderShop();
 });
 shopAction.addEventListener('click', () => {
-  const skin = SKINS.find((k) => k.id === shopSel);
-  if (progress.owns(skin.id)) progress.select(skin.id);
-  else if (progress.buy(skin.id)) {
+  const kind = shopKind();
+  const item = kind.list.find((k) => k.id === shopSel);
+  if (kind.owns(item.id)) kind.select(item.id);
+  else if (kind.buy(item.id)) {
     sfx.powerup();
-    particles.emit(bird.group.position, { count: 30, colors: [skin.body, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
+    const colors = shopTab === 'skins' ? [item.body] : item.colors.length ? item.colors : [0xffffff];
+    particles.emit(bird.group.position, { count: 30, colors: [...colors, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
   }
   renderShop();
 });
@@ -910,10 +943,17 @@ function popup(text) {
   void popupEl.offsetWidth;
   popupEl.classList.add('show');
 }
+function bumpCoins() {
+  coinsEl.classList.remove('bump');
+  void coinsEl.offsetWidth;
+  coinsEl.classList.add('bump');
+}
+
 function nearMiss() {
   state.nearChain++;
   state.coins++;
   coinCountEl.textContent = state.coins;
+  bumpCoins();
   sfx.near(state.nearChain - 1);
   buzz(15);
   popup(state.nearChain > 1 ? `Knapp! ×${state.nearChain}` : 'Knapp!');
@@ -1092,8 +1132,10 @@ function updatePlaying(dt) {
     if (!gate.active || gate.passed) continue;
     const gz = gate.group.position.z;
     const near = THREE.MathUtils.clamp(1 + gz / 45, 0, 1);
+    // Fade out right in front of the camera instead of filling the screen.
+    const close = THREE.MathUtils.clamp((-gz - 3) / 7, 0, 1);
     gate.ringMat.color.set(gate === next ? 0xfff176 : 0xffffff);
-    gate.ringMat.opacity = gate === next ? 0.3 + 0.6 * near : 0.15 * near;
+    gate.ringMat.opacity = (gate === next ? 0.3 + 0.6 * near : 0.15 * near) * close;
   }
 
   state.lastGateZ += dz;
@@ -1126,6 +1168,7 @@ function updatePlaying(dt) {
       c.mesh.visible = false;
       state.coins++;
       coinCountEl.textContent = state.coins;
+      bumpCoins();
       checkMissions();
       sfx.coin();
       particles.emit(p, { count: 8, colors: [0xfff176, 0xffd400, 0xffffff], speed: 5, size: 0.1, life: 0.45, gravity: 0 });
@@ -1177,6 +1220,7 @@ function updateDead(dt) {
   for (const gate of gates) if (gate.active) gate.update(state.time, state.beat, dt);
 }
 
+const trailPos = new THREE.Vector3();
 function updateBirdVisual(dt) {
   const g = bird.group;
   g.position.set(state.x, state.y, 0);
@@ -1206,6 +1250,18 @@ function updateBirdVisual(dt) {
   if (state.mode === 'playing' && state.power.star > 0) {
     bird.setGlow(tmpColor.setHSL((state.time * 1.5) % 1, 1, 0.5), 0.7);
   }
+  // Flight trail (cosmetic): during a run, and as a preview in the shop.
+  const trail = state.mode === 'playing' && !state.hold && state.power.star <= 0 ? progress.trail
+    : state.mode === 'ready' && state.menu === 'shop' ? previewTrail : null;
+  if (trail && trail.colors.length) {
+    state.trailAcc = (state.trailAcc || 0) + dt * 30;
+    const drift = state.mode === 'playing' ? 0 : 6; // the world stands still in the shop
+    trailPos.set(state.x, state.y - 0.1, 0.45);
+    while (state.trailAcc >= 1) {
+      state.trailAcc -= 1;
+      particles.emit(trailPos, { count: 1, colors: trail.colors, speed: trail.speed, size: trail.size, life: trail.life, gravity: trail.gravity, drag: 1, drift });
+    }
+  }
   // Blink during the grace period after the rainbow ends.
   g.visible = !(state.grace > 0 && Math.floor(state.time * 12) % 2 === 0);
 }
@@ -1217,7 +1273,8 @@ function updateCamera(dt) {
   if (state.mode === 'ready' && state.menu === 'shop') {
     // Shop: look the bird in the face so the skin preview is visible above
     // the panel.
-    camTarget.set(5.6, state.y + 0.9, -2.1);
+    const far = baseFov < 70 ? 1.2 : 1; // narrower lens on wider screens
+    camTarget.set(5.6 * far, state.y + 0.9, -2.1 * far);
     camLook.set(0, state.y - 1.2, 0);
   } else if (state.mode === 'ready') {
     // Start menu: closer, bird centred between title and panel.
@@ -1399,4 +1456,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop };
+window.__birdy = { state, gates, pickups, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera };

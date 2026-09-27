@@ -18,11 +18,15 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
 const errors = [];
 page.on('pageerror', (e) => errors.push(e.message));
+// A returning player (tutorial done), so the menu with the play button shows.
+// Set before the first load: a reload would also time the old page's teardown.
+await page.addInitScript(() => localStorage.setItem('birdy-progress', JSON.stringify({ runs: 1, tutorialDone: true })));
 const t0 = Date.now();
 await page.goto(url);
 await page.waitForFunction(() => window.__birdy?.renderer?.info.render.frame > 2);
 const firstFrame = Date.now() - t0;
 await page.click('#play-btn');
+await page.mouse.click(195, 560); // leave the get-ready hover
 await page.screenshot({ path: process.env.SHOT || '/dev/null' }).catch(() => {});
 const samples = [];
 for (let i = 0; i < 12; i++) {

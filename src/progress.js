@@ -14,6 +14,17 @@ export const SKINS = [
   { id: 'gold', name: 'Goldvogel', price: 1500, body: 0xffc629, belly: 0xfff1b0, wing: 0xffe57a, cover: 0xffd23d, tail: 0xe0a100, beak: 0xff7a1a, beakLow: 0xd9530f, metal: true },
 ];
 
+// Flight trails: a second cosmetic category. Particles behind the bird.
+export const TRAILS = [
+  { id: 'none', name: 'Keine Spur', price: 0, colors: [] },
+  { id: 'sparkle', name: 'Funkeln', price: 150, colors: [0xfff176, 0xffffff, 0xffd400], size: 0.08, life: 0.45, gravity: 0, speed: 0.8 },
+  { id: 'bubbles', name: 'Blasen', price: 300, colors: [0xbfe9ff, 0xe8f7ff, 0x8fd3ff], size: 0.14, life: 0.8, gravity: 2.5, speed: 0.5 },
+  { id: 'confetti', name: 'Konfetti', price: 500, colors: [0xff5a5a, 0x5ad1ff, 0xffd84a, 0x7be07b, 0xc58bff], size: 0.09, life: 0.7, gravity: -4, speed: 2 },
+  { id: 'leaves', name: 'Herbstlaub', price: 700, colors: [0xe8772e, 0xf2a93b, 0xd9492f], size: 0.12, life: 0.9, gravity: -2, speed: 1.2 },
+  { id: 'stardust', name: 'Sternenstaub', price: 1000, colors: [0xc58bff, 0xffffff, 0x8f7bff], size: 0.07, life: 0.9, gravity: 0.5, speed: 0.6 },
+  { id: 'fire', name: 'Feuerschweif', price: 1400, colors: [0xff7a1a, 0xffc93c, 0xff3d2e], size: 0.13, life: 0.4, gravity: 3, speed: 0.9 },
+];
+
 // Mission templates. `stat` is what is counted, `per` whether it counts
 // within one run (best run) or adds up over the day.
 const MISSION_POOL = [
@@ -82,6 +93,8 @@ function load() {
     missions: null,
     gift: { last: '', streak: 0 },
     tutorialDone: false,
+    trails: ['none'],
+    trail: 'none',
     ...(data || {}),
   };
   // Migrate the old best score.
@@ -119,6 +132,23 @@ export const progress = {
   },
   get skin() { return SKINS.find((s) => s.id === data.skin) || SKINS[0]; },
   owns: (id) => data.owned.includes(id),
+  get trail() { return TRAILS.find((t) => t.id === data.trail) || TRAILS[0]; },
+  ownsTrail: (id) => data.trails.includes(id),
+  buyTrail(id) {
+    const t = TRAILS.find((x) => x.id === id);
+    if (!t || data.trails.includes(id) || data.coins < t.price) return false;
+    data.coins -= t.price;
+    data.trails.push(id);
+    data.trail = id;
+    save();
+    return true;
+  },
+  selectTrail(id) {
+    if (!data.trails.includes(id)) return false;
+    data.trail = id;
+    save();
+    return true;
+  },
 
   missions() {
     return missions().map((m) => {
