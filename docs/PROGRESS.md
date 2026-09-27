@@ -1145,3 +1145,13 @@ Die Upgrades waren zum Zeitpunkt des Reviews schon in Arbeit (Iteration 28).
 - `swipe2.mjs` ✓.
 - Bot-Playtest (150 Runs): Anfänger 17,4 s und 7 Münzen/Run, Geübt 37,8 s und 27 Münzen/Run,
   Profi 96 % Überlebende.
+- Tutorial-E2E nach allen Änderungen erneut ✓ (Tutorial fertig, keine Fehler).
+- Beim Erzeugen der Store-Bilder fiel ein Fehler auf: Wer einen Run mit aktivem Regenbogen über
+  Pause → Menü verließ, sah den Vogel im Menü weiter bunt leuchten. Das ist behoben.
+
+**Scorecard dritte Runde (vor Iteration 21 → nach Iteration 30):** Onboarding 7 → 7, Game Feel
+6 → 6, Fairness 7 → 7, Abwechslung 6 → 6, Session-Loop 7 → 7, Meta-Progression 6 → 7, Audio
+5 → 5, Performance 5 → 5, Politur 7 → 6, Store-Reife 5 → 3. Die Senkungen übernehmen die strengere
+Bewertung aus Review 5 und 6 (u. a. Namensrisiko, App-ID, kein Gerätetest). Das Ziel „überall ≥ 8“
+ist nicht erreicht. Die fehlenden Punkte hängen an Tests mit Menschen und echten Geräten und an
+deinen Entscheidungen (Name, App-ID), nicht an weiterem Code.
