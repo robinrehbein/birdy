@@ -161,7 +161,9 @@ export function createGround(scene) {
 // Bake all meshes below `root` into one geometry with vertex colours, so a
 // whole group of static parts renders with a single draw call. The look is
 // unchanged: same shapes, same colours, same flat shading.
-export function bakeGroup(root) {
+// `spikes`: also bake a "spike" attribute: the tip vertices of meshes with
+// userData.spikeDir get that direction (for the cactus bristling in a shader).
+export function bakeGroup(root, spikes = false) {
   root.updateMatrixWorld(true);
   const inv = root.matrixWorld.clone().invert();
   const geos = [];
@@ -169,14 +171,25 @@ export function bakeGroup(root) {
   root.traverse((o) => {
     if (!o.isMesh) return;
     const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    if (spikes) g.userData.local = g.attributes.position.clone();
     g.applyMatrix4(m.multiplyMatrices(inv, o.matrixWorld));
     const c = o.material.color;
     const n = g.attributes.position.count;
     const col = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
     g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    if (spikes) {
+      const dir = o.userData.spikeDir;
+      const sp = new Float32Array(n * 3);
+      if (dir) {
+        // Local (untransformed) positions: the cone's tip is its top vertex.
+        const local = g.userData.local;
+        for (let i = 0; i < n; i++) if (local.getY(i) > 0.01) sp.set([dir.x, dir.y, dir.z], i * 3);
+      }
+      g.setAttribute('spike', new THREE.BufferAttribute(sp, 3));
+    }
     for (const key of Object.keys(g.attributes)) {
-      if (key !== 'position' && key !== 'normal' && key !== 'color') g.deleteAttribute(key);
+      if (key !== 'position' && key !== 'normal' && key !== 'color' && key !== 'spike') g.deleteAttribute(key);
     }
     geos.push(g);
   });
@@ -285,7 +298,119 @@ function hill(colors) {
   return mesh(G.hill, pick(colors), 0, s * 0.25, 0, s * 1.4, s * 0.8, s);
 }
 
+function snowman() {
+  const g = new THREE.Group();
+  g.add(mesh(G.hill, 0xffffff, 0, 0.7, 0, 0.8), mesh(G.hill, 0xffffff, 0, 1.75, 0, 0.55), mesh(G.hill, 0xffffff, 0, 2.5, 0, 0.38));
+  g.add(mesh(G.cone, 0xff8a1f, 0, 2.5, 0.45, 0.1, 0.4, 0.1).rotateX(Math.PI / 2));
+  for (const x of [-0.13, 0.13]) g.add(mesh(G.flower, 0x2e2530, x, 2.62, 0.33, 0.25));
+  g.add(mesh(G.cactus, 0xe8453c, 0, 2.08, 0, 1.25, 0.22, 1.25));
+  return g;
+}
+function snowyPine() {
+  const g = new THREE.Group();
+  const s = rand(0.9, 1.4);
+  g.add(mesh(G.trunk, 0x7a4a24, 0, 0.5, 0, 0.7, 0.5, 0.7));
+  g.add(mesh(G.pine, pick([0x2f6b4a, 0x3a7a55]), 0, 2.4 * s, 0, s));
+  g.add(mesh(G.pine, 0xffffff, 0, 3.4 * s, 0, s * 0.62, s * 0.5, s * 0.62));
+  return g;
+}
+function snowPeak() {
+  const g = new THREE.Group();
+  const w = rand(7, 12);
+  const h = rand(9, 16);
+  g.add(mesh(G.cone, pick([0x9fb4c8, 0xa9bfd6, 0x8fa6bd]), 0, h / 2, 0, w, h, w));
+  g.add(mesh(G.cone, 0xffffff, 0, h * 0.8, 0, w * 0.42, h * 0.4, w * 0.42));
+  return g;
+}
+function palm() {
+  const g = new THREE.Group();
+  const lean = rand(-0.25, 0.25);
+  let x = 0;
+  for (let i = 0; i < 5; i++) {
+    g.add(mesh(G.trunk, i % 2 ? 0xa8733f : 0x9a6835, x, 0.5 + i * 0.95, 0, 0.8 - i * 0.07, 0.5, 0.8 - i * 0.07));
+    x += lean;
+  }
+  const top = 4.9;
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const leaf = mesh(G.leaf, pick([0x3fae3a, 0x55c244]), x + Math.cos(a) * 1.3, top - 0.35, Math.sin(a) * 1.3, 0.9, 0.12, 0.35);
+    leaf.rotation.y = -a;
+    leaf.rotation.z = -0.35;
+    g.add(leaf);
+  }
+  for (let i = 0; i < 3; i++) g.add(mesh(G.flower, 0x6b4423, x + rand(-0.3, 0.3), top - 0.5, rand(-0.3, 0.3), 1.1));
+  return g;
+}
+function lighthouse() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 6; i++) g.add(mesh(G.cactus, i % 2 ? 0xffffff : 0xe8453c, 0, 1 + i * 2, 0, 3.2 - i * 0.2, 2, 3.2 - i * 0.2));
+  g.add(mesh(G.box, 0xfff3a0, 0, 12.8, 0, 1.4, 1.4, 1.4), mesh(G.cone, 0xe8453c, 0, 14.3, 0, 1.4, 1.6, 1.4));
+  return g;
+}
+function lollipop() {
+  const g = new THREE.Group();
+  const h = rand(2.4, 3.6);
+  g.add(mesh(G.cactus, 0xffffff, 0, h / 2, 0, 0.3, h, 0.3));
+  const disc = mesh(G.cactus, pick([0xff6fa8, 0x7ee0ff, 0xb07eff, 0xffd84a]), 0, h + 1, 0, 3.4, 0.35, 3.4);
+  disc.rotation.x = Math.PI / 2;
+  const inner = mesh(G.cactus, 0xffffff, 0, h + 1, 0.05, 1.8, 0.4, 1.8);
+  inner.rotation.x = Math.PI / 2;
+  g.add(disc, inner);
+  return g;
+}
+function candyCane() {
+  const g = new THREE.Group();
+  for (let i = 0; i < 6; i++) g.add(mesh(G.cactus, i % 2 ? 0xffffff : 0xe8453c, 0, 0.25 + i * 0.5, 0, 0.45, 0.5, 0.45));
+  g.add(mesh(G.hill, 0xe8453c, 0.3, 3.1, 0, 0.35));
+  return g;
+}
+function gumdrops() {
+  const g = new THREE.Group();
+  const n = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < n; i++) g.add(mesh(G.cone, pick([0xff7eb6, 0x7ee0ff, 0xfff07e, 0xb07eff, 0x8ff0a0]), (i - n / 2) * 0.9, 0.4, rand(0, 0.6), rand(0.6, 0.9), 0.8, rand(0.6, 0.9)));
+  return g;
+}
+function iceCreamHill() {
+  const s = rand(4, 7);
+  const g = new THREE.Group();
+  g.add(mesh(G.hill, pick([0xffc2dc, 0xc8f5dc, 0xfff1c8, 0xd9c8ff]), 0, s * 0.25, 0, s * 1.4, s * 0.8, s));
+  g.add(mesh(G.hill, 0xe8453c, 0, s * 0.95, 0, 0.8));
+  return g;
+}
+function mushroom(big) {
+  const g = new THREE.Group();
+  const s = big ? rand(1.4, 2.2) : rand(0.35, 0.6);
+  const cap = pick([0x7b6cff, 0x3fb7ff, 0xff9f43, 0x2fc6a8]);
+  g.add(mesh(G.cactus, 0xfff3de, 0, 1.2 * s, 0, 0.9 * s, 2.4 * s, 0.9 * s));
+  g.add(mesh(G.hill, cap, 0, 2.5 * s, 0, 1.5 * s, 0.75 * s, 1.5 * s));
+  if (big) for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + 0.4;
+    g.add(mesh(G.flower, 0xfff6e8, Math.cos(a) * 1.05 * s, 2.95 * s, Math.sin(a) * 1.05 * s, 1.4 * s));
+  }
+  return g;
+}
+
 const THEMES = {
+  winter: {
+    near: () => (Math.random() < 0.18 ? snowman() : bush([0xf4f8ff, 0xe3eefa, 0xd6e4f3])),
+    mid: () => snowyPine(),
+    far: () => snowPeak(),
+  },
+  beach: {
+    near: () => (Math.random() < 0.5 ? bush([0x9fc94a, 0x7fb83a]) : mesh(G.rock, pick([0xd9c49a, 0xc9b080]), 0, 0.3, 0, rand(0.5, 0.9), rand(0.4, 0.7), rand(0.5, 0.9))),
+    mid: () => palm(),
+    far: () => (Math.random() < 0.2 ? lighthouse() : hill([0x5fb84a, 0x6fc45a, 0x4fa83f])),
+  },
+  candy: {
+    near: () => (Math.random() < 0.3 ? candyCane() : gumdrops()),
+    mid: () => lollipop(),
+    far: () => iceCreamHill(),
+  },
+  mushroom: {
+    near: () => (Math.random() < 0.5 ? mushroom(false) : bush([0x4fa83f, 0x5fb84a, 0x3f8f36])),
+    mid: () => mushroom(true),
+    far: () => hill([0x3f8f6a, 0x4a9e76, 0x357f5c]),
+  },
   park: {
     near: () => bush([0x5cb338, 0x4a9e2c, 0x7ccf45]),
     mid: () => tree([0x5cb338, 0x4a9e2c, 0x7ccf45]),
@@ -414,7 +539,6 @@ const lipGeo = new THREE.CylinderGeometry(PIPE_RADIUS + 0.25, PIPE_RADIUS + 0.25
 const bandGeo = new THREE.CylinderGeometry(PIPE_RADIUS + 0.28, PIPE_RADIUS + 0.28, 0.14, 16);
 const stripeGeo = new THREE.BoxGeometry(0.28, 1, 0.28);
 stripeGeo.translate(0, 0.5, 0);
-const ringGeo = new THREE.TorusGeometry(1, 0.07, 6, 32);
 
 // The upper pipes fade into the sky with height, so the tall towers don't
 // fill the top of the screen: above HAZE_START the pipe colour blends into
@@ -463,6 +587,56 @@ const pipeBodyGeo = bakeParts([
 const capBelowGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, -0.4]]);
 const capAboveGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, 0.4]]);
 
+// Pipe designs (see PIPES in catalog.js): the shared pipe geometries are
+// recoloured in place, so every gate changes at once.
+const pipeMats = [];
+export function setPipeStyle(style) {
+  const recolor = (geo, parts) => {
+    const fresh = bakeParts(parts);
+    geo.attributes.color.array.set(fresh.attributes.color.array);
+    geo.attributes.color.needsUpdate = true;
+    fresh.dispose();
+  };
+  recolor(pipeBodyGeo, [
+    [pipeGeo, style.pipe],
+    [stripeGeo, style.light, -PIPE_RADIUS * 0.57, 0, PIPE_RADIUS * 0.8],
+    [stripeGeo, style.dark, PIPE_RADIUS * 0.64, 0, PIPE_RADIUS * 0.75],
+  ]);
+  recolor(capBelowGeo, [[lipGeo, style.pipe], [bandGeo, style.dark, 0, -0.4]]);
+  recolor(capAboveGeo, [[lipGeo, style.pipe], [bandGeo, style.dark, 0, 0.4]]);
+  pipeStyle = style;
+  for (const m of pipeMats) applyPipeMat(m);
+}
+let pipeStyle = null;
+
+// A bottom and a top pipe framing a gap, shown next to the bird in the shop.
+export function createPipePreview(scene) {
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true });
+  pipeMats.push(mat);
+  applyPipeMat(mat);
+  const group = new THREE.Group();
+  const bottom = makePipeSegment(mat, capBelowGeo);
+  const top = makePipeSegment(mat, capAboveGeo);
+  group.add(bottom.g, top.g);
+  group.visible = false;
+  scene.add(group);
+  return {
+    group,
+    // Gap between y0 and y1 (world units).
+    setGap(y0, y1) {
+      bottom.body.scale.y = y0;
+      bottom.lip.position.y = y0 - 0.4;
+      top.g.position.y = y1;
+      top.body.scale.y = 12;
+      top.lip.position.y = 0.4;
+    },
+  };
+}
+function applyPipeMat(m) {
+  m.metalness = pipeStyle?.metal ? 0.5 : 0;
+  m.roughness = pipeStyle?.metal ? 0.3 : 0.45;
+}
+
 function makePipeSegment(mat, capGeo) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(pipeBodyGeo, mat);
@@ -475,69 +649,123 @@ function makePipeSegment(mat, capGeo) {
   return { g, body, lip };
 }
 
-// --- Piranha plant ----------------------------------------------------------
+// --- Spiky cactus (obstacle) ------------------------------------------------
 
 export const PLANT_HEIGHT = 1.8;
 // How far the plant's head reaches into the gap when fully up. Leaves enough
 // room above it for a full flap arc.
 export const PLANT_REACH = 0.9;
-const plantMat = (color) => new THREE.MeshStandardMaterial({ color, roughness: 0.5, flatShading: true });
-const plantMats = {
-  stem: plantMat(0x3aa833),
-  leaf: plantMat(0x2f8f2a),
-  head: plantMat(0xd62f2f),
-  mouth: plantMat(0x5a0a0a),
-  lip: plantMat(0xfff1d6),
-  dot: plantMat(0xffffff),
-};
-const stemGeo = new THREE.CylinderGeometry(0.12, 0.16, 1.2, 6);
-const leafGeo = new THREE.SphereGeometry(0.3, 6, 4);
-const upperJawGeo = new THREE.SphereGeometry(0.5, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2);
-const lowerJawGeo = new THREE.SphereGeometry(0.5, 10, 6, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-const mouthGeo = new THREE.SphereGeometry(0.42, 8, 6);
-const jawLipGeo = new THREE.TorusGeometry(0.47, 0.07, 5, 14);
-jawLipGeo.rotateX(Math.PI / 2);
-const dotGeo = new THREE.SphereGeometry(0.08, 5, 4);
+// A grumpy spiky cactus that pops up out of the pipe on the beat. Built once
+// and baked into one geometry (one draw call per cactus); the "puff" when it
+// is fully up just scales the whole thing.
+const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a };
+const CACTUS_R = new THREE.Vector3(0.74, 0.8, 0.74); // body radii
+const CACTUS_Y = PLANT_HEIGHT - 0.95; // body centre: the top sits just under PLANT_HEIGHT
+function buildCactusGeometry() {
+  const root = new THREE.Group();
+  const m = (color) => new THREE.MeshBasicMaterial({ color });
+  const body = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 7), m(CACTUS.green));
+  body.scale.copy(CACTUS_R);
+  body.position.y = CACTUS_Y;
+  root.add(body);
+  // A point on the body surface in direction d, and its outward normal.
+  const onBody = (d, lift = 0) => {
+    const n = d.clone().divide(CACTUS_R).normalize();
+    const pos = d.clone().multiply(CACTUS_R).add(new THREE.Vector3(0, CACTUS_Y, 0)).addScaledVector(n, lift);
+    return { pos, n };
+  };
+  const place = (mesh, d, lift, up = new THREE.Vector3(0, 1, 0)) => {
+    const { pos, n } = onBody(d, lift);
+    mesh.position.copy(pos);
+    mesh.quaternion.setFromUnitVectors(up, n);
+    root.add(mesh);
+    return mesh;
+  };
+  // Spikes all around, but none on the face and none on the top (flower).
+  const spikeGeo = new THREE.ConeGeometry(0.045, 0.26, 4);
+  const d = new THREE.Vector3();
+  for (let i = 0; i < 46; i++) {
+    const phi = Math.acos(1 - (2 * (i + 0.5)) / 46);
+    d.setFromSphericalCoords(1, phi, i * 2.399);
+    const face = d.z > 0.3 && d.y > -0.6 && Math.abs(d.x) < 0.8; // face and forehead stay clear
+    if (face || d.y > 0.8 || d.y < -0.6) continue;
+    const spike = place(new THREE.Mesh(spikeGeo, m(CACTUS.spike)), d.clone(), 0.1);
+    spike.userData.spikeDir = new THREE.Vector3(0, 1, 0).applyQuaternion(spike.quaternion);
+  }
+  // Face: eyes set into the body, pupils squinting inwards, angry brows
+  // resting on the skin just above them, and a small frown with two teeth.
+  for (const side of [-1, 1]) {
+    const eyeDir = new THREE.Vector3(side * 0.34, 0.26, 0.9).normalize();
+    const eye = place(new THREE.Mesh(new THREE.SphereGeometry(0.15, 10, 8), m(CACTUS.eye)), eyeDir, -0.05, new THREE.Vector3(0, 0, 1));
+    eye.scale.set(1, 1.1, 0.6);
+    const pupilDir = new THREE.Vector3(side * 0.3, 0.24, 0.92).normalize();
+    place(new THREE.Mesh(new THREE.SphereGeometry(0.065, 8, 6), m(CACTUS.pupil)), pupilDir, 0.02, new THREE.Vector3(0, 0, 1));
+    const browDir = new THREE.Vector3(side * 0.32, 0.5, 0.8).normalize();
+    const brow = place(new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.07, 0.05), m(CACTUS.brow)), browDir, -0.01, new THREE.Vector3(0, 0, 1));
+    brow.rotateZ(side * 0.4); // inner ends down: grumpy
+  }
+  const mouthDir = new THREE.Vector3(0, -0.12, 1).normalize();
+  const mouth = place(new THREE.Mesh(new THREE.SphereGeometry(0.2, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), m(CACTUS.mouth)), mouthDir, -0.06, new THREE.Vector3(0, 0, 1));
+  mouth.scale.set(1, 0.45, 0.35); // an arch: a frown
+  // Two small fangs pointing up from the mouth corners (grumpy underbite).
+  for (const side of [-1, 1]) {
+    const fang = place(new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.14, 4), m(CACTUS.tooth)), new THREE.Vector3(side * 0.12, -0.15, 1).normalize(), 0.0);
+    fang.position.y += 0.04;
+  }
+  // Flower on top.
+  const top = CACTUS_Y + CACTUS_R.y;
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2;
+    const petal = new THREE.Mesh(new THREE.SphereGeometry(0.13, 6, 4), m(CACTUS.petal));
+    petal.scale.set(1.4, 0.45, 0.8);
+    petal.position.set(Math.cos(a) * 0.17, top + 0.02, Math.sin(a) * 0.17);
+    petal.rotation.y = -a;
+    root.add(petal);
+  }
+  const pollen = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 4), m(CACTUS.pollen));
+  pollen.position.y = top + 0.06;
+  root.add(pollen);
+  return bakeGroup(root, true);
+}
+let cactusGeo = null;
+// Each cactus has its own material (same shader program) so it can bristle
+// on its own: `bristle` pushes the spike tips outwards along the spike.
+const BRISTLE_LENGTH = 0.22;
+function cactusMaterial() {
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55, flatShading: true });
+  const bristle = { value: 0 };
+  mat.userData.bristle = bristle;
+  mat.customProgramCacheKey = () => 'cactus';
+  mat.onBeforeCompile = (shader) => {
+    shader.uniforms.bristle = bristle;
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nattribute vec3 spike;\nuniform float bristle;')
+      .replace('#include <begin_vertex>', `#include <begin_vertex>\ntransformed += spike * bristle * ${BRISTLE_LENGTH.toFixed(2)};`);
+  };
+  return mat;
+}
 
 function createPlant() {
+  cactusGeo ??= buildCactusGeometry();
   const group = new THREE.Group();
-  const stem = new THREE.Mesh(stemGeo, plantMats.stem);
-  stem.position.y = 0.6;
-  group.add(stem);
-  for (const side of [-1, 1]) {
-    const leaf = new THREE.Mesh(leafGeo, plantMats.leaf);
-    leaf.scale.set(1.5, 0.3, 0.8);
-    leaf.position.set(side * 0.32, 0.5, 0);
-    leaf.rotation.z = side * 0.4;
-    group.add(leaf);
-  }
-  const head = new THREE.Group();
-  head.scale.setScalar(1.35);
-  head.position.y = PLANT_HEIGHT - 0.5 * 1.35;
-  head.rotation.x = 0.35; // mouth faces the player
-  const mouth = new THREE.Mesh(mouthGeo, plantMats.mouth);
-  const upper = new THREE.Group();
-  upper.add(new THREE.Mesh(upperJawGeo, plantMats.head), new THREE.Mesh(jawLipGeo, plantMats.lip));
-  for (const [theta, phi] of [[0.3, 0.5], [1.6, 0.8], [2.9, 0.45], [4.2, 0.9], [5.4, 0.55]]) {
-    const dot = new THREE.Mesh(dotGeo, plantMats.dot);
-    dot.position.setFromSphericalCoords(0.49, phi, theta);
-    upper.add(dot);
-  }
-  const lower = new THREE.Group();
-  lower.add(new THREE.Mesh(lowerJawGeo, plantMats.head), new THREE.Mesh(jawLipGeo, plantMats.lip));
-  head.add(mouth, upper, lower);
-  group.add(head);
-  group.traverse((o) => {
-    if (o.isMesh) o.castShadow = true;
-  });
+  const mat = cactusMaterial();
+  const body = new THREE.Mesh(cactusGeo, mat);
+  body.castShadow = true;
+  group.add(body);
   group.visible = false;
-  return { group, upper, lower };
+  return { group, body, bristle: mat.userData.bristle };
 }
 
 // Gap size factor for breathing gaps: open (1) → narrow (0.7) → open, over
 // two beats.
 export function pulseScale(beat) {
   return 0.85 + 0.15 * Math.cos(beat * Math.PI);
+}
+
+// Warning a beat before it rises: the flower peeks out of the pipe and wiggles.
+function plantPeek(beat) {
+  const p = ((beat % 4) + 4) % 4;
+  return p >= 1.1 && p < 2;
 }
 
 // Rise amount (0..1) over a 4-beat cycle: hidden, pop up, chomp, retreat.
@@ -558,19 +786,18 @@ export function createGate(scene) {
     pipe: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }),
   };
   addSkyHaze(mats.pipe, scene.userData.env.sky);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
+  pipeMats.push(mats.pipe);
+  applyPipeMat(mats.pipe);
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);
     const top = makePipeSegment(mats.pipe, capAboveGeo);
     bottom.g.position.x = x;
     top.g.position.x = x;
-    const ring = new THREE.Mesh(ringGeo, ringMat);
-    ring.position.x = x;
     const plant = createPlant();
     plant.group.position.x = x;
-    group.add(bottom.g, top.g, ring, plant.group);
+    group.add(bottom.g, top.g, plant.group);
     return {
-      x, bottom, top, ring, plant,
+      x, bottom, top, plant,
       blocked: false, center: 0, size: 0, amp: 0, speed: 0, phase: 0,
       hasPlant: false, plantOffset: 0, pulse: false,
       gapLow: 0, gapHigh: 0, hitLow: 0, hitHigh: 0,
@@ -591,8 +818,6 @@ export function createGate(scene) {
     lane.gapHigh = center + size / 2;
     setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4);
     setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4);
-    lane.ring.position.y = center;
-    lane.ring.scale.set(0.95, size / 2 - 0.15, 1);
   }
 
   let opacity = 1;
@@ -600,17 +825,13 @@ export function createGate(scene) {
   return {
     group,
     lanes,
-    ringMat,
     passed: false,
-    popTime: -1,
     // spec per lane: null (blocked) or { center, size, amp, speed, phase, plant, plantOffset }
     configure(z, spec) {
       group.position.z = z;
       group.visible = true;
       this.passed = false;
-      this.popTime = -1;
       this.setOpacity(1);
-      ringMat.opacity = 0;
       spec.forEach((gap, i) => {
         const lane = lanes[i];
         lane.plant.group.visible = false;
@@ -620,12 +841,10 @@ export function createGate(scene) {
           lane.gapLow = lane.gapHigh = lane.hitLow = lane.hitHigh = 0;
           setSegment(lane.bottom, 0, PIPE_TOP, null);
           lane.top.g.visible = false;
-          lane.ring.visible = false;
           return;
         }
         lane.blocked = false;
         lane.top.g.visible = true;
-        lane.ring.visible = true;
         lane.center = gap.center;
         lane.size = gap.size;
         lane.amp = gap.amp || 0;
@@ -639,7 +858,7 @@ export function createGate(scene) {
         lane.hitHigh = lane.gapHigh;
       });
     },
-    // Animate moving gaps and piranha plants. `beat` drives the plants so
+    // Animate moving gaps and cacti. `beat` drives the plants so
     // they pop up in time with the music.
     update(time, beat, dt) {
       for (const lane of lanes) {
@@ -660,26 +879,26 @@ export function createGate(scene) {
         }
         const rise = plantRise(beat + lane.plantOffset);
         const plant = lane.plant;
+        if (rise <= 0 && plantPeek(beat + lane.plantOffset)) {
+          // Only the flower and the top of the head show above the lip; no hitbox.
+          plant.group.visible = true;
+          plant.group.position.y = lane.gapLow + 0.12 - (CACTUS_Y + CACTUS_R.y);
+          plant.group.rotation.z = Math.sin(time * 22) * 0.1;
+          plant.body.scale.set(1, 1, 1);
+          plant.bristle.value = 0;
+          continue;
+        }
+        plant.group.rotation.z = 0;
         plant.group.visible = rise > 0;
         if (rise <= 0) continue;
         // Hidden inside the pipe at rise 0; head sticks out of the gap at 1.
         plant.group.position.y = lane.gapLow + PLANT_REACH + 0.15 - PLANT_HEIGHT * (2 - rise);
         lane.hitLow = Math.max(lane.gapLow, plant.group.position.y + PLANT_HEIGHT - 0.15);
-        const chomp = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0.3;
-        plant.upper.rotation.x = -0.6 * chomp;
-        plant.lower.rotation.x = 0.35 * chomp;
-      }
-      if (this.popTime >= 0) {
-        // Ring "pop" feedback right after passing the gate.
-        this.popTime += dt;
-        // Short and small: the row is already right next to the camera.
-        const t = Math.min(1, this.popTime / 0.22);
-        for (const lane of lanes) lane.ring.scale.x = 0.95 * (1 + t * 0.25);
-        ringMat.opacity = 0.7 * (1 - t) * (1 - t);
-        if (t >= 1) {
-          for (const lane of lanes) lane.ring.visible = false;
-          this.popTime = -1;
-        }
+        // Fully up: it puffs itself up and down (wider, a little shorter), so
+        // the top of the hitbox stays where it is.
+        const puff = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0;
+        plant.body.scale.set(1 + 0.08 * puff, 1 - 0.03 * puff, 1 + 0.08 * puff);
+        plant.bristle.value = puff; // spikes stand up (looks only, same hitbox)
       }
     },
     setOpacity(o) {

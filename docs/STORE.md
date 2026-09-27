@@ -29,13 +29,13 @@ eingereicht; die schnellen Vorabprüfungen laufen noch.
 | Punkt | Status |
 |---|---|
 | Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk npm run android:aab` erfolgreich; Bundle 1.0.2 von Google Play angenommen |
-| Versionsnummer | ✅ `versionName 1.0.2`, `versionCode 3` (`android/app/build.gradle`) |
+| Versionsnummer | ✅ `versionName 1.0.3`, `versionCode 4` (`android/app/build.gradle`); 1.0.2 (versionCode 3) liegt bereits bei Google Play |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` |
-| Screenshots 1080×1920 | ✅ `docs/store/screenshot-1…6` aus einem echten Run (`scripts/store-shots.mjs`): Menü, Park, Zonen-Banner, Piranha-Pflanze, Regenbogen, Spuren-Shop |
+| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Für Version 1.0.3 neu hochladen (Vogel-Werkstatt, Welten, Kaktus). |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit | ✅ unten |
@@ -98,14 +98,19 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >
 > 🌳 **Vier Zonen:** Fliege vom Stadtpark in den Herbstwald, durch den Canyon bis in den
 > Blütenhain – jede Zone mit eigener Tageszeit, eigener Musik und eigenen Hindernissen:
-> wandernde und atmende Lücken und Piranha-Pflanzen, die im Takt schnappen.
+> wandernde und atmende Lücken und grimmige Stachelkakteen, die im Takt aus den Röhren springen.
 >
 > 🌈 **Power-ups:** Regenbogen-Unverwundbarkeit, Münz-Magnet und Mini-Vogel.
 >
 > ✨ **Knapp!** Fliege haarscharf an den Röhren vorbei und hole dir Bonus-Münzen.
 >
-> 🐦 **Sammeln:** Schalte mit Münzen neue Vögel frei, erfülle Tagesmissionen und hole dir jeden
-> Tag dein Geschenk – mit Serien-Bonus.
+> 🎩 **Bau deinen Vogel:** In der Vogel-Werkstatt kombinierst du Farben, Muster, Hüte, Brillen
+> und Schnäbel – von der Krone bis zur Propellermütze. Dazu 12 Flugspuren.
+>
+> 🌍 **Neue Welten:** Schalte Winterland, Südsee, Zuckerland und Pilzwald frei, gib den Röhren ein
+> neues Design und verbessere deine Power-ups.
+>
+> 📅 **Jeden Tag etwas Neues:** Tagesmissionen, Erfolge und ein Tagesgeschenk mit Serien-Bonus.
 >
 > Keine Werbung. Keine In-App-Käufe. Kein Konto. Funktioniert komplett offline.
 
@@ -124,14 +129,19 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >
 > 🌳 **Four zones:** from the city park through the autumn forest and the canyon to the blossom
 > grove – each with its own time of day, music and obstacles: moving and breathing gaps and
-> snapping plants that bite on the beat.
+> grumpy spiky cacti that pop up on the beat.
 >
 > 🌈 **Power-ups:** rainbow invincibility, coin magnet and mini bird.
 >
 > ✨ **Close call!** Skim past the pipes for bonus coins.
 >
-> 🐦 **Collect:** unlock new birds with coins, complete daily missions and claim a daily gift
-> with a streak bonus.
+> 🎩 **Build your bird:** mix colours, patterns, hats, glasses and beaks in the bird workshop –
+> from a crown to a propeller cap. Plus 12 flight trails.
+>
+> 🌍 **New worlds:** unlock Winterland, South Seas, Candyland and Mushroom Woods, restyle the pipes
+> and upgrade your power-ups.
+>
+> 📅 **Something new every day:** daily missions, awards and a daily gift with a streak bonus.
 >
 > No ads. No in-app purchases. No account. Works completely offline.
 
@@ -146,8 +156,8 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 >
 > - Die App stellt keine Verbindung zu Servern her und enthält keine Werbung, keine
 >   Analyse- oder Tracking-Dienste und keine In-App-Käufe.
-> - Spielstand, Rekord, Münzen, freigeschaltete Vögel und Einstellungen (Ton an/aus,
->   Grafikstufe) werden ausschließlich lokal auf deinem Gerät gespeichert und beim
+> - Spielstand, Rekord, Münzen, freigeschaltete Shop-Artikel und Einstellungen (Ton an/aus,
+>   Sprache, Grafikstufe) werden ausschließlich lokal auf deinem Gerät gespeichert und beim
 >   Deinstallieren gelöscht.
 > - Die Berechtigung „Vibration“ wird nur für kurze Vibrationen im Spiel genutzt.
 >
@@ -175,7 +185,7 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 | Element | Einschätzung | Stand |
 |---|---|---|
-| **Piranha-Pflanze** | Rot mit weißen Punkten und Röhren-Kontext. Das erinnert stark an Nintendos Piranha-Pflanze, sie war ja auch ausdrücklich so gewünscht („aka Mario“). **Größtes Risiko.** Empfehlung: eigenes Design, z. B. violette Venusfliegenfalle mit Zähnen und ohne weiße Punkte. | offen – deine Entscheidung |
+| Hindernis | Die Piranha-Pflanze (rot mit weißen Punkten) ist durch einen eigenen grimmigen Stachelkaktus mit Blüte ersetzt. | erledigt |
 | Grüne Röhren | Generisches Motiv, in vielen Spielen verbreitet. In Kombination mit der Pflanze aber näher an Mario. | niedrig |
 | Vogel-Design | Gelber Vogel mit großen Augen und orangem Schnabel, ähnlich wie Flappy Bird. Im Spiel bleibt er (Vorgabe). Das Store-Icon zeigt ihn jetzt in 3D-Frontansicht vor Regenbogen und Sonnenuntergangshimmel statt im Profil vor türkisem Himmel. | reduziert |
 | Wortlaut | „Flappy“ kommt in Store-Texten, README und Code nicht mehr vor. | erledigt |

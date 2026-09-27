@@ -20,16 +20,16 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt; Seitentipps im Tutorial flattern nur (Iteration 25). Offen: Test mit Menschen. |
+| 1 | Onboarding | 7 | Geführter erster Run (E2E-Test); ab der Ausweich-Lektion sind die Tipp-Linien sichtbar, im 2. und 4. Run kommt ein Wisch-Hinweis (Iteration 30). Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
-| 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 6 | 4 Zonen mit eigener Szenerie, Tageszeit, Musik und Spezialität. Aber: Anfänger sehen meist 1–2 Zonen (Zone 3 nur ~2 %), ab Reihe 40 wiederholen sich die Zonen (Review 4). |
+| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
+| 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
 | 5 | Session-Loop | 7 | 0,8 s vom Crash zum Neustart, nächstes Ziel, Missionen, Erfolge. Das Game-Over auf kleinen Displays ist entschlackt (Iteration 20). |
-| 6 | Meta-Progression | 6 | Farben, Spuren, Missionen, Geschenk, 14 Erfolge. Aber: Vögel sind nur Umfärbungen. |
+| 6 | Meta-Progression | 7 | Vogel-Werkstatt, Welten, Röhren, Upgrades (rund 90 Artikel/Stufen), 3D-Vorschaubilder im Shop. Aber: Gesichts-Teile sieht man im Spiel von hinten kaum; Preiskurve ab 1000 steil (Review 6). |
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
-| 9 | Politur | 7 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Die oberen Röhren blenden seit Iteration 23 in den Himmel aus, der obere Bildteil ist offen. |
-| 10 | Store-Reife | 4 | AAB, Texte DE/EN passend zur zweisprachigen App, Datenschutz, neues Icon. Aber: Namensrisiko „Flapsy“ (Review 5), App-ID offen. |
+| 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. App-ID `de.robinrehbein.birdy` festgelegt. Aber: Namensrisiko, kein Gerätetest. |
 
 ## Backlog (nach Hebel sortiert)
 
@@ -604,16 +604,16 @@ bereit ist. Die übrigen Lücken lassen sich nur mit echten Geräten und Mensche
 
 | # | Bereich | vorher | nachher | Was fehlt noch zur 8 |
 |---|---|---|---|---|
-| 1 | Onboarding | 4 | **7** | Test mit 5–10 Erstspielern: Verstehen sie die Regeln ohne Hilfe? |
+| 1 | Onboarding | 7 | Geführter erster Run (E2E-Test); ab der Ausweich-Lektion sind die Tipp-Linien sichtbar, im 2. und 4. Run kommt ein Wisch-Hinweis (Iteration 30). Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 4 | **6** | Auf dem Gerät fühlen (Vibration, Hit-Stop). Die oberen Röhren dominieren das Bild. |
-| 3 | Fairness & Kurve | 5 | **7** | Todesursachen echter Spieler; Tiefenwahrnehmung. |
-| 4 | Abwechslung | 3 | **7** | Mehr Mechaniken nach der 4. Zone; Bestätigung durch echte Spieler. |
+| 3 | Fairness & Kurve | 7 | Profi-Bot überlebt zu über 90 %. Wisch-Fehler aus Iteration 25 und der seitlich versetzte Schatten sind in Iteration 29 behoben (Touch-Test aus allen drei Zonen). |
+| 4 | Abwechslung | 6 | 4 Zonen plus 4 kaufbare Welten für Zone 1. Aber: Anfänger erreichen Zone 3 nur zu 3 % (Review 6). |
 | 5 | Session-Loop | 5 | **8** | – |
-| 6 | Meta-Progression | 1 | **6** | Erfolge und Langzeitziele; die Ökonomie mit echten Daten tunen. |
+| 6 | Meta-Progression | 7 | Vogel-Werkstatt, Welten, Röhren, Upgrades (rund 90 Artikel/Stufen), 3D-Vorschaubilder im Shop. Aber: Gesichts-Teile sieht man im Spiel von hinten kaum; Preiskurve ab 1000 steil (Review 6). |
 | 7 | Audio | 3 | **5** | Von Menschen gehört? Eventuell echte Samples oder Instrumente. |
 | 8 | Performance | 3 | **5** | fps auf einem Mittelklasse-Android messen (Anzeige: 5× auf den Titel tippen). |
-| 9 | Politur | 5 | **6** | Feinschliff nach Gerätetest. |
-| 10 | Store-Reife | 1 | **6** | App-ID, eigener Schlüssel, Datenschutz-URL, Pflanzen-Design (Rechte). |
+| 9 | Politur | 6 | Shop-Layout für 360×640 repariert (Iteration 29). Erfolgs-Toast verdeckt im Menü kurz den Rekord (Review 6). |
+| 10 | Store-Reife | 3 | AAB, Texte und Grafiken DE/EN, Datenschutz. App-ID `de.robinrehbein.birdy` festgelegt. Aber: Namensrisiko, kein Gerätetest. |
 
 ### Endmessung (Stand nach Iteration 15)
 
@@ -990,3 +990,194 @@ Als überhöht bewertet: Politur, Fairness, Onboarding, jeweils um einen Punkt.
 - Bot-Playtest (150 Runs): Anfänger 17,5 s, Geübt 29,1 s (vorher 36,1 s; zwei Bahnen brauchen
   jetzt zwei Tipps, der Bot ist darauf nicht optimiert), Profi 88 % Überlebende.
 - 161 Draw Calls, keine Fehler.
+
+### Iteration 26 – Vogel-Werkstatt (Shop, Teil 1)
+
+Dein Wunsch: deutlich mehr Shop-Optionen, Vögel bauen wie bei Crossy Road.
+
+**Was:**
+- Neuer Katalog `src/catalog.js`. Jede Kategorie hat einen kostenlosen Grundartikel.
+  - **Farbe:** 13 (neu: Rotkehlchen, Koralle, Papagei, Pinguin, Schneeeule, Pfau)
+  - **Muster:** Schlicht, Bäckchen, Tupfen, Streifen, Räubermaske (mit Knoten am Hinterkopf), Herz am Rücken
+  - **Kopf:** Federschopf, Blume, Partyhut, Propellermütze (Propeller dreht sich), Zylinder,
+    Wikingerhelm, Krone, Heiligenschein (schwebt)
+  - **Augen:** Kulleraugen, Wimpern, Entschlossen (Brauen), Sonnenbrille, Herzbrille, Fliegerbrille
+  - **Schnabel:** Rund, Ente, Adler, Tukan
+  - **Spuren:** 12 (neu: Herzchen, Schneeflocken, Neon, Regenbogen, Goldregen)
+- Die Teile sitzen am bestehenden Vogelmodell und sind im selben Low-Poly-Stil gebaut. Der
+  Grundvogel sieht unverändert aus. Muster und Hüte übernehmen die Farben der gewählten Farbe.
+- Viele Teile sind bewusst von hinten gut sichtbar (Tupfen, Streifen, Herz, Maskenknoten, Hüte),
+  weil man den Vogel im Spiel von hinten sieht.
+- Shop mit waagerecht wischbarer Kategorie-Leiste und 🎲 **Zufall** (würfelt ein Outfit aus
+  deinen gekauften Teilen). Beim Antippen probiert der 3D-Vogel das Teil sofort an.
+- Das Ziel auf dem Game-Over („Noch X 🪙 bis …“) berücksichtigt alle Kategorien und öffnet den
+  Shop direkt beim passenden Artikel.
+- Alte Spielstände werden übernommen (gekaufte Vögel und Spuren bleiben).
+
+**Beleg:**
+- `shop.mjs`: alten Spielstand geladen, in jeder Kategorie alles gekauft, Auswahl und Zufall ✓,
+  Spielstart mit Outfit ✓, keine Konsolenfehler.
+- `gallery.png`: 8 Kombinationen von vorn und hinten.
+- Perf: 159 Draw Calls, Tutorial- und Bahn-Tests ✓.
+
+### Iteration 27 – Welten und Röhren-Designs (Shop, Teil 2)
+
+**Was:**
+- **4 kaufbare Welten**, jede mit eigener Landschaft, eigenem Himmel und Boden:
+  - ⛄ **Winterland:** verschneite Tannen, Schneemänner, Schneegipfel
+  - 🏝️ **Südsee:** Palmen, Sandboden, Leuchtturm, grüne Inseln
+  - 🍭 **Zuckerland:** Lollipop-Bäume, Zuckerstangen, Gummibärchen-Hügel, Eiscreme-Berge
+  - 🍄 **Pilzwald:** Riesenpilze in Lila, Blau, Orange und Türkis (bewusst keine roten Pilze mit
+    weißen Punkten)
+- Die gewählte Welt ist Zone 1 jedes Runs (und jede vierte Zone danach). Danach geht es wie
+  bisher durch Herbstwald, Canyon und Blütenhain. So sieht man seine Welt in jedem Run, auch als
+  Anfänger.
+- Das Menü zeigt die gewählte Welt; im Shop wechselt die Welt beim Antippen als Vorschau.
+- **10 Röhren-Designs:** Klassisch, Himmelblau, Orange, Lila, Holz, Stein, Bonbon, Eis, Lava,
+  Gold. Im Shop steht eine Röhre als Vorschau neben dem Vogel. Umgefärbt werden die gemeinsamen
+  Geometrien, es kostet also keine zusätzlichen Draw Calls.
+
+**Beleg:**
+- `worlds.mjs`: jede Welt und jedes Design im Shop angeklickt, gekauft, Spielstart ✓, keine
+  Konsolenfehler.
+- Bilder `mont-worlds.png` und `mont-pipes.png`.
+- Leistung pro Welt im Run (Draw Calls / Dreiecke inkl. Schatten):
+
+| Welt | Draw Calls | Dreiecke |
+|---|---|---|
+| Stadtpark | 158 | 51k |
+| Winterland | 164 | 61k |
+| Südsee | 175 | 82k |
+| Zuckerland | 161 | 64k |
+| Pilzwald | 170 | 73k |
+
+### Iteration 28 – Power-up-Upgrades (Shop, Teil 3)
+
+**Was:**
+- Neuer Shop-Reiter ⚡ **Power** mit vier Upgrades in je drei Stufen:
+
+| Upgrade | Wirkung pro Stufe | Preise |
+|---|---|---|
+| 🌈 Regenbogen | +1,5 s unverwundbar | 300 / 800 / 1800 |
+| 🧲 Magnet | +3 s und +2 Reichweite | 300 / 800 / 1800 |
+| 🍄 Mini-Vogel | +3 s klein | 300 / 800 / 1800 |
+| 🍀 Glückspilz | Power-ups eine Reihe früher | 500 / 1200 / 2500 |
+
+- Kacheln zeigen die Stufe als Punkte; darunter steht die Wirkung und die aktuelle Stufe.
+- Die Laufleiste des Power-ups im Spiel rechnet mit der verlängerten Dauer.
+- Upgrades zählen für den Erfolg „Sammler“ mit.
+
+**Beleg (`upg.mjs`, 360×640):**
+- Regenbogen zweimal verbessert → 9 s statt 6 s im Run.
+- Magnet Stufe 1 → Knopf „Verbessern · 800“, Münzen korrekt abgezogen, keine Fehler.
+- Bot-Playtest (150 Runs): Anfänger 20,5 s und 7 Münzen/Run, Geübt 30,8 s und 19 Münzen/Run,
+  Profi 96 % Überlebende.
+
+**Shop gesamt:** rund 90 Artikel und Stufen für zusammen etwa 65.000 Münzen. Bei 19 Münzen pro
+Run plus Missionen, Geschenk und Erfolgen reicht das für Monate. Die ersten Artikel (100–150)
+kosten weniger als eine Sitzung.
+
+## Review 6 (nach Iteration 26) – Publisher-Subagent
+
+Urteil: **kein Soft Launch, interner Test-Track ja.**
+
+| Rang | Einstufung | Kritik |
+|---|---|---|
+| 1 | Blocker | Wischen geht in die falsche Richtung, wenn der Wisch in einer anderen Zone beginnt; ein Wisch auf der eigenen Bahn flattert zusätzlich |
+| 2 | wichtig | Kosmetik aus der Spielkamera kaum lesbar (Spuren 3–5 px, Brillen/Schnäbel von hinten unsichtbar) |
+| 3 | wichtig | Shop: Tabs und teuerste Artikel abgeschnitten, kein Scroll-Hinweis |
+| 4 | wichtig | Emoji-Kacheln passen nicht zu den Artikeln; grauer Knopf ohne „Noch X“ |
+| 5 | wichtig | Wirtschaft: ab 1000 Münzen sehr lange Wege; Upgrades ohne Wirkung (damals noch nicht eingebaut) |
+| 6 | klein | Tutorial erklärt Wischen und Tipp-Linien nicht; Schatten liegt in der Nachbarbahn |
+
+Nicht übernommen: Analytics und Werbung (Rewarded Ads) – beides schließen deine Vorgaben aus.
+Die Upgrades waren zum Zeitpunkt des Reviews schon in Arbeit (Iteration 28).
+
+### Iteration 29 – Fixes aus Review 6: Wischen, Shop, Sichtbarkeit
+
+**Was:**
+1. **Wischen korrekt:** Eine Berührung wirkt weiterhin sofort (keine Verzögerung beim Tippen).
+   Wird daraus ein Wisch, gewinnt der Wisch: Ziel ist die Nachbarbahn der Startbahn in
+   Wischrichtung, ein Flattern vom Aufsetzen wird zurückgenommen.
+2. **Schatten:** Der Vogel wirft keinen Sonnenschatten mehr (der fiel schräg in die Nachbarbahn).
+   Der runde Schatten liegt immer genau unter ihm.
+3. **Shop-Layout:**
+   - alle 10 Reiter in zwei Reihen sichtbar
+   - Artikel-Raster höher, mit Verlauf nach unten, solange noch Artikel folgen
+   - Knopf zeigt „Noch 480 🪙“ statt nur grau
+   - Würfel zieht jetzt auch Spuren und ist ausgegraut, solange es nichts zu kombinieren gibt
+4. **Echte Vorschaubilder:** Kacheln für Muster, Kopf, Augen und Schnabel zeigen kleine
+   3D-Renderings des Vogels mit dem Teil, in der aktuellen Farbe. Spur-Kacheln zeigen bunte
+   Punkte statt blasser Verläufe.
+5. **Spuren sichtbarer:** Partikel doppelt so groß, 50 statt 30 pro Sekunde, etwas länger sichtbar.
+
+**Beleg:**
+- `swipe2.mjs` (Touch):
+  - Wisch rechts aus der linken Zone → Bahn 2 ✓ (vorher 0)
+  - Wisch links aus der rechten Zone → Bahn 0 ✓ (vorher 2)
+  - Wische vom Vogel ✓, Wisch gegen den Rand ✓
+- `shop2.mjs` bei 360×640 und 390×844: Reiter 292/292 px sichtbar (vorher 300 von 473),
+  Verlauf aktiv, keine Fehler. Bilder `mont-s3.png`, `dots2.png` (Regenbogen-Spur im Run).
+- Tutorial-E2E ✓, Bahn-Test ✓, 151 Draw Calls.
+
+### Iteration 30 – Onboarding-Lücken, Überraschungs-Kauf, Store DE/EN
+
+**Was:**
+1. **Tutorial:** Ab der Ausweich-Lektion sind die Tipp-Linien eingeblendet, wie später im
+   normalen Spiel.
+2. **Wisch-Hinweis:** Im 2. und 4. Run erscheint kurz „👆 Tipp: Du kannst auch nach
+   links/rechts wischen“.
+3. **🎁 Überraschung (150 Münzen):** Schaltet einen zufälligen, noch nicht gekauften Artikel bis
+   900 Münzen frei (Farbe, Muster, Kopf, Augen, Schnabel, Spur oder Röhre) und legt ihn gleich
+   an.
+   - Antwort auf Review 6 (Wirtschaft): Schon nach wenigen Runs gibt es wieder etwas Neues.
+   - Alles bleibt ohne Echtgeld und ohne Werbung.
+4. **Store:**
+   - Screenshots neu, getrennt nach `docs/store/de/` und `docs/store/en/`, jetzt mit
+     Vogel-Werkstatt und Welten.
+   - Englische Feature-Grafik.
+   - Store-Texte um Werkstatt, Welten und Upgrades ergänzt.
+
+**Beleg:**
+- `surp.mjs` (360×640):
+  - Überraschung gekauft → 150 Münzen abgezogen, neuer Artikel besessen und angelegt, Toast „Neu: …“ ✓
+  - Wisch-Hinweis im 2. Run ✓
+- `swipe2.mjs` ✓.
+- Bot-Playtest (150 Runs): Anfänger 17,4 s und 7 Münzen/Run, Geübt 37,8 s und 27 Münzen/Run,
+  Profi 96 % Überlebende.
+- Tutorial-E2E nach allen Änderungen erneut ✓ (Tutorial fertig, keine Fehler).
+- Beim Erzeugen der Store-Bilder fiel ein Fehler auf: Wer einen Run mit aktivem Regenbogen über
+  Pause → Menü verließ, sah den Vogel im Menü weiter bunt leuchten. Das ist behoben.
+
+**Scorecard dritte Runde (vor Iteration 21 → nach Iteration 30):** Onboarding 7 → 7, Game Feel
+6 → 6, Fairness 7 → 7, Abwechslung 6 → 6, Session-Loop 7 → 7, Meta-Progression 6 → 7, Audio
+5 → 5, Performance 5 → 5, Politur 7 → 6, Store-Reife 5 → 3. Die Senkungen übernehmen die strengere
+Bewertung aus Review 5 und 6 (u. a. Namensrisiko, App-ID, kein Gerätetest). Das Ziel „überall ≥ 8“
+ist nicht erreicht. Die fehlenden Punkte hängen an Tests mit Menschen und echten Geräten und an
+deinen Entscheidungen (Name, App-ID), nicht an weiterem Code.
+
+### Nachtrag – Stachelkaktus statt Piranha-Pflanze, Lückenringe entfernt (deine Entscheidung)
+
+- Die Piranha-Pflanze ist durch einen eigenen **grimmigen Stachelkaktus** ersetzt:
+  - Aussehen: Stacheln rundherum, freies Gesicht mit Augen, Brauen und kleinen Hauern, pinke Blüte oben.
+  - Bewegung: Er springt im selben Takt aus der Röhre und plustert sich oben auf.
+  - Trefferzone und Timing sind unverändert.
+  - Technik: in eine Geometrie gebacken, also ein Draw Call pro Kaktus statt rund 16.
+- Die hellen Ringe in den Lücken sind entfernt; der kleine grüne/rote Höhen-Marker bleibt.
+- Texte angepasst (Mission, Erfolg „Gärtner“, README, Store). Das Markenrisiko zur Pflanze in
+  `docs/STORE.md` ist erledigt.
+- **Beleg:**
+  - Kaktus im Spiel (`cactus0–2.png`) und als Nahaufnahme (`cactus-close.png`).
+  - Tutorial-E2E ✓, Bot-Playtest: Anfänger 15,9 s, Geübt 38,9 s, Profi 96 % Überlebende.
+  - 127 statt 151 Draw Calls, keine Fehler.
+- **Nachschärfung (deine Freigabe):**
+  - Der Kaktus ist jetzt blaugrün (türkis) und hebt sich damit von grünen Röhren ab.
+  - Einen Takt vor dem Hochspringen schauen Blüte, Stirn und Augen wackelnd aus der Röhre, als
+    Vorwarnung ohne Trefferzone.
+  - Beleg: `mont-peekc.png`, Tutorial-E2E ✓, Playtest Anfänger 17,0 s / Geübt 38,8 s / Profi 96 %.
+- **Stacheln aufstellen (deine Freigabe):** Beim Aufplustern werden die Stacheln im Shader bis zu
+  0,22 Einheiten länger. Jeder Kaktus hat dafür ein eigenes Material mit demselben Shader-Programm,
+  weiterhin ein Draw Call pro Kaktus. Die Trefferzone bleibt gleich, die Stacheln sind nur Optik.
+  - Beleg: `bristle2.png` (Ruhe / halb / voll), Tutorial-E2E ✓
+  - Playtest: Anfänger 20,4 s / Geübt 41,2 s / Profi 96 %
+  - 128 Draw Calls, keine Fehler

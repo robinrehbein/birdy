@@ -3,27 +3,9 @@
 
 const KEY = 'birdy-progress';
 
-// Colour sets for the bird. Same model, same low-poly look.
-export const SKINS = [
-  { id: 'sunny', name: { de: 'Sunny', en: 'Sunny' }, price: 0, body: 0xf7d23e, belly: 0xfff3c4, wing: 0xfff6d5, cover: 0xf6e3a1, tail: 0xf2c230, beak: 0xf57c21, beakLow: 0xe0521b },
-  { id: 'sky', name: { de: 'Himmel', en: 'Sky' }, price: 100, body: 0x4aa8f0, belly: 0xe8f6ff, wing: 0xdff1ff, cover: 0x9fd2fa, tail: 0x2f86d0, beak: 0xf5a623, beakLow: 0xe07b1b },
-  { id: 'cardinal', name: { de: 'Kardinal', en: 'Cardinal' }, price: 250, body: 0xe8453c, belly: 0xffd7c9, wing: 0xffe3dc, cover: 0xf28b82, tail: 0xc4302b, beak: 0xffc93c, beakLow: 0xf0a020 },
-  { id: 'mint', name: { de: 'Minze', en: 'Mint' }, price: 400, body: 0x5fd39a, belly: 0xeafff3, wing: 0xe3fff0, cover: 0xa6ecc8, tail: 0x3bb37b, beak: 0xff8a5c, beakLow: 0xe8643a },
-  { id: 'flamingo', name: { de: 'Flamingo', en: 'Flamingo' }, price: 600, body: 0xff8fb8, belly: 0xffe6f0, wing: 0xfff0f6, cover: 0xffc2d8, tail: 0xf2649a, beak: 0x4a3b47, beakLow: 0x2f2530 },
-  { id: 'night', name: { de: 'Nachteule', en: 'Night Owl' }, price: 900, body: 0x5b4b8a, belly: 0xd9d0f5, wing: 0xc7bdf0, cover: 0x8f80c9, tail: 0x44376e, beak: 0xffc93c, beakLow: 0xe8a820 },
-  { id: 'gold', name: { de: 'Goldvogel', en: 'Golden Bird' }, price: 1500, body: 0xffc629, belly: 0xfff1b0, wing: 0xffe57a, cover: 0xffd23d, tail: 0xe0a100, beak: 0xff7a1a, beakLow: 0xd9530f, metal: true },
-];
+import { SKINS, TRAILS, CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
 
-// Flight trails: a second cosmetic category. Particles behind the bird.
-export const TRAILS = [
-  { id: 'none', name: { de: 'Keine Spur', en: 'No trail' }, price: 0, colors: [] },
-  { id: 'sparkle', name: { de: 'Funkeln', en: 'Sparkle' }, price: 150, colors: [0xfff176, 0xffffff, 0xffd400], size: 0.08, life: 0.45, gravity: 0, speed: 0.8 },
-  { id: 'bubbles', name: { de: 'Blasen', en: 'Bubbles' }, price: 300, colors: [0xbfe9ff, 0xe8f7ff, 0x8fd3ff], size: 0.14, life: 0.8, gravity: 2.5, speed: 0.5 },
-  { id: 'confetti', name: { de: 'Konfetti', en: 'Confetti' }, price: 500, colors: [0xff5a5a, 0x5ad1ff, 0xffd84a, 0x7be07b, 0xc58bff], size: 0.09, life: 0.7, gravity: -4, speed: 2 },
-  { id: 'leaves', name: { de: 'Herbstlaub', en: 'Autumn Leaves' }, price: 700, colors: [0xe8772e, 0xf2a93b, 0xd9492f], size: 0.12, life: 0.9, gravity: -2, speed: 1.2 },
-  { id: 'stardust', name: { de: 'Sternenstaub', en: 'Stardust' }, price: 1000, colors: [0xc58bff, 0xffffff, 0x8f7bff], size: 0.07, life: 0.9, gravity: 0.5, speed: 0.6 },
-  { id: 'fire', name: { de: 'Feuerschweif', en: 'Fire Tail' }, price: 1400, colors: [0xff7a1a, 0xffc93c, 0xff3d2e], size: 0.13, life: 0.4, gravity: 3, speed: 0.9 },
-];
+export { SKINS, TRAILS };
 
 // Long-term achievements (milestones). `stat` is a lifetime value; rewards
 // are paid out the moment one is unlocked.
@@ -36,12 +18,12 @@ export const ACHIEVEMENTS = [
   { id: 'near10', icon: '😬', name: { de: 'Haarscharf', en: "Hair's Breadth" }, text: { de: '10× „Knapp!“ insgesamt', en: '10 close calls in total' }, stat: 'nearTotal', goal: 10, reward: 40 },
   { id: 'chain5', icon: '🔥', name: { de: 'Nervenkitzel', en: "Thrill Seeker" }, text: { de: '5× „Knapp!“ in Folge', en: '5 close calls in a row' }, stat: 'bestChain', goal: 5, reward: 150 },
   { id: 'powers3', icon: '🌈', name: { de: 'Power-Sammler', en: "Power Collector" }, text: { de: '3 Power-ups in einem Flug', en: '3 power-ups in one flight' }, stat: 'bestPowerups', goal: 3, reward: 60 },
-  { id: 'plants25', icon: '🌱', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Piranha-Pflanzen vorbei', en: 'Pass 25 piranha plants' }, stat: 'plantsTotal', goal: 25, reward: 80 },
+  { id: 'plants25', icon: '🌱', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Stachelkakteen vorbei', en: 'Pass 25 spiky cacti' }, stat: 'plantsTotal', goal: 25, reward: 80 },
   { id: 'coins500', icon: '🪙', name: { de: 'Sparschwein', en: "Piggy Bank" }, text: { de: '500 Münzen eingesammelt', en: 'Collect 500 coins' }, stat: 'coinsTotal', goal: 500, reward: 80 },
   { id: 'coins2000', icon: '💰', name: { de: 'Schatzmeister', en: "Treasurer" }, text: { de: '2000 Münzen eingesammelt', en: 'Collect 2000 coins' }, stat: 'coinsTotal', goal: 2000, reward: 200 },
   { id: 'runs50', icon: '🎮', name: { de: 'Dauerflieger', en: "Frequent Flyer" }, text: { de: '50 Runden gespielt', en: 'Play 50 rounds' }, stat: 'runs', goal: 50, reward: 100 },
   { id: 'streak7', icon: '📅', name: { de: 'Stammgast', en: "Regular" }, text: { de: '7 Tage Geschenk-Serie', en: '7-day gift streak' }, stat: 'bestStreak', goal: 7, reward: 200 },
-  { id: 'unlock5', icon: '🎨', name: { de: 'Sammler', en: "Collector" }, text: { de: '5 Vögel oder Spuren freigeschaltet', en: 'Unlock 5 birds or trails' }, stat: 'unlocks', goal: 5, reward: 100 },
+  { id: 'unlock5', icon: '🎨', name: { de: 'Sammler', en: "Collector" }, text: { de: '5 Shop-Artikel freigeschaltet', en: 'Unlock 5 shop items' }, stat: 'unlocks', goal: 5, reward: 100 },
 ];
 const RUN_MAX_STATS = { bestScore: 'score', bestZone: 'zone', bestChain: 'bestChain', bestPowerups: 'powerups' };
 const RUN_SUM_STATS = { nearTotal: 'near', plantsTotal: 'plants', coinsTotal: 'coins' };
@@ -55,7 +37,7 @@ const MISSION_POOL = [
   { id: 'powers', text: (n) => ({ de: `Schnapp dir ${n} Power-ups`, en: `Grab ${n} power-ups` }), stat: 'powerups', per: 'day', goals: [2, 4, 6], minBest: 8 },
   { id: 'runs', text: (n) => ({ de: `Spiele ${n} Runden`, en: `Play ${n} rounds` }), stat: 'runs', per: 'day', goals: [3, 5, 8] },
   // Only offered once the player has seen these obstacles (best score).
-  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Piranha-Pflanzen vorbei`, en: `Pass ${n} piranha plants` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
+  { id: 'plants', text: (n) => ({ de: `Flieg an ${n} Stachelkakteen vorbei`, en: `Pass ${n} spiky cacti` }), stat: 'plants', per: 'day', goals: [3, 6, 10], minBest: 14 },
   { id: 'moving', text: (n) => ({ de: `Durchquere ${n} bewegte Lücken`, en: `Fly through ${n} moving gaps` }), stat: 'moving', per: 'day', goals: [4, 8, 14], minBest: 10 },
   { id: 'star', text: (n) => ({ de: `Fliege als Regenbogen durch ${n} Reihen`, en: `Pass ${n} rows as a rainbow` }), stat: 'starRows', per: 'day', goals: [3, 6, 10], minBest: 12 },
 ];
@@ -120,6 +102,20 @@ function load() {
     achieved: [],
     ...(data || {}),
   };
+  // Shop: owned items and the equipped one per kind. Older saves only had
+  // skins (owned/skin) and trails (trails/trail).
+  data.items = { ...(data.items || {}) };
+  data.equip = { ...(data.equip || {}) };
+  data.items.skin = [...new Set([...(data.items.skin || []), ...data.owned])];
+  data.items.trail = [...new Set([...(data.items.trail || []), ...data.trails])];
+  data.equip.skin ??= data.skin;
+  data.equip.trail ??= data.trail;
+  for (const kind of KINDS) {
+    const free = CATALOG[kind][0].id;
+    if (!data.items[kind]?.includes(free)) data.items[kind] = [free, ...(data.items[kind] || [])];
+    if (!data.items[kind].includes(data.equip[kind])) data.equip[kind] = free;
+  }
+  data.upgrades = { ...(data.upgrades || {}) };
   data.stats = { bestScore: data.best, bestZone: 0, nearTotal: 0, bestChain: 0, bestPowerups: 0, plantsTotal: 0, coinsTotal: 0, bestStreak: 0, ...data.stats };
   // Migrate the old best score.
   try {
@@ -132,7 +128,9 @@ const data = load();
 
 function statValue(stat) {
   if (stat === 'runs') return data.runs;
-  if (stat === 'unlocks') return data.owned.length - 1 + data.trails.length - 1;
+  if (stat === 'unlocks') {
+    return KINDS.reduce((n, k) => n + data.items[k].length - 1, 0) + Object.values(data.upgrades).reduce((n, l) => n + l, 0);
+  }
   return data.stats[stat] || 0;
 }
 
@@ -172,22 +170,52 @@ export const progress = {
     data.tutorialDone = true;
     save();
   },
-  get skin() { return SKINS.find((s) => s.id === data.skin) || SKINS[0]; },
-  owns: (id) => data.owned.includes(id),
-  get trail() { return TRAILS.find((t) => t.id === data.trail) || TRAILS[0]; },
-  ownsTrail: (id) => data.trails.includes(id),
-  buyTrail(id) {
-    const t = TRAILS.find((x) => x.id === id);
-    if (!t || data.trails.includes(id) || data.coins < t.price) return false;
-    data.coins -= t.price;
-    data.trails.push(id);
-    data.trail = id;
+  // Shop (see catalog.js). `kind` is one of KINDS.
+  equipped(kind) {
+    return CATALOG[kind].find((x) => x.id === data.equip[kind]) || CATALOG[kind][0];
+  },
+  get skin() { return this.equipped('skin'); },
+  get trail() { return this.equipped('trail'); },
+  owns: (kind, id) => data.items[kind].includes(id),
+  buy(kind, id) {
+    const item = CATALOG[kind].find((x) => x.id === id);
+    if (!item || data.items[kind].includes(id) || data.coins < item.price) return false;
+    data.coins -= item.price;
+    data.items[kind].push(id);
+    data.equip[kind] = id;
     save();
     return true;
   },
-  selectTrail(id) {
-    if (!data.trails.includes(id)) return false;
-    data.trail = id;
+  select(kind, id) {
+    if (!data.items[kind].includes(id)) return false;
+    data.equip[kind] = id;
+    save();
+    return true;
+  },
+  // Surprise purchase: pay, then grant() the randomly picked item.
+  buySurprise(price) {
+    if (data.coins < price) return false;
+    data.coins -= price;
+    save();
+    return true;
+  },
+  grant(kind, id) {
+    if (!data.items[kind].includes(id)) data.items[kind].push(id);
+    data.equip[kind] = id;
+    save();
+  },
+  // Upgrade levels 0..UPGRADE_MAX.
+  level: (id) => data.upgrades[id] || 0,
+  upgradePrice(id) {
+    const u = UPGRADES.find((x) => x.id === id);
+    const lvl = data.upgrades[id] || 0;
+    return lvl < UPGRADE_MAX ? u.prices[lvl] : null;
+  },
+  buyUpgrade(id) {
+    const price = this.upgradePrice(id);
+    if (price === null || data.coins < price) return false;
+    data.coins -= price;
+    data.upgrades[id] = (data.upgrades[id] || 0) + 1;
     save();
     return true;
   },
@@ -197,22 +225,6 @@ export const progress = {
       const tpl = MISSION_POOL.find((t) => t.id === m.id);
       return { ...m, text: tpl.text(m.goal) };
     });
-  },
-
-  buy(id) {
-    const skin = SKINS.find((s) => s.id === id);
-    if (!skin || data.owned.includes(id) || data.coins < skin.price) return false;
-    data.coins -= skin.price;
-    data.owned.push(id);
-    data.skin = id;
-    save();
-    return true;
-  },
-  select(id) {
-    if (!data.owned.includes(id)) return false;
-    data.skin = id;
-    save();
-    return true;
   },
 
   // Daily gift: available once per calendar day. Claiming on consecutive

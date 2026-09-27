@@ -67,9 +67,10 @@ export function createBiomeBlender({ scene, ground, scenery, clouds }) {
   let duration = 1;
   let index = 0;
 
-  function set(i, blend = 3) {
+  let current = null;
+  function set(i, blend = 3, b = BIOMES[i % BIOMES.length]) {
     index = i;
-    const b = BIOMES[i % BIOMES.length];
+    current = b;
     for (const k of Object.keys(targets)) {
       from[k].copy(targets[k]);
       const key = k === 'background' || k === 'fog' ? 'horizon' : k;
@@ -98,6 +99,9 @@ export function createBiomeBlender({ scene, ground, scenery, clouds }) {
     update,
     get index() {
       return index;
+    },
+    get current() {
+      return current;
     },
   };
 }

@@ -9,7 +9,7 @@ Ein Ein-Tipp-Arcade-Flieger in Low-Poly-3D: Flattere durch Röhren-Lücken, weic
 - Es gibt **drei Spuren**. Jede Röhren-Reihe hat pro Spur eine eigene Lücke (unterschiedlich hoch); ab 3 Punkten sind manche Spuren komplett blockiert.
 - Pro durchflogener Röhren-Reihe gibt es einen Punkt, Münzen sind Bonus.
 - Leuchtende Ringe markieren die Lücken, die nächste Reihe leuchtet gelb. Durchflogene Reihen werden durchsichtig, damit sie die Sicht nicht verdecken.
-- Ab 6 Punkten bewegen sich manche Lücken auf und ab, ab 10 Punkten schnappen Piranha-Pflanzen im Takt der Musik aus den Röhren. Eine Spur pro Reihe bleibt immer „einfach“.
+- Ab 6 Punkten bewegen sich manche Lücken auf und ab, ab 10 Punkten springen grimmige Stachelkakteen im Takt der Musik aus den Röhren. Eine Spur pro Reihe bleibt immer „einfach“.
 - Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher.
 - Der Rekord wird lokal im Browser gespeichert.
 
@@ -59,7 +59,7 @@ Nach einem Crash **tippst du irgendwo**, um nochmal zu spielen. Der Vogel schweb
 ## Sound
 
 - Die Musik wird im Code erzeugt (WebAudio, keine Audiodateien). Jede Zone hat ihr eigenes Thema mit eigener Tonart, eigenen Instrumenten und eigenem Groove. Ein Durchlauf ist ein 16-taktiger Song mit A-Teil, B-Teil und Breakdown.
-- Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Piranha-Pflanzen schnappen im Takt der Musik.
+- Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Stachelkakteen springen im Takt der Musik.
 - Soundeffekte gibt es für Flattern, Ausweichen, Punkte, Münzen, „Knapp!“, Power-ups, Zonenwechsel und Crash. Oben links schaltest du den Ton aus (samt Vibration), die Einstellung bleibt gespeichert.
 
 ## Entwicklung
@@ -97,7 +97,7 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 ## Struktur
 
 - `src/main.js` – Spielschleife, Physik, Kollision, Eingabe, UI-Zustände
-- `src/world.js` – Szene, Himmel, Boden, Kulisse, Röhren (inkl. Bewegung, Ringe, Piranha-Pflanzen) und Münzen
+- `src/world.js` – Szene, Himmel, Boden, Kulisse, Röhren (inkl. Bewegung, Ringe, Stachelkakteen) und Münzen
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
 - `src/audio.js` – Musik und Soundeffekte per WebAudio (keine Audiodateien nötig)
 - `src/powerups.js` – Power-up-Definitionen und Modelle
