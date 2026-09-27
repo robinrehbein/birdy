@@ -645,7 +645,7 @@ export const PLANT_REACH = 0.9;
 // A grumpy spiky cactus that pops up out of the pipe on the beat. Built once
 // and baked into one geometry (one draw call per cactus); the "puff" when it
 // is fully up just scales the whole thing.
-const CACTUS = { green: 0x4fae4a, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x2e5a2a, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a };
+const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a };
 const CACTUS_R = new THREE.Vector3(0.74, 0.8, 0.74); // body radii
 const CACTUS_Y = PLANT_HEIGHT - 0.95; // body centre: the top sits just under PLANT_HEIGHT
 function buildCactusGeometry() {
@@ -730,6 +730,12 @@ function createPlant() {
 // two beats.
 export function pulseScale(beat) {
   return 0.85 + 0.15 * Math.cos(beat * Math.PI);
+}
+
+// Warning a beat before it rises: the flower peeks out of the pipe and wiggles.
+function plantPeek(beat) {
+  const p = ((beat % 4) + 4) % 4;
+  return p >= 1.1 && p < 2;
 }
 
 // Rise amount (0..1) over a 4-beat cycle: hidden, pop up, chomp, retreat.
@@ -843,6 +849,15 @@ export function createGate(scene) {
         }
         const rise = plantRise(beat + lane.plantOffset);
         const plant = lane.plant;
+        if (rise <= 0 && plantPeek(beat + lane.plantOffset)) {
+          // Only the flower and the top of the head show above the lip; no hitbox.
+          plant.group.visible = true;
+          plant.group.position.y = lane.gapLow + 0.12 - (CACTUS_Y + CACTUS_R.y);
+          plant.group.rotation.z = Math.sin(time * 22) * 0.1;
+          plant.body.scale.set(1, 1, 1);
+          continue;
+        }
+        plant.group.rotation.z = 0;
         plant.group.visible = rise > 0;
         if (rise <= 0) continue;
         // Hidden inside the pipe at rise 0; head sticks out of the gap at 1.

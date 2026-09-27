@@ -1170,3 +1170,8 @@ deinen Entscheidungen (Name, App-ID), nicht an weiterem Code.
   - Kaktus im Spiel (`cactus0–2.png`) und als Nahaufnahme (`cactus-close.png`).
   - Tutorial-E2E ✓, Bot-Playtest: Anfänger 15,9 s, Geübt 38,9 s, Profi 96 % Überlebende.
   - 127 statt 151 Draw Calls, keine Fehler.
+- **Nachschärfung (deine Freigabe):**
+  - Der Kaktus ist jetzt blaugrün (türkis) und hebt sich damit von grünen Röhren ab.
+  - Einen Takt vor dem Hochspringen schauen Blüte, Stirn und Augen wackelnd aus der Röhre, als
+    Vorwarnung ohne Trefferzone.
+  - Beleg: `mont-peekc.png`, Tutorial-E2E ✓, Playtest Anfänger 17,0 s / Geübt 38,8 s / Profi 96 %.
