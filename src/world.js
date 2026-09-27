@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export const LANES = [-3, 0, 3];
 export const PIPE_RADIUS = 1.1;
@@ -132,7 +133,35 @@ export function createGround(scene) {
   };
 }
 
-const SCENERY_SPAN = 200;
+// Bake all meshes below `root` into one geometry with vertex colours, so a
+// whole group of static parts renders with a single draw call. The look is
+// unchanged: same shapes, same colours, same flat shading.
+export function bakeGroup(root) {
+  root.updateMatrixWorld(true);
+  const inv = root.matrixWorld.clone().invert();
+  const geos = [];
+  const m = new THREE.Matrix4();
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    g.applyMatrix4(m.multiplyMatrices(inv, o.matrixWorld));
+    const c = o.material.color;
+    const n = g.attributes.position.count;
+    const col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    for (const key of Object.keys(g.attributes)) {
+      if (key !== 'position' && key !== 'normal' && key !== 'color') g.deleteAttribute(key);
+    }
+    geos.push(g);
+  });
+  const merged = mergeGeometries(geos);
+  for (const g of geos) g.dispose();
+  return merged;
+}
+
+const SCENERY_CHUNK = 25;
+const SCENERY_SPAN = 225;
 
 // Trees, bushes and Flappy-like city blocks along both sides of the track.
 export function createScenery(scene) {
@@ -210,21 +239,31 @@ export function createScenery(scene) {
     }
   }
 
-  for (const it of items) {
-    it.traverse((o) => {
-      if (o.isMesh) {
-        o.castShadow = true;
-        o.receiveShadow = true;
-      }
-    });
-    scene.add(it);
+  // Bake the scenery into a few chunks along the track (one draw call each)
+  // that leapfrog to the far end once they are behind the camera.
+  const chunkMat = new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true });
+  const chunks = [];
+  for (let k = 0; k < SCENERY_SPAN / SCENERY_CHUNK; k++) {
+    const top = 20 - k * SCENERY_CHUNK;
+    const root = new THREE.Group();
+    for (const it of items) {
+      const z = it.position.z;
+      if (z <= top && (z > top - SCENERY_CHUNK || (k === SCENERY_SPAN / SCENERY_CHUNK - 1 && z <= top))) root.add(it);
+    }
+    const mesh = new THREE.Mesh(bakeGroup(root), chunkMat);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    mesh.userData.front = top - SCENERY_CHUNK; // nearest-to-horizon edge
+    scene.add(mesh);
+    chunks.push(mesh);
   }
 
   return {
     update(dz) {
-      for (const it of items) {
-        it.position.z += dz;
-        if (it.position.z > 25) it.position.z -= SCENERY_SPAN;
+      for (const c of chunks) {
+        c.position.z += dz;
+        // Fully behind the camera: move it to the far end.
+        if (c.position.z + c.userData.front > 25) c.position.z -= SCENERY_SPAN;
       }
     },
   };
@@ -234,15 +273,17 @@ export function createClouds(scene) {
   const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, flatShading: true, fog: true });
   const geo = new THREE.IcosahedronGeometry(1, 1);
   const clouds = [];
+  const bakedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true });
   for (let i = 0; i < 18; i++) {
-    const c = new THREE.Group();
+    const g = new THREE.Group();
     const n = 3 + Math.floor(Math.random() * 3);
     for (let j = 0; j < n; j++) {
       const puff = new THREE.Mesh(geo, mat);
       puff.position.set(j * 1.6 - n * 0.8, Math.random() * 0.6, Math.random() * 1.2);
       puff.scale.setScalar(1.3 + Math.random() * 0.9);
-      c.add(puff);
+      g.add(puff);
     }
+    const c = new THREE.Mesh(bakeGroup(g), bakedMat);
     c.position.set((Math.random() - 0.5) * 90, 18 + Math.random() * 14, -Math.random() * 220);
     c.userData.speed = 0.3 + Math.random() * 0.3;
     clouds.push(c);
@@ -272,22 +313,37 @@ const stripeGeo = new THREE.BoxGeometry(0.28, 1, 0.28);
 stripeGeo.translate(0, 0.5, 0);
 const ringGeo = new THREE.TorusGeometry(1, 0.07, 6, 32);
 
-function makePipeSegment(mats) {
+// Pipe body with its highlight/shadow stripes, and the lip with its dark
+// band, each baked into one geometry (2 draw calls per segment instead of 5).
+const pipeColor = (hex) => new THREE.MeshBasicMaterial({ color: hex });
+function bakeParts(parts) {
+  const root = new THREE.Group();
+  for (const [geo, hex, x = 0, y = 0, z = 0] of parts) {
+    const m = new THREE.Mesh(geo, pipeColor(hex));
+    m.position.set(x, y, z);
+    root.add(m);
+  }
+  return bakeGroup(root);
+}
+const pipeBodyGeo = bakeParts([
+  [pipeGeo, PIPE_COLORS.pipe],
+  [stripeGeo, PIPE_COLORS.light, -PIPE_RADIUS * 0.57, 0, PIPE_RADIUS * 0.8],
+  [stripeGeo, PIPE_COLORS.dark, PIPE_RADIUS * 0.64, 0, PIPE_RADIUS * 0.75],
+]);
+// Band below the lip (bottom pipe) or above it (top pipe).
+const capBelowGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, -0.4]]);
+const capAboveGeo = bakeParts([[lipGeo, PIPE_COLORS.pipe], [bandGeo, PIPE_COLORS.dark, 0, 0.4]]);
+
+function makePipeSegment(mat, capGeo) {
   const g = new THREE.Group();
-  const body = new THREE.Mesh(pipeGeo, mats.pipe);
-  // Highlight and shadow stripes on the side facing the camera.
-  const light = new THREE.Mesh(stripeGeo, mats.light);
-  light.position.set(-PIPE_RADIUS * 0.57, 0, PIPE_RADIUS * 0.8);
-  const dark = new THREE.Mesh(stripeGeo, mats.dark);
-  dark.position.set(PIPE_RADIUS * 0.64, 0, PIPE_RADIUS * 0.75);
-  const lip = new THREE.Mesh(lipGeo, mats.pipe);
-  const band = new THREE.Mesh(bandGeo, mats.dark);
-  for (const m of [body, light, dark, lip, band]) {
+  const body = new THREE.Mesh(pipeBodyGeo, mat);
+  const lip = new THREE.Mesh(capGeo, mat);
+  for (const m of [body, lip]) {
     m.castShadow = true;
     m.receiveShadow = true;
   }
-  g.add(body, light, dark, lip, band);
-  return { g, body, light, dark, lip, band };
+  g.add(body, lip);
+  return { g, body, lip };
 }
 
 // --- Piranha plant ----------------------------------------------------------
@@ -364,14 +420,12 @@ function plantRise(beat) {
 export function createGate(scene) {
   const group = new THREE.Group();
   const mats = {
-    pipe: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.pipe, roughness: 0.45, flatShading: true }),
-    dark: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.dark, roughness: 0.45, flatShading: true }),
-    light: new THREE.MeshStandardMaterial({ color: PIPE_COLORS.light, roughness: 0.4, flatShading: true }),
+    pipe: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }),
   };
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
   const lanes = LANES.map((x) => {
-    const bottom = makePipeSegment(mats);
-    const top = makePipeSegment(mats);
+    const bottom = makePipeSegment(mats.pipe, capBelowGeo);
+    const top = makePipeSegment(mats.pipe, capAboveGeo);
     bottom.g.position.x = x;
     top.g.position.x = x;
     const ring = new THREE.Mesh(ringGeo, ringMat);
@@ -388,24 +442,19 @@ export function createGate(scene) {
   });
   scene.add(group);
 
-  function setSegment(seg, from, to, lipAt, bandAt) {
+  function setSegment(seg, from, to, lipAt) {
     const h = Math.max(0.01, to - from);
     seg.g.position.y = from;
     seg.body.scale.y = h;
-    seg.light.scale.y = h;
-    seg.dark.scale.y = h;
-    seg.lip.visible = seg.band.visible = lipAt !== null;
-    if (lipAt !== null) {
-      seg.lip.position.y = lipAt - from;
-      seg.band.position.y = bandAt - from;
-    }
+    seg.lip.visible = lipAt !== null;
+    if (lipAt !== null) seg.lip.position.y = lipAt - from;
   }
 
   function setGap(lane, center) {
     lane.gapLow = center - lane.size / 2;
     lane.gapHigh = center + lane.size / 2;
-    setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4, lane.gapLow - 0.8);
-    setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4, lane.gapHigh + 0.8);
+    setSegment(lane.bottom, 0, lane.gapLow, lane.gapLow - 0.4);
+    setSegment(lane.top, lane.gapHigh, PIPE_TOP, lane.gapHigh + 0.4);
     lane.ring.position.y = center;
     lane.ring.scale.set(0.95, lane.size / 2 - 0.15, 1);
   }

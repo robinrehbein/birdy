@@ -16,28 +16,45 @@ Bot-Werte sind Näherungen an echte Spieler, keine Messung an Menschen.
 
 ## Bewertungsbogen (aktuell)
 
+Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrigiert.
+
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 5 | Anfänger-Bot: erster Tod im Median bei 17,4 s, 10 % der Runs enden vor 11,4 s. Aber: Erklärung nur als Text im Startmenü, kein Tutorial im Spiel. |
-| 2 | Game Feel / Juice | 5 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss-Feedback, Speed-Lines. |
-| 3 | Fairness & Kurve | 7 | Profi-Bot (perfekte Reaktion) überlebt 94 % der 150-s-Runs, vorher starb er in 100 % der Runs. Reihen haben eine garantierte Erreichbarkeit, der Abstand ist zeitbasiert. Offen: Ankündigung von Pflanzen und bewegten Lücken ist nicht an Menschen getestet, 6 % Rest-Tode beim Profi. |
-| 4 | Abwechslung | 4 | Neues nur bei 6 (bewegte Lücken) und 10 Punkten (Pflanzen), plus Power-ups. Keine Biome oder Events, gleiche Optik über den ganzen Run. |
-| 5 | Session-Loop | 6 | Runs im Median: Anfänger 17 s, geübt 42,5 s ✓ (Ziel 30–90 s). Game-Over zeigt „Nur noch X bis zum Rekord“ und erfüllte Missionen. Neustart per Button erst nach ca. 1,7 s. |
-| 6 | Meta-Progression | 6 | Münzen werden gespeichert. 7 Vogel-Skins (100–1500 Münzen) mit Live-Vorschau am 3D-Vogel. Täglich 3 Missionen (+40/+70/+120) mit Einblendung beim Erreichen. Fehlt: Erfolge und Meilensteine, weitere Kosmetik (Spuren, Hüte), Langzeitziele. |
-| 7 | Audio | 6 | Prozedurale Chiptune-Musik und Effekte. Der Loop ist nur ca. 31 s lang, Wiederholung nervt vermutlich nach 10 Minuten. Mix ist ungeprüft. |
-| 8 | Performance | 4 | 892 Draw Calls pro Frame inkl. Schattenpass, 43k Dreiecke, weiche Schatten, DPR 2 – zu viel für Mittelklasse-Android. APK 5,5 MB ✓, erster Frame nach 0,7 s ✓. |
-| 9 | Politur | 5 | Einfache HTML-Panels, Game-Over ohne Animation. Icon und Splash gerendert ✓. |
-| 10 | Store-Reife | 2 | Nur Debug-APK, Platzhalter-App-ID, keine Store-Grafiken, kein Datenschutztext, kein Release-Signing. |
+| 1 | Onboarding | 4 | Anfänger-Bot: erster Tod im Median bei 17,4 s. Aber: Die Erklärung steht nur als Text im Menü. Dass die eigene Spur flattert und eine fremde Spur nur hüpft, wird im Spiel nie gezeigt. Bot-Überlebenszeit ist kein Beleg für Verständnis. |
+| 2 | Game Feel / Juice | 4 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss, Vibration. |
+| 3 | Fairness & Kurve | 6 | Profi-Bot überlebt 94 % der 150-s-Runs dank garantierter Erreichbarkeit. Aber: Der Bot kennt die exakten Lückenhöhen. Die Tiefenwahrnehmung von Menschen ist nicht geprüft, die Kurve endet bei 40 Punkten. |
+| 4 | Abwechslung | 3 | Ab Punkt 10 ist alles freigeschaltet, es gibt nur ein Biom. |
+| 5 | Session-Loop | 5 | Runs im Median: Anfänger 17 s, geübt 42 s ✓. Aber: Nach „Nochmal“ fehlt ein Bereit-Zustand, der Vogel fällt sofort. Kein Neustart per Tippen irgendwo. |
+| 6 | Meta-Progression | 5 | Münzen, 7 Skins, 3 Tagesmissionen. Fehlt: Streak oder Geschenk, Zufalls-Freischaltung. Missionen passen nicht zum Spielerniveau (Pflanzen-Mission bei Rekord < 10). |
+| 7 | Audio | 4 | Korrektur: Der Loop dauert nur 7,7 s (64 Sechzehntel bei 124 BPM), nicht 31 s. Menü und Spiel nutzen denselben Loop, das wiederholt sich stark. |
+| 8 | Performance | 6 | 892 → **165 Draw Calls** (Szenerie und Röhren zusammengefasst, Optik unverändert). Automatische Qualitätsstufen (DPR 2 → 1,5 → 1,25 → 1 → ohne Schatten, mit Ersatz-Schatten). Offen: Messung auf einem echten Gerät (Anzeige: 5× auf den Titel tippen). |
+| 9 | Politur | 5 | Panels sauber. Münzen wirken bräunlich (Metall ohne Umgebungslicht). Der Ring-„Pop“ einer passierten Reihe wird nahe der Kamera riesig. Der Shop zeigt nur Farbpunkte. |
+| 10 | Store-Reife | 1 | Debug-APK, Platzhalter-App-ID, kein Release-Signing, kein Datenschutztext. Die Android-Zurück-Taste wird nicht behandelt. |
 
 ## Backlog (nach Hebel sortiert)
 
-1. Performance: Szenerie per Instancing oder Merge zusammenfassen, Schattenwerfer reduzieren, DPR begrenzen.
-2. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Kombo für perfekte Durchflüge.
-3. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Variationen.
-4. Session-Loop: schnellerer Neustart (Tippen überall), „Noch X bis zum Rekord“.
-5. Onboarding: Geister-Hand im ersten Run statt Text.
-6. Store: Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
-7. Meta: Erfolge und Meilensteine, Flug-Spuren als zweite Kosmetik-Kategorie.
+1. **BLOCKER Lesbarkeit & Fehltipps (Review):**
+   - Höhen-Marker an der nächsten Reihe: grün, wenn der Vogel auf Lückenhöhe ist, sonst rot.
+   - Tipp-Zone der eigenen Spur breiter (Hysterese), damit knappe Tipps nicht zum Hüpfer werden.
+   - Bereit-Zustand nach „Nochmal“, Neustart per Tippen irgendwo.
+2. Missionen an das Spielerniveau koppeln, dazu tägliches Geschenk oder Streak.
+3. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Vibration.
+4. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
+5. Politur: Münz-Material, Ring-Pop nahe der Kamera, Shop-Vorschau.
+6. Onboarding: Geister-Hand im ersten Run statt Text.
+7. Store: Zurück-Taste, Release-Build-Setup, Store-Texte, Datenschutz, Screenshots.
+
+## Review 1 (nach Iteration 3) – Publisher-Subagent
+
+Urteil: Soft Launch „heute nein“. Die drei wichtigsten Kritikpunkte:
+
+| Rang | Einstufung | Kritik |
+|---|---|---|
+| 1 | Blocker | Tiefen-Lesbarkeit und Fehltipps an den Zonengrenzen |
+| 2 | Blocker | Performance auf Mittelklasse-Android |
+| 3 | wichtig | Neustart ohne Bereit-Zustand; kaum Grund, am nächsten Tag wiederzukommen |
+
+Der Reviewer fand die Noten für Audio, Fairness, Onboarding, Session-Loop und Meta überhöht. Ich habe sie oben korrigiert.
 
 ## Iterations-Log
 
@@ -129,3 +146,33 @@ und es gab keinen Grund, morgen wiederzukommen.
 - Ökonomie: Der geübte Bot sammelt im Median 25 Münzen pro Run. Mit den Missionen ist der
   erste Skin also nach etwa 3 Runs erreichbar, alle Skins (4300 Münzen) nach etwa 3 Wochen
   täglichen Spielens.
+
+### Iteration 4 – Performance: Draw Calls −81 %, adaptive Qualität
+
+**Was:**
+- `bakeGroup()` fasst statische Teile zu einer Geometrie mit Vertex-Farben zusammen, bei
+  gleichen Formen, Farben und Flat Shading:
+  - **Szenerie:** Büsche, Bäume und Gebäude liegen in 9 Blöcken à 25 Einheiten, die beim
+    Weiterfliegen nach hinten wandern. Vorher waren es rund 600 einzelne Meshes.
+  - **Wolken:** 1 Mesh pro Wolke statt 3 bis 5.
+  - **Röhren:** Körper und Streifen bilden 1 Mesh, Rand und Band 1 Mesh, mit einem Material
+    pro Reihe. Das sind 2 statt 5 Meshes pro Segment.
+- **Adaptive Qualität:** Liegt die Framerate zweimal hintereinander für 1,5 s unter 48 fps,
+  sinkt die Pixeldichte stufenweise (2 → 1,5 → 1,25 → 1). Auf der letzten Stufe werden die
+  Schatten-Maps abgeschaltet, der Vogel behält einen einfachen Schatten auf dem Boden. Die Stufe
+  wird für den nächsten Start gespeichert.
+- **Entwickler-Anzeige:** 5× schnell auf den Titel tippen oder `?fps` zeigt fps, Draw Calls und
+  Qualitätsstufe. So lässt sich die Leistung am echten Handy prüfen.
+
+**Warum:** Der Reviewer stufte die Performance als Blocker ein. 892 Draw Calls pro Frame
+überfordern die GPU von Mittelklasse-Handys.
+
+**Messung (`scripts/perf.mjs`, gleiche Szene):**
+
+| Wert | vorher | nachher |
+|---|---|---|
+| Draw Calls (max) | 892 | **165** |
+| Dreiecke | 42,9k | 49,7k (größere Blöcke werden nicht einzeln ausgeblendet; für Handy-GPUs unkritisch) |
+
+Screenshots vorher und nachher sind optisch gleich. Die Qualitätsstufen wurden im Headless-Test
+durchlaufen (Software-GPU), ohne Fehler. Auf einem echten Gerät ist nichts gemessen.

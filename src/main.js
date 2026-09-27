@@ -39,9 +39,18 @@ const FALLBACK_BPM = 124;
 // --- Setup ------------------------------------------------------------------
 const canvas = document.getElementById('game');
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+// Adaptive quality: if a phone can't hold ~50 fps, lower the render
+// resolution step by step (and finally drop shadows). The chosen level is
+// remembered for the next launch.
+const QUALITY_DPR = [Math.min(window.devicePixelRatio, 2), 1.5, 1.25, 1];
+let quality = 0;
+try {
+  quality = Math.min(QUALITY_DPR.length, Number(localStorage.getItem('birdy-quality')) || 0);
+} catch { /* storage unavailable */ }
+renderer.setPixelRatio(Math.min(QUALITY_DPR[0], QUALITY_DPR[Math.min(quality, QUALITY_DPR.length - 1)]));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+if (quality >= QUALITY_DPR.length) renderer.shadowMap.enabled = false;
 
 const scene = createScene();
 const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 400);
@@ -50,6 +59,23 @@ const ground = createGround(scene);
 const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 const particles = createParticles(scene);
+
+// Simple blob shadow under the bird, used when real shadows are off (lowest
+// quality level) so the flight height stays readable.
+const blob = new THREE.Mesh(
+  new THREE.CircleGeometry(0.7, 20),
+  new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.22, depthWrite: false })
+);
+blob.rotation.x = -Math.PI / 2;
+blob.position.y = 0.03;
+blob.visible = false;
+scene.add(blob);
+function setShadows(on) {
+  renderer.shadowMap.enabled = on;
+  blob.visible = !on;
+  scene.traverse((o) => { if (o.material) o.material.needsUpdate = true; });
+}
+if (!renderer.shadowMap.enabled) blob.visible = true;
 
 const bird = createBird();
 bird.group.scale.setScalar(BIRD_SCALE);
@@ -829,6 +855,10 @@ function updateDead(dt) {
 function updateBirdVisual(dt) {
   const g = bird.group;
   g.position.set(state.x, state.y, 0);
+  if (blob.visible) {
+    blob.position.x = state.x;
+    blob.scale.setScalar(THREE.MathUtils.clamp(1.1 - state.y * 0.04, 0.5, 1) * (g.scale.x / BIRD_SCALE));
+  }
   if (state.mode === 'playing' || state.mode === 'ready') {
     const pitch = THREE.MathUtils.clamp(state.vy * 0.06, -0.9, 0.5);
     g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, pitch, Math.min(1, dt * 10));
@@ -916,8 +946,64 @@ function step(dt, beat) {
   }
 }
 
+const perf = { frames: 0, time: 0, cooldown: 3, fps: 0, slow: 0 };
+function adaptQuality(rawDt) {
+  perf.frames++;
+  perf.time += rawDt;
+  if (perf.time < 1.5) return;
+  perf.fps = perf.frames / perf.time;
+  perf.frames = 0;
+  perf.time = 0;
+  if (fpsEl) fpsEl.textContent = `${perf.fps.toFixed(0)} fps · ${renderer.info.render.calls} dc · Q${quality}`;
+  perf.cooldown -= 1.5;
+  // Only judge real gameplay, and give each step time to settle.
+  if (state.mode !== 'playing' || state.paused || perf.cooldown > 0) return;
+  // Two slow windows in a row, so a single hiccup doesn't lower quality.
+  perf.slow = perf.fps < 48 ? perf.slow + 1 : 0;
+  if (perf.slow < 2 || quality >= QUALITY_DPR.length) return;
+  perf.slow = 0;
+  quality++;
+  perf.cooldown = 3;
+  if (quality < QUALITY_DPR.length) {
+    renderer.setPixelRatio(Math.min(QUALITY_DPR[0], QUALITY_DPR[quality]));
+    resize();
+  } else {
+    setShadows(false);
+  }
+  try { localStorage.setItem('birdy-quality', String(quality)); } catch { /* ignore */ }
+}
+
+// Hidden developer overlay: tap the title 5 times (or open with ?fps).
+let fpsEl = null;
+function toggleFps(on) {
+  if (on && !fpsEl) {
+    fpsEl = document.createElement('div');
+    fpsEl.id = 'fps';
+    app.appendChild(fpsEl);
+  } else if (!on && fpsEl) {
+    fpsEl.remove();
+    fpsEl = null;
+  }
+  try { localStorage.setItem('birdy-fps', on ? '1' : ''); } catch { /* ignore */ }
+}
+{
+  let taps = 0;
+  let last = 0;
+  document.querySelector('#start h1').addEventListener('pointerdown', () => {
+    const now = performance.now();
+    taps = now - last < 400 ? taps + 1 : 1;
+    last = now;
+    if (taps >= 5) toggleFps(!fpsEl);
+  });
+  let saved = '';
+  try { saved = localStorage.getItem('birdy-fps'); } catch { /* ignore */ }
+  if (saved || new URLSearchParams(location.search).has('fps')) toggleFps(true);
+}
+
 function tick() {
-  const dt = Math.min(clock.getDelta(), 1 / 30);
+  const rawDt = clock.getDelta();
+  const dt = Math.min(rawDt, 1 / 30);
+  adaptQuality(rawDt);
   if (landscapeTouch.matches || state.paused) {
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
