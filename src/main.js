@@ -77,6 +77,32 @@ function setShadows(on) {
 }
 if (!renderer.shadowMap.enabled) blob.visible = true;
 
+// Height marker: a small ring at the next row, in the bird's lane and at the
+// bird's current height. Green = would pass right now, red = would hit.
+// Makes the gap height readable despite the depth of the 3D view.
+const MARKER_OK = new THREE.Color(0x8cff5a);
+const MARKER_BAD = new THREE.Color(0xff4a3d);
+const marker = new THREE.Mesh(
+  new THREE.RingGeometry(0.2, 0.36, 20),
+  new THREE.MeshBasicMaterial({ color: MARKER_OK, transparent: true, opacity: 0, depthTest: false, depthWrite: false })
+);
+marker.renderOrder = 10;
+marker.visible = false;
+scene.add(marker);
+
+function updateMarker(next, r) {
+  const z = next ? next.group.position.z : -999;
+  marker.visible = !!next && state.mode === 'playing' && state.power.star <= 0 && z > -48;
+  if (!marker.visible) return;
+  const lane = next.lanes[state.lane];
+  const ok = !lane.blocked && state.y - r * 0.8 > lane.hitLow && state.y + r * 0.8 < lane.hitHigh;
+  marker.material.color.copy(ok ? MARKER_OK : MARKER_BAD);
+  marker.material.opacity = 0.9 * THREE.MathUtils.clamp((z + 48) / 16, 0, 1);
+  marker.position.set(LANES[state.lane], state.y, z + PIPE_RADIUS + 0.3);
+  marker.scale.setScalar(Math.max(1, -z / 14)); // keep it readable in the distance
+  marker.quaternion.copy(camera.quaternion);
+}
+
 const bird = createBird();
 bird.group.scale.setScalar(BIRD_SCALE);
 bird.setSkin(progress.skin);
@@ -393,23 +419,24 @@ function makeReachable(spec, lo, hi) {
   const maxDrop = 1 + 3.5 * t;
   const maxRise = 0.8 + 3 * t;
   const SWITCH_FACTOR = 0.6;
-  const reach = (from, to, switching) => {
-    const k = switching ? SWITCH_FACTOR : 1;
+  // Each lane step is one tap with a small hop, so moving two lanes costs more.
+  const reach = (from, to, steps) => {
+    const k = SWITCH_FACTOR ** steps;
     const d = to - from;
     return d <= maxRise * k && -d <= maxDrop * k;
   };
   // A moving gap only counts if its whole travel range is in reach.
-  const fits = (p, g, switching) =>
-    reach(p.center, g.center - (g.amp || 0), switching) && reach(p.center, g.center + (g.amp || 0), switching);
+  const fits = (p, g, steps) =>
+    reach(p.center, g.center - (g.amp || 0), steps) && reach(p.center, g.center + (g.amp || 0), steps);
   prev.forEach((p, j) => {
     if (!p) return;
     const open = spec.map((g, i) => (g ? i : -1)).filter((i) => i >= 0);
-    if (open.some((i) => fits(p, spec[i], i !== j))) return;
+    if (open.some((i) => fits(p, spec[i], Math.abs(i - j)))) return;
     // Pull the closest open lane (same lane preferred) into reach and stop
     // it from moving.
     const i = open.sort((a, b) => Math.abs(a - j) - Math.abs(b - j))[0];
     const g = spec[i];
-    const k = i !== j ? SWITCH_FACTOR : 1;
+    const k = SWITCH_FACTOR ** Math.abs(i - j);
     g.amp = 0;
     g.center = THREE.MathUtils.clamp(g.center, p.center - maxDrop * k * 0.9, p.center + maxRise * k * 0.9);
     g.center = THREE.MathUtils.clamp(g.center, lo, hi);
@@ -499,16 +526,30 @@ function flap() {
   sfx.flap();
 }
 
-// A tap on the current lane flaps; a tap on another lane moves there with a
-// small hop, so dodging sideways never throws the bird into the upper pipe.
-function tap(lane) {
-  if (state.mode === 'playing' && !state.paused && lane !== state.lane) {
-    setLane(lane);
+// Touch controls are relative to where the bird is drawn: a tap near the
+// bird flaps, a tap left or right of it moves one lane that way with a small
+// hop (so dodging sideways never throws the bird into the upper pipe).
+const OWN_ZONE = 0.18; // half-width of the "flap" zone around the bird (screen fraction)
+const tmpProj = new THREE.Vector3();
+function birdScreenX() {
+  tmpProj.set(state.x, state.y, 0).project(camera);
+  return (tmpProj.x + 1) / 2;
+}
+
+function tapDir(dir) {
+  const target = state.lane + dir;
+  if (state.mode === 'playing' && !state.paused && dir !== 0 && target >= 0 && target < LANES.length) {
+    setLane(target);
     state.vy = Math.max(state.vy, SWITCH_HOP);
     state.wingSpeed = 26;
     return;
   }
   flap();
+}
+
+// Lane-based variant used by the playtest bots: one step towards `lane`.
+function tap(lane) {
+  tapDir(Math.sign(lane - state.lane));
 }
 
 function updateLaneDots() {
@@ -561,7 +602,8 @@ canvas.addEventListener('pointerdown', (e) => {
   startAudio();
   if (state.paused) return setPaused(false);
   const rect = canvas.getBoundingClientRect();
-  tap(THREE.MathUtils.clamp(Math.floor(((e.clientX - rect.left) / rect.width) * 3), 0, 2));
+  const d = (e.clientX - rect.left) / rect.width - birdScreenX();
+  tapDir(Math.abs(d) <= OWN_ZONE ? 0 : Math.sign(d));
 });
 // Tapping the free area of the start screen starts right away; the panel's
 // buttons do their own thing.
@@ -610,6 +652,7 @@ const tmpColor = new THREE.Color();
 function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
+  marker.visible = false;
   lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause };
   state.deadTimer = 0;
   state.shake = 0.5;
@@ -771,6 +814,8 @@ function updatePlaying(dt) {
       }
     }
   }
+  updateMarker(next, r);
+
   // Rings mark the gaps: the next row glows brighter the closer it gets.
   for (const gate of gates) {
     if (!gate.active || gate.passed) continue;

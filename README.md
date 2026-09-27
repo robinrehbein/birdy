@@ -19,12 +19,14 @@ Das Spiel ist für Hochkant ausgelegt. Am Desktop wird es als zentrierte 9:16-Sp
 
 ## Steuerung
 
-Auf dem Handy reicht eine einzige Geste: **Tippe ins linke, mittlere oder rechte Drittel** des Bildschirms. Tippst du in die Spur, in der der Vogel gerade ist, flattert er. Tippst du in eine andere Spur, wechselt er dorthin und macht nur einen kleinen Hüpfer – so knallt man beim Ausweichen nicht oben an die Röhre. Die drei Zonen werden zu Beginn jeder Runde kurz eingeblendet, unten zeigt eine Punkt-Anzeige die aktuelle Spur.
+Auf dem Handy reicht eine einzige Geste: **Tippe beim Vogel**, dann flattert er. **Tippe links oder rechts neben den Vogel**, dann weicht er eine Spur in diese Richtung aus und macht dabei nur einen kleinen Hüpfer. Die Zonen richten sich nach der Position, an der der Vogel auf dem Bildschirm zu sehen ist. So löst ein Tipp auf den Vogel auch in den Außenspuren immer einen Flügelschlag aus.
+
+Ein kleiner **Zielring** an der nächsten Reihe zeigt, auf welcher Höhe du ankommst: grün heißt, du passt gerade durch; rot heißt, du würdest anstoßen.
 
 | Aktion | Desktop | Mobil |
 | --- | --- | --- |
-| Flügelschlag | Leertaste / ↑ / W / Klick | Tippen |
-| Spur wechseln | ← → / A D / Klick ins Drittel | Ins linke/mittlere/rechte Drittel tippen |
+| Flügelschlag | Leertaste / ↑ / W / Klick | Beim Vogel tippen |
+| Spur wechseln | ← → / A D / Klick neben den Vogel | Links/rechts neben den Vogel tippen |
 | Neustart | Enter / Leertaste | „Nochmal“-Button |
 | Ton an/aus | 🔊-Knopf oben links | 🔊-Knopf oben links |
 

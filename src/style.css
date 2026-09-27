@@ -206,7 +206,7 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
 .howto { margin-bottom: 18px; }
 .howto-zones {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 32fr 36fr 32fr;
   gap: 4px;
   margin-bottom: 10px;
 }
@@ -227,7 +227,7 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
   position: absolute;
   inset: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 32fr 36fr 32fr;
   opacity: 0;
   pointer-events: none;
 }

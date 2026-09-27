@@ -20,7 +20,7 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 
 | # | Bereich | Note | Beleg / Begründung |
 |---|---------|------|--------------------|
-| 1 | Onboarding | 4 | Anfänger-Bot: erster Tod im Median bei 17,4 s. Aber: Die Erklärung steht nur als Text im Menü. Dass die eigene Spur flattert und eine fremde Spur nur hüpft, wird im Spiel nie gezeigt. Bot-Überlebenszeit ist kein Beleg für Verständnis. |
+| 1 | Onboarding | 5 | Anfänger-Bot: erster Tod im Median bei 17,4 s. Aber: Die Erklärung steht nur als Text im Menü. Die Steuerung ist jetzt einfacher erklärbar („beim Vogel = flattern, daneben = ausweichen“), der Zielring zeigt die Höhe. Bot-Überlebenszeit ist kein Beleg für Verständnis. |
 | 2 | Game Feel / Juice | 4 | Vorhanden: Flatter-Sound, Punkte-Pop, Partikel, Kamera-Shake und Blitz beim Tod. Fehlt: Squash & Stretch, Hit-Stop, Near-Miss, Vibration. |
 | 3 | Fairness & Kurve | 6 | Profi-Bot überlebt 94 % der 150-s-Runs dank garantierter Erreichbarkeit. Aber: Der Bot kennt die exakten Lückenhöhen. Die Tiefenwahrnehmung von Menschen ist nicht geprüft, die Kurve endet bei 40 Punkten. |
 | 4 | Abwechslung | 3 | Ab Punkt 10 ist alles freigeschaltet, es gibt nur ein Biom. |
@@ -33,10 +33,7 @@ Nach dem ersten Publisher-Review (Iteration 3) habe ich überhöhte Noten korrig
 
 ## Backlog (nach Hebel sortiert)
 
-1. **BLOCKER Lesbarkeit & Fehltipps (Review):**
-   - Höhen-Marker an der nächsten Reihe: grün, wenn der Vogel auf Lückenhöhe ist, sonst rot.
-   - Tipp-Zone der eigenen Spur breiter (Hysterese), damit knappe Tipps nicht zum Hüpfer werden.
-   - Bereit-Zustand nach „Nochmal“, Neustart per Tippen irgendwo.
+1. Session-Loop: Bereit-Zustand nach „Nochmal“, Neustart per Tippen irgendwo.
 2. Missionen an das Spielerniveau koppeln, dazu tägliches Geschenk oder Streak.
 3. Juice: Squash & Stretch, Hit-Stop, Near-Miss („knapp!“), Vibration.
 4. Abwechslung: Biome oder Tageszeiten alle ca. 25 Punkte, Musik-Varianten für Menü und Spiel, längerer Loop.
@@ -176,3 +173,53 @@ und es gab keinen Grund, morgen wiederzukommen.
 
 Screenshots vorher und nachher sind optisch gleich. Die Qualitätsstufen wurden im Headless-Test
 durchlaufen (Software-GPU), ohne Fehler. Auf einem echten Gerät ist nichts gemessen.
+
+### Iteration 5 – Relative Tipp-Zonen und Höhen-Marker (Review-Blocker 1)
+
+**Befund:**
+- Die Kamera folgt dem Vogel seitlich. Deshalb erscheint er in der linken Spur bei 37,7 % der
+  Bildschirmbreite und in der rechten bei 62,4 %, also jeweils schon in der **mittleren**
+  Tipp-Zone (33–67 %).
+- Wer in einer Außenspur auf den Vogel tippte, um zu flattern, bekam stattdessen einen
+  Spurwechsel mit kleinem Hüpfer. Berechnet mit `three` und der echten Kamera
+  (`scratchpad/proj.mjs`).
+
+**Was:**
+- **Relative Steuerung:**
+  - Ein Tipp in ±18 % der Breite um die aktuelle Bildschirmposition des Vogels lässt ihn
+    flattern.
+  - Ein Tipp links oder rechts daneben wechselt eine Spur in diese Richtung.
+  - Ein Tipp neben den Vogel in Richtung Rand (es gibt dort keine Spur mehr) lässt ihn
+    flattern.
+  - Die Anleitung im Menü und die Zonen-Einblendung wurden angepasst.
+- **Höhen-Marker:**
+  - Ein Ring an der nächsten Reihe, in der Spur und auf der Höhe des Vogels. Grün heißt, er
+    würde jetzt durchpassen; rot heißt, er würde anstoßen.
+  - Der Ring blendet ab 48 Einheiten Entfernung ein, wird mit der Entfernung skaliert und
+    verschwindet während des Regenbogens.
+- **Erreichbarkeitsregel:** Ein Wechsel über zwei Spuren braucht jetzt zwei Tipps, der
+  Spielraum wird pro Spurschritt mit 0,6 multipliziert.
+
+**Messung:**
+- **Fehltipp-Modell** (Monte-Carlo, 200k Tipps, Streuung σ = 5–7 % der Breite; die Hälfte der
+  Flatter-Tipps zielt auf den Vogel, die andere Hälfte auf die Spur):
+
+  | Tipp-Zonen | Fehltipps |
+  |---|---|
+  | Drittel (alt) | **13,4 %** |
+  | relativ (neu) | **0,0–0,5 %** |
+
+- **Headless-Test:** Ein Tipp links wechselt in Spur 0. Ein Tipp auf den Vogel in Spur 0 lässt
+  ihn flattern (vorher: Wechsel in die Mitte).
+- **Bot-Playtest (100 Runs):**
+
+  | Bot | Überlebenszeit (Median) | Überlebensrate beim Profi |
+  |---|---|---|
+  | Anfänger | 15,9 s (vorher 17,4 s) | – |
+  | Geübt | 41,2 s (vorher 42,5 s) | – |
+  | Profi | – | 88 % (vorher 94 %) |
+
+  Die leichte Verschlechterung kommt daher, dass ein Doppelwechsel jetzt zwei Tipps braucht.
+  Bots tippen nie daneben und profitieren deshalb nicht vom eigentlichen Gewinn (13,4 % → 0,5 %
+  Fehltipps). Der Höhen-Marker hilft nur Menschen; das muss ein Test mit echten Spielern
+  zeigen.
