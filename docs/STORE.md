@@ -33,10 +33,14 @@ brauchst du die Entscheidungen unten.
      - `capacitor.config.json` (`appId`)
      - `android/app/build.gradle` (`namespace` und `applicationId`)
    - Außerdem muss der Paketordner von `MainActivity.java` passend umbenannt werden.
-2. **Name im Store**
-   - „Birdy 3D“ ist kurz und passend. Es gibt aber mehrere Apps und Spiele mit „Birdy“ im
-     Namen, deshalb vor dem Launch eine Markenrecherche machen (DPMA/EUIPO, Play-Store-Suche).
-   - Alternativen: „Birdy Dash 3D“, „Flutter Lanes“, „Tap Wings 3D“.
+2. **Name: „Flapsy“ (deine Wahl).** Vor dem Launch unbedingt eine Markenrecherche machen
+   (DPMA/EUIPO/WIPO, Klassen 9 und 41). Die Websuche fand:
+   - ein Browser-Spiel „Flapsy“ mit Röhren (whop.com/flapsy),
+   - einen „Flapsy Bird“-Klon,
+   - die Figur „Flapsy“ aus der Kinderserie *Dino Ranch* (Disney Junior).
+
+   Außerdem ist der Name nah an „Flappy Bird“. Der Name steht zentral in `src/i18n.js`,
+   `index.html`, `capacitor.config.json` und `strings.xml` und ist schnell getauscht.
 3. **Zielgruppe:** Richtest du das Spiel ausdrücklich an Kinder unter 13, gelten die
    Families-Richtlinien. Die sind erfüllbar, weil die App keine Daten, Werbung oder Käufe hat,
    bedeuten aber zusätzlichen Prüfaufwand. Einfacher ist die Zielgruppe „13+“.
@@ -70,13 +74,13 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 ## Store-Eintrag – Deutsch
 
-**Titel (max. 30):** Birdy 3D
+**Titel (max. 30):** Flapsy – Tippen & Fliegen
 
 **Kurzbeschreibung (max. 80):** Tippen, ausweichen, durchfliegen – ein Ein-Finger-Flieger in Low-Poly-3D.
 
 **Beschreibung:**
 
-> Flieg so weit du kannst! Birdy 3D ist ein bunter Ein-Finger-Arcade-Flieger in Low-Poly-3D.
+> Flieg so weit du kannst! Flapsy ist ein bunter Ein-Finger-Arcade-Flieger in Low-Poly-3D.
 >
 > 👆 **Ein Tipp genügt:** Tippe beim Vogel, um zu flattern – tippe daneben, um auf eine andere
 > Spur auszuweichen. Ein Zielring zeigt dir, ob du durch die nächste Lücke passt.
@@ -96,13 +100,13 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 ## Store listing – English
 
-**Title:** Birdy 3D
+**Title:** Flapsy – Tap & Fly
 
 **Short description:** Tap, dodge, fly through – a one-finger low-poly 3D flyer.
 
 **Description:**
 
-> Fly as far as you can! Birdy 3D is a colourful one-finger arcade flyer in low-poly 3D.
+> Fly as far as you can! Flapsy is a colourful one-finger arcade flyer in low-poly 3D.
 >
 > 👆 **One tap is all it takes:** tap the bird to flap, tap beside it to dodge into another
 > lane. A target ring shows whether you'll make the next gap.
@@ -125,9 +129,9 @@ Für jedes Update `versionCode` (+1) und `versionName` in `android/app/build.gra
 
 ## Datenschutzerklärung (Text zum Veröffentlichen)
 
-> **Datenschutzerklärung für „Birdy 3D“**
+> **Datenschutzerklärung für „Flapsy“**
 >
-> Birdy 3D erhebt, speichert oder überträgt keine personenbezogenen Daten.
+> Flapsy erhebt, speichert oder überträgt keine personenbezogenen Daten.
 >
 > - Die App stellt keine Verbindung zu Servern her und enthält keine Werbung, keine
 >   Analyse- oder Tracking-Dienste und keine In-App-Käufe.

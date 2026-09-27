@@ -839,3 +839,29 @@ sieht das Spiel bereit für den internen Test-Track.
 3. **Sprache:** Englisch einbauen oder nur in DE/AT/CH starten.
 4. **Steuerung:** Was genau fühlt sich nicht „tip top“ an? (Flattern zu stark oder schwach,
    Wechsel, Zonen, Verzögerung?)
+
+---
+
+## Dritte Runde (Iterationen 21–30, nach deinen Vorgaben)
+
+Deine Vorgaben:
+- Name „Flapsy“
+- Röhren ausblenden: okay
+- Deutsch und Englisch
+- Steuerung: Beim Spurwechsel ist es schwer, die Bahn genau zu treffen und zu halten
+- deutlich mehr Shop-Optionen (Kosmetik, Welten, Spuren usw.)
+
+### Iteration 21 – Umbenennung in „Flapsy“
+
+**Was:**
+- Neuer Name überall: Titel und Startmenü (Schriftzug „Flap“ in Gelb, „sy“ in Grün),
+  `capacitor.config.json`, Android-`strings.xml`, README, Store-Texte (DE „Flapsy – Tippen &
+  Fliegen“, EN „Flapsy – Tap & Fly“), Datenschutztext.
+- Splash und Feature-Grafik mit neuem Schriftzug neu gerendert.
+- Der Speicherschlüssel bleibt intern gleich, damit Spielstände erhalten bleiben.
+
+**Rechte-Hinweis** (Details in `docs/STORE.md`):
+- Die Websuche fand ein Browser-Spiel „Flapsy“ mit Röhren, einen „Flapsy Bird“-Klon und die
+  Figur „Flapsy“ aus *Dino Ranch* (Disney Junior).
+- Dazu die Nähe zu „Flappy Bird“.
+- Vor dem Launch ist eine Markenrecherche Pflicht.
