@@ -28,7 +28,7 @@ const BIRD_RADIUS = 0.5;
 const MINI_RADIUS = 0.3;
 const BIRD_SCALE = 1.1;
 const MINI_SCALE = 0.6;
-const LANE_SWITCH_SPEED = 12;
+const LANE_SWITCH_SPEED = 18; // ~0.17 s to reach 95 % of a lane change
 const SPAWN_DISTANCE = 170;
 const FIRST_GATE_Z = -60;
 const COIN_RADIUS = 1.1;
@@ -738,9 +738,48 @@ function flap() {
 // hop (so dodging sideways never throws the bird into the upper pipe).
 const OWN_ZONE = 0.18; // half-width of the "flap" zone around the bird (screen fraction)
 const tmpProj = new THREE.Vector3();
+// Zones are centred on the lane the bird is heading to (not its in-between
+// position during a switch), so quick tap sequences behave predictably.
 function birdScreenX() {
-  tmpProj.set(state.x, state.y, 0).project(camera);
+  tmpProj.set(LANES[state.lane], state.y, 0).project(camera);
   return (tmpProj.x + 1) / 2;
+}
+
+// The zone hint follows the bird: flap zone around it, dodge zones beside it
+// (none towards the edge in an outer lane).
+const zoneCols = [...zonesEl.children];
+let zonesKey = '';
+function updateZonesOverlay() {
+  if (!zonesEl.classList.contains('show') && !zonesEl.classList.contains('hold')) return;
+  const bx = birdScreenX();
+  const left = state.lane > 0 ? Math.max(0, bx - OWN_ZONE) : 0;
+  const right = state.lane < LANES.length - 1 ? Math.max(0, 1 - (bx + OWN_ZONE)) : 0;
+  const mid = 1 - left - right;
+  const key = `${left.toFixed(3)}|${right.toFixed(3)}`;
+  if (key === zonesKey) return;
+  zonesKey = key;
+  zonesEl.style.gridTemplateColumns = `${left}fr ${mid}fr ${right}fr`;
+  zoneCols[0].style.visibility = left > 0.05 ? '' : 'hidden';
+  zoneCols[2].style.visibility = right > 0.05 ? '' : 'hidden';
+}
+
+// Small ripple where the finger touched, showing what the tap did.
+const tapFxPool = Array.from({ length: 4 }, () => {
+  const el = document.createElement('div');
+  el.className = 'tap-fx';
+  app.appendChild(el);
+  return el;
+});
+let tapFxNext = 0;
+function tapFx(x, y, dir) {
+  const el = tapFxPool[tapFxNext];
+  tapFxNext = (tapFxNext + 1) % tapFxPool.length;
+  el.textContent = dir < 0 ? '◀' : dir > 0 ? '▶' : '▲';
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
 }
 
 function tapDir(dir) {
@@ -814,7 +853,10 @@ canvas.addEventListener('pointerdown', (e) => {
   if (state.paused) return setPaused(false);
   const rect = canvas.getBoundingClientRect();
   const d = (e.clientX - rect.left) / rect.width - birdScreenX();
-  tapDir(Math.abs(d) <= OWN_ZONE ? 0 : Math.sign(d));
+  const dir = Math.abs(d) <= OWN_ZONE ? 0 : Math.sign(d);
+  const wasPlaying = state.mode === 'playing' && !state.hold;
+  tapDir(dir);
+  if (wasPlaying) tapFx(e.clientX - rect.left, e.clientY - rect.top, dir);
 });
 // Tapping the free area of the start screen starts right away; the panel's
 // buttons do their own thing.
@@ -1546,6 +1588,7 @@ function tick() {
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   updateToast(dt);
   updateHand();
+  updateZonesOverlay();
   biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);

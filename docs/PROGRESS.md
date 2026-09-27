@@ -711,3 +711,31 @@ Screenshots von Übersicht und Menü, keine Fehler. Regressions-Playtest unauff�
 
 **Beleg:** Kontaktbogen der vier Varianten und Maskenvorschau (Scratchpad `icon-sheet.png`,
 `icon-preview.png`). Die APK baut.
+
+### Iteration 18 – Steuerung verfeinert (dein Feedback „besser, aber nicht tip top“)
+
+**Befund:**
+- Ein Spurwechsel brauchte 0,25 s bis 95 % der Strecke (zum Vergleich: Subway Surfers liegt
+  bei etwa 0,15 s).
+- Die Tipp-Zonen richteten sich während eines Wechsels nach der Zwischenposition des Vogels.
+- Es gab kein sichtbares Feedback, was ein Tipp ausgelöst hat.
+- Die Zonen-Einblendung zeigte feste Drittel, auch wenn der Vogel in einer Außenspur war.
+
+**Was:**
+- **Schnellerer Spurwechsel:** 95 % der Strecke nach 0,17 s statt 0,25 s.
+- **Zonen richten sich nach der Zielspur:** Direkt nach „links“ zählt ein Tipp auf die neue
+  Position des Vogels als Flattern und nicht als weiterer Wechsel.
+- **Tipp-Feedback:** Ein kurzer Ring mit Pfeil (◀ ▲ ▶) erscheint dort, wo der Finger war, und
+  zeigt die ausgelöste Aktion.
+- **Zonen-Einblendung folgt dem Vogel:** In einer Außenspur gibt es nur noch „flattern“ und
+  „ausweichen“ zur anderen Seite.
+
+**Messung:**
+- Headless-Test „links tippen, dann sofort auf die Zielposition tippen“: Spur 0, Flügelschlag,
+  kein zweiter Wechsel ✓.
+- Bot-Playtest (100 Runs, vorher → nachher): Anfänger 16,1 → 16,1 s. Geübt 36,4 → 37,9 s, die
+  Tode oben an der Röhre sinken von 10 auf 5. Profi 90 → 91 % Überlebende.
+- Tutorial-E2E-Test weiterhin grün.
+
+Ob es sich „tip top“ anfühlt, zeigt nur das Handy. Konkrete Hinweise, was stört (Flattern zu
+stark oder schwach? Wechsel? Zonen?), helfen beim nächsten Schritt.
