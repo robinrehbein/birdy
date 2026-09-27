@@ -14,7 +14,7 @@ brauchst du die Entscheidungen unten.
 | Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-1024x500.png` (DE), `feature-1024x500-en.png` (EN) |
-| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Piranha-Pflanze, Regenbogen, Vogel-Werkstatt, Welten |
+| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 Bilder aus einem echten Run (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Zonen-Banner, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ Text unten; muss unter einer öffentlichen URL liegen |
 | Angaben zur Datensicherheit | ✅ unten |

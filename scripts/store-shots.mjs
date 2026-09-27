@@ -32,6 +32,13 @@ await page.addInitScript((lang) => {
 await page.goto(URL);
 await page.waitForTimeout(4000);
 await page.screenshot({ path: `${OUT}/screenshot-1-menu.png` });
+// Wait until no toast (achievement etc.) has been showing for a moment.
+async function noToast() {
+  for (let calm = 0; calm < 6;) {
+    await page.waitForTimeout(500);
+    calm = (await page.evaluate(() => document.getElementById('toast').classList.contains('show'))) ? 0 : calm + 1;
+  }
+}
 const until = (fn, arg, timeout = 400000) => page.waitForFunction(fn, arg, { timeout, polling: 100 });
 
 await page.click('#play-btn');
@@ -59,7 +66,7 @@ await until(() => window.__birdy.state.zone >= 1);
 await page.waitForTimeout(700);
 await page.screenshot({ path: `${OUT}/screenshot-3-herbstwald.png` });
 
-// A snapping piranha plant close enough to see (canyon or later).
+// A spiky cactus popped up close enough to see (canyon or later).
 await until(() => window.__birdy.state.zone >= 2);
 await until(() => {
   const B = window.__birdy;
@@ -69,7 +76,7 @@ await until(() => {
   const coinInFront = B.coins.some((c) => c.active && c.mesh.position.z > -9 && Math.abs(c.mesh.position.x - B.state.x) < 2);
   return plantNear && !coinInFront && B.state.power.mini <= 0;
 });
-await page.screenshot({ path: `${OUT}/screenshot-4-pflanze.png` });
+await page.screenshot({ path: `${OUT}/screenshot-4-kaktus.png` });
 
 // Rainbow power-up (the real effect, triggered as if picked up).
 await page.evaluate(() => window.__birdy.activatePower('star'));
@@ -86,10 +93,12 @@ await page.click('#shop-action');
 await page.click('.tab[data-tab="hat"]');
 await page.click('.skin[data-id="crown"]');
 await page.waitForTimeout(6000);
+await noToast();
 await page.screenshot({ path: `${OUT}/screenshot-6-shop.png` });
 await page.click('.tab[data-tab="world"]');
 await page.click('.skin[data-id="candy"]');
 await page.waitForTimeout(12000);
+await noToast();
 await page.screenshot({ path: `${OUT}/screenshot-7-welten.png` });
 await browser.close();
 console.log('done');
