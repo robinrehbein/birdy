@@ -42,6 +42,10 @@ Power-ups schweben in Blasen zwischen den Röhren:
 | 🧲 Magnet | 9 s lang werden Münzen angezogen |
 | 🍄 Mini | 9 s lang ist der Vogel kleiner und passt leichter durch Lücken |
 
+## Sprache
+
+Das Spiel gibt es auf **Deutsch und Englisch**. Die Sprache richtet sich nach dem Handy und lässt sich oben links (DE/EN) umschalten.
+
 ## Münzen, Vögel & Missionen
 
 - Gesammelte Münzen werden gespeichert (lokal auf dem Gerät, ohne Account).
@@ -97,6 +101,7 @@ Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus un
 - `src/bird.js` – Low-Poly-Vogel aus Grundkörpern inkl. Flügelanimation
 - `src/audio.js` – Musik und Soundeffekte per WebAudio (keine Audiodateien nötig)
 - `src/powerups.js` – Power-up-Definitionen und Modelle
+- `src/i18n.js` – Texte auf Deutsch/Englisch, Sprachwahl
 - `src/progress.js` – Münzen, Skins, Tagesmissionen (localStorage)
 - `src/bot.js` – Playtest-Bots (Anfänger / geübt / Profi) für die Headless-Simulation
 - `scripts/playtest.mjs`, `scripts/perf.mjs` – automatischer Bot-Playtest und Render-Budget-Messung

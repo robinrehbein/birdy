@@ -23,40 +23,38 @@
     </div>
 
     <button id="mute" type="button">🔊</button>
+    <button id="lang-btn" type="button">EN</button>
 
     <div id="wallet" class="wallet"><span class="coin-icon"></span><span id="wallet-count">0</span></div>
 
     <div id="start" class="panel-wrap menu">
       <div class="menu-title">
         <h1>Flap<span>sy</span></h1>
-        <p class="best">Rekord: <span id="best-start">0</span></p>
+        <p class="best"><span data-i18n="best">Rekord</span>: <span id="best-start">0</span></p>
       </div>
       <div class="panel">
         <div id="howto" class="howto">
           <div class="howto-zones"><span>◀</span><span>▲</span><span>▶</span></div>
-          <p class="controls">
-            Tippe auf <b>die Bahn des Vogels</b> zum Flattern,<br />
-            auf <b>eine andere Bahn</b> zum Wechseln.
-          </p>
-          <p class="controls small">Tastatur: Leertaste / ↑ flattern, ← → Spur</p>
-          <p class="powers-legend">🌈 unverwundbar · 🧲 Münz-Magnet · 🍄 Mini-Vogel</p>
+          <p class="controls" data-i18n-html="howto"></p>
+          <p class="controls small" data-i18n="keys"></p>
+          <p class="powers-legend" data-i18n="legend"></p>
         </div>
         <button id="gift-btn" class="gift hidden">🎁 Tagesgeschenk</button>
         <p id="streak" class="streak hidden"></p>
         <div id="missions-start" class="missions hidden"></div>
-        <button id="play-btn">Los geht's</button>
+        <button id="play-btn" data-i18n="play"></button>
         <div class="btn-row">
-          <button id="shop-btn" class="secondary">🐦 Shop</button>
-          <button id="ach-btn" class="secondary">🏆 Erfolge</button>
+          <button id="shop-btn" class="secondary" data-i18n="shop"></button>
+          <button id="ach-btn" class="secondary" data-i18n="achievements"></button>
         </div>
       </div>
     </div>
 
     <div id="achievements" class="panel-wrap menu hidden">
-      <div class="menu-title"><h2>Erfolge</h2><p class="best" id="ach-count">0 / 0</p></div>
+      <div class="menu-title"><h2 data-i18n="achTitle"></h2><p class="best" id="ach-count">0 / 0</p></div>
       <div class="panel">
         <div id="ach-list" class="ach-list"></div>
-        <button id="ach-back" class="secondary">Zurück</button>
+        <button id="ach-back" class="secondary" data-i18n="back"></button>
       </div>
     </div>
 
@@ -64,37 +62,37 @@
       <div class="menu-title"><h2 id="shop-name">Sunny</h2></div>
       <div class="panel">
         <div class="tabs">
-          <button class="tab on" data-tab="skins">🐦 Vögel</button>
-          <button class="tab" data-tab="trails">✨ Spuren</button>
+          <button class="tab on" data-tab="skins" data-i18n="tabSkins"></button>
+          <button class="tab" data-tab="trails" data-i18n="tabTrails"></button>
         </div>
         <div id="skins" class="skins"></div>
         <button id="shop-action">Ausgewählt</button>
-        <button id="shop-back" class="secondary">Zurück</button>
+        <button id="shop-back" class="secondary" data-i18n="back"></button>
       </div>
     </div>
 
     <div id="pause" class="panel-wrap hidden">
       <div class="panel">
-        <h2>Pause</h2>
-        <p class="controls">Tippen zum Weiterspielen</p>
+        <h2 data-i18n="pause"></h2>
+        <p class="controls" data-i18n="resume"></p>
       </div>
     </div>
 
     <div id="gameover" class="panel-wrap hidden">
       <div class="panel">
-        <h2>Game Over</h2>
+        <h2 data-i18n="gameOver"></h2>
         <div class="stats">
-          <div><small>Punkte</small><strong id="final-score">0</strong></div>
-          <div><small>Münzen</small><strong id="final-coins">0</strong></div>
-          <div><small>Rekord</small><strong id="final-best">0</strong></div>
+          <div><small data-i18n="score"></small><strong id="final-score">0</strong></div>
+          <div><small data-i18n="coins"></small><strong id="final-coins">0</strong></div>
+          <div><small data-i18n="best"></small><strong id="final-best">0</strong></div>
         </div>
-        <p id="new-best" class="hidden">Neuer Rekord!</p>
+        <p id="new-best" class="hidden" data-i18n="newBest"></p>
         <p id="to-best" class="hidden"></p>
         <p id="zone-reached" class="zone-reached"></p>
         <div id="next-unlock" class="next-unlock hidden"></div>
         <div id="missions-done" class="missions"></div>
-        <button id="retry-btn">Nochmal</button>
-        <button id="menu-btn" class="secondary">Menü</button>
+        <button id="retry-btn" data-i18n="again"></button>
+        <button id="menu-btn" class="secondary" data-i18n="menu"></button>
       </div>
     </div>
 
@@ -103,7 +101,7 @@
 
     <div id="rotate">
       <div class="phone"></div>
-      <p>Bitte Handy hochkant halten</p>
+      <p data-i18n="rotate"></p>
     </div>
 
     <script type="module" src="./src/main.js"></script>

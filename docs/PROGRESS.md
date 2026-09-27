@@ -926,3 +926,41 @@ rutscht.
 **Beleg:** Screenshot `haze.png`. Der obere Bildteil zeigt jetzt Himmel und Wolken statt einer
 grünen Wand; Review 4 hatte die Röhren dort auf rund 40 % der Bildfläche gemessen.
 Perf unverändert (170 Draw Calls), keine Fehler.
+
+### Iteration 24 – Deutsch und Englisch
+
+**Was:**
+- `src/i18n.js` mit rund 55 Texten in Deutsch und Englisch.
+  - Die Sprache kommt aus der Handysprache und bleibt nach Umschalten gespeichert.
+  - `t(key, {…})` für Texte mit Platzhaltern, `L({de,en})` für Datenobjekte.
+- Übersetzt sind:
+  - alle Menüs, Shop, Erfolge, Pause, Game-Over, Drehhinweis, Tutorial-Hand, Zonen-Hinweis
+  - Einblendungen („Knapp!“ / „Close call!“), Zonen-Banner und Namen
+  - Vögel, Spuren, Missionen und Erfolge (z. B. „Haarscharf“ / „Hair's Breadth“)
+- DE/EN-Knopf oben links; er ist im Run ausgeblendet und schaltet sofort um.
+
+**Beleg (`i18n.mjs`):**
+
+| Browser | Ergebnis |
+|---|---|
+| `de-DE` | deutsche Oberfläche |
+| `en-US` | englische Oberfläche („Birds / Trails“, „Awards“, „Again“, „bird “Sky” ready to unlock!“) |
+| Umschalten auf dem Game-Over | wechselt sofort |
+
+Keine Konsolenfehler. Beim Einbau ist ein Fehler aufgetreten (der Sprachcode landete im
+Klick-Handler des Ton-Knopfs); der Test hat ihn gefunden, er ist behoben.
+
+## Review 5 (nach Iteration 23) – Publisher-Subagent
+
+Urteil: **interner Test-Track ja, öffentlicher Soft Launch nein.**
+
+Neue Fehler aus meinen Iterationen 22 und 23:
+- Im Tutorial führt ein Tipp auf eine Seitenbahn in den Tod.
+- Ein Sprung über zwei Bahnen streift die Röhre der Mittelbahn.
+- Die Bodenmarkierungen liegen perspektivisch nicht auf den Tipp-Grenzen.
+- Der Dither-Dunst wirkt als grobes, flimmerndes Raster.
+
+**Namensrisiko:** „Flapsy“ ist die Figur aus *Dino Ranch*, und es gibt ein Röhren-Browserspiel
+gleichen Namens. Store-Note 4 wegen dieses Risikos.
+
+Als überhöht bewertet: Politur, Fairness, Onboarding, jeweils um einen Punkt.

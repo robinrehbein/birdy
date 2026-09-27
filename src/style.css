@@ -652,3 +652,18 @@ button.gift {
   #gameover .stats strong { font-size: 26px; }
 }
 #zones div.own { background: rgba(255, 241, 118, 0.18); }
+
+#lang-btn {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 70px;
+  z-index: 5;
+  font-size: 15px;
+  line-height: 1;
+  padding: 10px 10px;
+  border-width: 3px;
+  box-shadow: 0 3px 0 #543847;
+  background: rgba(222, 216, 149, 0.9);
+  color: #543847;
+  text-shadow: none;
+}

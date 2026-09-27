@@ -6,7 +6,7 @@ import { createParticles, createSpeedLines } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, SKINS, TRAILS, ACHIEVEMENTS } from './progress.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
-import { t } from './i18n.js';
+import { t, L, applyI18n, getLang, setLang } from './i18n.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -186,7 +186,7 @@ function renderWallet(bump = false) {
 function missionHTML(m, isNew = false) {
   const pct = Math.round((m.progress / m.goal) * 100);
   return `<div class="mission${m.done ? ' done' : ''}${isNew ? ' new' : ''}">
-    <span class="text">${m.text}</span><span class="reward">+${m.reward}</span>
+    <span class="text">${L(m.text)}</span><span class="reward">+${m.reward}</span>
     <span class="bar"><i style="width:${pct}%"></i></span></div>`;
 }
 
@@ -197,15 +197,15 @@ function renderStart() {
   $('howto').classList.toggle('hidden', !firstRuns);
   const ms = $('missions-start');
   ms.classList.toggle('hidden', firstRuns);
-  ms.innerHTML = '<h3>Tagesmissionen</h3>' + progress.missions().map((m) => missionHTML(m)).join('');
+  ms.innerHTML = `<h3>${t('missions')}</h3>` + progress.missions().map((m) => missionHTML(m)).join('');
   // Daily gift (from the second run on, so the first launch stays simple).
   const giftBtn = $('gift-btn');
   const streakEl = $('streak');
   const gift = !firstRuns && progress.giftAvailable();
   giftBtn.classList.toggle('hidden', !gift);
-  if (gift) giftBtn.textContent = `🎁 Tagesgeschenk · +${progress.giftAmount(progress.streak + 1)}`;
+  if (gift) giftBtn.textContent = t('gift', { n: progress.giftAmount(progress.streak + 1) });
   streakEl.classList.toggle('hidden', gift || progress.streak === 0);
-  streakEl.textContent = `🔥 Serie: Tag ${progress.streak} · morgen +${progress.giftAmount(progress.streak + 1)}`;
+  streakEl.textContent = t('streak', { d: progress.streak, n: progress.giftAmount(progress.streak + 1) });
   renderWallet();
 }
 
@@ -231,21 +231,21 @@ function renderShop() {
       : k.colors.length ? `linear-gradient(135deg, ${k.colors.map(hexColor).join(', ')})` : '#cbb968';
     const inner = shopTab === 'trails' && !k.colors.length ? '✕' : '';
     const price = owned ? '' : `<span class="price">${k.price}</span>`;
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${k.name}"><span class="dot" style="background:${bg}">${inner}</span>${price}</button>`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="dot" style="background:${bg}">${inner}</span>${price}</button>`;
   }).join('');
   const item = kind.list.find((k) => k.id === shopSel);
-  shopName.textContent = item.name;
+  shopName.textContent = L(item.name);
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
   if (!kind.owns(item.id)) {
-    shopAction.innerHTML = `Kaufen · ${item.price} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
+    shopAction.innerHTML = `${t('buy', { n: item.price })} <span class="coin-icon" style="display:inline-block;vertical-align:-3px;width:20px;height:20px"></span>`;
     shopAction.classList.add('buy');
     shopAction.disabled = progress.coins < item.price;
   } else if (item.id === kind.equipped) {
-    shopAction.textContent = 'Ausgewählt';
+    shopAction.textContent = t('selected');
     shopAction.disabled = true;
   } else {
-    shopAction.textContent = 'Auswählen';
+    shopAction.textContent = t('select');
   }
   // Live preview on the 3D bird.
   if (shopTab === 'skins') {
@@ -309,7 +309,7 @@ function renderAchievements() {
     const pct = Math.round((a.value / a.goal) * 100);
     return `<div class="ach${a.done ? ' done' : ''}">
       <span class="ach-icon">${a.done ? a.icon : '🔒'}</span>
-      <span class="ach-body"><b>${a.name}</b><small>${a.text}</small>
+      <span class="ach-body"><b>${L(a.name)}</b><small>${L(a.text)}</small>
         <span class="bar"><i style="width:${pct}%"></i></span></span>
       <span class="reward">${a.done ? '✓' : `+${a.reward}`}</span></div>`;
   }).join('');
@@ -327,7 +327,7 @@ $('ach-back').addEventListener('click', () => openAchievements(false));
 // Achievements earned outside a run (gift streak, unlocks) are paid at once.
 function celebrateMenuAchievements() {
   for (const a of progress.checkAchievements()) {
-    toast(`🏆 ${a.name} +${a.reward}`);
+    toast(`🏆 ${L(a.name)} +${a.reward}`);
     sfx.powerup();
   }
   renderWallet(true);
@@ -471,6 +471,7 @@ function resetGame() {
   overEl.classList.add('hidden');
   walletEl.classList.add('hidden');
   walletEl.classList.remove('over');
+  document.getElementById('lang-btn').classList.add('hidden');
   state.menu = 'start';
   bird.setSkin(progress.skin);
   updateLaneDots();
@@ -906,7 +907,7 @@ overEl.addEventListener('pointerdown', (e) => {
 
 function renderMute() {
   muteBtn.textContent = audio.muted ? '🔇' : '🔊';
-  muteBtn.setAttribute('aria-label', audio.muted ? 'Ton an' : 'Ton aus');
+  muteBtn.setAttribute('aria-label', audio.muted ? t('muteOn') : t('muteOff'));
 }
 muteBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
 muteBtn.addEventListener('click', () => {
@@ -915,6 +916,26 @@ muteBtn.addEventListener('click', () => {
   renderMute();
 });
 renderMute();
+
+// Language: German / English (device language by default).
+const langBtn = $('lang-btn');
+function renderLang() {
+  applyI18n();
+  langBtn.textContent = t('lang');
+  langBtn.setAttribute('aria-label', t('langLabel'));
+  renderMute();
+}
+langBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+langBtn.addEventListener('click', () => {
+  setLang(getLang() === 'de' ? 'en' : 'de');
+  renderLang();
+  zonesKey = '';
+  if (state.menu === 'shop') renderShop();
+  else if (state.menu === 'achievements') renderAchievements();
+  else if (state.mode === 'over') renderNextUnlock();
+  else renderStart();
+});
+renderLang();
 
 // Android back button: pause a run, leave a paused run / shop / game over
 // to the menu, and close the app from the menu.
@@ -929,6 +950,7 @@ function goToMenu() {
   achEl.classList.add('hidden');
   startEl.classList.remove('hidden');
   walletEl.classList.remove('hidden', 'over');
+  langBtn.classList.remove('hidden');
   zonesEl.classList.remove('hold', 'show');
   marker.visible = false;
   showHand(null);
@@ -1015,21 +1037,22 @@ function showGameOver() {
   const toBest = $('to-best');
   const missing = progress.best - state.score;
   toBest.classList.toggle('hidden', isBest || missing > 15 || progress.best < 5);
-  toBest.textContent = missing === 0 ? 'Rekord eingestellt!' : `Nur noch ${missing + 1} bis zum Rekord!`;
+  toBest.textContent = missing === 0 ? t('tieRecord') : t('toRecord', { n: missing + 1 });
   // Next goals: all of today's missions (just completed ones pop in), the
   // zone reached and the next thing to unlock.
   const doneNow = new Set(completed.map((m) => m.id));
   $('missions-done').innerHTML =
-    achievements.map((a) => `<div class="mission done new achievement"><span class="text">${a.icon} Erfolg: ${a.name}</span><span class="reward">+${a.reward}</span></div>`).join('') +
+    achievements.map((a) => `<div class="mission done new achievement"><span class="text">${a.icon} ${t('achUnlocked', { name: L(a.name) })}</span><span class="reward">+${a.reward}</span></div>`).join('') +
     progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
   const zoneLine = $('zone-reached');
   zoneLine.classList.toggle('hidden', state.zone === 0);
-  zoneLine.textContent = `Zone ${state.zone + 1} erreicht: ${BIOMES[state.zone % BIOMES.length].name}`;
+  zoneLine.textContent = t('zoneReached', { n: state.zone + 1, name: L(BIOMES[state.zone % BIOMES.length].name) });
   renderNextUnlock();
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
   walletEl.classList.remove('hidden');
   walletEl.classList.add('over');
+  langBtn.classList.remove('hidden');
   renderWallet(completed.length > 0 || achievements.length > 0 || state.coins > 0);
 }
 
@@ -1037,8 +1060,8 @@ function showGameOver() {
 function renderNextUnlock() {
   const el = $('next-unlock');
   const items = [
-    ...SKINS.filter((k) => !progress.owns(k.id)).map((k) => ({ ...k, kind: 'Vogel' })),
-    ...TRAILS.filter((t) => !progress.ownsTrail(t.id)).map((t) => ({ ...t, kind: 'Spur' })),
+    ...SKINS.filter((k) => !progress.owns(k.id)).map((k) => ({ ...k, kind: t('kindBird') })),
+    ...TRAILS.filter((x) => !progress.ownsTrail(x.id)).map((x) => ({ ...x, kind: t('kindTrail') })),
   ].sort((a, b) => a.price - b.price);
   const next = items[0];
   el.classList.toggle('hidden', !next);
@@ -1046,15 +1069,15 @@ function renderNextUnlock() {
   const pct = Math.min(100, Math.round((progress.coins / next.price) * 100));
   el.classList.toggle('ready', progress.coins >= next.price);
   el.innerHTML = progress.coins >= next.price
-    ? `<span class="text">✨ ${next.kind} „${next.name}“ jetzt freischaltbar! ›</span><span class="bar"><i style="width:100%"></i></span>`
-    : `<span class="text">Noch ${next.price - progress.coins} 🪙 bis ${next.kind} „${next.name}“</span><span class="bar"><i style="width:${pct}%"></i></span>`;
+    ? `<span class="text">${t('unlockReady', { kind: next.kind, name: L(next.name) })}</span><span class="bar"><i style="width:100%"></i></span>`
+    : `<span class="text">${t('unlockNext', { n: next.price - progress.coins, kind: next.kind, name: L(next.name) })}</span><span class="bar"><i style="width:${pct}%"></i></span>`;
 }
 
 function addScore(gate) {
   state.score++;
   if (state.score === progress.best + 1 && progress.best >= 5) {
     // Beat the record mid-run: celebrate right away.
-    toast('🏆 Neuer Rekord!');
+    toast(t('recordToast'));
     sfx.powerup();
     buzz(30);
   }
@@ -1099,7 +1122,7 @@ function nearMiss() {
   bumpCoins();
   sfx.near(state.nearChain - 1);
   buzz(15);
-  popup(state.nearChain > 1 ? `Knapp! ×${state.nearChain}` : 'Knapp!');
+  popup(state.nearChain > 1 ? `${t('near')} ×${state.nearChain}` : t('near'));
   particles.emit(birdPos, { count: 10, colors: [0xffffff, 0xfff176], speed: 5, size: 0.09, life: 0.4, gravity: 0 });
   checkMissions();
 }
@@ -1111,7 +1134,7 @@ function enterZone(zone) {
   state.zone = zone;
   const b = biomes.set(zone, 3);
   music.setTheme(zone);
-  zoneBanner.innerHTML = `<small>Zone ${zone + 1}</small>${b.name}`;
+  zoneBanner.innerHTML = `<small>${t('zone', { n: zone + 1 })}</small>${L(b.name)}`;
   zoneBanner.classList.remove('show');
   void zoneBanner.offsetWidth;
   zoneBanner.classList.add('show');
@@ -1130,13 +1153,13 @@ function checkMissions() {
     if (state.celebrated.has(id)) continue;
     state.celebrated.add(id);
     const m = progress.missions().find((x) => x.id === id);
-    toast(`✓ ${m.text} +${m.reward}`);
+    toast(`✓ ${L(m.text)} +${m.reward}`);
     sfx.powerup();
   }
   for (const a of progress.wouldUnlock(run)) {
     if (state.celebrated.has(`a:${a.id}`)) continue;
     state.celebrated.add(`a:${a.id}`);
-    toast(`🏆 ${a.name} +${a.reward}`);
+    toast(`🏆 ${L(a.name)} +${a.reward}`);
     sfx.powerup();
     buzz(25);
   }
@@ -1213,7 +1236,7 @@ function updatePlaying(dt) {
       tut.active = false;
       tut.step = '';
       progress.finishTutorial();
-      toast('Super! Jetzt allein weiter 🎉');
+      toast(t('tutDone'));
       sfx.powerup();
     }
   }

@@ -5,7 +5,7 @@ import * as THREE from 'three';
 // keep their colours so gameplay reads the same everywhere.
 export const BIOMES = [
   {
-    name: 'Stadtpark',
+    name: { de: 'Stadtpark', en: 'City Park' },
     scenery: 'park',
     top: 0x2a9bd0, horizon: 0xa6e4ea,
     hemiSky: 0xdff6ff, hemiGround: 0x6a8f3a, hemiI: 1.4,
@@ -13,7 +13,7 @@ export const BIOMES = [
     tint: 0xffffff, clouds: 0xffffff, grass: 0x73bf2e, track: 0xffffff,
   },
   {
-    name: 'Herbstwald',
+    name: { de: 'Herbstwald', en: 'Autumn Forest' },
     scenery: 'autumn',
     top: 0x4d6fc4, horizon: 0xffc08a,
     hemiSky: 0xffe2c8, hemiGround: 0x7a6a3a, hemiI: 1.35,
@@ -21,7 +21,7 @@ export const BIOMES = [
     tint: 0xfff0e2, clouds: 0xffd2dc, grass: 0x9aae36, track: 0xfff0dc,
   },
   {
-    name: 'Canyon',
+    name: { de: 'Canyon', en: 'Canyon' },
     scenery: 'canyon',
     top: 0x5b53b8, horizon: 0xf2a6cc,
     hemiSky: 0xebd8ff, hemiGround: 0x5d6a80, hemiI: 1.35,
@@ -29,7 +29,7 @@ export const BIOMES = [
     tint: 0xf6ecff, clouds: 0xf6dcff, grass: 0xd9a86a, track: 0xfff0e0,
   },
   {
-    name: 'Blütenhain',
+    name: { de: 'Blütenhain', en: 'Blossom Grove' },
     scenery: 'blossom',
     top: 0x36b3c9, horizon: 0xd6f6d2,
     hemiSky: 0xf0fff2, hemiGround: 0x6a9a4a, hemiI: 1.45,
