@@ -57,6 +57,8 @@ for (const skill of skills) {
     time: { median: +median(times).toFixed(1), p10: +pct(times, 0.1).toFixed(1), p90: +pct(times, 0.9).toFixed(1) },
     score: { median: median(scores), p10: pct(scores, 0.1), p90: pct(scores, 0.9), max: Math.max(...scores) },
     coins: median(res.map((r) => r.coins)),
+    // Share of runs that reached zone 2, 3 and 4 (index 1..3).
+    zonesReached: [1, 2, 3].map((z) => `${Math.round((100 * res.filter((r) => (r.zone || 0) >= z).length) / res.length)}%`).join(' / '),
     causes,
     deathsByScore: buckets,
   };

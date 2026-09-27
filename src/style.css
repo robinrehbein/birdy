@@ -551,3 +551,21 @@ button.gift {
 .tabs .tab.on { background: #f26b1d; }
 .panel .tabs button + button { margin-top: 0; }
 .skin .dot { display: flex; align-items: center; justify-content: center; color: #543847; font-size: 18px; }
+
+/* Game over: next goals. */
+.zone-reached { font-size: 16px; margin: -6px 0 8px; color: #f26b1d; }
+.next-unlock {
+  display: grid;
+  gap: 4px;
+  background: #fcb800;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #fff;
+  text-shadow: 0 2px 0 #543847;
+}
+.next-unlock .bar { height: 8px; border-radius: 4px; background: rgba(84, 56, 71, 0.3); overflow: hidden; }
+.next-unlock .bar i { display: block; height: 100%; background: #fff; }
+#gameover .missions { margin-bottom: 12px; }
+.next-unlock.ready { cursor: pointer; animation: pulse 0.9s infinite alternate; }

@@ -23,8 +23,8 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 1 | Onboarding | 7 | Geführter erster Run mit Geister-Hand und Einfrieren, per E2E-Test belegt. Offen: Test mit Menschen. |
 | 2 | Game Feel / Juice | 6 | Hit-Stop, Stretch, „Knapp!“, Vibration, Flugspuren. Aber: Die oberen Röhren füllen 40–50 % des Bildes, das Tempo ist kaum spürbar. |
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
-| 4 | Abwechslung | 5 | 4 Zonen mit eigener Szenerie und Musik, aber: Anfänger sehen Zone 2 selten, Zone 4 erreicht kaum jemand. Die Szenerie kommt ~8 s nach dem Banner an, deshalb mischen sich die Biome. |
-| 5 | Session-Loop | 7 | 0,8 s vom Crash zum nächsten Run. Aber: Der Game-Over-Screen zeigt kein nächstes Ziel. |
+| 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung: Zone 2 erreichen 47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59 % (vorher 26 %), Zone 4 zu 23 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
+| 5 | Session-Loop | 8 | 0,8 s vom Crash zum nächsten Run. Game-Over zeigt das nächste Ziel (Münzen bis zum nächsten Vogel oder zur nächsten Spur; wenn freischaltbar, führt ein Tipp direkt in den Shop), alle Tagesmissionen mit Balken und die erreichte Zone. „🏆 Neuer Rekord!“ erscheint schon während des Runs. |
 | 6 | Meta-Progression | 6 | 7 Vogel-Farben und 7 Flugspuren (zwei Kategorien, Reiter im Shop, Live-Vorschau), Missionen, Tagesgeschenk. Fehlt: nächstes Ziel sichtbar machen. |
 | 7 | Audio | 5 | 4 Zonen-Themen, Menü-Modus, Pegel gemessen. Nur Oszillator-Klänge, von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
@@ -33,16 +33,8 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 
 ## Backlog (nach Hebel sortiert)
 
-1. **Zonen erreichbar und sauber (Review 3, Punkt 1):**
-   - Zonen alle 10 statt 15 Reihen.
-   - Die Szenerie beim Anlegen der Zonen-Marke umstellen, damit sie beim Banner fertig ist.
-2. **Nächstes Ziel auf dem Game-Over-Screen:**
-   - Fortschritt zum nächsten Kauf.
-   - Offene Missionen mit Balken.
-   - Erreichte Zone.
-   - „Neuer Rekord!“ schon während des Runs.
-3. **Bildaufteilung:** Menü-Panel und Vogel, Shop-Kamera je nach Seitenverhältnis, Höhe der oberen Röhren.
-4. **Store-Screenshots mit Mechaniken,** ohne Inszenierung.
+1. **Bildaufteilung:** Menü-Panel und Vogel, Shop-Kamera je nach Seitenverhältnis, Höhe der oberen Röhren.
+2. **Store-Screenshots mit Mechaniken,** ohne Inszenierung.
 
 ## Review 1 (nach Iteration 3) – Publisher-Subagent
 
@@ -522,3 +514,32 @@ Rechte-Risiko; es war ausdrücklich „wie Mario“ gewünscht, deshalb ändere 
 - E2E-Test: Reiter wechseln, Konfetti kaufen (800 → 300 Münzen, ausgewählt), Konfetti-Spur im
   Spiel sichtbar. Keine Fehler.
 - Perf-Messung: 162 Draw Calls, 49,7k Dreiecke, erster Frame nach 0,79 s.
+
+### Iteration 14 – Zonen erreichbar, nächstes Ziel beim Game-Over (Review-3-Punkte 1 und 2)
+
+**Was:**
+- **Zonenwechsel alle 10 statt 15 Reihen.**
+- **Szenerie früher umgestellt:** Sie wechselt schon beim Anlegen der Zonen-Marke, also etwa
+  5 Reihen vorher. Die neue Umgebung beginnt dadurch genau dort, wo das Banner erscheint (vorher
+  kam sie rund 8 s später).
+- **Game-Over zeigt das nächste Ziel:**
+  - „Noch X 🪙 bis Vogel/Spur ‚Name‘“ mit Fortschrittsbalken.
+  - Ist das Ziel schon bezahlbar, erscheint „jetzt freischaltbar ›“; ein Tipp darauf führt direkt
+    in den Shop.
+  - Alle drei Tagesmissionen mit Balken; gerade erfüllte ploppen auf.
+  - „Zone N erreicht: Name“.
+- **„🏆 Neuer Rekord!“** erscheint sofort im Run, sobald der Rekord (mindestens 5) übertroffen
+  ist, mit Sound und Vibration.
+- **Playtest-Skript** misst jetzt, welcher Anteil der Runs die Zonen 2, 3 und 4 erreicht.
+
+**Messung (100 Runs je Bot, gleicher Bot-Code):**
+
+| Bot | Zone 2 | Zone 3 | Zone 4 | Überlebenszeit (Median) |
+|---|---|---|---|---|
+| Anfänger | 15 % → **47 %** | 0 % → 5 % | 0 % → 2 % | 17,4 s → 17,5 s |
+| Geübt | 91 % → **100 %** | 26 % → **59 %** | 1 % → **23 %** | 37,7 s → 37,4 s |
+| Profi | 100 % | 99 % | 96 % → 97 % | 91 % überleben |
+
+Die Schwierigkeit bleibt dabei gleich, die Überlebenszeiten sind praktisch unverändert.
+Screenshots: Beim Banner „Zone 2 · Herbstwald“ steht der Herbstwald schon komplett. Der
+Game-Over-Screen zeigt Rekord, Zone, nächstes Ziel und Missionen. Keine Fehler.

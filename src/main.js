@@ -36,7 +36,7 @@ const MAGNET_RANGE = 9;
 const STAR_SPEED_BOOST = 1.35;
 const GRACE_TIME = 1.2; // invulnerable blinking after the rainbow ends
 const FALLBACK_BPM = 124;
-const ZONE_ROWS = 15; // a new zone (time of day) every 15 rows, opened by a coin rush
+const ZONE_ROWS = 10; // a new zone (place + time of day) every 10 rows, opened by a coin rush
 const NEAR_MISS = 0.45; // gap clearance below which a pass counts as "Knapp!"
 const HIT_STOP = 0.14; // freeze-frame on impact (s)
 
@@ -604,7 +604,11 @@ function spawnRush(z) {
     const t = k / (pattern.length - 1);
     placeCoin(LANES[lane], 5 + Math.sin(t * Math.PI * 2) * 1.6, z + gap * 0.45 - t * gap * 0.9);
   });
-  zoneMarks.push({ z: z + gap * 0.45, zone: state.zone + zoneMarks.length + 1 });
+  const zone = state.zone + zoneMarks.length + 1;
+  zoneMarks.push({ z: z + gap * 0.45, zone });
+  // Switch the scenery now: chunks wrapping from here on are built in the new
+  // theme, so the new place starts right where the banner appears.
+  scenery.setTheme(BIOMES[zone % BIOMES.length].scenery);
   state.prevGaps = null; // plenty of time after the rush: no reach limit
 }
 
@@ -795,6 +799,12 @@ pauseEl.addEventListener('pointerdown', () => setPaused(false));
 overEl.addEventListener('pointerdown', (e) => {
   startAudio();
   if (e.target.closest('#menu-btn')) return;
+  if (e.target.closest('#next-unlock.ready')) {
+    // Straight to the shop when something can be unlocked.
+    goToMenu();
+    openShop(true);
+    return;
+  }
   if (state.mode === 'over' && performance.now() - state.overAt > 350) resetGame();
 });
 
@@ -869,7 +879,7 @@ function die(cause) {
   showHand(null);
   state.hitStop = HIT_STOP;
   buzz(70);
-  lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause };
+  lastRun = { score: state.score, coins: state.coins, time: state.runTime, cause, zone: state.zone };
   state.deadTimer = 0;
   state.shake = 0.5;
   state.vy = Math.max(state.vy, 6);
@@ -908,15 +918,43 @@ function showGameOver() {
   const missing = progress.best - state.score;
   toBest.classList.toggle('hidden', isBest || missing > 15 || progress.best < 5);
   toBest.textContent = missing === 0 ? 'Rekord eingestellt!' : `Nur noch ${missing + 1} bis zum Rekord!`;
-  $('missions-done').innerHTML = completed.map((m) => missionHTML(m, true)).join('');
+  // Next goals: all of today's missions (just completed ones pop in), the
+  // zone reached and the next thing to unlock.
+  const doneNow = new Set(completed.map((m) => m.id));
+  $('missions-done').innerHTML = progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
+  $('zone-reached').textContent = `Zone ${state.zone + 1} erreicht: ${BIOMES[state.zone % BIOMES.length].name}`;
+  renderNextUnlock();
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
   walletEl.classList.remove('hidden');
   renderWallet(completed.length > 0 || state.coins > 0);
 }
 
+// The cheapest cosmetic not owned yet, as a goal on the game-over screen.
+function renderNextUnlock() {
+  const el = $('next-unlock');
+  const items = [
+    ...SKINS.filter((k) => !progress.owns(k.id)).map((k) => ({ ...k, kind: 'Vogel' })),
+    ...TRAILS.filter((t) => !progress.ownsTrail(t.id)).map((t) => ({ ...t, kind: 'Spur' })),
+  ].sort((a, b) => a.price - b.price);
+  const next = items[0];
+  el.classList.toggle('hidden', !next);
+  if (!next) return;
+  const pct = Math.min(100, Math.round((progress.coins / next.price) * 100));
+  el.classList.toggle('ready', progress.coins >= next.price);
+  el.innerHTML = progress.coins >= next.price
+    ? `<span class="text">✨ ${next.kind} „${next.name}“ jetzt freischaltbar! ›</span><span class="bar"><i style="width:100%"></i></span>`
+    : `<span class="text">Noch ${next.price - progress.coins} 🪙 bis ${next.kind} „${next.name}“</span><span class="bar"><i style="width:${pct}%"></i></span>`;
+}
+
 function addScore(gate) {
   state.score++;
+  if (state.score === progress.best + 1 && progress.best >= 5) {
+    // Beat the record mid-run: celebrate right away.
+    toast('🏆 Neuer Rekord!');
+    sfx.powerup();
+    buzz(30);
+  }
   const lane = gate.lanes[state.lane];
   if (lane.hasPlant) state.run.plants++;
   if (lane.amp) state.run.moving++;
@@ -1449,7 +1487,7 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
       if (act) tap(act.lane ?? state.lane);
       step(dt);
     }
-    results.push(lastRun ?? { score: state.score, coins: state.coins, time: state.runTime, cause: 'timeout' });
+    results.push(lastRun ?? { score: state.score, coins: state.coins, time: state.runTime, cause: 'timeout', zone: state.zone });
     state.mode = 'over';
   }
   return results;
