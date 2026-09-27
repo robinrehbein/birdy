@@ -763,5 +763,5 @@ stark oder schwach? Wechsel? Zonen?), helfen beim nächsten Schritt.
 | Blütenhain | −32,5 → −29,5 dBFS | 0,43 → 0,57 | 1,1 → 0,9 % |
 
 Der Klang ist voller und weicher, ohne Übersteuerung; die Themen bleiben innerhalb von 1,5 dB.
-Das Spiel läuft ohne Audiofehler (Juice-Test). Die WAVs liegen zum Anhören im Scratchpad
+Live-Spieltest mit Musik und Effekten (`audiolive.mjs`): keine Fehler, der Takt läuft mit. Nebenbei sind die letzten Three.js-Warnungen behoben (`Timer` statt des veralteten `Clock`, `PCFShadowMap`), die Konsole ist jetzt leer. Die WAVs liegen zum Anhören im Scratchpad
 unter `audio2/`.

@@ -59,7 +59,7 @@ try {
 } catch { /* storage unavailable */ }
 renderer.setPixelRatio(Math.min(QUALITY_DPR[0], QUALITY_DPR[Math.min(quality, QUALITY_DPR.length - 1)]));
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 if (quality >= QUALITY_DPR.length) renderer.shadowMap.enabled = false;
 
 const scene = createScene();
@@ -1490,7 +1490,7 @@ function resize() {
 window.addEventListener('resize', resize);
 resize();
 
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
 camera.position.set(0, 6.2, 6.5);
 music.setMode('menu'); // calm version until the first run starts
 renderStart();
@@ -1568,7 +1568,8 @@ function toggleFps(on) {
 }
 
 function tick() {
-  const rawDt = clock.getDelta();
+  timer.update();
+  const rawDt = timer.getDelta();
   const dt = Math.min(rawDt, 1 / 30);
   adaptQuality(rawDt);
   if (landscapeTouch.matches || state.paused) {
