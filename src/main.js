@@ -6,6 +6,7 @@ import { createParticles, createSpeedLines } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, SKINS, TRAILS, ACHIEVEMENTS } from './progress.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
+import { t } from './i18n.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -500,7 +501,7 @@ const handLabel = handEl.querySelector('.label');
 
 function showHand(mode) {
   handEl.className = mode ? `show ${mode}` : '';
-  handLabel.innerHTML = mode === 'flap' ? 'Tippen = flattern' : mode === 'side' ? 'Daneben tippen<br>= ausweichen' : '';
+  handLabel.innerHTML = mode === 'flap' ? t('handFlap') : mode === 'side' ? t('handSide') : '';
 }
 
 function updateHand() {
@@ -508,7 +509,7 @@ function updateHand() {
   tmpProj.set(state.x, state.y, 0).project(camera);
   const bx = (tmpProj.x + 1) / 2;
   const by = (1 - tmpProj.y) / 2;
-  const x = handEl.classList.contains('side') ? Math.max(0.2, bx - 0.28) : bx;
+  const x = handEl.classList.contains('side') ? Math.max(0.2, screenX(LANES[0], state.y)) : bx;
   handEl.style.left = `${x * 100}%`;
   handEl.style.top = `${(by + 0.06) * 100}%`;
 }
@@ -736,34 +737,45 @@ function flap() {
   sfx.flap();
 }
 
-// Touch controls are relative to where the bird is drawn: a tap near the
-// bird flaps, a tap left or right of it moves one lane that way with a small
-// hop (so dodging sideways never throws the bird into the upper pipe).
-const OWN_ZONE = 0.18; // half-width of the "flap" zone around the bird (screen fraction)
+// Touch controls: the camera never pans sideways, so each lane keeps a fixed
+// place on screen (about 20 % / 50 % / 80 % of the width). Tap the lane you
+// want to be in: your own lane flaps, another lane moves there with a small
+// hop. A tap close to the bird as drawn always flaps, even while it is still
+// sliding between lanes, so flapping never changes lanes by accident.
+const NEAR_BIRD = 0.12; // screen fraction around the drawn bird that always flaps
 const tmpProj = new THREE.Vector3();
-// Zones are centred on the lane the bird is heading to (not its in-between
-// position during a switch), so quick tap sequences behave predictably.
-function birdScreenX() {
-  tmpProj.set(LANES[state.lane], state.y, 0).project(camera);
+function screenX(x, y) {
+  tmpProj.set(x, y, 0).project(camera);
   return (tmpProj.x + 1) / 2;
 }
+// Lane boundaries on screen at the bird's depth.
+function laneBounds() {
+  const xs = LANES.map((x) => screenX(x, state.y));
+  return [(xs[0] + xs[1]) / 2, (xs[1] + xs[2]) / 2];
+}
+function laneAtScreen(x) {
+  const [b1, b2] = laneBounds();
+  const lane = x < b1 ? 0 : x < b2 ? 1 : 2;
+  return Math.abs(x - screenX(state.x, state.y)) <= NEAR_BIRD ? state.lane : lane;
+}
 
-// The zone hint follows the bird: flap zone around it, dodge zones beside it
-// (none towards the edge in an outer lane).
+// The zone hint shows the three lanes: "flattern" on the bird's lane,
+// arrows on the others.
 const zoneCols = [...zonesEl.children];
 let zonesKey = '';
 function updateZonesOverlay() {
   if (!zonesEl.classList.contains('show') && !zonesEl.classList.contains('hold')) return;
-  const bx = birdScreenX();
-  const left = state.lane > 0 ? Math.max(0, bx - OWN_ZONE) : 0;
-  const right = state.lane < LANES.length - 1 ? Math.max(0, 1 - (bx + OWN_ZONE)) : 0;
-  const mid = 1 - left - right;
-  const key = `${left.toFixed(3)}|${right.toFixed(3)}`;
+  const [b1, b2] = laneBounds();
+  const key = `${b1.toFixed(3)}|${b2.toFixed(3)}|${state.lane}`;
   if (key === zonesKey) return;
   zonesKey = key;
-  zonesEl.style.gridTemplateColumns = `${left}fr ${mid}fr ${right}fr`;
-  zoneCols[0].style.visibility = left > 0.05 ? '' : 'hidden';
-  zoneCols[2].style.visibility = right > 0.05 ? '' : 'hidden';
+  zonesEl.style.gridTemplateColumns = `${b1}fr ${b2 - b1}fr ${1 - b2}fr`;
+  zoneCols.forEach((col, i) => {
+    const own = i === state.lane;
+    col.querySelector('b').textContent = own ? '▲' : i < state.lane ? '◀' : '▶';
+    col.querySelector('span').textContent = own ? t('zoneFlap') : t('zoneMove');
+    col.classList.toggle('own', own);
+  });
 }
 
 // Small ripple where the finger touched, showing what the tap did.
@@ -785,16 +797,16 @@ function tapFx(x, y, dir) {
   el.classList.add('show');
 }
 
-function tapDir(dir) {
+// Tap on a lane: the own lane flaps, another lane moves there with a hop.
+function tapLane(lane) {
   if (state.hold) return flap(); // first tap just starts
   if (tut.step === 'switch') {
-    if (dir === 0) return; // frozen until the player taps beside the bird
+    if (lane === state.lane) return; // frozen until the player taps another lane
     tut.step = 'go';
     showHand(null);
   }
-  const target = state.lane + dir;
-  if (state.mode === 'playing' && !state.paused && dir !== 0 && target >= 0 && target < LANES.length) {
-    setLane(target);
+  if (state.mode === 'playing' && !state.paused && lane !== state.lane) {
+    setLane(lane);
     state.vy = Math.max(state.vy, SWITCH_HOP);
     state.wingSpeed = 26;
     state.squash = 0.5;
@@ -803,9 +815,9 @@ function tapDir(dir) {
   flap();
 }
 
-// Lane-based variant used by the playtest bots: one step towards `lane`.
+// Used by the playtest bots.
 function tap(lane) {
-  tapDir(Math.sign(lane - state.lane));
+  tapLane(lane);
 }
 
 function updateLaneDots() {
@@ -855,16 +867,14 @@ canvas.addEventListener('pointerdown', (e) => {
   startAudio();
   if (state.paused) return setPaused(false);
   const rect = canvas.getBoundingClientRect();
-  const d = (e.clientX - rect.left) / rect.width - birdScreenX();
-  const dir = Math.abs(d) <= OWN_ZONE ? 0 : Math.sign(d);
+  const from = state.lane;
+  const lane = laneAtScreen((e.clientX - rect.left) / rect.width);
   const wasPlaying = state.mode === 'playing' && !state.hold;
-  tapDir(dir);
+  tapLane(lane);
   if (wasPlaying) {
-    // Show it at the bird (the finger would hide it), nudged in the direction.
-    tmpProj.set(state.x, state.y, 0).project(camera);
-    const bx = ((tmpProj.x + 1) / 2) * rect.width;
-    const by = ((1 - tmpProj.y) / 2) * rect.height;
-    tapFx(bx + dir * rect.width * 0.14, by, dir);
+    // Feedback at the lane the bird goes to (the finger would hide it).
+    tmpProj.set(LANES[lane], state.y, 0).project(camera);
+    tapFx(((tmpProj.x + 1) / 2) * rect.width, ((1 - tmpProj.y) / 2) * rect.height, Math.sign(lane - from));
   }
 });
 // Tapping the free area of the start screen starts right away; the panel's
@@ -1428,8 +1438,9 @@ function updateCamera(dt) {
   } else {
     // Camera sits above and behind the bird so it stays in the lower third
     // and the gaps ahead remain visible (Temple Run / Subway Surfers style).
-    camTarget.set(state.x * 0.5, 7.5 + state.y * 0.6, 14);
-    camLook.set(state.x * 0.7, 1.8 + state.y * 0.6, -22);
+    // No sideways panning: lanes keep a fixed place on screen for tapping.
+    camTarget.set(0, 7.5 + state.y * 0.6, 14);
+    camLook.set(0, 1.8 + state.y * 0.6, -22);
   }
   const k = Math.min(1, dt * (state.mode === 'ready' ? 3.5 : 6));
   camera.position.lerp(camTarget, k);

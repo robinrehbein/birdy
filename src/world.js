@@ -87,6 +87,11 @@ function makeGroundTexture() {
     g.lineTo(x1, i + 128);
     g.stroke();
   }
+  // Lane markings between the three lanes (x = ±1.5 in world units).
+  g.fillStyle = 'rgba(255, 250, 225, 0.85)';
+  for (const lx of [256 - 29.5, 256 + 29.5]) {
+    for (let y = 0; y < 128; y += 64) g.fillRect(lx - 2.5, y, 5, 38);
+  }
   // track borders
   g.fillStyle = '#9ce659';
   g.fillRect(x0 - 10, 0, 10, 128);

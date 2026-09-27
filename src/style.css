@@ -651,3 +651,4 @@ button.gift {
   #gameover h2 { font-size: 38px; margin-bottom: 10px; }
   #gameover .stats strong { font-size: 26px; }
 }
+#zones div.own { background: rgba(255, 241, 118, 0.18); }

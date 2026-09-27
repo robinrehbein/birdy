@@ -865,3 +865,50 @@ Deine Vorgaben:
   Figur „Flapsy“ aus *Dino Ranch* (Disney Junior).
 - Dazu die Nähe zu „Flappy Bird“.
 - Vor dem Launch ist eine Markenrecherche Pflicht.
+
+### Iteration 22 – Steuerung: Bahnen sicher treffen und halten (dein Feedback)
+
+**Befund** (Monte-Carlo-Modell mit echter Kamera-Projektion, `proj2.mjs`):
+- Die Kamera schwenkte seitlich mit. Dadurch lagen die Bahnen auf dem Bildschirm nur bei
+  38 / 50 / 62 % der Breite, und alles wanderte während eines Wechsels.
+- Seit Iteration 18 hingen die Zonen an der Zielbahn, während der Vogel noch sichtbar
+  dazwischen flog. Ein Flatter-Tipp auf den sichtbaren Vogel wechselte dann in 8–10 % der
+  Fälle ungewollt die Bahn.
+- Genau dieses Verhalten hast du als „schwer, die Bahn zu halten“ beschrieben. Der Fehler kam
+  aus meiner Änderung in Iteration 18.
+
+**Was:**
+- **Kamera ohne seitliches Mitschwenken:** Die Bahnen liegen fest bei etwa 20 / 50 / 80 % der
+  Breite.
+- **„Tippe auf die Bahn“:** Die eigene Bahn lässt den Vogel flattern, eine andere Bahn wechselt
+  direkt dorthin, auch zwei Bahnen weit.
+- **Ein Tipp nahe am sichtbaren Vogel** (±12 % der Breite) lässt ihn immer flattern, auch
+  während er noch rutscht.
+- **Bahnmarkierungen** auf der Strecke; die Zonen-Einblendung zeigt die Bahnen (▲ flattern,
+  ◀/▶ hierhin) und hebt die eigene Bahn hervor.
+- Tipp-Feedback an der Zielbahn, Tutorial-Hand an der linken Bahn, neuer Anleitungstext.
+- `src/i18n.js` ist angelegt; die Zonen- und Tutorial-Texte sind schon zweisprachig.
+
+**Messung (Modell, Tipp-Streuung σ = 6 % der Breite; 30 % der Tipps fallen in einen laufenden Wechsel):**
+
+| Variante | Ungewollter Wechsel beim Flattern | Gewollter Wechsel klappt |
+|---|---|---|
+| vorher | 8,0 % | 97,1 % |
+| **nachher** | **1,0–1,7 %** | 93 % |
+
+Gewollte Wechsel scheitern nur noch bei extrem schnellen Umkehr-Tipps, solange der Vogel noch
+rutscht.
+
+**Headless-Test (`lanes.mjs`):**
+
+| Tipp | Ergebnis |
+|---|---|
+| linke Bahn | Bahn 0 ✓ |
+| sofort danach auf den noch rutschenden Vogel | bleibt in Bahn 0 und flattert ✓ |
+| rechte Bahn | direkt Bahn 2 ✓ |
+| Mitte | Bahn 1 ✓ |
+
+**Regressionen:**
+- Tutorial-E2E-Test ✓.
+- Bot-Playtest (100 Runs): Anfänger 17,4 s, Geübt 36,1 s, Profi 94 % Überlebende.
+- 170 Draw Calls, keine Fehler.
