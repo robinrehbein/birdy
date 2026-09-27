@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
-import { createParticles, createSpeedLines, createImpact } from './effects.js';
+import { createParticles, createSpeedLines, createImpact, createAura } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, ACHIEVEMENTS } from './progress.js';
 import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
@@ -16,7 +16,7 @@ import {
   createScenery,
   createClouds,
   createGate,
-  createCoin,
+  createCoinField,
   setPipeStyle,
   createPipePreview,
 } from './world.js';
@@ -79,6 +79,7 @@ const clouds = createClouds(scene);
 const particles = createParticles(scene);
 const speedLines = createSpeedLines(scene);
 const impact = createImpact(scene, camera);
+const aura = createAura(scene, camera);
 const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
 const zoneMarks = []; // { z, zone } – where the next zone begins
 // The first zone (and every fourth) is the world chosen in the shop.
@@ -140,7 +141,8 @@ const gates = Array.from({ length: 12 }, () => {
   g.active = false;
   return g;
 });
-const coins = Array.from({ length: 60 }, () => createCoin(scene));
+const coinField = createCoinField(scene, 60);
+const coins = coinField.coins;
 const pickups = POWERUP_TYPES.flatMap((type) => [createPowerupPickup(scene, type), createPowerupPickup(scene, type)]);
 
 // --- DOM --------------------------------------------------------------------
@@ -1719,6 +1721,10 @@ function updateBirdVisual(dt) {
       particles.emit(trailPos, { count: 1, colors: trail.colors, speed: trail.speed, size: trail.size * 2, life: trail.life * 1.2, gravity: trail.gravity, drag: 1, drift });
     }
   }
+  // Power-up aura (rainbow first, then magnet, then mini).
+  const p = state.power;
+  const auraKind = state.mode !== 'playing' ? null : p.star > 0 ? 'star' : p.magnet > 0 ? 'magnet' : p.mini > 0 ? 'mini' : null;
+  aura.update(auraKind, g.position, state.time, state.baseScale);
   // Blink during the grace period after the rainbow ends.
   g.visible = !(state.grace > 0 && Math.floor(state.time * 12) % 2 === 0);
 }
@@ -1929,6 +1935,7 @@ function update(rawDt) {
   biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
+  coinField.sync();
 }
 
 // Screenshot scripts: `freeze` stops real-time updates (frames are still

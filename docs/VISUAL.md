@@ -99,7 +99,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 19 | 5/8 | mittel | Pause und Game Over dunkeln das Spiel nicht ab. | Scrim und Scale-In | ✅ It. 3 (Scrim) |
 | 20 | 9 | mittel | Toasts und Zonenbanner liegen auf den Hindernissen. | Toast kompakt unter dem HUD, Banner kürzer und höher | offen |
 | 21 | 2 | mittel | Die Stadt besteht aus grauen Quadern, die im Shop riesig wirken. | Fenster, Dächer, Pastelltöne | offen |
-| 22 | 7 | mittel | Das Regenbogen-Power-up zeigt nur Farbe, der Magnet ist unsichtbar, die Speed-Lines sind schwach. | Regenbogen-Band, Magnet-Ring, kräftigere Linien | offen |
+| 22 | 7 | mittel | Das Regenbogen-Power-up zeigt nur Farbe, der Magnet ist unsichtbar, die Speed-Lines sind schwach. | Regenbogen-Band, Magnet-Ring, kräftigere Linien | ✅ It. 10 (Aura, Linien) |
 | 23 | 3 | niedrig | Münzen ohne Rand und Prägung. | Rand und Prägung, Glanz | offen |
 | 24 | 10 | niedrig | Im Icon ist der Vogel angeschnitten, der Schnabel wirkt wie Lippen. | Vogel vollständig, mit Outline | ✅ It. 1 |
 | 25 | 10 | niedrig | Die Feature-Grafik ist leer, und das Logo ist anders gefärbt als im Menü. | Logo wie im Menü, Vogel vollständig | ✅ It. 1 |
@@ -523,3 +523,48 @@ der Wolkenbank. Das ist reine Optik: Die Kollision nutzt die Lückenkanten und d
 - APK baut.
 
 **Neue Einschätzung:** Lesbarkeit 7 → 7, Hindernisse 6 → 6.
+
+### Iteration 10 – Power-up-Auren und Render-Budget (Bereich 7)
+
+**Warum:** Laut Review 1 und 2 hatten die Power-ups kaum eigene Effekte. Der Regenbogen färbte
+den Vogel nur, der Magnet war unsichtbar, und der Mini-Vogel ging fast verloren. Die Speed-Lines
+wirkten wie Kratzer.
+
+**Was:**
+- **Aura um den Vogel:** ein Ring, der immer zur Kamera zeigt. Ein Draw Call, nur während eines
+  Power-ups sichtbar.
+  - Regenbogen: Der Ring wechselt ständig die Farbe und pulsiert.
+  - Magnet: Rote Wellen laufen alle 0,6 s nach außen.
+  - Mini: ein lila pulsierender Ring, damit der kleine Vogel sichtbar bleibt.
+- **Speed-Lines:** gut 50 % dicker.
+- **Budget-Befund:**
+  - Das neue Messwerkzeug `scripts/perf-peak.mjs` misst den ungünstigsten Fall: später Run, alle
+    Zonen, alle Power-ups gleichzeitig, Crash.
+  - Ergebnis: **Schon die Basis lag dort bei 209 Draw Calls**, über dem Budget von 170. Die
+    normale Probe (`perf.mjs`) sieht nur den Anfang eines Runs (≈ 140).
+  - Behoben ohne sichtbaren Verlust:
+    - Alle Münzen sind jetzt ein einziges Instanced Mesh statt je ein Draw Call. Die Spiellogik
+      arbeitet weiter mit denselben Münz-Objekten.
+    - Obere Röhren, Münzen und Kaktus werfen keinen Sonnenschatten mehr. Der Schatten der oberen
+      Röhren fiel weit neben die Spuren, den Kaktus verdeckt ohnehin die Röhre.
+  - **Spitze jetzt 167–168 Draw Calls (Basis 209), 53 k Dreiecke (Budget 90 k).**
+
+![Iteration 10 vorher/nachher: Regenbogen, Magnet, Mini](visual/it10.jpg)
+
+**Messwerte:**
+- Playtest mit sechs Seeds, Basis gegen neu, je 50 Runs pro Stufe:
+
+  | Stufe | Basis (Mittel der Mediane) | Neu | Spanne Basis |
+  |---|---|---|---|
+  | Anfänger | 16,7 s | 16,8 s | 15,9–17,4 s |
+  | Geübt | 38,0 s | 36,2 s | 33,6–40,3 s |
+  | Profi | 142 Punkte, fast alle bis zum Zeitlimit | 144 Punkte | 141–144 |
+
+  Die Seeds streuen in beide Richtungen (Seed 47: Geübt 33,6 → 38,9 s; Seed 23: 35,0 → 30,6 s).
+  Die Münzlogik ist unverändert, die Abweichungen sind Rauschen. Keine Fehler.
+- Perf, normale Probe im direkten Wechsel: erster Frame 650 ms gegenüber 685 ms der Basis.
+  120–122 Draw Calls statt 131–143.
+- Die adaptive Qualitätsstufe ist unverändert (Pixelverhältnis und zuletzt Schatten aus).
+- APK baut.
+
+**Neue Einschätzung:** Effekte 5 → 6.

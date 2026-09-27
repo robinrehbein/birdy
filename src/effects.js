@@ -78,7 +78,7 @@ export function createParticles(scene, max = 300) {
 // Speed streaks: thin light lines beside and above the track that rush past
 // the camera. Their opacity follows how fast the run is.
 export function createSpeedLines(scene, count = 28) {
-  const geo = new THREE.BoxGeometry(0.07, 0.07, 3.6);
+  const geo = new THREE.BoxGeometry(0.11, 0.11, 3.6);
   const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false });
   const mesh = new THREE.InstancedMesh(geo, mat, count);
   mesh.frustumCulled = false;
@@ -188,4 +188,42 @@ function mergeSimple(geos) {
   out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   out.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   return out;
+}
+
+// Power-up aura around the bird (one billboard ring, drawn only while a
+// power-up is active): a colour-cycling rainbow ring, magnet waves that run
+// outwards, or a pulsing ring that keeps the tiny mini bird easy to spot.
+export function createAura(scene, camera) {
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.82, 1, 40),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false, toneMapped: false, fog: false, side: THREE.DoubleSide }),
+  );
+  ring.renderOrder = 9;
+  ring.visible = false;
+  scene.add(ring);
+  const col = new THREE.Color();
+  return {
+    // kind: 'star' | 'magnet' | 'mini' | null; `size` = bird scale.
+    update(kind, pos, time, size) {
+      ring.visible = !!kind;
+      if (!kind) return;
+      ring.position.copy(pos);
+      ring.quaternion.copy(camera.quaternion);
+      const m = ring.material;
+      if (kind === 'star') {
+        m.color.copy(col.setHSL((time * 1.5) % 1, 1, 0.6));
+        m.opacity = 0.75;
+        ring.scale.setScalar(size * (1.25 + 0.08 * Math.sin(time * 12)));
+      } else if (kind === 'magnet') {
+        const k = (time * 1.6) % 1; // a wave every 0.6 s
+        m.color.setHex(0xff4a4a);
+        m.opacity = 0.7 * (1 - k);
+        ring.scale.setScalar(size * (1 + 2.2 * k));
+      } else {
+        m.color.setHex(0xc58bff);
+        m.opacity = 0.85;
+        ring.scale.setScalar(size * (1.5 + 0.15 * Math.sin(time * 8)));
+      }
+    },
+  };
 }

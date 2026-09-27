@@ -647,12 +647,14 @@ function applyPipeMat(m) {
   m.roughness = pipeStyle?.metal ? 0.3 : 0.45;
 }
 
-function makePipeSegment(mat, capGeo) {
+// Upper pipes cast no sun shadow: it fell far beside the lanes, and skipping
+// it saves up to two draw calls per pipe in the shadow pass (budget).
+function makePipeSegment(mat, capGeo, castShadow = true) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(pipeBodyGeo, mat);
   const lip = new THREE.Mesh(capGeo, mat);
   for (const m of [body, lip]) {
-    m.castShadow = true;
+    m.castShadow = castShadow;
     m.receiveShadow = true;
   }
   g.add(body, lip);
@@ -808,7 +810,7 @@ function createPlant() {
   const group = new THREE.Group();
   const mat = cactusMaterial();
   const body = new THREE.Mesh(cactusGeo, mat);
-  body.castShadow = true;
+  body.castShadow = false; // sits inside the pipe, whose shadow covers it (render budget)
   group.add(body);
   group.visible = false;
   return { group, body, bristle: mat.userData.bristle };
@@ -848,7 +850,7 @@ export function createGate(scene) {
   applyPipeMat(mats.pipe);
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);
-    const top = makePipeSegment(mats.pipe, capAboveGeo);
+    const top = makePipeSegment(mats.pipe, capAboveGeo, false);
     bottom.g.position.x = x;
     top.g.position.x = x;
     const plant = createPlant();
@@ -995,10 +997,30 @@ const coinMat = new THREE.MeshStandardMaterial({
   flatShading: true,
 });
 
-export function createCoin(scene) {
-  const mesh = new THREE.Mesh(coinGeo, coinMat);
-  mesh.castShadow = true;
-  mesh.visible = false;
-  scene.add(mesh);
-  return { mesh, active: false };
+// All coins are drawn as one instanced mesh (a draw call each was the
+// biggest item in the render budget). The game moves plain Object3D proxies
+// (`coin.mesh`: position, rotation, scale, visible); sync() copies them over.
+export function createCoinField(scene, count) {
+  const inst = new THREE.InstancedMesh(coinGeo, coinMat, count);
+  inst.frustumCulled = false;
+  scene.add(inst);
+  const coins = Array.from({ length: count }, () => {
+    const mesh = new THREE.Object3D();
+    mesh.visible = false;
+    return { mesh, active: false };
+  });
+  return {
+    coins,
+    sync() {
+      let n = 0;
+      for (const c of coins) {
+        if (!c.mesh.visible) continue;
+        c.mesh.updateMatrix();
+        inst.setMatrixAt(n++, c.mesh.matrix);
+      }
+      inst.count = n;
+      inst.visible = n > 0;
+      inst.instanceMatrix.needsUpdate = true;
+    },
+  };
 }
