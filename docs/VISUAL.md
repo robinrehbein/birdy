@@ -85,7 +85,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 5 | 10 | hoch | Store-Screenshots ohne Rahmen, Hintergrund und Claim. | Gestaltete Screens DE/EN mit Claim | offen |
 | 6 | 6 | hoch | Emoji als Icons: Shop-Reiter, Schlösser, Toasts, Hand, Ton, Geschenk. | Eigenes SVG-Icon-Set | ⏸ Varianten zur Wahl |
 | 7 | 6 | hoch | Fließtexte in System-Schrift statt Hausschrift. | Einheitliche Schrift | ⏸ Varianten zur Wahl |
-| 8 | 7/8 | hoch | Beim Crash ist keine Rückmeldung sichtbar. | Treffer-Stern, Federn, Flash, Squash | offen |
+| 8 | 7/8 | hoch | Beim Crash ist keine Rückmeldung sichtbar. | Treffer-Stern, Federn, Flash, Squash | ✅ It. 4 |
 | 9 | 3 | hoch | Die Röhren blenden nach oben zu „grünen Lichtsäulen“ aus. | Röhren oben sauber enden lassen oder in den Himmel ausblenden | offen |
 | 10 | 2/3 | hoch | Alle Kaufwelten haben denselben beigen Weg und denselben Rand. | Weg-Palette je Welt | ⏸ Farbwelt (Rückfrage) |
 | 11 | 3 | hoch | Der Kaktus ist nicht erkennbar, Power-up-Blasen sind in der Ferne winzig. | Silhouette, Kontrast, Halo | offen |
@@ -279,3 +279,42 @@ trotzdem scrollen. Der Versatz blieb bis zum nächsten Bildschirm stehen.
 
 **Neue Einschätzung:** UI-System 6 → 7. Offen sind die Titelzeile, die bei 360 px mit der
 Münzanzeige kollidiert, Kacheln und Preise im Shop sowie die Icons (Rückfrage läuft).
+
+### Iteration 4 – Treffer-Feedback beim Crash (Bereich 7)
+
+**Warum:** Im Crash-Bild war keine Rückmeldung zu sehen (Mangel 8). Die Crash-Partikel waren
+außerdem immer gelb, auch beim roten Kardinal oder beim Pinguin.
+
+**Was:**
+- **„Bonk“-Stern:** ein Comic-Stern mit Plum-Kontur, weißer Fläche und gelbem Kern.
+  - Er sitzt auf der Seite, an der der Vogel anstößt: oben an der oberen Röhre, unten an Röhre,
+    Kaktus und Boden, vorne an einer gesperrten Spur.
+  - Er springt während des Freeze-Frames auf und blendet nach 0,5 s aus.
+  - Ein Mesh, das nur in diesem Moment gezeichnet wird (+1 Draw Call).
+- **Vogel:** Er wird im Freeze-Frame platt gestaucht (130 % breit, 72 % hoch).
+- **Federn:** Die Partikel haben die Farben des gewählten Vogels (Körper, Bauch, Flügel, Weiß)
+  statt immer Gelb. Es sind 36 statt 28, etwas länger in der Luft.
+- **Blitz:** Der weiße Blitz ist weicher (55 % statt 90 %), damit Stern und Vogel sichtbar
+  bleiben.
+
+![Iteration 4 vorher/nachher: Crash](visual/it4.jpg)
+
+**Messwerte:**
+- **Playtest:** Mehr Crash-Partikel verbrauchen andere Zufallszahlen. Deshalb ist der
+  Seed-Vergleich nicht mehr Run für Run gleich, sondern wird über drei Seeds verglichen (Basis
+  gegen neu):
+
+  | Seed | Anfänger | Geübt | Profi |
+  |---|---|---|---|
+  | 7 | 17,4 s / 9 → 17,5 s / 9 | 40,2 s / 23 → 37,4 s / 21 | 144 → 142 Punkte |
+  | 11 | 15,9 s / 8 → 15,9 s / 8 | 38,8 s / 22 → 37,6 s / 22 | 141 → 144 |
+  | 23 | 15,9 s / 8 → 16,1 s / 8 | 35,0 s / 20 → 36,3 s / 22 | 141 → 142 |
+
+  Die Abweichungen liegen in beide Richtungen und im Rauschen. Die Spiellogik ist nicht
+  verändert.
+- **Perf:** Im direkten Wechsel gemessen: erster Frame 733 ms gegenüber 738 ms der Basis.
+  136–139 Draw Calls, 41–42 k Dreiecke.
+- **APK:** baut.
+
+**Neue Einschätzung:** Effekte 4 → 5. Offen: Regenbogen-Band, Magnet-Ring, kräftigere
+Speed-Lines, Münz-Effekte.

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
-import { createParticles, createSpeedLines } from './effects.js';
+import { createParticles, createSpeedLines, createImpact } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, ACHIEVEMENTS } from './progress.js';
 import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
@@ -78,6 +78,7 @@ const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 const particles = createParticles(scene);
 const speedLines = createSpeedLines(scene);
+const impact = createImpact(scene, camera);
 const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
 const zoneMarks = []; // { z, zone } – where the next zone begins
 // The first zone (and every fourth) is the world chosen in the shop.
@@ -674,6 +675,7 @@ function resetGame() {
   bird.setGlow(null);
   music.setHype(false);
   particles.clear();
+  impact.clear();
 
   for (const g of gates) { g.active = false; g.group.visible = false; }
   for (const c of coins) { c.active = false; c.mesh.visible = false; }
@@ -1253,6 +1255,10 @@ document.addEventListener('visibilitychange', () => {
 const birdPos = new THREE.Vector3();
 const tmpColor = new THREE.Color();
 
+// Where the bonk star appears, relative to the bird, per cause of death:
+// on the side it hit, so the squashed bird stays visible next to it.
+const HIT_OFFSET = { 'pipe-top': [0.25, 0.8, 0], 'pipe-bottom': [0.25, -0.75, 0], plant: [0.25, -0.75, 0], ground: [0.25, -0.7, 0], blocked: [0.8, 0.45, -0.6] };
+const tmpHit = new THREE.Vector3();
 function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
@@ -1269,11 +1275,18 @@ function die(cause) {
   music.duck();
   music.setHype(false);
   bird.setGlow(null);
+  // Feathers in the bird's own colours, a "bonk" star where it hit, and the
+  // bird squashed flat for the freeze-frame.
+  const skin = progress.skin;
   particles.emit(birdPos, {
-    count: 28, colors: [0xf7d23e, 0xfff3c4, 0xf57c21], speed: 8, size: 0.14, life: 1.2, gravity: -9,
+    count: 36, colors: [skin.body, skin.body, skin.belly, skin.wing, 0xffffff], speed: 9, size: 0.15, life: 1.3, gravity: -8,
   });
+  const at = HIT_OFFSET[cause] || HIT_OFFSET.blocked;
+  impact.hit(tmpHit.set(state.x + at[0], state.y + at[1], at[2]));
+  const sc = bird.group.scale.x;
+  bird.group.scale.set(sc * 1.3, sc * 0.72, sc * 1.25);
   flash.style.transition = 'none';
-  flash.style.opacity = '0.9';
+  flash.style.opacity = '0.55';
   requestAnimationFrame(() => {
     flash.style.transition = 'opacity 0.35s';
     flash.style.opacity = '0';
@@ -1900,6 +1913,7 @@ function update(rawDt) {
     // Freeze-frame on impact; only the camera shake keeps going.
     state.hitStop -= rawDt;
     updateCamera(dt);
+    impact.update(dt);
     return;
   }
   step(dt, music.beat());
@@ -1908,6 +1922,7 @@ function update(rawDt) {
   const rush = state.mode === 'playing' && !state.hold
     ? Math.min(1, Math.max(0, (state.speed - 22) / 14) + (state.power.star > 0 ? 0.6 : 0)) : 0;
   speedLines.update(state.mode === 'playing' ? state.speed * dt : 0, rush);
+  impact.update(dt);
   updateToast(dt);
   updateHand();
   updateZonesOverlay();

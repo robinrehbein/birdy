@@ -109,3 +109,83 @@ export function createSpeedLines(scene, count = 28) {
     },
   };
 }
+
+// Crash feedback: a comic "bonk" star at the point of impact that pops up
+// during the freeze-frame and fades. One mesh, drawn only while needed.
+function starGeometry(points, outer, inner) {
+  const shape = new THREE.Shape();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 ? inner : outer;
+    const a = (i / (points * 2)) * Math.PI * 2 + Math.PI / 2;
+    if (i === 0) shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  return new THREE.ShapeGeometry(shape);
+}
+
+export function createImpact(scene, camera) {
+  // Bonk: plum outline star, white star, yellow core (baked, one draw call).
+  const layers = [
+    [starGeometry(8, 1.25, 0.62), 0x543847, 0],
+    [starGeometry(8, 1.08, 0.52), 0xffffff, 0.01],
+    [starGeometry(8, 0.62, 0.34), 0xffe14a, 0.02],
+  ];
+  const geos = layers.map(([g, hex, z]) => {
+    g.translate(0, 0, z);
+    const n = g.attributes.position.count;
+    const c = new THREE.Color(hex);
+    const col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.deleteAttribute('uv');
+    g.deleteAttribute('normal');
+    return g;
+  });
+  const bonkGeo = mergeSimple(geos);
+  const bonk = new THREE.Mesh(bonkGeo, new THREE.MeshBasicMaterial({
+    vertexColors: true, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false,
+  }));
+  bonk.renderOrder = 11;
+  bonk.visible = false;
+  scene.add(bonk);
+
+  let t = 1;
+  return {
+    // Impact at `pos` (world space).
+    hit(pos) {
+      t = 0;
+      bonk.position.copy(pos);
+      bonk.visible = true;
+      bonk.material.opacity = 1;
+      bonk.scale.setScalar(0.5);
+    },
+    update(dt) {
+      if (!bonk.visible) return;
+      t += dt;
+      bonk.quaternion.copy(camera.quaternion);
+      bonk.rotateZ(t * 1.5);
+      // Pops to full size right away, holds through the freeze, then fades.
+      bonk.scale.setScalar(0.5 + 0.3 * Math.min(1, t / 0.12));
+      bonk.material.opacity = 1 - THREE.MathUtils.smoothstep(t, 0.25, 0.5);
+      if (t > 0.5) bonk.visible = false;
+    },
+    clear() {
+      bonk.visible = false;
+    },
+  };
+}
+
+// Merge geometries that share the same attributes (position + color).
+function mergeSimple(geos) {
+  const out = new THREE.BufferGeometry();
+  const pos = [];
+  const col = [];
+  for (const g of geos) {
+    const gi = g.index ? g.toNonIndexed() : g;
+    pos.push(...gi.attributes.position.array);
+    col.push(...gi.attributes.color.array);
+  }
+  out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  out.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  return out;
+}
