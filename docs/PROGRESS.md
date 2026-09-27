@@ -687,3 +687,27 @@ bemängelten fehlende Langzeitziele.
 | Erneute Prüfung | keine Doppelvergabe ✓ |
 
 Screenshots von Übersicht und Menü, keine Fehler. Regressions-Playtest unauffällig.
+
+### Iteration 17 – Neues App-Icon (dein Wunsch)
+
+**Was:**
+- Vier Varianten mit dem echten 3D-Vogel gerendert und jeweils groß sowie in Launcher-Größe
+  (48 px) verglichen:
+
+  | Variante | Motiv | Ergebnis |
+  |---|---|---|
+  | A | Gesicht in Großaufnahme | stark, aber beliebig |
+  | B | Vogel zwischen grünen Röhren | zu nah an Flappy Bird, verworfen |
+  | **C** | **Vogel frontal vor Regenbogen und Sonnenuntergangshimmel** | **gewählt** |
+  | D | bisheriges Icon (Vogel im Ring) | Vogel in 48 px zu klein |
+
+- **Gewählt: C.** Der Vogel ist groß und frontal mit erhobenen Flügeln, vor Sonnenstrahlen und
+  Regenbogen. Das ist farbig, eigenständig, bei 48 px noch klar erkennbar und zeigt das
+  Regenbogen-Power-up.
+- **Adaptives Android-Icon** jetzt mit eigener Hintergrund-Ebene (Himmel und Regenbogen) statt
+  Farbfläche. Der Vogel liegt im Sicherheitsbereich; geprüft mit runder und abgerundeter Maske.
+- Legacy- und Rund-Icons, Store-Icon 512, Feature-Grafik und Splash sind neu gerendert. Die
+  Hintergrundfarbe des Android-12-Splashs ist an den Himmel angeglichen.
+
+**Beleg:** Kontaktbogen der vier Varianten und Maskenvorschau (Scratchpad `icon-sheet.png`,
+`icon-preview.png`). Die APK baut.
