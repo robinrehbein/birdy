@@ -929,6 +929,11 @@ function startAudio() {
 
 function setPaused(paused) {
   state.paused = paused;
+  if (paused) {
+    $('pause-score').textContent = state.score;
+    $('pause-coins').textContent = state.coins;
+    $('pause-zone').textContent = state.zone + 1;
+  }
   pauseEl.classList.toggle('hidden', !paused);
   audio.setSuspended(paused);
 }
@@ -1144,7 +1149,12 @@ $('play-btn').addEventListener('click', () => {
   startAudio();
   flap();
 });
-pauseEl.addEventListener('pointerdown', () => setPaused(false));
+// Pause: "Menü" leaves the run; a tap anywhere else (or "Weiter") resumes.
+pauseEl.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('#pause-menu-btn')) return;
+  setPaused(false);
+});
+$('pause-menu-btn').addEventListener('click', () => goToMenu());
 
 // Game over: tap anywhere (except "Menü") to go again, after a short delay
 // so a panicked tap at the moment of death doesn't skip the screen.

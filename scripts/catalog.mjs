@@ -217,7 +217,7 @@ for (const lang of LANGS) {
     // Pause, crash, game over.
     await page.evaluate(() => window.__birdy.handleBack(() => {}));
     await shot('17-pause', 400);
-    await page.mouse.click(size[0] / 2, size[1] / 2);
+    await page.mouse.click(size[0] / 2, size[1] * 0.12); // resume: tap outside the panel
     await page.evaluate(() => { window.__birdy.state.god = false; window.__pilot = () => {}; });
     await run(20, "B.state.mode === 'dead'");
     await run(0.1);

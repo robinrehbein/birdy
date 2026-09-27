@@ -744,3 +744,28 @@ gebacken und wird weiter als ein Instanced Draw Call gezeichnet.
 - Normale Probe: erster Frame 711 ms gegenüber 625 ms der Basis. Das ist Streuung im Headless-Test,
   der Median über 3 Messungen liegt unter +20 %.
 - APK baut.
+
+### Iteration 12 – Pause mit Inhalt, Zonenbanner auf einem Band (Bereiche 5 und 9)
+
+**Warum:**
+- Review 2 und 3 nannten das Pause-Panel leer: nur Titel und Hinweistext.
+- Das Zonenbanner hatte vor hellem oder violettem Himmel wenig Kontrast (Blütenhain).
+- Toasts hatten eine 3D-Kante wie Knöpfe. Laut Styleguide gehört die nur an klickbare
+  Elemente.
+
+**Was:**
+- **Pause:**
+  - Zeigt Punkte, Münzen und Zone des Runs.
+  - Darunter „Weiter“ (primär) und „Menü“ (sekundär).
+  - Ein Tipp irgendwo außer auf „Menü“ setzt das Spiel wie bisher fort.
+  - Neue Texte DE/EN: „Weiter“/„Continue“, „Zone“.
+- **Zonenbanner:** liegt auf einem Plum-Band (72 %) mit Kontur und ist vor jedem Himmel lesbar.
+- **Toasts:** flach, ohne 3D-Kante.
+
+![Iteration 12 vorher/nachher](visual/it12.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 11. Die Änderung betrifft nur UI.
+- Perf, erster Frame im direkten Wechsel: 658 ms gegenüber 682 ms der Basis. Bis zu 127 Draw
+  Calls.
+- APK baut.
