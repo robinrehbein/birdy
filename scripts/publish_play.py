@@ -42,9 +42,9 @@ def main():
     tracks_url = f"{BASE}/{edit_id}/tracks"
     available = {item["track"] for item in request(session, "GET", tracks_url).get("tracks", [])}
     closed_track = os.environ.get("PLAY_CLOSED_TRACK", "alpha")
-    if closed_track in {"qa", "beta", "production"} or ":" in closed_track:
+    if closed_track in {"internal", "beta", "production"} or ":" in closed_track:
         raise SystemExit("PLAY_CLOSED_TRACK must name a closed phone/tablet test track")
-    targets = ("qa", closed_track)
+    targets = ("internal", closed_track)
     for track in targets:
         if track not in available:
             raise SystemExit(f"Track {track!r} not found. Available tracks: {sorted(available)}")

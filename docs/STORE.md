@@ -91,7 +91,8 @@ Die GitHub-Pipeline vergibt bei jedem Lauf einen eigenen `versionCode` ab 100001
 Merge) ein signiertes Bundle und veröffentlicht es im internen Test und im geschlossenen
 Alpha-Test. Offener Test und Produktion bleiben ausgeschlossen, solange der Produktionszugriff
 fehlt. Ein manueller Start über GitHub Actions ist ebenfalls möglich. Das Workflow-Job startet
-erst, wenn die Repository-Variable `PLAY_PUBLISH_ENABLED` auf `true` gesetzt wurde.
+erst, wenn die Repository-Variable `PLAY_PUBLISH_ENABLED` auf `true` gesetzt wurde. Sie ist
+für dieses Repository aktiviert.
 
 Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
 Repository-Secrets benötigt:
@@ -107,8 +108,8 @@ Repository-Secrets benötigt:
 Das Google-Cloud-Projekt muss die **Google Play Developer API** aktiviert haben. Das Dienstkonto
 braucht in der Play Console die Berechtigung, Releases für Birdy in den Test-Tracks zu erstellen
 und zu veröffentlichen. Die Variable `PLAY_CLOSED_TRACK` kann den API-Namen des geschlossenen
-Tracks festlegen; Standard ist `alpha`. Vor dem Einschalten mit der API prüfen, ob der Track
-wirklich `alpha` heißt. Der Workflow validiert beide Tracks vor dem Commit und veröffentlicht
+Tracks festlegen; Standard ist `alpha`. Die Play API meldet `internal` und `alpha` als vorhandene
+Tracks. Der Workflow validiert beide Tracks vor dem Commit und veröffentlicht
 niemals in `production`.
 
 Secrets und Keystore-Dateien bleiben außerhalb von Git. Nach dem Einrichten einmal den
