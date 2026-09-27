@@ -4,7 +4,7 @@ import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
 import { createParticles } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
-import { progress, SKINS, TRAILS } from './progress.js';
+import { progress, SKINS, TRAILS, ACHIEVEMENTS } from './progress.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import {
   LANES,
@@ -289,6 +289,7 @@ shopAction.addEventListener('click', () => {
   const item = kind.list.find((k) => k.id === shopSel);
   if (kind.owns(item.id)) kind.select(item.id);
   else if (kind.buy(item.id)) {
+    setTimeout(celebrateMenuAchievements, 400);
     sfx.powerup();
     const colors = shopTab === 'skins' ? [item.body] : item.colors.length ? item.colors : [0xffffff];
     particles.emit(bird.group.position, { count: 30, colors: [...colors, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
@@ -296,10 +297,44 @@ shopAction.addEventListener('click', () => {
   renderShop();
 });
 $('shop-btn').addEventListener('click', () => { startAudio(); openShop(true); });
+
+// Achievements overview.
+const achEl = $('achievements');
+function renderAchievements() {
+  const list = progress.achievements();
+  $('ach-count').textContent = `${list.filter((a) => a.done).length} / ${list.length}`;
+  $('ach-list').innerHTML = list.map((a) => {
+    const pct = Math.round((a.value / a.goal) * 100);
+    return `<div class="ach${a.done ? ' done' : ''}">
+      <span class="ach-icon">${a.done ? a.icon : '🔒'}</span>
+      <span class="ach-body"><b>${a.name}</b><small>${a.text}</small>
+        <span class="bar"><i style="width:${pct}%"></i></span></span>
+      <span class="reward">${a.done ? '✓' : `+${a.reward}`}</span></div>`;
+  }).join('');
+}
+function openAchievements(open) {
+  state.menu = open ? 'achievements' : 'start';
+  achEl.classList.toggle('hidden', !open);
+  startEl.classList.toggle('hidden', open);
+  if (open) renderAchievements();
+  else renderStart();
+}
+$('ach-btn').addEventListener('click', () => { startAudio(); sfx.swoosh(); openAchievements(true); });
+$('ach-back').addEventListener('click', () => openAchievements(false));
+
+// Achievements earned outside a run (gift streak, unlocks) are paid at once.
+function celebrateMenuAchievements() {
+  for (const a of progress.checkAchievements()) {
+    toast(`🏆 ${a.name} +${a.reward}`);
+    sfx.powerup();
+  }
+  renderWallet(true);
+}
 $('gift-btn').addEventListener('click', () => {
   startAudio();
   const res = progress.claimGift();
   if (!res) return;
+  setTimeout(celebrateMenuAchievements, 600);
   sfx.powerup();
   for (let i = 0; i < 5; i++) setTimeout(() => sfx.coin(), 120 + i * 70);
   particles.emit(bird.group.position, { count: 36, colors: [0xfff176, 0xffd400, 0xffffff], speed: 7, size: 0.13, life: 0.9, gravity: -5 });
@@ -411,7 +446,7 @@ function resetGame() {
   music.setTheme(0);
   music.setMode('game');
   state.squash = 0;
-  state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0 };
+  state.run = { coins: 0, score: 0, powerups: 0, plants: 0, moving: 0, starRows: 0, near: 0, bestChain: 0, zone: 0 };
   state.celebrated = new Set();
   bird.group.rotation.set(0, 0, 0);
   bird.group.visible = true;
@@ -830,6 +865,7 @@ function goToMenu() {
   hud.classList.add('hidden');
   overEl.classList.add('hidden');
   shopEl.classList.add('hidden');
+  achEl.classList.add('hidden');
   startEl.classList.remove('hidden');
   walletEl.classList.remove('hidden');
   zonesEl.classList.remove('hold', 'show');
@@ -850,6 +886,7 @@ function handleBack(exitApp) {
   if (state.mode === 'playing' && !state.paused) setPaused(true);
   else if (state.paused || state.mode === 'over' || state.mode === 'dead') goToMenu();
   else if (state.menu === 'shop') openShop(false);
+  else if (state.menu === 'achievements') openAchievements(false);
   else exitApp();
 }
 if (window.Capacitor?.isNativePlatform?.()) {
@@ -904,7 +941,7 @@ function showGameOver() {
   state.overAt = performance.now();
   state.run.coins = state.coins;
   state.run.score = state.score;
-  const { isBest, completed } = progress.finishRun(state.run);
+  const { isBest, completed, achievements } = progress.finishRun(state.run);
   $('final-score').textContent = state.score;
   $('final-coins').textContent = state.coins;
   $('final-best').textContent = progress.best;
@@ -921,13 +958,15 @@ function showGameOver() {
   // Next goals: all of today's missions (just completed ones pop in), the
   // zone reached and the next thing to unlock.
   const doneNow = new Set(completed.map((m) => m.id));
-  $('missions-done').innerHTML = progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
+  $('missions-done').innerHTML =
+    achievements.map((a) => `<div class="mission done new achievement"><span class="text">${a.icon} Erfolg: ${a.name}</span><span class="reward">+${a.reward}</span></div>`).join('') +
+    progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
   $('zone-reached').textContent = `Zone ${state.zone + 1} erreicht: ${BIOMES[state.zone % BIOMES.length].name}`;
   renderNextUnlock();
   hud.classList.add('hidden');
   overEl.classList.remove('hidden');
   walletEl.classList.remove('hidden');
-  renderWallet(completed.length > 0 || state.coins > 0);
+  renderWallet(completed.length > 0 || achievements.length > 0 || state.coins > 0);
 }
 
 // The cheapest cosmetic not owned yet, as a goal on the game-over screen.
@@ -989,6 +1028,8 @@ function bumpCoins() {
 
 function nearMiss() {
   state.nearChain++;
+  state.run.near++;
+  state.run.bestChain = Math.max(state.run.bestChain, state.nearChain);
   state.coins++;
   coinCountEl.textContent = state.coins;
   bumpCoins();
@@ -1011,7 +1052,11 @@ function enterZone(zone) {
   void zoneBanner.offsetWidth;
   zoneBanner.classList.add('show');
   sfx.zone();
-  if (state.run) state.run.zones = Math.max(state.run.zones || 0, zone);
+  if (state.run) {
+    state.run.zones = Math.max(state.run.zones || 0, zone);
+    state.run.zone = Math.max(state.run.zone, zone);
+    checkMissions();
+  }
 }
 
 // Celebrate a daily mission the moment it is reached.
@@ -1023,6 +1068,13 @@ function checkMissions() {
     const m = progress.missions().find((x) => x.id === id);
     toast(`✓ ${m.text} +${m.reward}`);
     sfx.powerup();
+  }
+  for (const a of progress.wouldUnlock(run)) {
+    if (state.celebrated.has(`a:${a.id}`)) continue;
+    state.celebrated.add(`a:${a.id}`);
+    toast(`🏆 ${a.name} +${a.reward}`);
+    sfx.powerup();
+    buzz(25);
   }
 }
 
@@ -1347,7 +1399,7 @@ function updateCamera(dt) {
 // Menus: find the free space between the title and the panel so the bird
 // is framed there on every screen size (small phones included).
 function measureMenuFrame() {
-  const wrap = state.menu === 'shop' ? shopEl : startEl;
+  const wrap = state.menu === 'shop' ? shopEl : state.menu === 'achievements' ? achEl : startEl;
   const title = wrap.querySelector('.menu-title');
   const panel = wrap.querySelector('.panel');
   const box = app.getBoundingClientRect();

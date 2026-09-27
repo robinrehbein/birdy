@@ -25,7 +25,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 3 | Fairness & Kurve | 7 | Profi-Bot erreicht in über 90 % der Runs das Zeitlimit, Erreichbarkeit ist garantiert. Tiefenwahrnehmung von Menschen ungeprüft. |
 | 4 | Abwechslung | 7 | 4 Zonen alle 10 Reihen, jede mit eigener Szenerie, Tageszeit, Musik und Spezialität. Bot-Messung (zwei Läufe à 100 Runs): Zone 2 erreichen 33–47 % der Anfänger (vorher 15 %); Geübte erreichen Zone 3 zu 59–63 % (vorher 26 %), Zone 4 zu 23–25 % (vorher 1 %). Die Szenerie steht beim Banner (Screenshot). |
 | 5 | Session-Loop | 8 | 0,8 s vom Crash zum nächsten Run. Game-Over zeigt das nächste Ziel (Münzen bis zum nächsten Vogel oder zur nächsten Spur; wenn freischaltbar, führt ein Tipp direkt in den Shop), alle Tagesmissionen mit Balken und die erreichte Zone. „🏆 Neuer Rekord!“ erscheint schon während des Runs. |
-| 6 | Meta-Progression | 6 | 7 Vogel-Farben und 7 Flugspuren (zwei Kategorien, Reiter im Shop, Live-Vorschau), Missionen, Tagesgeschenk. Fehlt: nächstes Ziel sichtbar machen. |
+| 6 | Meta-Progression | 7 | 7 Vogel-Farben und 7 Flugspuren, Tagesmissionen, Tagesgeschenk mit Serie, 14 Erfolge mit Münzbelohnung und Fortschrittsbalken, nächstes Ziel beim Game-Over. Offen: Ökonomie mit echten Spielern tunen. |
 | 7 | Audio | 5 | 4 Zonen-Themen, Menü-Modus, Pegel gemessen. Nur Oszillator-Klänge, von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
 | 9 | Politur | 6 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Offen: Die oberen Röhren nehmen viel Bildfläche ein (bewusst belassen, siehe Iteration 15). |
@@ -649,3 +649,41 @@ Unterschiede sind also Rauschen.
    - Richtwerte für Casual-Top-Titel: D1 ≥ 35–40 %, D7 ≥ 12–15 %.
 4. **Danach tunen:** Tempo und Lückengröße (`gateSpec()` und `baseSpeed()` in `src/main.js`)
    und die Münz-Ökonomie (`progress.js`) anhand der Beobachtungen anpassen.
+
+---
+
+## Zweite Runde (Iterationen 16–20, nach „Mach weiter“)
+
+### Iteration 16 – Erfolge und Meilensteine
+
+**Was:**
+- **14 Erfolge** mit Münzbelohnung (30–300 Münzen), die beim Freischalten sofort ausgezahlt
+  werden. Beispiele:
+  - Abgehoben / Flugschüler / Himmelsstürmer / Legende: 10 / 25 / 50 / 100 Punkte in einem Flug
+  - Weltenbummler: Zone 4 erreichen
+  - Haarscharf: 10× „Knapp!“ insgesamt; Nervenkitzel: 5× „Knapp!“ in Folge
+  - Power-Sammler: 3 Power-ups in einem Flug; Gärtner: an 25 Pflanzen vorbei
+  - Sparschwein / Schatzmeister: 500 / 2000 Münzen eingesammelt
+  - Dauerflieger: 50 Runden; Stammgast: 7 Tage Geschenk-Serie; Sammler: 5 Freischaltungen
+- **Lebenszeit-Statistiken** in `progress.js`. Bestehende Spielstände werden übernommen (der
+  Rekord zählt sofort).
+- **Anzeige:**
+  - Im Run erscheint „🏆 Name +X“ im Moment des Erreichens, mit Sound und Vibration.
+  - Auf dem Game-Over-Screen stehen die freigeschalteten Erfolge über den Missionen.
+  - Erfolge durch Kauf oder Tagesgeschenk werden direkt im Menü gefeiert.
+- **Übersicht „🏆 Erfolge“** im Startmenü: alle 14 mit Symbol, Fortschrittsbalken und
+  Belohnung, Zähler „5 / 14“. Die Zurück-Taste funktioniert auch dort.
+
+**Warum:** Der Bewertungsbogen nennt ausdrücklich Rekorde und Meilensteine, und alle Reviews
+bemängelten fehlende Langzeitziele.
+
+**Beleg (Logiktest `ach.mjs`):**
+
+| Schritt | Ergebnis |
+|---|---|
+| Run mit 26 Punkten, 12× Knapp!, Serie 5 | 4 Erfolge (+280), plus die Mission „20 Münzen“ (+40): 300 → 650 ✓ |
+| 50. Runde | „Dauerflieger“ ✓ |
+| 4 Freischaltungen | „Sammler“ (Ziel 5) wird korrekt noch nicht vergeben ✓ |
+| Erneute Prüfung | keine Doppelvergabe ✓ |
+
+Screenshots von Übersicht und Menü, keine Fehler. Regressions-Playtest unauffällig.

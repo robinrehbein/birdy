@@ -583,3 +583,38 @@ button.gift {
   .skins { gap: 6px; margin-bottom: 10px; }
   .tabs { margin-bottom: 8px; }
 }
+
+/* Start menu: two secondary buttons side by side. */
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.btn-row button { width: 100%; padding-left: 6px; padding-right: 6px; }
+.panel .btn-row button + button { margin-top: 0; }
+
+/* Achievements overview. */
+.ach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 46vh;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  text-align: left;
+  touch-action: pan-y;
+}
+.ach {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  background: #cbb968;
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+.ach.done { background: #b5d98a; }
+.ach-icon { font-size: 24px; }
+.ach-body { display: flex; flex-direction: column; gap: 2px; font-family: system-ui, sans-serif; }
+.ach-body b { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 16px; color: #543847; }
+.ach-body small { font-size: 12px; font-weight: 600; }
+.ach .bar { height: 5px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
+.ach .bar i { display: block; height: 100%; background: #73bf2e; }
+.ach .reward { font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
+.mission.achievement { background: #fcb800; color: #fff; text-shadow: 0 1px 0 #543847; }

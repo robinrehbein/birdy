@@ -25,6 +25,27 @@ export const TRAILS = [
   { id: 'fire', name: 'Feuerschweif', price: 1400, colors: [0xff7a1a, 0xffc93c, 0xff3d2e], size: 0.13, life: 0.4, gravity: 3, speed: 0.9 },
 ];
 
+// Long-term achievements (milestones). `stat` is a lifetime value; rewards
+// are paid out the moment one is unlocked.
+export const ACHIEVEMENTS = [
+  { id: 'score10', icon: '🐣', name: 'Abgehoben', text: '10 Punkte in einem Flug', stat: 'bestScore', goal: 10, reward: 30 },
+  { id: 'score25', icon: '🐤', name: 'Flugschüler', text: '25 Punkte in einem Flug', stat: 'bestScore', goal: 25, reward: 60 },
+  { id: 'score50', icon: '🦅', name: 'Himmelsstürmer', text: '50 Punkte in einem Flug', stat: 'bestScore', goal: 50, reward: 120 },
+  { id: 'score100', icon: '👑', name: 'Legende', text: '100 Punkte in einem Flug', stat: 'bestScore', goal: 100, reward: 300 },
+  { id: 'zone4', icon: '🌸', name: 'Weltenbummler', text: 'Erreiche den Blütenhain (Zone 4)', stat: 'bestZone', goal: 3, reward: 150 },
+  { id: 'near10', icon: '😬', name: 'Haarscharf', text: '10× „Knapp!“ insgesamt', stat: 'nearTotal', goal: 10, reward: 40 },
+  { id: 'chain5', icon: '🔥', name: 'Nervenkitzel', text: '5× „Knapp!“ in Folge', stat: 'bestChain', goal: 5, reward: 150 },
+  { id: 'powers3', icon: '🌈', name: 'Power-Sammler', text: '3 Power-ups in einem Flug', stat: 'bestPowerups', goal: 3, reward: 60 },
+  { id: 'plants25', icon: '🌱', name: 'Gärtner', text: 'An 25 Piranha-Pflanzen vorbei', stat: 'plantsTotal', goal: 25, reward: 80 },
+  { id: 'coins500', icon: '🪙', name: 'Sparschwein', text: '500 Münzen eingesammelt', stat: 'coinsTotal', goal: 500, reward: 80 },
+  { id: 'coins2000', icon: '💰', name: 'Schatzmeister', text: '2000 Münzen eingesammelt', stat: 'coinsTotal', goal: 2000, reward: 200 },
+  { id: 'runs50', icon: '🎮', name: 'Dauerflieger', text: '50 Runden gespielt', stat: 'runs', goal: 50, reward: 100 },
+  { id: 'streak7', icon: '📅', name: 'Stammgast', text: '7 Tage Geschenk-Serie', stat: 'bestStreak', goal: 7, reward: 200 },
+  { id: 'unlock5', icon: '🎨', name: 'Sammler', text: '5 Vögel oder Spuren freigeschaltet', stat: 'unlocks', goal: 5, reward: 100 },
+];
+const RUN_MAX_STATS = { bestScore: 'score', bestZone: 'zone', bestChain: 'bestChain', bestPowerups: 'powerups' };
+const RUN_SUM_STATS = { nearTotal: 'near', plantsTotal: 'plants', coinsTotal: 'coins' };
+
 // Mission templates. `stat` is what is counted, `per` whether it counts
 // within one run (best run) or adds up over the day.
 const MISSION_POOL = [
@@ -95,8 +116,11 @@ function load() {
     tutorialDone: false,
     trails: ['none'],
     trail: 'none',
+    stats: {},
+    achieved: [],
     ...(data || {}),
   };
+  data.stats = { bestScore: data.best, bestZone: 0, nearTotal: 0, bestChain: 0, bestPowerups: 0, plantsTotal: 0, coinsTotal: 0, bestStreak: 0, ...data.stats };
   // Migrate the old best score.
   try {
     data.best = Math.max(data.best, Number(localStorage.getItem('birdy-best')) || 0);
@@ -105,6 +129,24 @@ function load() {
 }
 
 const data = load();
+
+function statValue(stat) {
+  if (stat === 'runs') return data.runs;
+  if (stat === 'unlocks') return data.owned.length - 1 + data.trails.length - 1;
+  return data.stats[stat] || 0;
+}
+
+// Unlock every achievement whose goal is reached; pays the reward.
+function unlockAchievements() {
+  const unlocked = [];
+  for (const a of ACHIEVEMENTS) {
+    if (data.achieved.includes(a.id) || statValue(a.stat) < a.goal) continue;
+    data.achieved.push(a.id);
+    data.coins += a.reward;
+    unlocked.push(a);
+  }
+  return unlocked;
+}
 
 function save() {
   try {
@@ -191,6 +233,7 @@ export const progress = {
     const amount = this.giftAmount(streak);
     data.gift = { last: today(), streak };
     data.coins += amount;
+    data.stats.bestStreak = Math.max(data.stats.bestStreak || 0, streak);
     save();
     return { amount, streak };
   },
@@ -202,6 +245,8 @@ export const progress = {
     data.coins += run.coins;
     const isBest = run.score > data.best;
     if (isBest) data.best = run.score;
+    for (const [stat, key] of Object.entries(RUN_MAX_STATS)) data.stats[stat] = Math.max(data.stats[stat] || 0, run[key] || 0);
+    for (const [stat, key] of Object.entries(RUN_SUM_STATS)) data.stats[stat] = (data.stats[stat] || 0) + (run[key] || 0);
     const completed = [];
     for (const m of missions()) {
       if (m.done) continue;
@@ -215,8 +260,37 @@ export const progress = {
         completed.push({ ...m, text: tpl.text(m.goal) });
       }
     }
+    const achievements = unlockAchievements();
     save();
-    return { isBest, completed };
+    return { isBest, completed, achievements };
+  },
+
+  // Achievements with current progress, for the overview.
+  achievements() {
+    return ACHIEVEMENTS.map((a) => ({
+      ...a,
+      value: Math.min(a.goal, statValue(a.stat)),
+      done: data.achieved.includes(a.id),
+    }));
+  },
+
+  // Live check during a run (nothing is stored until finishRun).
+  wouldUnlock(run) {
+    const hits = [];
+    for (const a of ACHIEVEMENTS) {
+      if (data.achieved.includes(a.id)) continue;
+      let v = statValue(a.stat);
+      if (RUN_MAX_STATS[a.stat]) v = Math.max(v, run[RUN_MAX_STATS[a.stat]] || 0);
+      if (RUN_SUM_STATS[a.stat]) v += run[RUN_SUM_STATS[a.stat]] || 0;
+      if (v >= a.goal) hits.push(a);
+    }
+    return hits;
+  },
+  // For achievements earned outside a run (gift streak, unlocks).
+  checkAchievements() {
+    const unlocked = unlockAchievements();
+    if (unlocked.length) save();
+    return unlocked;
   },
 
   // Live check during a run so a mission can be celebrated the moment it
