@@ -751,3 +751,7 @@ button.surprise:disabled { opacity: 0.55; }
 
 /* Toasts are information, not buttons: flat, no 3D lip (style guide). */
 .toast { box-shadow: none; background: #73bf2e; }
+
+/* Pause / game over: a lighter plum scrim and a soft blur of the game
+   instead of a heavy grey veil. */
+#pause, #gameover { background: rgba(43, 30, 46, 0.3); -webkit-backdrop-filter: blur(3px) saturate(1.15); backdrop-filter: blur(3px) saturate(1.15); }

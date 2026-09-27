@@ -504,7 +504,9 @@ export function createScenery(scene) {
 
 // Shared by the sky clouds and the cloud banks the pipes hang from, so the
 // zone tint (biomes.js) colours both.
-const cloudMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true });
+// Lit a little from within, so the undersides seen from below stay soft
+// instead of heavy grey.
+const cloudMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true, emissive: 0xffffff, emissiveIntensity: 0.22 });
 
 export function createClouds(scene) {
   const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, flatShading: true, fog: true });

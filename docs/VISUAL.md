@@ -769,3 +769,24 @@ gebacken und wird weiter als ein Instanced Draw Call gezeichnet.
 - Perf, erster Frame im direkten Wechsel: 658 ms gegenüber 682 ms der Basis. Bis zu 127 Draw
   Calls.
 - APK baut.
+
+### Iteration 13 – Leichtere Wolken, weicher Hintergrund hinter Overlays (Bereich 4)
+
+**Warum:** Review 3 nannte die Wolken „schwer und grau“ und das Pause-Overlay „grau und
+schmutzig“.
+
+**Was:**
+- Die Himmelswolken leuchten von innen leicht auf, wie seit Iteration 5 die Wolkenbank. Die
+  Unterseiten sind weich statt grau, die Zonentönung bleibt.
+- Hinter Pause und Game Over liegt ein leichterer Plum-Schleier (30 statt 45 %). Das Spiel
+  dahinter ist leicht weichgezeichnet (3 px) und etwas satter.
+- Auf schwachen Handys prüfen, ob die Unschärfe hinter Game Over flüssig bleibt. Sie läuft nur,
+  solange ein Overlay offen ist.
+
+![Iteration 13 vorher/nachher](visual/it13.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 11 und 12.
+- Perf, erster Frame im direkten Wechsel: 626 ms gegenüber 617 ms der Basis. Bis zu 126 Draw
+  Calls.
+- APK baut.
