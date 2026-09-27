@@ -1916,7 +1916,7 @@ function update(rawDt) {
     impact.update(dt);
     return;
   }
-  step(dt, music.beat());
+  step(dt, frozen ? undefined : music.beat()); // frozen (test shots): beat from game time
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   // Speed feel: streaks fade in from ~24 units/s and are strongest in the rainbow.
   const rush = state.mode === 'playing' && !state.hold

@@ -82,7 +82,7 @@ Status: offen / ✅ erledigt (Iteration) / ⏸ wartet auf Entscheidung.
 | 2 | 5 | Blocker | Game Over in EN 390×844 ist nach oben verrutscht, unten erscheint ein türkiser Streifen. Ursache: Der App-Container scrollt (`scrollIntoView`). | Container gegen Scrollen sperren, nur die Liste scrollen lassen | ✅ It. 3 |
 | 3 | 10 | ~~Blocker~~ | ~~Schwarze Ecken am runden Launcher-Icon~~ | Geprüft: Die Icons sind transparent. Das Schwarz kam vom Übersichtsbild-Werkzeug. Die gezackte Kante wird beim Neurendern mit geglättet. | – |
 | 4 | 9 | hoch | Passierte Röhren und Münzen erscheinen als riesige halbtransparente Geister vor der Kamera und verdecken den Vogel. | Schneller und vollständig ausblenden, sobald sie hinter dem Vogel sind | ✅ It. 2 |
-| 5 | 10 | hoch | Store-Screenshots ohne Rahmen, Hintergrund und Claim. | Gestaltete Screens DE/EN mit Claim | offen |
+| 5 | 10 | hoch | Store-Screenshots ohne Rahmen, Hintergrund und Claim. | Gestaltete Screens DE/EN mit Claim | ✅ It. 8 |
 | 6 | 6 | hoch | Emoji als Icons: Shop-Reiter, Schlösser, Toasts, Hand, Ton, Geschenk. | Eigenes SVG-Icon-Set | ⏸ Varianten zur Wahl |
 | 7 | 6 | hoch | Fließtexte in System-Schrift statt Hausschrift. | Einheitliche Schrift | ⏸ Varianten zur Wahl |
 | 8 | 7/8 | hoch | Beim Crash ist keine Rückmeldung sichtbar. | Treffer-Stern, Federn, Flash, Squash | ✅ It. 4 |
@@ -436,3 +436,47 @@ Karussells.
 - **APK:** baut.
 
 **Neue Einschätzung:** Lesbarkeit 6 → 7, UI 7 → 7.
+
+### Iteration 8 – Gestaltete Store-Screenshots DE/EN (Bereich 10)
+
+**Warum:** Laut Review 1 ist das Blocker Nr. 1. Die Store-Bilder waren rohe Spielframes ohne
+Rahmen, Hintergrund und Claim, und darin standen noch Spurpunkte und der Sprachknopf.
+
+**Was:**
+- `scripts/store-shots.mjs` ist neu aufgebaut:
+  - Echte Frames aus einem Run, mit gesätem Zufall und angehaltener Echtzeit. Der Autopilot
+    spielt, die Spielzeit läuft ohne Zeichnen vor, dadurch dauern beide Sprachen nur 2 Minuten
+    statt bisher über 6 Minuten.
+  - Aufnahme bei 390×844. So ist im Shop der Vogel sichtbar, bei 360×640 war er vom Panel
+    verdeckt.
+  - Gerahmt als 1080×1920:
+    - Himmel mit Sonnenstrahlen wie Icon und Feature-Grafik
+    - Claim in zwei Zeilen: weiß und gold, mit Plum-Kontur
+    - Spielbild im abgerundeten Plum-Rahmen
+  - Ohne Toasts und ohne Sprachknopf.
+- Die sieben Claims (DE / EN):
+  1. „Tippen. Ausweichen. Durchfliegen.“ – „Ohne Werbung · offline“ /
+     „Tap. Dodge. Fly through.“ – „No ads · works offline“
+  2. „Drei Spuren, ein Finger“ / „Three lanes, one finger“
+  3. „Vier Zonen mit eigener Musik“ / „Four zones with their own music“
+  4. „Vorsicht, Stachelkaktus!“ / „Watch out for the spiky cactus!“
+  5. „Regenbogen, Magnet und Mini-Vogel“ / „Rainbow, magnet and mini bird“
+  6. „Bau dir deinen eigenen Vogel“ / „Build your own bird“
+  7. „Neue Welten freispielen“ / „Unlock new worlds“
+- Das Kaktus-Motiv setzt eine echte Reihe mit aufgerichtetem Kaktus direkt vor den Vogel, weil
+  ein gut gerahmter Zufallsmoment sehr lange dauert.
+- Solange die Echtzeit angehalten ist (nur in Tests), folgt der Takt der Kakteen der Spielzeit
+  statt der Audio-Uhr. Sonst liefen Screenshots und Musik auseinander.
+
+![Iteration 8 vorher/nachher](visual/it8.jpg)
+![Store-Screenshots DE](visual/store-de.jpg)
+![Store-Screenshots EN](visual/store-en.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 6 und 7. Der Spielcode ist unverändert, der
+  Takt-Schalter greift nur im Testmodus.
+- Perf im direkten Wechsel gemessen: erster Frame 670 ms gegenüber 630 ms der Basis (+6 %), bis
+  zu 146 Draw Calls, 46 k Dreiecke.
+- APK baut.
+
+**Neue Einschätzung:** Store-Assets 5 → 7.
