@@ -28,7 +28,7 @@ Die Noten sind nach Review 3 (nach Iteration 12) korrigiert; überhöhte Werte w
 | 6 | Meta-Progression | 6 | Farben, Spuren, Missionen, Geschenk, 14 Erfolge. Aber: Vögel sind nur Umfärbungen. |
 | 7 | Audio | 5 | Mischkette, Hall, Variation. Pegelmessungen belegen Lautheit, nicht Qualität. Von keinem Menschen gehört. |
 | 8 | Performance | 5 | 162 Draw Calls, 50k Dreiecke, erster Frame 0,79 s (Headless), adaptive Qualität. Auf keinem Gerät gemessen. |
-| 9 | Politur | 6 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Offen: Die oberen Röhren nehmen viel Bildfläche ein (bewusst belassen, siehe Iteration 15). |
+| 9 | Politur | 7 | Münzen golden, Zielringe blenden vor der Kamera aus, Shop-Kacheln mit Preis, Menü und Shop rahmen den Vogel auf jeder Displaygröße (360×640 und 390×844 geprüft). Die oberen Röhren blenden seit Iteration 23 in den Himmel aus, der obere Bildteil ist offen. |
 | 10 | Store-Reife | 5 | AAB, Texte, Datenschutz, neues Icon. Aber: englisches Listing zu einer rein deutschen App. Offen: App-ID, Name. |
 
 ## Backlog (nach Hebel sortiert)
@@ -912,3 +912,17 @@ rutscht.
 - Tutorial-E2E-Test ✓.
 - Bot-Playtest (100 Runs): Anfänger 17,4 s, Geübt 36,1 s, Profi 94 % Überlebende.
 - 170 Draw Calls, keine Fehler.
+
+### Iteration 23 – Röhrentürme blenden in den Himmel aus (von dir freigegeben)
+
+**Was:**
+- Die oberen Röhren verschwinden mit der Höhe (Weltkoordinate 16 → 27) im Himmel. Technisch
+  schneidet ein 4×4-Ordered-Dither im Shader Pixel aus, statt echte Transparenz zu verwenden.
+  Die Röhren bleiben damit undurchsichtig (keine Sortierfehler), auf dem Handy-Display wirkt es
+  wie ein weicher Verlauf.
+- Spielerisch ändert sich nichts: Der Vogel fliegt höchstens bis Höhe 14, der Dunst beginnt
+  bei 16, es gibt also keine unsichtbaren Hindernisse.
+
+**Beleg:** Screenshot `haze.png`. Der obere Bildteil zeigt jetzt Himmel und Wolken statt einer
+grünen Wand; Review 4 hatte die Röhren dort auf rund 40 % der Bildfläche gemessen.
+Perf unverändert (170 Draw Calls), keine Fehler.

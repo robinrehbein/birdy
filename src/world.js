@@ -421,6 +421,30 @@ const stripeGeo = new THREE.BoxGeometry(0.28, 1, 0.28);
 stripeGeo.translate(0, 0.5, 0);
 const ringGeo = new THREE.TorusGeometry(1, 0.07, 6, 32);
 
+// The upper pipes fade into the sky with height, so the tall towers don't
+// fill the top of the screen. A 4x4 ordered dither discards pixels instead of
+// real transparency: the pipes stay opaque (no sorting problems) and on a
+// phone display it reads as a soft fade.
+export const HAZE_START = 16;
+export const HAZE_END = 27;
+function addSkyHaze(mat) {
+  mat.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying float vHazeY;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvHazeY = (modelMatrix * vec4(transformed, 1.0)).y;');
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', `#include <common>
+varying float vHazeY;
+float bayer4(vec2 p) {
+  ivec2 i = ivec2(mod(p, 4.0));
+  const float m[16] = float[16](0., 8., 2., 10., 12., 4., 14., 6., 3., 11., 1., 9., 15., 7., 13., 5.);
+  return (m[i.x + i.y * 4] + 0.5) / 16.0;
+}`)
+      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+if (1.0 - smoothstep(${HAZE_START.toFixed(1)}, ${HAZE_END.toFixed(1)}, vHazeY) < bayer4(gl_FragCoord.xy)) discard;`);
+  };
+}
+
 // Pipe body with its highlight/shadow stripes, and the lip with its dark
 // band, each baked into one geometry (2 draw calls per segment instead of 5).
 const pipeColor = (hex) => new THREE.MeshBasicMaterial({ color: hex });
@@ -536,6 +560,7 @@ export function createGate(scene) {
   const mats = {
     pipe: new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, flatShading: true }),
   };
+  addSkyHaze(mats.pipe);
   const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false });
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);
