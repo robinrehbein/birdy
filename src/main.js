@@ -8,6 +8,7 @@ import { progress, ACHIEVEMENTS } from './progress.js';
 import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import { t, L, applyI18n, getLang, setLang } from './i18n.js';
+import { ICONS, icon, iconSvg, rich, setRich } from './icons.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -158,6 +159,10 @@ const pauseEl = $('pause');
 const zonesEl = $('zones');
 const laneDots = [...document.querySelectorAll('#lanes span')];
 const muteBtn = $('mute');
+// Badge icons used from CSS (::before marks for locked, owned and done).
+for (const n of ['check', 'lock']) {
+  document.documentElement.style.setProperty(`--ic-${n}`, `url("data:image/svg+xml,${encodeURIComponent(icon(n, 24))}")`);
+}
 
 const flash = document.createElement('div');
 flash.id = 'flash';
@@ -171,7 +176,7 @@ const powerChips = {};
 for (const type of POWERUP_TYPES) {
   const chip = document.createElement('div');
   chip.className = 'power hidden';
-  chip.innerHTML = `<span class="power-icon">${POWERUPS[type].icon}</span><span class="power-bar"><i></i></span>`;
+  chip.innerHTML = `<span class="power-icon">${icon(POWERUPS[type].icon, '1.2em')}</span><span class="power-bar"><i></i></span>`;
   powersEl.appendChild(chip);
   powerChips[type] = { chip, fill: chip.querySelector('i') };
 }
@@ -216,9 +221,9 @@ function renderStart() {
   const streakEl = $('streak');
   const gift = !firstRuns && progress.giftAvailable();
   giftBtn.classList.toggle('hidden', !gift);
-  if (gift) giftBtn.textContent = t('gift', { n: progress.giftAmount(progress.streak + 1) });
+  if (gift) setRich(giftBtn, t('gift', { n: progress.giftAmount(progress.streak + 1) }));
   streakEl.classList.toggle('hidden', gift || progress.streak === 0);
-  streakEl.textContent = t('streak', { d: progress.streak, n: progress.giftAmount(progress.streak + 1) });
+  setRich(streakEl, t('streak', { d: progress.streak, n: progress.giftAmount(progress.streak + 1) }));
   renderWallet();
 }
 
@@ -226,15 +231,15 @@ function renderStart() {
 // build the bird like a workshop, with a live preview on the 3D bird.
 const LOOK_KINDS = ['pattern', 'hat', 'eyes', 'beak'];
 const SHOP_TABS = [
-  { kind: 'skin', icon: '🎨' },
-  { kind: 'pattern', icon: '🐾' },
-  { kind: 'hat', icon: '🎩' },
-  { kind: 'eyes', icon: '🕶️' },
-  { kind: 'beak', icon: '🐤' },
-  { kind: 'trail', icon: '✨' },
-  { kind: 'world', icon: '🌍' },
-  { kind: 'pipe', icon: '🟢' },
-  { kind: 'upgrade', icon: '⚡' },
+  { kind: 'skin', icon: 'palette' },
+  { kind: 'pattern', icon: 'paw' },
+  { kind: 'hat', icon: 'tophat' },
+  { kind: 'eyes', icon: 'glasses' },
+  { kind: 'beak', icon: 'beak' },
+  { kind: 'trail', icon: 'sparkle' },
+  { kind: 'world', icon: 'globe' },
+  { kind: 'pipe', icon: 'pipe' },
+  { kind: 'upgrade', icon: 'bolt' },
 ];
 const pipePreview = createPipePreview(scene);
 pipePreview.group.position.set(-2.4, 0, 2.6); // beside the bird as seen by the shop camera
@@ -251,8 +256,8 @@ function applyBird() {
 applyBird();
 
 const tabsEl = $('shop-tabs');
-tabsEl.innerHTML = SHOP_TABS.map((tb) => `<button class="tab" data-tab="${tb.kind}"><span>${tb.icon}</span><small data-i18n="tab_${tb.kind}"></small></button>`).join('')
-  + `<button class="tab dice" id="shop-dice"><span>🎲</span><small data-i18n="tab_dice"></small></button>`;
+tabsEl.innerHTML = SHOP_TABS.map((tb) => `<button class="tab" data-tab="${tb.kind}"><span>${icon(tb.icon, '1.2em')}</span><small data-i18n="tab_${tb.kind}"></small></button>`).join('')
+  + `<button class="tab dice" id="shop-dice"><span>${icon('dice', '1.2em')}</span><small data-i18n="tab_dice"></small></button>`;
 applyI18n(tabsEl);
 
 // Tiles for bird parts show the real part: small 3D renders of a bird wearing
@@ -309,9 +314,9 @@ function tileBg(kind, k) {
   return '#fff6d5';
 }
 function tileInner(kind, k) {
-  if (kind === 'trail') return k.colors.length ? '' : '✕';
-  if (THUMB_VIEW[kind]) return k.id === CATALOG[kind][0].id && kind === 'hat' ? '✕' : '';
-  return k.icon || '';
+  if (kind === 'trail') return k.colors.length ? '' : icon('close', '70%');
+  if (THUMB_VIEW[kind]) return k.id === CATALOG[kind][0].id && kind === 'hat' ? icon('close', '70%') : '';
+  return ICONS[k.icon] ? icon(k.icon, '70%') : '';
 }
 
 // Upgrades tab: one tile per power-up with its level, bought step by step.
@@ -321,7 +326,7 @@ function renderUpgrades() {
     const pips = Array.from({ length: UPGRADE_MAX }, (_, i) => `<i class="${i < lvl ? 'on' : ''}"></i>`).join('');
     const cls = ['skin', 'upgrade'];
     if (u.id === shopSel) cls.push('sel');
-    return `<button class="${cls.join(' ')}" data-id="${u.id}" aria-label="${L(u.name)}"><span class="dot" style="background:#fff6d5">${u.icon}</span><span class="pips">${pips}</span></button>`;
+    return `<button class="${cls.join(' ')}" data-id="${u.id}" aria-label="${L(u.name)}"><span class="dot" style="background:#fff6d5">${icon(u.icon, '70%')}</span><span class="pips">${pips}</span></button>`;
   }).join('');
   updateGridFade();
   renderSurprise();
@@ -414,7 +419,7 @@ function renderSurprise() {
   const pool = surprisePool();
   surpriseBtn.classList.toggle('hidden', !pool.length);
   const missing = SURPRISE_PRICE - progress.coins;
-  surpriseBtn.textContent = missing > 0 ? `${t('surprise', { n: SURPRISE_PRICE })} · ${t('needMore', { n: missing })}` : t('surprise', { n: SURPRISE_PRICE });
+  setRich(surpriseBtn, missing > 0 ? `${t('surprise', { n: SURPRISE_PRICE })} · ${t('needMore', { n: missing })}` : t('surprise', { n: SURPRISE_PRICE }));
   surpriseBtn.disabled = missing > 0;
 }
 surpriseBtn.addEventListener('click', () => {
@@ -524,10 +529,10 @@ function renderAchievements() {
   $('ach-list').innerHTML = list.map((a) => {
     const pct = Math.round((a.value / a.goal) * 100);
     return `<div class="ach${a.done ? ' done' : ''}">
-      <span class="ach-icon">${a.done ? a.icon : '🔒'}</span>
+      <span class="ach-icon">${icon(a.done ? a.icon : 'lock', '1.2em')}</span>
       <span class="ach-body"><b>${L(a.name)}</b><small>${L(a.text)}</small>
         <span class="bar"><i style="width:${pct}%"></i></span></span>
-      <span class="reward">${a.done ? '✓' : `+${a.reward}`}</span></div>`;
+      <span class="reward">${a.done ? icon('check', 22) : `+${a.reward}`}</span></div>`;
   }).join('');
   requestAnimationFrame(() => listFade(achList));
 }
@@ -546,7 +551,7 @@ $('ach-back').addEventListener('click', () => openAchievements(false));
 // Achievements earned outside a run (gift streak, unlocks) are paid at once.
 function celebrateMenuAchievements() {
   for (const a of progress.checkAchievements()) {
-    toast(`🏆 ${L(a.name)} +${a.reward}`);
+    toast(`[trophy] ${L(a.name)} +${a.reward}`);
     sfx.powerup();
   }
   renderWallet(true);
@@ -577,7 +582,7 @@ function updateToast(dt) {
     return;
   }
   if (toastQueue.length && toastTimer <= 0) {
-    toastEl.textContent = toastQueue.shift();
+    setRich(toastEl, toastQueue.shift());
     toastEl.classList.add('show');
     toastTimer = 2.2;
   }
@@ -718,7 +723,7 @@ const TUT_SWITCH_ROW = 3;
 const tut = { active: false, step: '', gate: null, freezeY: 0 };
 const handEl = document.createElement('div');
 handEl.id = 'hand';
-handEl.innerHTML = '<span class="finger">👆</span><span class="label"></span>';
+handEl.innerHTML = `<span class="finger">${iconSvg('hand', { size: '1em' })}</span><span class="label"></span>`;
 app.appendChild(handEl);
 const handLabel = handEl.querySelector('.label');
 
@@ -1176,7 +1181,7 @@ overEl.addEventListener('pointerdown', (e) => {
 });
 
 function renderMute() {
-  muteBtn.textContent = audio.muted ? '🔇' : '🔊';
+  muteBtn.innerHTML = icon(audio.muted ? 'mute' : 'sound', '1.3em');
   muteBtn.setAttribute('aria-label', audio.muted ? t('muteOn') : t('muteOff'));
 }
 muteBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
@@ -1329,7 +1334,7 @@ function showGameOver() {
   // zone reached and the next thing to unlock.
   const doneNow = new Set(completed.map((m) => m.id));
   $('missions-done').innerHTML =
-    achievements.map((a) => `<div class="mission done new achievement"><span class="text">${a.icon} ${t('achUnlocked', { name: L(a.name) })}</span><span class="reward">+${a.reward}</span></div>`).join('') +
+    achievements.map((a) => `<div class="mission done new achievement"><span class="text">${rich(`[${a.icon}]`)} ${t('achUnlocked', { name: L(a.name) })}</span><span class="reward">+${a.reward}</span></div>`).join('') +
     progress.missions().map((m) => missionHTML(m, doneNow.has(m.id))).join('');
   const zoneLine = $('zone-reached');
   zoneLine.classList.toggle('hidden', state.zone === 0);
@@ -1358,8 +1363,8 @@ function renderNextUnlock() {
   const pct = Math.min(100, Math.round((progress.coins / next.price) * 100));
   el.classList.toggle('ready', progress.coins >= next.price);
   el.innerHTML = progress.coins >= next.price
-    ? `<span class="text">${t('unlockReady', { kind: next.kind, name: L(next.name) })}</span><span class="bar"><i style="width:100%"></i></span>`
-    : `<span class="text">${t('unlockNext', { n: next.price - progress.coins, kind: next.kind, name: L(next.name) })}</span><span class="bar"><i style="width:${pct}%"></i></span>`;
+    ? `<span class="text">${rich(t('unlockReady', { kind: next.kind, name: L(next.name) }))}</span><span class="bar"><i style="width:100%"></i></span>`
+    : `<span class="text">${rich(t('unlockNext', { n: next.price - progress.coins, kind: next.kind, name: L(next.name) }))}</span><span class="bar"><i style="width:${pct}%"></i></span>`;
 }
 
 function addScore(gate) {
@@ -1442,13 +1447,13 @@ function checkMissions() {
     if (state.celebrated.has(id)) continue;
     state.celebrated.add(id);
     const m = progress.missions().find((x) => x.id === id);
-    toast(`✓ ${L(m.text)} +${m.reward}`);
+    toast(`[check] ${L(m.text)} +${m.reward}`);
     sfx.powerup();
   }
   for (const a of progress.wouldUnlock(run)) {
     if (state.celebrated.has(`a:${a.id}`)) continue;
     state.celebrated.add(`a:${a.id}`);
-    toast(`🏆 ${L(a.name)} +${a.reward}`);
+    toast(`[trophy] ${L(a.name)} +${a.reward}`);
     sfx.powerup();
     buzz(25);
   }

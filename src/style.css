@@ -389,7 +389,7 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
 .mission .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
 .mission .bar i { display: block; height: 100%; background: #73bf2e; }
 .mission.done { background: #b5d98a; }
-.mission.done .text::before { content: '✓ '; color: #3f8f16; }
+.mission.done .text::before { content: ''; display: inline-block; width: 1.2em; height: 1.2em; margin-right: 0.3em; vertical-align: -0.28em; background: var(--ic-check) center / contain no-repeat; }
 .mission.new { animation: mission-in 0.5s cubic-bezier(.2, 1.4, .5, 1) both; }
 @keyframes mission-in { from { transform: scale(0.6); opacity: 0; } }
 
@@ -421,9 +421,9 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   color: #fff;
   text-shadow: 0 1px 0 #543847, 1px 0 0 #543847, -1px 0 0 #543847, 0 -1px 0 #543847;
 }
-.skin .price::before { content: '🔒 '; font-size: 10px; }
+.skin .price::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 2px; vertical-align: -2px; background: var(--ic-lock) center / contain no-repeat; }
 .skin.sel { background: #fcb800; transform: translateY(-2px); }
-.skin.equipped::before { content: '✓'; position: absolute; left: 5px; top: 1px; font-size: 14px; color: #fff; text-shadow: 0 1px 0 #543847; }
+.skin.equipped::before { content: ''; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; z-index: 1; background: var(--ic-check) center / contain no-repeat; }
 #shop-action.buy { background: #fcb800; }
 #shop-action:disabled { background: #b7ad7a; box-shadow: 0 5px 0 #543847; opacity: 0.8; }
 
@@ -764,3 +764,8 @@ button.surprise:disabled { opacity: 0.55; }
 /* Pause / game over: a lighter plum scrim and a soft blur of the game
    instead of a heavy grey veil. */
 #pause, #gameover { background: rgba(43, 30, 46, 0.3); -webkit-backdrop-filter: blur(3px) saturate(1.15); backdrop-filter: blur(3px) saturate(1.15); }
+
+/* Badge icons (src/icons.js) inside texts and buttons. */
+.ic { display: inline-block; vertical-align: -0.3em; margin: 0 0.1em; line-height: 0; }
+.ic svg { display: block; }
+button > svg, .tab span svg, .power-icon svg, .ach-icon svg, #hand .finger svg { display: block; margin: 0 auto; }

@@ -147,7 +147,7 @@ for (const lang of LANGS) {
     await page.evaluate(() => { window.__birdy.state.god = true; });
     await run(5);
     await shot('07-run-zone1');
-    await page.evaluate((de) => window.__birdy.toast(de ? '✓ Sammle 20 Münzen +40' : '✓ Collect 20 coins +40'), lang === 'de');
+    await page.evaluate((de) => window.__birdy.toast(de ? '[check] Sammle 20 Münzen +40' : '[check] Collect 20 coins +40'), lang === 'de');
     await run(0.2);
     await shot('08-toast', 450);
     await run(2.5);

@@ -4,6 +4,8 @@
 // for open strokes (waves, arcs), or ['circle', cx, cy, r, fill].
 
 const INK = '#543847';
+// Land on the globe: green as a sticker, cut out in badge colour on a badge.
+const LAND = '#6cbb35';
 const C = {
   gold: '#fcb800', orange: '#f26b1d', green: '#73bf2e', red: '#e8453c', blue: '#4ab8ff',
   violet: '#8f63d6', cream: '#fff6d5', white: '#ffffff', ink: INK, grey: '#c9d1d9',
@@ -32,7 +34,7 @@ export const ICONS = {
   beak: [['M3 12c3-4 9-6 18-1-9 5-15 3-18 1z', C.orange], ['M3 12c5 1 11 1 18-1', null, C.ink]],
   sparkle: [['M11 3l2.2 6.4L19.5 12l-6.3 2.6L11 21l-2.2-6.4L2.5 12l6.3-2.6z', C.yellow], ['M19 2.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z', C.white]],
   globe: [['circle', 12, 12, 9, C.blue],
-    ['M6.2 7.5c2-.8 4.3.2 4.1 2.3-.2 2-2.8 2.2-2 4.3.8 2-.8 3.3-2 2.3C4.5 14.6 4 9.5 6.2 7.5zM13.5 4.2c2.4.2 4.8 1.7 5.9 3.9-1.2 1-3.2.1-4 2.1-.8 1.9 1.3 2.8 3.2 3 .1 2.4-2 4.6-4.4 5.4.1-2.2-2-3.2-2-5.2s1.4-2.6.2-4.2c-1.1-1.4-.9-3.6 1.1-5z', C.green]],
+    ['M6.2 7.5c2-.8 4.3.2 4.1 2.3-.2 2-2.8 2.2-2 4.3.8 2-.8 3.3-2 2.3C4.5 14.6 4 9.5 6.2 7.5zM13.5 4.2c2.4.2 4.8 1.7 5.9 3.9-1.2 1-3.2.1-4 2.1-.8 1.9 1.3 2.8 3.2 3 .1 2.4-2 4.6-4.4 5.4.1-2.2-2-3.2-2-5.2s1.4-2.6.2-4.2c-1.1-1.4-.9-3.6 1.1-5z', LAND]],
   pipe: [['M7.5 10h9v11h-9z', C.green], ['M9.3 10h1.6v11H9.3z', '#b2ea6c'], [rr(5, 4, 14, 6, 1), C.green], ['M7 4h1.8v6H7z', '#b2ea6c']],
   bolt: [['M13.5 2L5 13.5h6.2L9.5 22 19 9.8h-6.3z', C.gold]],
   dice: [[rr(4, 4, 16, 16, 3), C.white], ['circle', 8.5, 8.5, 1.5, INK], ['circle', 15.5, 8.5, 1.5, INK], ['circle', 12, 12, 1.5, INK], ['circle', 8.5, 15.5, 1.5, INK], ['circle', 15.5, 15.5, 1.5, INK]],
@@ -46,7 +48,47 @@ export const ICONS = {
   star: [['M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4L2.8 9.5l6.4-.8z', C.gold]],
   pause: [[rr(6, 4.5, 4, 15, 1.2), C.white], [rr(14, 4.5, 4, 15, 1.2), C.white]],
   coin: [['circle', 12, 12, 8.5, C.coin], ['circle', 12, 12, 5.2, '#f5b800'], ['M10.2 9.3c.8-1.2 2.8-1.4 3.6-.2', null, C.white]],
+  close: [['M6.5 6.5l11 11M17.5 6.5l-11 11', null, C.red]],
+  tree: [['M10.6 14h2.8v7h-2.8z', '#8b5a2b'], ['circle', 12, 9.5, 6.5, C.green]],
+  snowflake: [['M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9', null, C.sky], ['M9.5 4.5L12 6.5l2.5-2M9.5 19.5l2.5-2 2.5 2', null, C.sky]],
+  palm: [['M12.5 21.5c0-5 .8-8.6 2.5-12', null, '#a8733f'],
+    ['M15 9.5C12 6.5 8 6.3 5.5 8.5c3.2 0 6.4.5 9.5 1zM15 9.5c.6-3.8 3.4-6 7-5.5-2.4 1.2-4.6 3.2-7 5.5zM15 9.5c3.2-.8 6.2.3 7.5 3.3-2.8-1.2-5.2-2-7.5-3.3z', C.green]],
+  lollipop: [['M12 13.5v8', null, C.white], ['circle', 12, 8.5, 5.8, C.pink], ['M12 8.5a1.8 1.8 0 1 1 1.8 1.8 3.4 3.4 0 1 1-3.4-3.4', null, C.white]],
+  crown: [['M3.5 17.5l-1-10 5.2 4 4.3-7 4.3 7 5.2-4-1 10z', C.gold], [rr(3.5, 17.5, 17, 3, 1), C.orange]],
+  fire: [['M12 2.5c1 3.5 5.8 5.6 5.8 11.2a5.8 5.8 0 0 1-11.6 0c0-3.1 1.8-4.8 2.9-6.4.4 1.8 1.2 2.8 2.3 3.3-.6-3.1.1-5.8.6-8.1z', C.orange]],
+  flower: [['circle', 12, 6.8, 3.2, C.pink], ['circle', 17, 10.5, 3.2, C.pink], ['circle', 15, 16.3, 3.2, C.pink], ['circle', 9, 16.3, 3.2, C.pink], ['circle', 7, 10.5, 3.2, C.pink], ['circle', 12, 12, 2.6, C.yellow]],
+  cactus: [['M10 21.5V6a2 2 0 0 1 4 0v15.5z', C.teal], ['M10 13H7.5a1.8 1.8 0 0 1-1.8-1.8V8.5M14 11h2.5a1.8 1.8 0 0 0 1.8-1.8V7', null, C.teal]],
+  calendar: [[rr(3.5, 5.5, 17, 15, 2.5), C.white], ['M3.5 10h17', null, C.red], ['M8 3.5v4M16 3.5v4', null, C.grey]],
+  play: [['M8.5 5.5v13l10.5-6.5z', C.green]],
 };
+
+// The owner's chosen style (docs/VISUAL.md): a white glyph on a round badge,
+// each icon with its own badge colour.
+export const BADGE = {
+  sound: '#4ab8ff', mute: '#9aa3ad', gift: '#e8453c', trophy: '#fcb800', lock: '#9aa3ad', bird: '#fcb800',
+  palette: '#f26b1d', paw: '#8f63d6', tophat: '#4ab8ff', glasses: '#2fa58f', beak: '#f26b1d', sparkle: '#8f63d6',
+  globe: '#4ab8ff', pipe: '#73bf2e', bolt: '#f26b1d', dice: '#8f63d6', magnet: '#e8453c', rainbow: '#8f63d6',
+  mushroom: '#8f63d6', clover: '#73bf2e', hand: '#f26b1d', check: '#73bf2e', star: '#fcb800', pause: '#4ab8ff',
+  coin: '#fcb800', close: '#9aa3ad', tree: '#73bf2e', snowflake: '#4ab8ff', palm: '#2fa58f', lollipop: '#ff6fa8',
+  crown: '#fcb800', fire: '#f26b1d', flower: '#ff6fa8', cactus: '#2fa58f', calendar: '#e8453c', play: '#73bf2e',
+};
+
+// Shorthand used by the UI: a badge icon as an SVG string.
+export function icon(name, size = 22) {
+  return iconSvg(name, { style: 'badge', size, badge: BADGE[name] });
+}
+
+// Texts mark icons as [name] (e.g. '[gift] Daily gift'); rich() turns them
+// into inline badges sized to the text.
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]);
+export function rich(s, escape = false) {
+  const str = escape ? esc(String(s)) : String(s);
+  return str.replace(/\[(\w+)\]/g, (m, n) => (ICONS[n] ? `<span class="ic">${icon(n, '1.35em')}</span>` : m));
+}
+export function setRich(el, s) {
+  if (/\[\w+\]/.test(s)) el.innerHTML = rich(s, true);
+  else el.textContent = s;
+}
 
 // Styles for the icon set (see docs/VISUAL.md). 'sticker': colour fills with
 // the plum outline. 'glyph': white shapes with outline and a drop shadow, like
@@ -75,9 +117,9 @@ export function iconSvg(name, { style = 'sticker', size = 24, badge = '#f26b1d' 
     const white = (c) => (c === INK ? INK : C.white);
     body = `<g opacity="1">${draw(() => INK, INK, sw, 1.4)}</g>${draw(white, INK, sw)}`;
   } else if (style === 'badge') {
-    const white = (c) => (c === INK ? INK : C.white);
+    const white = (c) => (c === INK ? INK : c === LAND ? badge : C.white);
     body = `<circle cx="12" cy="12" r="11" fill="${badge}" stroke="${INK}" stroke-width="1.6"/>`
-      + `<g transform="translate(12 12) scale(0.62) translate(-12 -12)">${draw(white, 'none', 0)}</g>`;
+      + `<g transform="translate(12 12) scale(0.7) translate(-12 -12)">${draw(white, 'none', 0)}</g>`;
   } else {
     body = draw(null, INK, sw);
   }

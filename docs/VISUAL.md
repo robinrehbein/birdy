@@ -896,3 +896,24 @@ Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „en
 - Playtest (`SEED=7`): identisch mit Iteration 16 (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
 - Keine Änderung an der 3D-Szene, also auch keine an Draw Calls und Dreiecken.
 - APK baut.
+
+### Iteration 18 – eigene Abzeichen-Icons statt Emoji (Bereich 6, Variante C)
+
+**Was:**
+- Alle Emoji in der Oberfläche sind durch eigene SVG-Icons ersetzt: ein weißes Symbol auf einer
+  farbigen runden Plakette mit Pflaumen-Rand (`src/icons.js`). Sie sehen auf jedem Handy gleich aus.
+- Betroffen sind:
+  - Shop-Reiter und Zufall-Würfel, Welt- und Upgrade-Kacheln
+  - Erfolge und das Schloss für gesperrte Erfolge
+  - die Häkchen bei erledigten Missionen und bei angelegten Artikeln
+  - Tagesgeschenk, Serie, Überraschung, Toasts, Freischalt-Hinweis
+  - Power-up-Chips im HUD, Ton-Knopf und die Tutorial-Hand
+- Texte markieren Icons als `[name]`; `rich()`/`setRich()` machen daraus Inline-Icons in Textgröße.
+
+![Iteration 18](visual/it18.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 17 (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte),
+  keine Fehler.
+- Nur die Oberfläche hat sich geändert, die 3D-Szene nicht.
+- APK baut.

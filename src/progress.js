@@ -10,20 +10,20 @@ export { SKINS, TRAILS };
 // Long-term achievements (milestones). `stat` is a lifetime value; rewards
 // are paid out the moment one is unlocked.
 export const ACHIEVEMENTS = [
-  { id: 'score10', icon: '🐣', name: { de: 'Abgehoben', en: "Lift-off" }, text: { de: '10 Punkte in einem Flug', en: 'Score 10 in one flight' }, stat: 'bestScore', goal: 10, reward: 30 },
-  { id: 'score25', icon: '🐤', name: { de: 'Flugschüler', en: "Student Pilot" }, text: { de: '25 Punkte in einem Flug', en: 'Score 25 in one flight' }, stat: 'bestScore', goal: 25, reward: 60 },
-  { id: 'score50', icon: '🦅', name: { de: 'Himmelsstürmer', en: "Sky Racer" }, text: { de: '50 Punkte in einem Flug', en: 'Score 50 in one flight' }, stat: 'bestScore', goal: 50, reward: 120 },
-  { id: 'score100', icon: '👑', name: { de: 'Legende', en: "Legend" }, text: { de: '100 Punkte in einem Flug', en: 'Score 100 in one flight' }, stat: 'bestScore', goal: 100, reward: 300 },
-  { id: 'zone4', icon: '🌸', name: { de: 'Weltenbummler', en: "Globetrotter" }, text: { de: 'Erreiche den Blütenhain (Zone 4)', en: 'Reach the Blossom Grove (zone 4)' }, stat: 'bestZone', goal: 3, reward: 150 },
-  { id: 'near10', icon: '😬', name: { de: 'Haarscharf', en: "Hair's Breadth" }, text: { de: '10× „Knapp!“ insgesamt', en: '10 close calls in total' }, stat: 'nearTotal', goal: 10, reward: 40 },
-  { id: 'chain5', icon: '🔥', name: { de: 'Nervenkitzel', en: "Thrill Seeker" }, text: { de: '5× „Knapp!“ in Folge', en: '5 close calls in a row' }, stat: 'bestChain', goal: 5, reward: 150 },
-  { id: 'powers3', icon: '🌈', name: { de: 'Power-Sammler', en: "Power Collector" }, text: { de: '3 Power-ups in einem Flug', en: '3 power-ups in one flight' }, stat: 'bestPowerups', goal: 3, reward: 60 },
-  { id: 'plants25', icon: '🌱', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Stachelkakteen vorbei', en: 'Pass 25 spiky cacti' }, stat: 'plantsTotal', goal: 25, reward: 80 },
-  { id: 'coins500', icon: '🪙', name: { de: 'Sparschwein', en: "Piggy Bank" }, text: { de: '500 Münzen eingesammelt', en: 'Collect 500 coins' }, stat: 'coinsTotal', goal: 500, reward: 80 },
-  { id: 'coins2000', icon: '💰', name: { de: 'Schatzmeister', en: "Treasurer" }, text: { de: '2000 Münzen eingesammelt', en: 'Collect 2000 coins' }, stat: 'coinsTotal', goal: 2000, reward: 200 },
-  { id: 'runs50', icon: '🎮', name: { de: 'Dauerflieger', en: "Frequent Flyer" }, text: { de: '50 Runden gespielt', en: 'Play 50 rounds' }, stat: 'runs', goal: 50, reward: 100 },
-  { id: 'streak7', icon: '📅', name: { de: 'Stammgast', en: "Regular" }, text: { de: '7 Tage Geschenk-Serie', en: '7-day gift streak' }, stat: 'bestStreak', goal: 7, reward: 200 },
-  { id: 'unlock5', icon: '🎨', name: { de: 'Sammler', en: "Collector" }, text: { de: '5 Shop-Artikel freigeschaltet', en: 'Unlock 5 shop items' }, stat: 'unlocks', goal: 5, reward: 100 },
+  { id: 'score10', icon: 'bird', name: { de: 'Abgehoben', en: "Lift-off" }, text: { de: '10 Punkte in einem Flug', en: 'Score 10 in one flight' }, stat: 'bestScore', goal: 10, reward: 30 },
+  { id: 'score25', icon: 'bird', name: { de: 'Flugschüler', en: "Student Pilot" }, text: { de: '25 Punkte in einem Flug', en: 'Score 25 in one flight' }, stat: 'bestScore', goal: 25, reward: 60 },
+  { id: 'score50', icon: 'star', name: { de: 'Himmelsstürmer', en: "Sky Racer" }, text: { de: '50 Punkte in einem Flug', en: 'Score 50 in one flight' }, stat: 'bestScore', goal: 50, reward: 120 },
+  { id: 'score100', icon: 'crown', name: { de: 'Legende', en: "Legend" }, text: { de: '100 Punkte in einem Flug', en: 'Score 100 in one flight' }, stat: 'bestScore', goal: 100, reward: 300 },
+  { id: 'zone4', icon: 'flower', name: { de: 'Weltenbummler', en: "Globetrotter" }, text: { de: 'Erreiche den Blütenhain (Zone 4)', en: 'Reach the Blossom Grove (zone 4)' }, stat: 'bestZone', goal: 3, reward: 150 },
+  { id: 'near10', icon: 'bolt', name: { de: 'Haarscharf', en: "Hair's Breadth" }, text: { de: '10× „Knapp!“ insgesamt', en: '10 close calls in total' }, stat: 'nearTotal', goal: 10, reward: 40 },
+  { id: 'chain5', icon: 'fire', name: { de: 'Nervenkitzel', en: "Thrill Seeker" }, text: { de: '5× „Knapp!“ in Folge', en: '5 close calls in a row' }, stat: 'bestChain', goal: 5, reward: 150 },
+  { id: 'powers3', icon: 'rainbow', name: { de: 'Power-Sammler', en: "Power Collector" }, text: { de: '3 Power-ups in einem Flug', en: '3 power-ups in one flight' }, stat: 'bestPowerups', goal: 3, reward: 60 },
+  { id: 'plants25', icon: 'cactus', name: { de: 'Gärtner', en: "Gardener" }, text: { de: 'An 25 Stachelkakteen vorbei', en: 'Pass 25 spiky cacti' }, stat: 'plantsTotal', goal: 25, reward: 80 },
+  { id: 'coins500', icon: 'coin', name: { de: 'Sparschwein', en: "Piggy Bank" }, text: { de: '500 Münzen eingesammelt', en: 'Collect 500 coins' }, stat: 'coinsTotal', goal: 500, reward: 80 },
+  { id: 'coins2000', icon: 'coin', name: { de: 'Schatzmeister', en: "Treasurer" }, text: { de: '2000 Münzen eingesammelt', en: 'Collect 2000 coins' }, stat: 'coinsTotal', goal: 2000, reward: 200 },
+  { id: 'runs50', icon: 'play', name: { de: 'Dauerflieger', en: "Frequent Flyer" }, text: { de: '50 Runden gespielt', en: 'Play 50 rounds' }, stat: 'runs', goal: 50, reward: 100 },
+  { id: 'streak7', icon: 'calendar', name: { de: 'Stammgast', en: "Regular" }, text: { de: '7 Tage Geschenk-Serie', en: '7-day gift streak' }, stat: 'bestStreak', goal: 7, reward: 200 },
+  { id: 'unlock5', icon: 'palette', name: { de: 'Sammler', en: "Collector" }, text: { de: '5 Shop-Artikel freigeschaltet', en: 'Unlock 5 shop items' }, stat: 'unlocks', goal: 5, reward: 100 },
 ];
 const RUN_MAX_STATS = { bestScore: 'score', bestZone: 'zone', bestChain: 'bestChain', bestPowerups: 'powerups' };
 const RUN_SUM_STATS = { nearTotal: 'near', plantsTotal: 'plants', coinsTotal: 'coins' };

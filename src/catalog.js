@@ -81,19 +81,19 @@ export const TRAILS = [
 // still moves on through autumn forest, canyon and blossom grove. Colours
 // for sky, light and ground as in biomes.js; `scenery` is a theme in world.js.
 export const WORLDS = [
-  { id: 'park', icon: '🌳', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
+  { id: 'park', icon: 'tree', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
     top: 0x2a9bd0, horizon: 0xa6e4ea, hemiSky: 0xdff6ff, hemiGround: 0x6a8f3a, hemiI: 1.4, sun: 0xfff4d6, sunI: 2.2,
     tint: 0xffffff, clouds: 0xffffff, grass: 0x73bf2e, track: 0xffffff },
-  { id: 'winter', icon: '⛄', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
+  { id: 'winter', icon: 'snowflake', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
     top: 0x5aa9e6, horizon: 0xe3f2ff, hemiSky: 0xffffff, hemiGround: 0x9fb4c8, hemiI: 1.45, sun: 0xfff6e8, sunI: 2.0,
     tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8 },
-  { id: 'beach', icon: '🏝️', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
+  { id: 'beach', icon: 'palm', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
     top: 0x1fa5e0, horizon: 0xbff3f0, hemiSky: 0xe8fbff, hemiGround: 0xc9b27a, hemiI: 1.45, sun: 0xfff4d6, sunI: 2.3,
     tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff },
-  { id: 'candy', icon: '🍭', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
+  { id: 'candy', icon: 'lollipop', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
     top: 0xf07ab8, horizon: 0xffe3f1, hemiSky: 0xfff0f8, hemiGround: 0xc98fb8, hemiI: 1.45, sun: 0xfff0f6, sunI: 2.0,
     tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6 },
-  { id: 'mushroom', icon: '🍄', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
+  { id: 'mushroom', icon: 'mushroom', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
     top: 0x4a6fd0, horizon: 0xc8f0d8, hemiSky: 0xeafff2, hemiGround: 0x5a8a5a, hemiI: 1.4, sun: 0xfff0c8, sunI: 2.1,
     tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0 },
 ];
@@ -126,9 +126,9 @@ export const KINDS = Object.keys(CATALOG);
 
 // Upgrades: each power-up can be improved in three steps.
 export const UPGRADES = [
-  { id: 'star', icon: '🌈', name: { de: 'Regenbogen', en: 'Rainbow' }, text: { de: '+1,5 s unverwundbar pro Stufe', en: '+1.5 s invincible per level' }, prices: [300, 800, 1800] },
-  { id: 'magnet', icon: '🧲', name: { de: 'Magnet', en: 'Magnet' }, text: { de: '+3 s und größere Reichweite pro Stufe', en: '+3 s and wider reach per level' }, prices: [300, 800, 1800] },
-  { id: 'mini', icon: '🍄', name: { de: 'Mini-Vogel', en: 'Mini Bird' }, text: { de: '+3 s klein pro Stufe', en: '+3 s tiny per level' }, prices: [300, 800, 1800] },
-  { id: 'luck', icon: '🍀', name: { de: 'Glückspilz', en: 'Lucky' }, text: { de: 'Power-ups tauchen öfter auf', en: 'Power-ups show up more often' }, prices: [500, 1200, 2500] },
+  { id: 'star', icon: 'rainbow', name: { de: 'Regenbogen', en: 'Rainbow' }, text: { de: '+1,5 s unverwundbar pro Stufe', en: '+1.5 s invincible per level' }, prices: [300, 800, 1800] },
+  { id: 'magnet', icon: 'magnet', name: { de: 'Magnet', en: 'Magnet' }, text: { de: '+3 s und größere Reichweite pro Stufe', en: '+3 s and wider reach per level' }, prices: [300, 800, 1800] },
+  { id: 'mini', icon: 'mushroom', name: { de: 'Mini-Vogel', en: 'Mini Bird' }, text: { de: '+3 s klein pro Stufe', en: '+3 s tiny per level' }, prices: [300, 800, 1800] },
+  { id: 'luck', icon: 'clover', name: { de: 'Glückspilz', en: 'Lucky' }, text: { de: 'Power-ups tauchen öfter auf', en: 'Power-ups show up more often' }, prices: [500, 1200, 2500] },
 ];
 export const UPGRADE_MAX = 3;
