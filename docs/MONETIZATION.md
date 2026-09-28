@@ -4,7 +4,7 @@
 
 - Android: AdMob-App-ID `ca-app-pub-1786159152036324~5284705514`.
 - Zwei freiwillige Rewarded-Ad-Blöcke: 30 Münzen (`ca-app-pub-1786159152036324/7854280106`) oder ein einstündiger Style-Pass (`ca-app-pub-1786159152036324/8020434087`).
-- Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
+- Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten, außer den sieben seltenen animierten Skins. Diese gibt es nur für Münzen oder über ihren Erfolg, nicht über Anzeigen oder Echtgeld. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
 - Debug-Builds verwenden Googles Test-Anzeigenblock. Android fordert vor dem Laden den UMP-Datenschutzstatus an, setzt TFUA und Inhaltsbewertung G.
 - Der AdMob-App-Status ist noch „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe, korrekter Store-Verknüpfung und Prüfung der Datenschutzangaben zu erwarten.
 

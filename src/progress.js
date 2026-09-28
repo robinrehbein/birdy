@@ -254,9 +254,12 @@ export const progress = {
     return amount;
   },
   hasProcessedPurchase: (token) => data.processedPurchases.includes(token),
+  // The style pass lends skins and worlds for an hour, but not the rare
+  // skins: those stay earned (coins or their achievement).
   owns(kind, id) {
     return this.permanentlyOwns(kind, id)
-      || (this.stylePassMinutesLeft > 0 && (kind === 'skin' || kind === 'world'));
+      || (this.stylePassMinutesLeft > 0 && (kind === 'skin' || kind === 'world')
+        && !CATALOG[kind].find((x) => x.id === id)?.rare);
   },
   buy(kind, id) {
     const item = CATALOG[kind].find((x) => x.id === id);
