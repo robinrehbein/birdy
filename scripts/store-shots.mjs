@@ -24,7 +24,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
 const CLAIMS = {
   de: {
-    menu: ['Tippen. Ausweichen.', 'Durchfliegen.', 'Ohne Werbung · offline'],
+    menu: ['Tippen. Ausweichen.', 'Durchfliegen.', 'Offline spielbar · Werbung nur freiwillig'],
     park: ['Drei Spuren,', 'ein Finger'],
     herbstwald: ['Vier Zonen mit', 'eigener Musik'],
     kaktus: ['Vorsicht,', 'Stachelkaktus!'],
@@ -33,7 +33,7 @@ const CLAIMS = {
     welten: ['Neue Welten', 'freispielen'],
   },
   en: {
-    menu: ['Tap. Dodge.', 'Fly through.', 'No ads · works offline'],
+    menu: ['Tap. Dodge.', 'Fly through.', 'Plays offline · ads only if you want'],
     park: ['Three lanes,', 'one finger'],
     herbstwald: ['Four zones with', 'their own music'],
     kaktus: ['Watch out for', 'the spiky cactus!'],
