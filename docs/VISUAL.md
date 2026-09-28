@@ -862,3 +862,21 @@ Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „en
 - Spitzenwert: 157 Draw Calls, 52 k Dreiecke. Ohne Wolke ist ein Draw Call gespart.
 - Erster Frame: 583–662 ms.
 - APK baut.
+
+### Iteration 16 – Vogel Variante B: Flügel im Körperton, größerer Schwanz (Bereich 1)
+
+**Was:**
+- **Flügel:** Blasse, cremefarbene Flügel lasen sich von hinten wie Stäbchen. Sie haben jetzt den
+  Farbton des Körpers: etwas heller für den Flügel, die obere Federlage in der Schwanzfarbe.
+  Das gilt automatisch für alle Farben mit hellen Flügeln (Sunny, Himmel, Kardinal, Minze,
+  Koralle, Flamingo, Rotkehlchen, Nachteule, Schneeeule). Bewusst gefärbte Flügel bleiben: Papagei,
+  Pinguin, Pfau, Gold.
+- **Schwanzfedern:** etwa 30 % größer, damit der Vogel von hinten eine klare Silhouette hat.
+- Icon, Splash und Feature-Grafiken sind mit dem neuen Vogel neu gerendert.
+
+![Iteration 16 vorher/nachher](visual/it16.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`) im Streubereich.
+- Spitzenwert: ≤ 170 Draw Calls.
+- APK baut.
