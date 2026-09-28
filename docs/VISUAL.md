@@ -823,3 +823,42 @@ ohne Rückfrage lösbar und folgen in Iteration 14.
 - Spitzenwert: 170 Draw Calls (am Budget), 56 k Dreiecke.
 - Normale Probe, im direkten Wechsel gemessen: erster Frame 642 ms gegenüber 619 ms der Basis.
 - APK baut.
+
+## Runde 2: deine Entscheidungen (28.09.)
+
+Deine Wahl:
+- **Röhren:** hoch in den Himmel, pro Reihe zufällig Wolkenbank, Wolkenkragen oder keine Wolke,
+  spät ausblenden.
+- **Icons:** C, Abzeichen.
+- **Schrift:** C, Fredoka SemiBold.
+- **Vogel:** B.
+- **Weltfarben:** Varianten zeigen.
+- **Neu:** animierte Premium-Skins.
+
+Die Varianten-Bilder liegen in `docs/visual/choice-*.jpg`.
+
+### Iteration 15 – Röhren wieder hoch in den Himmel, gemischte Wolken
+
+**Warum:** Seit Iteration 9 endeten die oberen Röhren in der Wolkenbank. In der Ferne wirkten die
+Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „endlos hoch“ fehlte.
+
+**Was:**
+- Die oberen Röhren reichen wieder bis Höhe 40. Sie bleiben bis Höhe 32 kräftig grün und blenden
+  erst ganz oben aus (32–40). So entstehen keine blassen „Lichtsäulen“ wie früher mit 15–26.
+- Jede Reihe bekommt zufällig eine von drei Varianten: eine breite Wolkenbank, durch die die
+  Röhren gehen; einen kleinen Wolkenkragen um jede obere Röhre; oder keine Wolke. Der Zufall
+  kommt aus einer eigenen Folge, der Spielzufall bleibt unberührt.
+- Die Trefferzonen sind unverändert.
+
+![Iteration 15](visual/it15.jpg)
+
+**Messwerte:**
+- Playtest mit drei Seeds:
+  - Anfänger: 19,5 / 17,4 / 15,9 s
+  - Geübt: 38,8 / 35,0 / 36,1 s
+  - Profi: 142 / 142 / 143 Punkte
+
+  Das liegt im Streubereich der Basis. Keine Fehler.
+- Spitzenwert: 157 Draw Calls, 52 k Dreiecke. Ohne Wolke ist ein Draw Call gespart.
+- Erster Frame: 583–662 ms.
+- APK baut.
