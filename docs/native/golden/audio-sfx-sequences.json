@@ -1,0 +1,753 @@
+{
+ "midiTable": {
+  "40": 82.406889,
+  "41": 87.307058,
+  "45": 110,
+  "48": 130.812783,
+  "50": 146.832384,
+  "52": 164.813778,
+  "53": 174.614116,
+  "55": 195.997718,
+  "57": 220,
+  "59": 246.941651,
+  "60": 261.625565,
+  "62": 293.664768,
+  "64": 329.627557,
+  "67": 391.995436,
+  "69": 440,
+  "71": 493.883301,
+  "72": 523.251131,
+  "74": 587.329536,
+  "76": 659.255114,
+  "77": 698.456463,
+  "79": 783.990872,
+  "81": 880,
+  "84": 1046.502261,
+  "86": 1174.659072,
+  "88": 1318.510228,
+  "91": 1567.981744,
+  "93": 1760,
+  "96": 2093.004522,
+  "100": 2637.020455,
+  "103": 3135.963488,
+  "105": 3520
+ },
+ "point": [
+  {
+   "freq": 988,
+   "dur": 0.08,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0
+  },
+  {
+   "freq": 1319,
+   "dur": 0.16,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.07
+  }
+ ],
+ "coin": {
+  "comboMax": 7,
+  "comboResetMs": 700,
+  "byCombo": [
+   {
+    "combo": 0,
+    "k": 1,
+    "tone1": {
+     "freq": 1568,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2093,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 1,
+    "k": 1.059463,
+    "tone1": {
+     "freq": 1661.238132,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2217.456256,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 2,
+    "k": 1.122462,
+    "tone1": {
+     "freq": 1760.020492,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2349.313067,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 3,
+    "k": 1.189207,
+    "tone1": {
+     "freq": 1864.676756,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2489.010492,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 4,
+    "k": 1.259921,
+    "tone1": {
+     "freq": 1975.556206,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2637.014757,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 5,
+    "k": 1.33484,
+    "tone1": {
+     "freq": 2093.028891,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2793.819815,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 6,
+    "k": 1.414214,
+    "tone1": {
+     "freq": 2217.486866,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 2959.948986,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   },
+   {
+    "combo": 7,
+    "k": 1.498307,
+    "tone1": {
+     "freq": 2349.345497,
+     "dur": 0.06,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0
+    },
+    "tone2": {
+     "freq": 3135.956712,
+     "dur": 0.12,
+     "type": "square",
+     "vol": 0.05,
+     "delay": 0.05
+    }
+   }
+  ]
+ },
+ "powerup": [
+  {
+   "midi": 60,
+   "freq": 261.625565,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0
+  },
+  {
+   "midi": 64,
+   "freq": 329.627557,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.045
+  },
+  {
+   "midi": 67,
+   "freq": 391.995436,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.09
+  },
+  {
+   "midi": 72,
+   "freq": 523.251131,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.135
+  },
+  {
+   "midi": 76,
+   "freq": 659.255114,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.18
+  },
+  {
+   "midi": 79,
+   "freq": 783.990872,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.225
+  },
+  {
+   "midi": 84,
+   "freq": 1046.502261,
+   "dur": 0.1,
+   "type": "square",
+   "vol": 0.06,
+   "delay": 0.27
+  }
+ ],
+ "powerdown": [
+  {
+   "midi": 79,
+   "freq": 783.990872,
+   "dur": 0.1,
+   "type": "triangle",
+   "vol": 0.12,
+   "delay": 0
+  },
+  {
+   "midi": 74,
+   "freq": 587.329536,
+   "dur": 0.1,
+   "type": "triangle",
+   "vol": 0.12,
+   "delay": 0.06
+  },
+  {
+   "midi": 67,
+   "freq": 391.995436,
+   "dur": 0.1,
+   "type": "triangle",
+   "vol": 0.12,
+   "delay": 0.12
+  },
+  {
+   "midi": 62,
+   "freq": 293.664768,
+   "dur": 0.1,
+   "type": "triangle",
+   "vol": 0.12,
+   "delay": 0.18
+  }
+ ],
+ "near": {
+  "chainMax": 6,
+  "byChain": [
+   {
+    "chain": 0,
+    "clampedChain": 0,
+    "base": 76,
+    "notes": [
+     {
+      "midi": 76,
+      "freq": 659.255114,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 80,
+      "freq": 830.609395,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 83,
+      "freq": 987.766603,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 88,
+      "freq": 1318.510228,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 1,
+    "clampedChain": 1,
+    "base": 78,
+    "notes": [
+     {
+      "midi": 78,
+      "freq": 739.988845,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 82,
+      "freq": 932.327523,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 85,
+      "freq": 1108.730524,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 90,
+      "freq": 1479.977691,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 2,
+    "clampedChain": 2,
+    "base": 80,
+    "notes": [
+     {
+      "midi": 80,
+      "freq": 830.609395,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 84,
+      "freq": 1046.502261,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 87,
+      "freq": 1244.507935,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 92,
+      "freq": 1661.21879,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 3,
+    "clampedChain": 3,
+    "base": 82,
+    "notes": [
+     {
+      "midi": 82,
+      "freq": 932.327523,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 86,
+      "freq": 1174.659072,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 89,
+      "freq": 1396.912926,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 94,
+      "freq": 1864.655046,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 4,
+    "clampedChain": 4,
+    "base": 84,
+    "notes": [
+     {
+      "midi": 84,
+      "freq": 1046.502261,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 88,
+      "freq": 1318.510228,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 91,
+      "freq": 1567.981744,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 96,
+      "freq": 2093.004522,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 5,
+    "clampedChain": 5,
+    "base": 86,
+    "notes": [
+     {
+      "midi": 86,
+      "freq": 1174.659072,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 90,
+      "freq": 1479.977691,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 93,
+      "freq": 1760,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 98,
+      "freq": 2349.318143,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 6,
+    "clampedChain": 6,
+    "base": 88,
+    "notes": [
+     {
+      "midi": 88,
+      "freq": 1318.510228,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 92,
+      "freq": 1661.21879,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 95,
+      "freq": 1975.533205,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 100,
+      "freq": 2637.020455,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 7,
+    "clampedChain": 6,
+    "base": 88,
+    "notes": [
+     {
+      "midi": 88,
+      "freq": 1318.510228,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 92,
+      "freq": 1661.21879,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 95,
+      "freq": 1975.533205,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 100,
+      "freq": 2637.020455,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   },
+   {
+    "chain": 8,
+    "clampedChain": 6,
+    "base": 88,
+    "notes": [
+     {
+      "midi": 88,
+      "freq": 1318.510228,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0
+     },
+     {
+      "midi": 92,
+      "freq": 1661.21879,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.035
+     },
+     {
+      "midi": 95,
+      "freq": 1975.533205,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.07
+     },
+     {
+      "midi": 100,
+      "freq": 2637.020455,
+      "dur": 0.07,
+      "type": "square",
+      "vol": 0.05,
+      "delay": 0.105
+     }
+    ]
+   }
+  ]
+ },
+ "zone": {
+  "sweep": {
+   "freq": 300,
+   "to": 900,
+   "dur": 0.35,
+   "type": "triangle",
+   "vol": 0.12,
+   "delay": 0
+  },
+  "arpeggio": [
+   {
+    "midi": 72,
+    "freq": 523.251131,
+    "dur": 0.14,
+    "type": "square",
+    "vol": 0.05,
+    "delay": 0.2
+   },
+   {
+    "midi": 76,
+    "freq": 659.255114,
+    "dur": 0.14,
+    "type": "square",
+    "vol": 0.05,
+    "delay": 0.27
+   },
+   {
+    "midi": 79,
+    "freq": 783.990872,
+    "dur": 0.14,
+    "type": "square",
+    "vol": 0.05,
+    "delay": 0.34
+   },
+   {
+    "midi": 84,
+    "freq": 1046.502261,
+    "dur": 0.14,
+    "type": "square",
+    "vol": 0.05,
+    "delay": 0.41
+   },
+   {
+    "midi": 88,
+    "freq": 1318.510228,
+    "dur": 0.14,
+    "type": "square",
+    "vol": 0.05,
+    "delay": 0.48
+   }
+  ]
+ },
+ "bounce": {
+  "freq": 200,
+  "to": 500,
+  "dur": 0.15,
+  "type": "triangle",
+  "vol": 0.2,
+  "delay": 0
+ },
+ "hit": {
+  "tone1": {
+   "freq": 220,
+   "to": 60,
+   "dur": 0.35,
+   "type": "sawtooth",
+   "vol": 0.18,
+   "delay": 0
+  },
+  "tone2": {
+   "freq": 120,
+   "to": 40,
+   "dur": 0.5,
+   "type": "square",
+   "vol": 0.1,
+   "delay": 0.05
+  },
+  "noise": {
+   "dur": 0.25,
+   "vol": 0.3,
+   "cutoff": 400
+  }
+ },
+ "flap": {
+  "kMin": 0.94,
+  "kMaxExclusive": 1.06,
+  "toneAtKEquals1": {
+   "freq": 380,
+   "to": 620,
+   "dur": 0.09,
+   "type": "triangle",
+   "vol": 0.18
+  },
+  "noise": {
+   "dur": 0.06,
+   "vol": 0.05,
+   "cutoff": 3000
+  }
+ },
+ "swoosh": {
+  "dur": 0.18,
+  "vol": 0.12,
+  "cutoff": 1200
+ }
+}

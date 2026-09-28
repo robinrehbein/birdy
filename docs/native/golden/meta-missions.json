@@ -1,0 +1,1597 @@
+{
+  "source": "src/progress.js lines 41-86",
+  "note": "seeded() is an FNV-1a hash (2166136261 offset basis, 16777619 prime) feeding an xorshift-ish mix, taken as a 32-bit generator; pool.splice mutates the filtered pool array in place, so draws are without replacement.",
+  "rewardsByTier": [
+    40,
+    70,
+    120
+  ],
+  "missionPoolIds": [
+    "coins",
+    "score",
+    "rows",
+    "powers",
+    "runs",
+    "plants",
+    "moving",
+    "star"
+  ],
+  "missionPoolMinBest": {
+    "coins": 0,
+    "score": 0,
+    "rows": 0,
+    "powers": 8,
+    "runs": 0,
+    "plants": 14,
+    "moving": 10,
+    "star": 12
+  },
+  "seededRawDraws": {
+    "2024-1-1": [
+      0.5021003582514822,
+      0.553551004268229,
+      0.03672685124911368,
+      0.0617601634003222,
+      0.1907095992937684
+    ],
+    "2026-9-28": [
+      0.9631516414228827,
+      0.5392609678674489,
+      0.37333796080201864,
+      0.5014597163535655,
+      0.6577393373008817
+    ],
+    "": [
+      0.8339333257172257,
+      0.81003926997073,
+      0.9669574950821698,
+      0.7444336137268692,
+      0.9813157033640891
+    ],
+    "a": [
+      0.6697624446824193,
+      0.8461105164606124,
+      0.17704969877377152,
+      0.6732609628234059,
+      0.16728560556657612
+    ],
+    "2026-12-31": [
+      0.9901890126056969,
+      0.8065379075706005,
+      0.33809797186404467,
+      0.561676113633439,
+      0.3898615092039108
+    ]
+  },
+  "dailyMissions": [
+    {
+      "date": "2024-1-1",
+      "best": 0,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 5,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 8,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 13,
+      "list": [
+        {
+          "id": "powers",
+          "goal": 2,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 14,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 30,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 100,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-1",
+      "best": 999,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 0,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 40,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 5,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 40,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 8,
+      "list": [
+        {
+          "id": "powers",
+          "goal": 2,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 13,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 12,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 14,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 13,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 30,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 27,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 100,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 90,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-1-2",
+      "best": 999,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 899,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 0,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 5,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 8,
+      "list": [
+        {
+          "id": "powers",
+          "goal": 2,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 13,
+      "list": [
+        {
+          "id": "moving",
+          "goal": 4,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 6,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 6,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 14,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 6,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 30,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 6,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 100,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 6,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "best": 999,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 6,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 0,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 40,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 5,
+      "list": [
+        {
+          "id": "rows",
+          "goal": 30,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 40,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 8,
+      "list": [
+        {
+          "id": "powers",
+          "goal": 2,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 13,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 12,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 14,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 13,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 30,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 27,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 100,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 90,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2025-6-15",
+      "best": 999,
+      "list": [
+        {
+          "id": "plants",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 899,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 0,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 5,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 7,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "coins",
+          "goal": 70,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 8,
+      "list": [
+        {
+          "id": "runs",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 60,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 9,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 13,
+      "list": [
+        {
+          "id": "star",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "score",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 14,
+      "list": [
+        {
+          "id": "star",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 30,
+      "list": [
+        {
+          "id": "star",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 100,
+      "list": [
+        {
+          "id": "star",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-28",
+      "best": 999,
+      "list": [
+        {
+          "id": "star",
+          "goal": 3,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 0,
+      "list": [
+        {
+          "id": "coins",
+          "goal": 20,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 60,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 5,
+      "list": [
+        {
+          "id": "coins",
+          "goal": 20,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 60,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 8,
+      "list": [
+        {
+          "id": "score",
+          "goal": 5,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 60,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 8,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 13,
+      "list": [
+        {
+          "id": "score",
+          "goal": 8,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 14,
+      "list": [
+        {
+          "id": "score",
+          "goal": 8,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 30,
+      "list": [
+        {
+          "id": "score",
+          "goal": 18,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 100,
+      "list": [
+        {
+          "id": "score",
+          "goal": 60,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2026-9-29",
+      "best": 999,
+      "list": [
+        {
+          "id": "score",
+          "goal": 599,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 4,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 14,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 0,
+      "list": [
+        {
+          "id": "coins",
+          "goal": 20,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 5,
+      "list": [
+        {
+          "id": "coins",
+          "goal": 20,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "rows",
+          "goal": 100,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 8,
+      "list": [
+        {
+          "id": "coins",
+          "goal": 20,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "runs",
+          "goal": 5,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "powers",
+          "goal": 6,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 13,
+      "list": [
+        {
+          "id": "score",
+          "goal": 8,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 8,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 10,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 14,
+      "list": [
+        {
+          "id": "score",
+          "goal": 8,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 8,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 10,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 30,
+      "list": [
+        {
+          "id": "score",
+          "goal": 18,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 8,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 10,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 100,
+      "list": [
+        {
+          "id": "score",
+          "goal": 60,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 8,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 10,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    },
+    {
+      "date": "2000-1-1",
+      "best": 999,
+      "list": [
+        {
+          "id": "score",
+          "goal": 599,
+          "progress": 0,
+          "reward": 40,
+          "done": false
+        },
+        {
+          "id": "moving",
+          "goal": 8,
+          "progress": 0,
+          "reward": 70,
+          "done": false
+        },
+        {
+          "id": "star",
+          "goal": 10,
+          "progress": 0,
+          "reward": 120,
+          "done": false
+        }
+      ]
+    }
+  ],
+  "dayKeyFormat": "template: `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}` — NOT zero-padded, month is 1-based (JS getMonth() is 0-based, +1 applied)",
+  "dayKeyExamples": [
+    {
+      "y": 2026,
+      "m0": 8,
+      "d": 28,
+      "label": "Sep 28 2026 (getMonth()=8)",
+      "key": "2026-9-28"
+    },
+    {
+      "y": 2026,
+      "m0": 0,
+      "d": 5,
+      "label": "Jan 5 2026",
+      "key": "2026-1-5"
+    }
+  ]
+}

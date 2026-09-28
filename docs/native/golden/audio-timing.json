@@ -1,0 +1,101 @@
+{
+ "BPM": 124,
+ "STEP": 0.12096774193548387,
+ "stepMs": 120.96774193548387,
+ "schedulerIntervalMs": 25,
+ "scheduleLookaheadSec": 0.12,
+ "loopLengthSteps": 256,
+ "barLengthSteps": 16,
+ "barsPerFormPart": 4,
+ "formParts": 4,
+ "startOffsetSec": 0.05,
+ "beatFormula": "beat = (currentTime - startTime) / (STEP * 4)",
+ "quarterNoteSec": 0.4838709677419355,
+ "beatSamples": [
+  {
+   "elapsedSec": 0,
+   "beat": 0
+  },
+  {
+   "elapsedSec": 0.25,
+   "beat": 0.516667
+  },
+  {
+   "elapsedSec": 0.5,
+   "beat": 1.033333
+  },
+  {
+   "elapsedSec": 0.75,
+   "beat": 1.55
+  },
+  {
+   "elapsedSec": 1,
+   "beat": 2.066667
+  },
+  {
+   "elapsedSec": 1.25,
+   "beat": 2.583333
+  },
+  {
+   "elapsedSec": 1.5,
+   "beat": 3.1
+  },
+  {
+   "elapsedSec": 1.75,
+   "beat": 3.616667
+  },
+  {
+   "elapsedSec": 2,
+   "beat": 4.133333
+  },
+  {
+   "elapsedSec": 2.25,
+   "beat": 4.65
+  },
+  {
+   "elapsedSec": 2.5,
+   "beat": 5.166667
+  },
+  {
+   "elapsedSec": 2.75,
+   "beat": 5.683333
+  },
+  {
+   "elapsedSec": 3,
+   "beat": 6.2
+  },
+  {
+   "elapsedSec": 3.25,
+   "beat": 6.716667
+  },
+  {
+   "elapsedSec": 3.5,
+   "beat": 7.233333
+  },
+  {
+   "elapsedSec": 3.75,
+   "beat": 7.75
+  },
+  {
+   "elapsedSec": 4,
+   "beat": 8.266667
+  }
+ ],
+ "toneEnvelope": {
+  "attackSec": 0.006,
+  "attackFrom": 0.0001,
+  "decayToFloor": 0.0001,
+  "note": "gain: exponentialRamp(0.0001 -> vol) over first 6ms, then exponentialRamp(vol -> 0.0001) finishing at t+dur. Oscillator stops at t+dur+0.02.",
+  "freqRampNote": "if to !== freq: frequency.exponentialRampToValueAtTime(to, t+dur) starting from freq set at t (i.e. exponential/log-linear glide over the full note duration)"
+ },
+ "noiseHitEnvelope": {
+  "attack": "instantaneous (setValueAtTime(vol, at))",
+  "decayToFloor": 0.0001,
+  "decayEndsAt": "at + dur",
+  "stopsAt": "at + dur + 0.02",
+  "bufferOffsetRange": [
+   0,
+   0.5
+  ]
+ }
+}

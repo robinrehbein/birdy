@@ -1,0 +1,62 @@
+[
+  {
+    "type": "star",
+    "level": 0,
+    "duration": 6
+  },
+  {
+    "type": "star",
+    "level": 1,
+    "duration": 7.5
+  },
+  {
+    "type": "star",
+    "level": 2,
+    "duration": 9
+  },
+  {
+    "type": "star",
+    "level": 3,
+    "duration": 10.5
+  },
+  {
+    "type": "magnet",
+    "level": 0,
+    "duration": 9
+  },
+  {
+    "type": "magnet",
+    "level": 1,
+    "duration": 12
+  },
+  {
+    "type": "magnet",
+    "level": 2,
+    "duration": 15
+  },
+  {
+    "type": "magnet",
+    "level": 3,
+    "duration": 18
+  },
+  {
+    "type": "mini",
+    "level": 0,
+    "duration": 9
+  },
+  {
+    "type": "mini",
+    "level": 1,
+    "duration": 12
+  },
+  {
+    "type": "mini",
+    "level": 2,
+    "duration": 15
+  },
+  {
+    "type": "mini",
+    "level": 3,
+    "duration": 18
+  }
+]

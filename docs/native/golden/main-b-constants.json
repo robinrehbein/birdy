@@ -1,0 +1,17 @@
+{
+  "UPGRADE_BONUS": {
+    "star": 1.5,
+    "magnet": 3,
+    "mini": 3
+  },
+  "MAGNET_RANGE": 9,
+  "STAR_SPEED_BOOST": 1.35,
+  "GRACE_TIME": 1.2,
+  "HIT_STOP": 0.14,
+  "NEAR_MISS": 0.45,
+  "QUALITY_DPR_STEPS": 4,
+  "SURPRISE_PRICE": 150,
+  "SURPRISE_MAX": 900,
+  "TUT_SWITCH_ROW": 3,
+  "NEAR_BIRD": 0.12
+}

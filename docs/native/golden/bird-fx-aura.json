@@ -1,0 +1,247 @@
+{
+  "source": "src/effects.js lines 196-229",
+  "ringGeometry": "RingGeometry(innerRadius=0.82, outerRadius=1, thetaSegments=40)",
+  "materialBase": "MeshBasicMaterial: transparent, depthWrite=false, toneMapped=false, fog=false, side=DoubleSide, color starts 0xffffff",
+  "renderOrder": 9,
+  "billboarding": "ring.quaternion = camera.quaternion every frame it is visible (full billboard, not just Y-axis)",
+  "formulas": {
+    "star": {
+      "color": "HSL((time*1.5) % 1, s=1, l=0.6)  // cycles hue once every 2/3 s",
+      "opacity": "0.75 (constant)",
+      "scale": "size * (1.25 + 0.08 * sin(time*12))"
+    },
+    "magnet": {
+      "colorHex": "0xff4a4a (constant)",
+      "opacity": "0.7 * (1 - k), k = (time*1.6) % 1  // sawtooth, one wave every 1/1.6 = 0.625s (comment in source incorrectly says \"every 0.6 s\")",
+      "scale": "size * (1 + 2.2 * k)"
+    },
+    "mini": {
+      "colorHex": "0xc58bff (constant)",
+      "opacity": "0.85 (constant)",
+      "scale": "size * (1.5 + 0.15 * sin(time*8))"
+    }
+  },
+  "visibility": "ring.visible = (kind !== null); kind precedence in main.js is star > magnet > mini (main.js line 1853), and null (hidden) whenever state.mode !== \"playing\"",
+  "samples": [
+    {
+      "time": 0,
+      "star": {
+        "color": {
+          "r": 1,
+          "g": 0.19999999999999996,
+          "b": 0.19999999999999996
+        },
+        "opacity": 0.75,
+        "scale": 1.375
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.7,
+        "scale": 1.1
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.6500000000000001
+      }
+    },
+    {
+      "time": 0.1,
+      "star": {
+        "color": {
+          "r": 1,
+          "g": 0.9199999999999996,
+          "b": 0.19999999999999996
+        },
+        "opacity": 0.75,
+        "scale": 1.457019439565116
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.588,
+        "scale": 1.4872000000000003
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.7683637549984215
+      }
+    },
+    {
+      "time": 0.25,
+      "star": {
+        "color": {
+          "r": 0.19999999999999996,
+          "g": 1,
+          "b": 0.4000000000000001
+        },
+        "opacity": 0.75,
+        "scale": 1.3874185607092684
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.42,
+        "scale": 2.0680000000000005
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.8000340754262376
+      }
+    },
+    {
+      "time": 0.333,
+      "star": {
+        "color": {
+          "r": 0.19999999999999996,
+          "g": 1,
+          "b": 0.9976000000000004
+        },
+        "opacity": 0.75,
+        "scale": 1.3086319951421397
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.32703999999999994,
+        "scale": 2.3893760000000004
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.725841018354707
+      }
+    },
+    {
+      "time": 0.5,
+      "star": {
+        "color": {
+          "r": 0.5999999999999996,
+          "g": 0.19999999999999996,
+          "b": 1
+        },
+        "opacity": 0.75,
+        "scale": 1.3504114361584947
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.13999999999999996,
+        "scale": 3.0360000000000005
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.525127588274192
+      }
+    },
+    {
+      "time": 0.625,
+      "star": {
+        "color": {
+          "r": 1,
+          "g": 0.19999999999999996,
+          "b": 0.49999999999999944
+        },
+        "opacity": 0.75,
+        "scale": 1.4575439979561773
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.7,
+        "scale": 1.1
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.4917774946805822
+      }
+    },
+    {
+      "time": 0.75,
+      "star": {
+        "color": {
+          "r": 1,
+          "g": 0.8,
+          "b": 0.19999999999999996
+        },
+        "opacity": 0.75,
+        "scale": 1.4112664267012747
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.5599999999999998,
+        "scale": 1.5840000000000005
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.6038964427971774
+      }
+    },
+    {
+      "time": 1,
+      "star": {
+        "color": {
+          "r": 0.19999999999999996,
+          "g": 0.9999999999999998,
+          "b": 1
+        },
+        "opacity": 0.75,
+        "scale": 1.3277815832159618
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.2799999999999999,
+        "scale": 2.5520000000000005
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.813244110692858
+      }
+    },
+    {
+      "time": 1.5,
+      "star": {
+        "color": {
+          "r": 0.6000000000000001,
+          "g": 1,
+          "b": 0.19999999999999996
+        },
+        "opacity": 0.75,
+        "scale": 1.3089131222840926
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.4199999999999997,
+        "scale": 2.068000000000001
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.5614654685299283
+      }
+    },
+    {
+      "time": 2,
+      "star": {
+        "color": {
+          "r": 1,
+          "g": 0.19999999999999996,
+          "b": 0.19999999999999996
+        },
+        "opacity": 0.75,
+        "scale": 1.2953091041434173
+      },
+      "magnet": {
+        "colorHex": 16730698,
+        "opacity": 0.5599999999999998,
+        "scale": 1.5840000000000005
+      },
+      "mini": {
+        "colorHex": 12946431,
+        "opacity": 0.85,
+        "scale": 1.6024959527502642
+      }
+    }
+  ]
+}

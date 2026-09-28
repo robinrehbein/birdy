@@ -1,0 +1,310 @@
+{
+  "source": "src/effects.js lines 5-76",
+  "seed": 1234567,
+  "rng": "mulberry32 (test-only substitute for Math.random; production code is unseeded)",
+  "pool": {
+    "max": 300,
+    "structure": "flat array of {life, maxLife, size, gravity, drag, pos:Vec3, vel:Vec3, spin}; a single ring-buffer cursor picks the next slot to overwrite regardless of whether it is still alive (oldest-slot eviction, not oldest-particle)"
+  },
+  "emitFormulas": {
+    "velocityDirection": "normalize(rand()-0.5, rand()-0.5, rand()-0.5)  // uniform in a CUBE then normalized (not a uniform sphere distribution)",
+    "velocityMagnitude": "speed * (0.4 + rand()*0.6) * spread",
+    "driftAddedToZ": "vel.z += drift  // constant backward bias, e.g. trail particles",
+    "life": "life = maxLife = life_param * (0.7 + rand()*0.6)",
+    "size": "size = size_param * (0.6 + rand()*0.8)",
+    "spin": "spin = rand() * 6  // radians, used as rotation.x = spin*k, rotation.y = spin*1.3*k in update-render (k = life/maxLife)",
+    "color": "colors[floor(rand() * colors.length)]  // uniform pick from the palette array, independent per particle",
+    "drawOrderPerParticle": [
+      "vel.x rand()",
+      "vel.y rand()",
+      "vel.z rand()",
+      "speed jitter rand()",
+      "life jitter rand()",
+      "size jitter rand()",
+      "spin rand()",
+      "color index rand()"
+    ]
+  },
+  "updateFormulas": {
+    "lifeDecay": "life -= dt",
+    "gravity": "vel.y += gravity * dt  // gravity is typically negative (down) but callers pass positive too (e.g. trail gravity:-4..3)",
+    "drag": "vel *= max(0, 1 - drag*dt)  // uniform scalar damping on all 3 axes",
+    "integrate": "pos += vel * dt",
+    "worldScroll": "pos.z += dz  // dz = state.speed*dt while playing, 0 otherwise; makes particles scroll with the world so trails read as stationary in world-space",
+    "renderScale": "visible while life>0; renderScale = size * (0.3 + 0.7 * max(0, life/maxLife)); rotation.set(spin*k, spin*1.3*k, 0)"
+  },
+  "defaults": {
+    "count": 10,
+    "colors": [
+      16777215
+    ],
+    "speed": 4,
+    "size": 0.12,
+    "life": 0.6,
+    "gravity": -6,
+    "drag": 1.5,
+    "spread": 1,
+    "drift": 0
+  },
+  "traces": {
+    "emit1_params": {
+      "count": 5,
+      "colors": [
+        16734858,
+        5951999,
+        16767050
+      ],
+      "speed": 7,
+      "size": 0.13,
+      "life": 0.9,
+      "gravity": -4
+    },
+    "afterEmit1": [
+      {
+        "index": 0,
+        "color": 16734858,
+        "particle": {
+          "life": 0.698057956136763,
+          "maxLife": 0.698057956136763,
+          "size": 0.12118311561457813,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0,
+            "y": 5,
+            "z": 0
+          },
+          "vel": {
+            "x": 1.3622126304175184,
+            "y": -3.911073169710138,
+            "z": -0.7920540311409121
+          },
+          "spin": 0.9031251920387149
+        }
+      },
+      {
+        "index": 1,
+        "color": 5951999,
+        "particle": {
+          "life": 1.1459236634569243,
+          "maxLife": 1.1459236634569243,
+          "size": 0.13870701196789742,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0,
+            "y": 5,
+            "z": 0
+          },
+          "vel": {
+            "x": -4.363333353584271,
+            "y": -0.7213871101511202,
+            "z": 0.7568736966622616
+          },
+          "spin": 0.5558683373965323
+        }
+      },
+      {
+        "index": 2,
+        "color": 16734858,
+        "particle": {
+          "life": 0.8837249247031286,
+          "maxLife": 0.8837249247031286,
+          "size": 0.09495123518258335,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0,
+            "y": 5,
+            "z": 0
+          },
+          "vel": {
+            "x": -0.8299600535564854,
+            "y": 0.1622324588808453,
+            "z": 4.157863535785165
+          },
+          "spin": 0.387733640614897
+        }
+      },
+      {
+        "index": 3,
+        "color": 16767050,
+        "particle": {
+          "life": 1.1247751394379886,
+          "maxLife": 1.1247751394379886,
+          "size": 0.14532758685387673,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0,
+            "y": 5,
+            "z": 0
+          },
+          "vel": {
+            "x": -2.255189957132708,
+            "y": 4.048191441662632,
+            "z": -2.2411853830548134
+          },
+          "spin": 0.9604885317385197
+        }
+      },
+      {
+        "index": 4,
+        "color": 16767050,
+        "particle": {
+          "life": 0.8005716072488576,
+          "maxLife": 0.8005716072488576,
+          "size": 0.1195459884442389,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0,
+            "y": 5,
+            "z": 0
+          },
+          "vel": {
+            "x": -3.4490564050284336,
+            "y": 2.146629415551479,
+            "z": 1.6691670197133355
+          },
+          "spin": 3.5597934876568615
+        }
+      }
+    ],
+    "afterOneFrame_dt": 0.016666666666666666,
+    "afterOneFrame_dz": 0.3,
+    "afterOneFrame": [
+      {
+        "index": 0,
+        "particle": {
+          "life": 0.6813912894700963,
+          "maxLife": 0.698057956136763,
+          "size": 0.12118311561457813,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": 0.022135955244284675,
+            "y": 4.935361727658877,
+            "z": 0.2871291219939602
+          },
+          "vel": {
+            "x": 1.3281573146570804,
+            "y": -3.8782963404673847,
+            "z": -0.7722526803623893
+          },
+          "spin": 0.9031251920387149
+        }
+      },
+      {
+        "index": 1,
+        "particle": {
+          "life": 1.1292569967902577,
+          "maxLife": 1.1459236634569243,
+          "size": 0.13870701196789742,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": -0.07090416699574441,
+            "y": 4.9871941261267105,
+            "z": 0.31229919757076174
+          },
+          "vel": {
+            "x": -4.254250019744664,
+            "y": -0.7683524323973422,
+            "z": 0.737951854245705
+          },
+          "spin": 0.5558683373965323
+        }
+      },
+      {
+        "index": 2,
+        "particle": {
+          "life": 0.8670582580364619,
+          "maxLife": 0.8837249247031286,
+          "size": 0.09495123518258335,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": -0.013486850870292888,
+            "y": 5.00155294412348,
+            "z": 0.36756528245650893
+          },
+          "vel": {
+            "x": -0.8092110522175733,
+            "y": 0.09317664740882417,
+            "z": 4.053916947390536
+          },
+          "spin": 0.387733640614897
+        }
+      },
+      {
+        "index": 3,
+        "particle": {
+          "life": 1.108108472771322,
+          "maxLife": 1.1247751394379886,
+          "size": 0.14532758685387673,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": -0.0366468368034065,
+            "y": 5.064699777593685,
+            "z": 0.26358073752535927
+          },
+          "vel": {
+            "x": -2.19881020820439,
+            "y": 3.881986655621066,
+            "z": -2.185155748478443
+          },
+          "spin": 0.9604885317385197
+        }
+      },
+      {
+        "index": 4,
+        "particle": {
+          "life": 0.7839049405821908,
+          "maxLife": 0.8005716072488576,
+          "size": 0.1195459884442389,
+          "gravity": -4,
+          "drag": 1.5,
+          "pos": {
+            "x": -0.05604716658171204,
+            "y": 5.033799394669378,
+            "z": 0.32712396407034167
+          },
+          "vel": {
+            "x": -3.3628299949027225,
+            "y": 2.0279636801626917,
+            "z": 1.627437844220502
+          },
+          "spin": 3.5597934876568615
+        }
+      }
+    ]
+  },
+  "renderShrinkCurveSamples": [
+    {
+      "k": 1,
+      "renderScaleFactor": 1
+    },
+    {
+      "k": 0.75,
+      "renderScaleFactor": 0.825
+    },
+    {
+      "k": 0.5,
+      "renderScaleFactor": 0.65
+    },
+    {
+      "k": 0.25,
+      "renderScaleFactor": 0.475
+    },
+    {
+      "k": 0.1,
+      "renderScaleFactor": 0.37
+    },
+    {
+      "k": 0,
+      "renderScaleFactor": 0.3
+    }
+  ]
+}

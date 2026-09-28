@@ -1,0 +1,59 @@
+[versions]
+# Verified together on 2026-09-28 (Gradle 8.14.4, JDK 21, compileSdk 36):
+# - AGP 8.13 is the newest line that runs on Gradle 8.x and still supports `com.android.library`
+#   + KMP `androidTarget()` (AGP 9 needs Gradle 9 and `com.android.kotlin.multiplatform.library`).
+# - Compose Multiplatform 1.12 pulls androidx Compose 1.12 (compileSdk 37 + AGP 9.1 required),
+#   so CMP stays on 1.11.x (androidx Compose 1.11: compileSdk >= 35, AGP >= 8.6).
+# - androidx.core 1.19 requires compileSdk 37; 1.18 is the newest for compileSdk 36.
+# - CMP no longer publishes iosX64, so iOS targets are iosArm64 + iosSimulatorArm64.
+agp = "8.13.2"
+kotlin = "2.4.20"
+compose-multiplatform = "1.11.1"
+coroutines = "1.11.0"
+serialization = "1.11.0"
+kotlinx-io = "0.9.1"
+lwjgl = "3.4.3"
+activity-compose = "1.13.0"
+core-ktx = "1.18.0"
+core-splashscreen = "1.2.0"
+play-services-ads = "25.5.0"
+ump = "4.0.0"
+billing = "9.1.0"
+junit = "4.13.2"
+
+[libraries]
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
+
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose-multiplatform" }
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose-multiplatform" }
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose-multiplatform" }
+compose-desktop-linux-x64 = { module = "org.jetbrains.compose.desktop:desktop-jvm-linux-x64", version.ref = "compose-multiplatform" }
+
+lwjgl-core = { module = "org.lwjgl:lwjgl", version.ref = "lwjgl" }
+lwjgl-egl = { module = "org.lwjgl:lwjgl-egl", version.ref = "lwjgl" }
+lwjgl-opengles = { module = "org.lwjgl:lwjgl-opengles", version.ref = "lwjgl" }
+
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "core-splashscreen" }
+play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "play-services-ads" }
+ump = { module = "com.google.android.ump:user-messaging-platform", version.ref = "ump" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billing" }
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

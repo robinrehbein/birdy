@@ -1,0 +1,42 @@
+{
+  "01-menu:start": {
+    "menu": "start",
+    "titleBottom": 0.1551912568306011,
+    "panelTop": 0.5136612021857924
+  },
+  "02-shop-skins:shop": {
+    "menu": "shop",
+    "titleBottom": 0.1355191256830601,
+    "panelTop": 0.4083333333333333
+  },
+  "03-shop-hats:shop": {
+    "menu": "shop",
+    "titleBottom": 0.1355191256830601,
+    "panelTop": 0.43709016393442623
+  },
+  "04-shop-worlds:shop": {
+    "menu": "shop",
+    "titleBottom": 0.1355191256830601,
+    "panelTop": 0.5335724043715847
+  },
+  "05-shop-upgrades:shop": {
+    "menu": "shop",
+    "titleBottom": 0.1355191256830601,
+    "panelTop": 0.5117144808743169
+  },
+  "07-achievements:achievements": {
+    "menu": "achievements",
+    "titleBottom": 0.15956284153005465,
+    "panelTop": 0.3979337431693989
+  },
+  "23-shop-trail-diamond:shop": {
+    "menu": "shop",
+    "titleBottom": 0.1355191256830601,
+    "panelTop": 0.4083333333333333
+  },
+  "24-menu-en:start": {
+    "menu": "start",
+    "titleBottom": 0.1551912568306011,
+    "panelTop": 0.5136612021857924
+  }
+}

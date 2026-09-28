@@ -1,0 +1,26 @@
+[
+  {
+    "epochSeconds": 1790553600,
+    "runNumber": 1,
+    "runAttempt": 1,
+    "versionCode": 207240011
+  },
+  {
+    "epochSeconds": 1790598896,
+    "runNumber": 7,
+    "runAttempt": 2,
+    "versionCode": 207240072
+  },
+  {
+    "epochSeconds": 1790640000,
+    "runNumber": 1,
+    "runAttempt": 1,
+    "versionCode": 207250011
+  },
+  {
+    "epochSeconds": 1790553600,
+    "runNumber": 1000,
+    "runAttempt": 1,
+    "versionCode": null
+  }
+]

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Post-splash theme: no action bar, app background colour from style.css (#4ec0ca). -->
+    <style name="Theme.Birdy" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/birdy_app_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28">shortEdges</item>
+    </style>
+
+    <!-- Launch theme (core-splashscreen), splash colour from the Capacitor app (#5AA9E6). -->
+    <style name="Theme.Birdy.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/birdy_splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.Birdy</item>
+    </style>
+</resources>

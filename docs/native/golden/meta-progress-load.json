@@ -1,0 +1,124 @@
+{
+  "source": "src/progress.js load() lines 96-146, and the shop/upgrade/achievement methods",
+  "scenarios": [
+    {
+      "name": "fresh-install",
+      "coins": 0,
+      "best": 0,
+      "runs": 0,
+      "equippedSkin": "sunny",
+      "equippedTrail": "none",
+      "ownsExtraSkin": false,
+      "tutorialDone": false,
+      "rewardedAdsLeft": 3,
+      "savedShape": null
+    },
+    {
+      "name": "legacy-pre-shop-save-migration",
+      "coins": 250,
+      "equippedSkin": "sky",
+      "equippedTrail": "sparkle",
+      "ownsSky": true,
+      "ownsSparkleTrail": true
+    },
+    {
+      "name": "birdy-best-legacy-key-migration",
+      "note": "load() does best = max(data.best, Number(localStorage.birdy-best)||0) — the OLD standalone key wins if higher",
+      "best": 77
+    },
+    {
+      "name": "equip-points-to-unowned-item-falls-back-to-free",
+      "equippedSkin": "sunny"
+    },
+    {
+      "name": "style-pass-trial-access",
+      "ownsUnpurchasedSkin_night": true,
+      "ownsUnpurchasedWorld_candy": true,
+      "ownsUnpurchasedPattern_mask": false,
+      "ownsUnpurchasedPipe_gold": false,
+      "stylePassMinutesLeft": 60
+    },
+    {
+      "name": "paid-product-ownership",
+      "ownsGoldSkin": true,
+      "ownsCandyWorld": true,
+      "equippedSkinAfterLoad": "sunny",
+      "note": "paidProducts alone (from an external purchase-restore) does NOT auto-equip; equip[kind] is only forced to the paid item inside grantPaidProduct(), not in load(). load() DOES accept paidAccess as a reason to keep an already-equipped-but-unowned-in-items id (see load() line 135-137)."
+    },
+    {
+      "name": "buy-select-upgrade-flow",
+      "buyOk": true,
+      "coinsAfterBuy": 900,
+      "selectOk": true,
+      "buyTwiceOk": false,
+      "upgradePrice0": 300,
+      "levelAfter1": 1,
+      "upgradePrice1": 800
+    },
+    {
+      "name": "insufficient-coins",
+      "buySky": false,
+      "coinsUnchanged": 5,
+      "buyUpgradeStar": false
+    },
+    {
+      "name": "rewarded-ad-cap-3-per-day",
+      "grants": [
+        30,
+        30,
+        30,
+        0,
+        0
+      ],
+      "finalCoins": 90,
+      "rewardedAdsLeft": 0
+    },
+    {
+      "name": "claim-gift-same-day-blocked",
+      "first": {
+        "amount": 20,
+        "streak": 1
+      },
+      "secondSameDay": null,
+      "streakAfter": 1
+    },
+    {
+      "name": "finishRun-completes-everything-with-a-huge-run",
+      "missionsBefore": [
+        {
+          "id": "runs",
+          "goal": 3
+        },
+        {
+          "id": "score",
+          "goal": 7
+        },
+        {
+          "id": "coins",
+          "goal": 70
+        }
+      ],
+      "isBest": true,
+      "completedMissionIds": [
+        "score"
+      ],
+      "unlockedAchievementIds": [
+        "score10",
+        "score25",
+        "score50",
+        "score100",
+        "zone4",
+        "near10",
+        "chain5",
+        "powers3",
+        "plants25",
+        "rareToadstool",
+        "rareWater",
+        "rareDiamond",
+        "rareGalaxy"
+      ],
+      "coinsAfter": 1510,
+      "bestAfter": 999
+    }
+  ]
+}
