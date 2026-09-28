@@ -877,6 +877,22 @@ Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „en
 ![Iteration 16 vorher/nachher](visual/it16.jpg)
 
 **Messwerte:**
-- Playtest (`SEED=7`) im Streubereich.
-- Spitzenwert: ≤ 170 Draw Calls.
+- Playtest (`SEED=7`): identisch mit Iteration 15 (Anfänger 19,5 s, Geübt 38,8 s,
+  Profi 142 Punkte).
+- Spitzenwert: 160 Draw Calls, 56 k Dreiecke.
+- APK baut.
+
+### Iteration 17 – Fließtext in Fredoka SemiBold (Bereich 6)
+
+**Was:**
+- Alle Fließtexte (Missionen, Erfolge, Shop-Tabs, Hinweise, Datenschutz-Link) nutzen jetzt
+  Fredoka SemiBold statt der Systemschrift. Die Titel bleiben in Lilita One.
+- Die Schrift ist lokal eingebettet (offline) und steht mit Lizenz (OFL 1.1) in `docs/ASSETS.md`.
+- Missions- und Erfolgstexte sind 1 px größer, weil Fredoka kleiner läuft.
+
+![Iteration 17 vorher/nachher](visual/it17.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 16 (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Keine Änderung an der 3D-Szene, also auch keine an Draw Calls und Dreiecken.
 - APK baut.

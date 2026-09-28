@@ -6,6 +6,15 @@
   font-display: swap;
   src: url('./fonts/lilita-one-latin.woff2') format('woff2');
 }
+/* Fredoka SemiBold (SIL Open Font License) for body text, bundled as well. */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/fredoka-latin-600.woff2') format('woff2');
+}
+:root { --body-font: 'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -164,7 +173,7 @@ h1, h2 {
 h1 span { color: #73bf2e; }
 h2 { color: #f26b1d; }
 
-.controls { font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+.controls { font-family: var(--body-font); font-weight: 600; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
 
 button {
   font: inherit;
@@ -220,7 +229,7 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
 }
 .controls { margin-bottom: 6px; }
 .controls.small { font-size: 12px; opacity: 0.75; }
-.powers-legend { font-family: system-ui, sans-serif; font-size: 13px; margin-top: 8px; }
+.powers-legend { font-family: var(--body-font); font-weight: 600; font-size: 13px; margin-top: 8px; }
 
 /* Three tap zones flash briefly at the start of a run. */
 #zones {
@@ -372,8 +381,8 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   background: #cbb968;
   border-radius: 10px;
   padding: 6px 10px;
-  font-family: system-ui, sans-serif;
-  font-size: 13px;
+  font-family: var(--body-font);
+  font-size: 14px;
   font-weight: 600;
 }
 .mission .reward { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
@@ -605,7 +614,7 @@ button.gift {
   .panel { padding: 14px 14px 16px; }
   .missions { gap: 4px; margin-bottom: 10px; }
   .missions h3 { font-size: 16px; }
-  .mission { padding: 4px 8px; font-size: 12px; }
+  .mission { padding: 4px 8px; font-size: 13px; }
   button.gift { font-size: 17px; padding: 6px 12px; margin-bottom: 8px; }
   #play-btn { font-size: 22px; padding: 8px 20px; }
   button.secondary { font-size: 17px; padding: 5px 16px; }
@@ -617,7 +626,7 @@ button.gift {
 .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .btn-row button { width: 100%; padding-left: 6px; padding-right: 6px; }
 .panel .btn-row button + button { margin-top: 0; }
-.privacy-link { display: block; margin-top: 12px; color: inherit; opacity: 0.75; font: 12px system-ui, sans-serif; text-align: center; }
+.privacy-link { display: block; margin-top: 12px; color: inherit; opacity: 0.75; font: 600 12px var(--body-font); text-align: center; }
 
 /* Achievements overview. */
 .ach-list {
@@ -641,9 +650,9 @@ button.gift {
 }
 .ach.done { background: #b5d98a; }
 .ach-icon { font-size: 24px; }
-.ach-body { display: flex; flex-direction: column; gap: 2px; font-family: system-ui, sans-serif; }
+.ach-body { display: flex; flex-direction: column; gap: 2px; font-family: var(--body-font); }
 .ach-body b { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 16px; color: #543847; }
-.ach-body small { font-size: 12px; font-weight: 600; }
+.ach-body small { font-size: 13px; font-weight: 600; }
 .ach .bar { height: 5px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
 .ach .bar i { display: block; height: 100%; background: #73bf2e; }
 .ach .reward { font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
@@ -698,12 +707,12 @@ button.gift {
 }
 #zones b, #zones span { position: relative; }
 
-.tabs .tab small { font-size: 11px; font-family: system-ui, sans-serif; font-weight: 700; }
+.tabs .tab small { font-size: 11px; font-family: var(--body-font); font-weight: 600; }
 .tabs .tab.dice { background: #7a6fc9; }
 .skin .dot { font-size: 20px; }
 .skins { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-height: min(26vh, 190px); overflow-x: hidden; overflow-y: auto; touch-action: pan-y; padding: 4px 3px 5px; }
 
-.shop-desc { margin: -6px 0 10px; font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; min-height: 0; }
+.shop-desc { margin: -6px 0 10px; font-family: var(--body-font); font-size: 13px; font-weight: 600; min-height: 0; }
 .shop-desc:empty { display: none; }
 .skin.upgrade .pips { display: flex; gap: 3px; }
 .skin.upgrade .pips i { width: 8px; height: 8px; border-radius: 50%; background: rgba(84, 56, 71, 0.3); }
