@@ -84,13 +84,13 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
 
         val STRINGS: Map<String, LocalizedText> = mapOf(
             "zoneFlap" to LocalizedText("flattern", "flap"),
-            "zoneMove" to LocalizedText("hierhin", "move here"),
-            "handFlap" to LocalizedText("Tippen = flattern", "Tap = flap"),
-            "handSide" to LocalizedText("Andere Bahn tippen<br>= ausweichen", "Tap another lane<br>= dodge"),
+            "zoneMove" to LocalizedText("wischen", "swipe"),
+            "handFlap" to LocalizedText("Tippen oder hochwischen<br>= flattern", "Tap or swipe up<br>= flap"),
+            "handSide" to LocalizedText("Zur Seite wischen<br>= ausweichen", "Swipe sideways<br>= dodge"),
             "best" to LocalizedText("Rekord", "Best"),
             "howto" to LocalizedText(
-                "Tippe auf <b>die Bahn des Vogels</b> zum Flattern,<br />auf <b>eine andere Bahn</b> zum Wechseln – oder wische.",
-                "Tap <b>the bird's lane</b> to flap,<br />tap <b>another lane</b> or swipe to switch.",
+                "Wische <b>nach oben</b> (oder tippe) zum Flattern,<br /><b>nach links/rechts</b> zum Bahnwechsel.",
+                "Swipe <b>up</b> (or tap) to flap,<br />swipe <b>left/right</b> to switch lanes.",
             ),
             "keys" to LocalizedText("Tastatur: Leertaste / ↑ flattern, ← → Spur", "Keyboard: Space / ↑ flap, ← → lane"),
             "legend" to LocalizedText(
@@ -149,7 +149,7 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
             "skinReward" to LocalizedText("+ Skin „{name}“", "+ “{name}” skin"),
             "surprise" to LocalizedText("[gift] Überraschung · {n}", "[gift] Surprise · {n}"),
             "surpriseGot" to LocalizedText("[gift] Neu: {name}!", "[gift] New: {name}!"),
-            "swipeHint" to LocalizedText("[hand] Tipp: Du kannst auch nach links/rechts wischen", "[hand] Tip: you can also swipe left/right"),
+            "swipeHint" to LocalizedText("[hand] Wische nach links/rechts, um die Bahn zu wechseln", "[hand] Swipe left/right to switch lanes"),
             "pause" to LocalizedText("Pause", "Paused"),
             "resume" to LocalizedText("Tippen zum Weiterspielen", "Tap to continue"),
             "continue" to LocalizedText("Weiter", "Continue"),

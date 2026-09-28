@@ -6,8 +6,9 @@ import kotlin.math.abs
 import kotlin.math.max
 
 /**
- * Touch lane targeting (main-a.md §9.4, main.js `screenX`/`laneBounds`/`laneAtScreen`) and the
- * swipe detector of the canvas pointer handlers. Screen positions are fractions of the surface.
+ * The sideways-swipe detector of the canvas pointer handlers (swipe controls: where a touch lands
+ * does not matter) plus the projected lane geometry the lane hint overlay draws
+ * (main.js `screenX`/`laneBounds`). Screen positions are fractions of the surface.
  */
 class InputMapper(private val rig: CameraRig) {
     private val p = DoubleArray(2)
@@ -19,12 +20,6 @@ class InputMapper(private val rig: CameraRig) {
     fun laneBounds(birdY: Double): DoubleArray {
         val xs = DoubleArray(3) { screenX(WorldConst.LANES[it], birdY) }
         return doubleArrayOf((xs[0] + xs[1]) / 2, (xs[1] + xs[2]) / 2)
-    }
-
-    /** Lane under screen fraction [x]; near the drawn bird it is always the bird's own lane. */
-    fun laneAtScreen(x: Double, birdX: Double, birdY: Double, lane: Int): Int {
-        val b = laneBounds(birdY)
-        return laneAt(x, b[0], b[1], screenX(birdX, birdY), lane)
     }
 
     // --- swipes (pointermove) ---------------------------------------------------------------
@@ -56,12 +51,6 @@ class InputMapper(private val rig: CameraRig) {
     }
 
     companion object {
-        /** `x < b1 ? 0 : x < b2 ? 1 : 2`, overridden by the NEAR_BIRD flap zone. */
-        fun laneAt(x: Double, b1: Double, b2: Double, birdScreenX: Double, lane: Int): Int {
-            val l = if (x < b1) 0 else if (x < b2) 1 else 2
-            return if (abs(x - birdScreenX) <= Tuning.NEAR_BIRD) lane else l
-        }
-
         /**
          * `|dx| >= max(18 px, 5 % width)` and `|dx| >= 1.2 |dy|` (pixels; 18 CSS px scaled by
          * [density]). Returns sign(dx) or 0.

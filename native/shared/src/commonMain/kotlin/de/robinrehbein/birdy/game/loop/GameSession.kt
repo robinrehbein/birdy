@@ -325,7 +325,10 @@ class GameSession(
         routeEvents()
     }
 
-    /** Canvas `pointerdown`: unpause, or lane targeting + tap + swipe tracking + ripple. */
+    /**
+     * Canvas `pointerdown` (swipe controls): unpause, or flap in the current lane wherever the
+     * finger lands, plus swipe tracking and the ▲ ripple at the bird.
+     */
     private fun pointerDown(x: Double, y: Double) {
         startAudio()
         val s = sim.state
@@ -335,23 +338,21 @@ class GameSession(
             sim.tryRestart()
             return
         }
-        val lane = input.laneAtScreen(x, s.x, s.y, s.lane)
-        val from = s.lane
-        val wasPlaying = sim.pointerDown(lane)
+        val flapped = sim.pointerDown()
         input.down(x, y)
-        // Feedback at the lane the bird goes to (the finger would hide it).
-        if (wasPlaying) laneFx(from)
+        if (flapped) laneFx(0)
     }
 
     private fun swipe(dir: Int) {
         val before = sim.state.lane
-        if (sim.swipe(dir)) laneFx(before)
+        if (sim.swipe(dir)) laneFx(sign(sim.state.lane - before))
     }
 
-    private fun laneFx(from: Int) {
+    /** Ripple at the bird's (new) lane: [dir] -1 ◀, 0 ▲, +1 ▶ (the finger would hide the bird). */
+    private fun laneFx(dir: Int) {
         val s = sim.state
-        val p = rig.project(WorldConst.LANES[s.lane], s.y, 0.0)
-        hud.tap(p[0], p[1], sign(s.lane - from))
+        val p = rig.project(if (dir == 0) s.x else WorldConst.LANES[s.lane], s.y, 0.0)
+        hud.tap(p[0], p[1], dir)
     }
 
     private fun back() {
@@ -596,7 +597,7 @@ class GameSession(
         val bird = if (needsBird) rig.project(s.x, s.y, 0.0) else null
         val hand = if (bird != null) {
             TutorialHand.ui(
-                s.hand, bird[0], bird[1], input.screenX(WorldConst.LANES[0], s.y),
+                s.hand, bird[0], bird[1], realTimeMs / 1000,
                 t(if (s.hand == de.robinrehbein.birdy.game.HandMode.Side) "handSide" else "handFlap"),
             )
         } else null

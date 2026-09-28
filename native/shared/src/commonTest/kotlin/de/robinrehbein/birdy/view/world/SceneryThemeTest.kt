@@ -3,10 +3,11 @@ package de.robinrehbein.birdy.view.world
 import de.robinrehbein.birdy.engine.scene.Mesh
 import de.robinrehbein.birdy.engine.scene.Node
 import de.robinrehbein.birdy.engine.scene.Scene
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readString
+import de.robinrehbein.birdy.Golden
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.random.Random
@@ -14,36 +15,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-/** The scenery theme tables and chunk layout against src/world.js. */
+/** The scenery theme tables and chunk layout against the old world.js (docs/native/golden/world-scenery-themes.json). */
 class SceneryThemeTest {
-    private val worldJs: String by lazy {
-        SystemFileSystem.source(Path("../../src/world.js")).buffered().use { it.readString() }
-    }
+    private val themes by lazy { Golden.json("world-scenery-themes.json").jsonObject["themes"]!!.jsonObject }
 
-    private val hexRe = Regex("0x[0-9a-fA-F]{6}")
-    private fun hexes(s: String) = hexRe.findAll(s).map { it.value.substring(2).toInt(16) }.toSet()
-
-    /** Source text of one THEMES slot: `slot: () => ...` up to the next slot or theme. */
-    private fun slotSource(theme: String, slot: String): String {
-        val themes = worldJs.substring(worldJs.indexOf("const THEMES = {"))
-        val t = themes.substring(themes.indexOf("\n  $theme: {"))
-        val start = t.indexOf("$slot: () =>")
-        val end = listOf("near: () =>", "mid: () =>", "far: () =>", "\n  },")
-            .map { t.indexOf(it, start + 1) }.filter { it > 0 }.min()
-        return t.substring(start, end)
-    }
-
-    /** Hex literals of all world.js helper functions a slot calls (incl. default parameters). */
-    private fun helperHexes(slot: String): Set<Int> {
-        val names = Regex("([a-zA-Z]+)\\(").findAll(slot).map { it.groupValues[1] }.toSet()
-        val out = HashSet<Int>()
-        for (n in names) {
-            val i = worldJs.indexOf("\nfunction $n(")
-            if (i < 0) continue
-            out += hexes(worldJs.substring(i, worldJs.indexOf("\n}\n", i)))
-        }
-        return out
-    }
+    private fun slotColors(theme: String, slot: String, key: String): Set<Int> =
+        themes[theme]!!.jsonObject[slot]!!.jsonObject[key]!!.jsonArray.map { it.jsonPrimitive.int }.toSet()
 
     private fun colors(n: Node): Set<Int> {
         val out = HashSet<Int>()
@@ -52,14 +29,13 @@ class SceneryThemeTest {
     }
 
     @Test
-    fun themeTablesMatchWorldJs() {
+    fun themeTablesMatchGolden() {
         val items = SceneryItems(Random(7))
         assertEquals(setOf("winter", "beach", "candy", "mushroom", "park", "autumn", "canyon", "blossom"), SCENERY_THEMES.keys)
         for ((name, theme) in SCENERY_THEMES) {
             for ((slot, gen) in listOf("near" to theme.near, "mid" to theme.mid, "far" to theme.far)) {
-                val src = slotSource(name, slot)
-                val direct = hexes(src)
-                val allowed = direct + helperHexes(src)
+                val direct = slotColors(name, slot, "direct")
+                val allowed = slotColors(name, slot, "allowed")
                 val seen = HashSet<Int>()
                 repeat(600) { seen += colors(gen(items)) }
                 assertTrue(seen.containsAll(direct), "$name.$slot: JS colours ${direct.map(::h)} not all produced, got ${seen.map(::h)}")

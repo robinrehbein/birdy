@@ -26,7 +26,7 @@ import kotlin.random.Random
  * with the fairness pass, coins/pickups/rush placement, physics, lane switching, collisions,
  * scoring, near misses, power-ups, zones, tutorial flow and run finishing.
  *
- * Deterministic given [rng] and the sequence of [step]/[flap]/[tapLane] calls, so tests, the
+ * Deterministic given [rng] and the sequence of [step]/[flap]/[tapLane]/[pointerDown]/[swipe] calls, so tests, the
  * bot playtest and the screenshot tool can replay runs. Game thread only.
  *
  * Frame driving: the loop calls [update] (JS `update()`: hit-stop, [step], bird pose, shake decay)
@@ -243,23 +243,23 @@ class GameSimulation(
         emit(GameEvent.Flap)
     }
 
-    /** Tap on a lane (main.js `tapLane`): own lane flaps, another lane moves one step with a hop. */
+    /**
+     * Programmatic lane action (bot, tests; JS `tap(lane)`): the own lane flaps, another lane
+     * moves one step toward it with a hop. Touch input uses [pointerDown] + [swipe] instead.
+     */
     fun tapLane(lane: Int) {
         val s = state
         if (s.hold) return flap() // first tap just starts
         // Tutorial: until the dodge lesson every tap flaps.
         if (s.tutorialActive && (s.tutorialStep == TutorialStep.Flap || s.tutorialStep == TutorialStep.Fly)) return flap()
         if (s.tutorialStep == TutorialStep.Switch) {
-            if (lane == s.lane) return // frozen until the player taps another lane
+            if (lane == s.lane) return // frozen until the player dodges
             s.tutorialStep = TutorialStep.Go
             s.hand = HandMode.None
         }
         if (s.mode == GameMode.Playing && !s.paused && lane != s.lane) {
-            // One lane per tap: a two-lane jump would sweep through the middle pipe.
-            setLane(s.lane + SimMath.sign(lane - s.lane))
-            s.vy = max(s.vy, Tuning.SWITCH_HOP)
-            s.wingSpeed = Tuning.WING_SWITCH
-            s.squash = 0.5
+            // One lane per action: a two-lane jump would sweep through the middle pipe.
+            switchHop(s.lane + SimMath.sign(lane - s.lane), s.vy)
             return
         }
         flap()
@@ -280,11 +280,23 @@ class GameSimulation(
         }
     }
 
+    /** Lane change with the small hop instead of a flap (`vy = max(vyBefore, SWITCH_HOP)`). */
+    private fun switchHop(lane: Int, vyBefore: Double) {
+        val s = state
+        setLane(lane)
+        s.vy = max(vyBefore, Tuning.SWITCH_HOP)
+        s.wingSpeed = Tuning.WING_SWITCH
+        s.squash = 0.5
+    }
+
     /**
-     * Canvas `pointerdown` after lane targeting: unpauses if paused, else [tapLane] and arms the
-     * swipe tracker. Returns true if a run was already in flight (show the tap ripple).
+     * Touch down anywhere on the canvas (swipe controls): unpauses if paused, otherwise flaps at
+     * once in the current lane (a tap and a swipe up both flap without latency) and arms the
+     * swipe tracker. The screen position does not matter and the lane never changes here. In the
+     * tutorial's dodge lesson the touch does nothing until it turns into a sideways [swipe].
+     * Returns true if a run was already in flight (show the tap ripple).
      */
-    fun pointerDown(lane: Int): Boolean {
+    fun pointerDown(): Boolean {
         val s = state
         if (s.paused) {
             setPaused(false)
@@ -293,29 +305,36 @@ class GameSimulation(
         val from = s.lane
         val vy = s.vy
         val wasPlaying = s.mode == GameMode.Playing && !s.hold
-        tapLane(lane)
-        swipeState.arm(done = !wasPlaying || s.tutorialActive, lane = from, vy = vy)
-        return wasPlaying
+        val dodgeLesson = wasPlaying && s.tutorialStep == TutorialStep.Switch
+        if (!dodgeLesson) flap()
+        // Sideways swipes count in normal runs and in the dodge lesson, not while learning to flap.
+        val swipes = wasPlaying && (!s.tutorialActive || dodgeLesson)
+        swipeState.arm(done = !swipes, lane = from, vy = vy)
+        return wasPlaying && !dodgeLesson
     }
 
     /**
      * The touch turned into a sideways swipe ([direction] = sign of dx; thresholds in [Tuning]).
-     * The swipe wins: the lane next to where it started, and the touch's flap is taken back.
-     * Returns true if the lane changed.
+     * The swipe wins: exactly one lane from where the gesture started, the touch's flap is taken
+     * back as a hop, and the bird stays in that lane until the next sideways swipe. A swipe into
+     * the edge keeps the flap. One action per touch. Returns true if the lane changed.
      */
     fun swipe(direction: Int): Boolean {
         val s = state
         val sw = swipeState
         if (sw.done) return false
         sw.done = true
-        if (s.mode != GameMode.Playing || s.paused || s.hold || s.tutorialActive) return false
-        val before = s.lane
+        if (s.mode != GameMode.Playing || s.paused || s.hold || direction == 0) return false
+        val lesson = s.tutorialStep == TutorialStep.Switch
+        if (s.tutorialActive && !lesson) return false
         val target = min(max(sw.lane + SimMath.sign(direction), 0), WorldConst.LANES.size - 1)
-        if (target == sw.lane && before == sw.lane) return false // swipe into the edge: keep the tap
-        setLane(target)
-        s.vy = if (target != sw.lane) max(sw.vy, Tuning.SWITCH_HOP) else sw.vy
-        s.wingSpeed = Tuning.WING_SWITCH
-        s.squash = 0.5
+        if (target == sw.lane) return false // swipe into the edge: keep the flap
+        if (lesson) {
+            s.tutorialStep = TutorialStep.Go
+            s.hand = HandMode.None
+        }
+        val before = s.lane
+        switchHop(target, sw.vy)
         return s.lane != before
     }
 

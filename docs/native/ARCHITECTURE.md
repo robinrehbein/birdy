@@ -1,9 +1,12 @@
 # Birdy native: architecture
 
-A Kotlin rewrite of the Three.js/Capacitor game (`src/`). The game core is Kotlin Multiplatform
-so an iOS app can follow. The JS app stays in the repo as the reference until parity is
-confirmed. Behaviour specs: `docs/native/spec/*.md`. Golden fixtures generated from the JS:
-`docs/native/golden/*.json` (generators in `scripts/native-golden/`).
+A Kotlin rewrite of the former Three.js/Capacitor game. The game core is Kotlin Multiplatform so
+an iOS app can follow. The old JS app and its tooling have been removed from the repo (available
+in git history before the removal commit); this is now the only app. Behaviour specs written from
+the JS app: `docs/native/spec/*.md` (historical references to the removed sources — see that
+directory's note). Golden fixtures: `docs/native/golden/*.json`, frozen reference values 1:1 from
+the former JS app; their generator scripts (`scripts/native-golden/`) were removed along with it,
+so these fixtures are now the source of truth for the Kotlin tests.
 
 ## Toolchain (verified 2026-09-28)
 
@@ -144,9 +147,12 @@ per-frame lane update (`LaneState`, including plant pose). The world view only r
 
 - `BirdyApp(state: UiState, strings: Strings, onCommand: (UiCommand) -> Unit)` is stateless and
   lives in `ui` (commonMain), so the same code renders on Android and headless on desktop.
-- Touches on the play area fall through to `UiCommand.Touch(x, y)` in screen fractions. Lane
-  targeting (main-a.md §9.4, `screenX` with camera projection) runs on the game thread, where the
-  camera is.
+- A tap anywhere on the play area, or an upward swipe, becomes `UiCommand.Touch(x, y)` (screen
+  fractions; the position no longer selects a lane, it only triggers a flap in the current lane).
+  The touch-down flaps at once. `UiCommand.TouchMove`/`TouchUp` feed the game's swipe detector
+  (`InputMapper`); a left/right swipe (or `UiCommand.Swipe(direction)`) moves the bird exactly one
+  lane from where the gesture started and takes back that touch's flap as a small hop. The bird
+  stays in that lane until the next sideways swipe. All of it runs on the game thread.
 - Transient UI (toast queue, tutorial hand, zone hints) is driven by game-side state machines
   that reproduce main.js timing. The UI renders it and animates only cosmetics.
 - The shell handles effects that need an Activity (`UiEffect.ShowRewardedAd`, `LaunchPurchase`,
@@ -224,6 +230,6 @@ edit `androidApp/build.gradle.kts`.
 | 1 | audio | `S/commonMain/P/audio/**`, `S/androidMain/P/audio/**`, `S/commonTest/P/audio/**`, `S/desktopTest/P/audio/**` |
 | 2 | world | `S/commonMain/P/view/world/**`, `S/commonTest/P/view/world/**`, `S/desktopTest/P/view/world/**` |
 | 2 | bird-fx | `S/commonMain/P/view/bird/**`, `view/fx/**`, `view/thumb/**`, matching `commonTest`/`desktopTest` dirs |
-| 2 | loop | `S/commonMain/P/game/BirdyGame.kt`, `game/GameFactory.kt`, `game/UiContract.kt`, `game/loop/**` (new), `view/SceneView.kt`, `S/commonTest/P/game/loop/**`, `screenshots/src/**`, `scripts/native-shots/**` (repo root) |
+| 2 | loop | `S/commonMain/P/game/BirdyGame.kt`, `game/GameFactory.kt`, `game/UiContract.kt`, `game/loop/**` (new), `view/SceneView.kt`, `S/commonTest/P/game/loop/**`, `screenshots/src/**` |
 | 2 | ui | `S/commonMain/P/ui/**`, `S/commonMain/composeResources/**`, `S/commonTest/P/ui/**`, `S/desktopTest/P/ui/**` |
 | 2 | platform | `androidApp/**`, `S/androidMain/P/platform/**` except the two meta files, `S/commonMain/P/platform/**` except `KeyValueStore.kt`, `S/jvmSharedMain/P/platform/**`, `docs/native/RELEASE.md` (repo root) |

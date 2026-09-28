@@ -10,7 +10,7 @@
 
 ## Play Billing
 
-- Die Android-Billing-Library 9.1.0 ist eingebunden. Die native Brücke kann Produktdetails und lokalisierte Preise abfragen, Play-Kaufdialoge öffnen und bestehende Käufe abfragen.
+- Die Android-Billing-Library 9.1.0 ist eingebunden. Der Billing-Code in `native/androidApp` (Platform-Implementierung von `platform.Billing`) kann Produktdetails und lokalisierte Preise abfragen, Play-Kaufdialoge öffnen und bestehende Käufe abfragen.
 - Einzelne Skins und Welten gehören nach einem Echtgeldkauf dauerhaft dem Spieler. Die App verarbeitet Play-Kaufereignisse und stellt nicht verbrauchte Käufe wieder her. Eine serverseitige Prüfung von Kaufnachweisen und eine dauerhafte serverseitige Gutschriftenliste für Münzpakete fehlen noch. Bis dahin keine Produkte aktivieren oder den Build mit Echtgeldkäufen veröffentlichen.
 - Ein „Werbung entfernen“-Kauf entfällt, weil Anzeigen ausschließlich freiwillig sind.
 

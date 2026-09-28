@@ -29,18 +29,18 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk npm run android:aab` erfolgreich; Bundle 1.0.3 von Google Play angenommen |
-| Versionsnummer | ✅ `versionName 1.0.3`, `versionCode 4` (`android/app/build.gradle`); 1.0.2 (versionCode 3) liegt bereits bei Google Play |
+| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk ./gradlew :androidApp:bundleRelease` (in `native/`) erfolgreich; Bundle 1.0.3 (Capacitor-Vorgänger) von Google Play angenommen |
+| Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
 | Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ in `main`, Veröffentlichung gesperrt bis `BIRDY_MONETIZATION_RELEASE_READY` (siehe `docs/MONETIZATION.md`) |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
-| Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN), gerendert mit `scripts/render-assets.mjs` |
-| Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 gestaltete Bilder: echter Spielframe im Rahmen auf Himmel mit Claim (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Herbstwald, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Neu seit der visuellen Politur, müssen in Play neu hochgeladen werden. |
+| Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
+| Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit für Monetarisierung | ⚠️ Play-Console-Fragebogen vor Release aktualisieren |
-| **App-ID** | ✅ `de.robinrehbein.birdy` in Capacitor und Android konfiguriert |
+| **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
 | Test auf echten Geräten | ⚠️ noch offen (fps-Anzeige: 5× auf den Titel tippen) |
@@ -60,16 +60,16 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 
 ## Release signieren
 
-Der Upload-Schlüssel liegt lokal unter `android/birdy-upload.jks`; die Zugangsdaten liegen in
-`android/keystore.properties`. Beide Dateien sind aus Git ausgeschlossen. Erstelle ein sicheres
+Der Upload-Schlüssel liegt lokal unter `native/birdy-upload.jks`; die Zugangsdaten liegen in
+`native/keystore.properties`. Beide Dateien sind aus Git ausgeschlossen. Erstelle ein sicheres
 Backup außerhalb dieses Projekts. Bei Play App Signing kann ein verlorener Upload-Schlüssel
 zurückgesetzt werden, aber das erfordert ein Verfahren über die Play Console.
 
 ```bash
-keytool -list -keystore android/birdy-upload.jks -alias birdy-upload
+keytool -list -keystore native/birdy-upload.jks -alias birdy-upload
 ```
 
-Die vorhandene `android/keystore.properties` hat dieses Format:
+Die vorhandene `native/keystore.properties` hat dieses Format:
 
 ```properties
 storeFile=birdy-upload.jks
@@ -78,19 +78,22 @@ keyAlias=birdy-upload
 keyPassword=…
 ```
 
-Dann `npm run android:aab`. Das Bundle liegt unter
-`android/app/build/outputs/bundle/release/app-release.aab`. In der Play Console **Play App
-Signing** aktivieren; dann ist dein Schlüssel nur noch der Upload-Schlüssel.
+Dann `cd native && ./gradlew :androidApp:bundleRelease`. Das Bundle liegt unter
+`native/androidApp/build/outputs/bundle/release/androidApp-release.aab`. In der Play Console
+**Play App Signing** aktivieren; dann ist dein Schlüssel nur noch der Upload-Schlüssel.
 
-Für manuelle Updates einen unbenutzten `versionCode` und `versionName` in
-`android/app/build.gradle` setzen. Auch Entwurfs-Bundles verbrauchen einen Versionscode.
-Die GitHub-Pipeline berechnet ihren Code aus UTC-Tag, Workflow-Laufnummer und Versuch;
-damit liegt er oberhalb des am 28. September 2026 hochgeladenen Entwurfs `26092801`.
+Für manuelle Updates einen unbenutzten `versionCode` (per `BIRDY_VERSION_CODE`-Umgebungsvariable)
+setzen; `versionName` ist fest `"2.0.0"` (`native/androidApp/build.gradle.kts`). Auch
+Entwurfs-Bundles verbrauchen einen Versionscode. Die GitHub-Pipeline berechnet ihren Code aus
+UTC-Tag, Workflow-Laufnummer und Versuch; damit liegt er oberhalb des am 28. September 2026
+hochgeladenen Capacitor-Entwurfs `26092801`. Mehr zu Build/Signatur-Details:
+[`docs/native/RELEASE.md`](native/RELEASE.md).
 
 ## Automatischer Release nach einem Merge
 
 `.github/workflows/play-release.yml` baut nach jedem Push auf `main` (also auch nach einem
-Merge) ein signiertes Bundle und veröffentlicht es im internen Test und im geschlossenen
+Merge) das signierte native Bundle (`native/androidApp:bundleRelease`) und veröffentlicht es im
+internen Test und im geschlossenen
 Alpha-Test, sobald sowohl `PLAY_PUBLISH_ENABLED` als auch
 `BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Die zweite Variable bleibt bis
 zum Abschluss der Monetarisierungsprüfungen deaktiviert; auch ein manueller Workflow-Start
@@ -102,10 +105,10 @@ Repository-Secrets benötigt:
 
 | Secret | Inhalt |
 |---|---|
-| `UPLOAD_KEYSTORE_BASE64` | Base64-Inhalt von `android/birdy-upload.jks` (ohne Zeilenumbrüche) |
-| `UPLOAD_STORE_PASSWORD` | `storePassword` aus der lokalen `android/keystore.properties` |
-| `UPLOAD_KEY_ALIAS` | `keyAlias` aus der lokalen `android/keystore.properties` |
-| `UPLOAD_KEY_PASSWORD` | `keyPassword` aus der lokalen `android/keystore.properties` |
+| `UPLOAD_KEYSTORE_BASE64` | Base64-Inhalt von `native/birdy-upload.jks` (ohne Zeilenumbrüche) |
+| `UPLOAD_STORE_PASSWORD` | `storePassword` aus der lokalen `native/keystore.properties` |
+| `UPLOAD_KEY_ALIAS` | `keyAlias` aus der lokalen `native/keystore.properties` |
+| `UPLOAD_KEY_PASSWORD` | `keyPassword` aus der lokalen `native/keystore.properties` |
 | `PLAY_SERVICE_ACCOUNT_JSON` | JSON-Schlüssel eines Dienstkontos mit Zugriff auf Birdy in der Play Console |
 
 Das Google-Cloud-Projekt muss die **Google Play Developer API** aktiviert haben. Das Dienstkonto
@@ -118,18 +121,26 @@ niemals in `production`.
 Secrets und Keystore-Dateien bleiben außerhalb von Git. Nach dem Einrichten einmal den
 manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-Tracks prüfen.
 
+> **Hinweis:** Der aktuell live geschaltete Play-Store-Eintrag sowie die Screenshots in
+> `docs/store/` zeigen noch die alte Fassung mit Tipp-Steuerung (Tippen auf eine Spur). Die
+> Steuerung wurde auf Wischen umgestellt (siehe [README](../README.md#steuerung)); Titel,
+> Kurzbeschreibung und Beschreibung unten sind bereits auf die neue Steuerung aktualisiert, müssen
+> aber **manuell in der Play Console** nachgezogen werden, bevor sie live gehen. Neue Screenshots
+> fehlen noch (siehe Checkliste oben).
+
 ## Store-Eintrag – Deutsch
 
-**Titel (max. 30):** Birdy – Tippen & Fliegen
+**Titel (max. 30):** Birdy – Wischen & Fliegen
 
-**Kurzbeschreibung (max. 80):** Tippen, ausweichen, durchfliegen – ein Ein-Finger-Flieger in Low-Poly-3D.
+**Kurzbeschreibung (max. 80):** Wischen, ausweichen, durchfliegen – ein Ein-Finger-Flieger in Low-Poly-3D.
 
 **Beschreibung:**
 
 > Flieg so weit du kannst! Birdy ist ein bunter Ein-Finger-Arcade-Flieger in Low-Poly-3D.
 >
-> 👆 **Ein Tipp genügt:** Tippe beim Vogel, um zu flattern – tippe daneben, um auf eine andere
-> Spur auszuweichen. Ein Zielring zeigt dir, ob du durch die nächste Lücke passt.
+> 👆 **Wischen genügt:** Wische nach links oder rechts, um die Spur zu wechseln – tippe irgendwo
+> oder wische nach oben, um zu flattern. Ein Zielring zeigt dir, ob du durch die nächste Lücke
+> passt.
 >
 > 🌳 **Vier Zonen:** Fliege vom Stadtpark in den Herbstwald, durch den Canyon bis in den
 > Blütenhain – jede Zone mit eigener Tageszeit, eigener Musik und eigenen Hindernissen:
@@ -154,16 +165,16 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 
 ## Store listing – English
 
-**Title:** Birdy – Tap & Fly
+**Title:** Birdy – Swipe & Fly
 
-**Short description:** Tap, dodge, fly through – a one-finger low-poly 3D flyer.
+**Short description:** Swipe, dodge, fly through – a one-finger low-poly 3D flyer.
 
 **Description:**
 
 > Fly as far as you can! Birdy is a colourful one-finger arcade flyer in low-poly 3D.
 >
-> 👆 **One tap is all it takes:** tap the bird to flap, tap beside it to dodge into another
-> lane. A target ring shows whether you'll make the next gap.
+> 👆 **Just swipe:** swipe left or right to change lane – tap anywhere or swipe up to flap.
+> A target ring shows whether you'll make the next gap.
 >
 > 🌳 **Four zones:** from the city park through the autumn forest and the canyon to the blossom
 > grove – each with its own time of day, music and obstacles: moving and breathing gaps and

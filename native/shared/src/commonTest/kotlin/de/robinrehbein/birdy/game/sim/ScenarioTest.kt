@@ -109,18 +109,24 @@ class ScenarioTest {
         assertEquals(listOf(false, true, false), rows[3].lanes.map { it.blocked })
         assertEquals(rows[3], h.sim.tutorialGate)
 
-        // A side tap only flaps while learning to flap.
-        h.sim.tapLane(0)
+        // Touches only flap while learning to flap; sideways swipes are ignored.
+        assertFalse(h.sim.pointerDown())
         assertEquals(1, s.lane)
         assertEquals(TutorialStep.Fly, s.tutorialStep)
         assertEquals(HandMode.None, s.hand)
-        h.sim.tapLane(2)
+        h.sim.pointerUp()
+        h.sim.pointerDown()
+        assertFalse(h.sim.swipe(+1))
         assertEquals(1, s.lane)
+        h.sim.pointerUp()
 
         // Fly the middle gaps (5.2 ± 3.1) until the dodge lesson freezes the bird.
         var steps = 0
         while (s.tutorialStep == TutorialStep.Fly && steps++ < 2000) {
-            if (s.y < 4.6 && s.vy < 0) h.sim.tapLane(1)
+            if (s.y < 4.6 && s.vy < 0) {
+                h.sim.pointerDown()
+                h.sim.pointerUp()
+            }
             h.sim.step(dt, null)
         }
         assertEquals(GameMode.Playing, s.mode)
@@ -136,18 +142,31 @@ class ScenarioTest {
         assertEquals(runTime, s.runTime)
         assertTrue(kotlin.math.abs(s.y - s.freezeY) <= 0.15 + 1e-9)
         assertEquals(frozenZ, h.sim.tutorialGate!!.z, "rows wait while frozen")
-        // Same lane: swallowed.
-        h.sim.tapLane(1)
+        // A plain touch is swallowed: no flap, no lane change.
+        val flaps = h.eventsOf<GameEvent.Flap>().size
+        assertFalse(h.sim.pointerDown())
+        h.sim.pointerUp()
         assertEquals(TutorialStep.Switch, s.tutorialStep)
-        // Another lane: dodge.
-        h.sim.tapLane(0)
+        assertEquals(flaps, h.eventsOf<GameEvent.Flap>().size)
+        assertEquals(1, s.lane)
+        // A sideways swipe dodges (either side works; here left), with a hop.
+        h.sim.pointerDown()
+        assertTrue(h.sim.swipe(-1))
+        h.sim.pointerUp()
         assertEquals(TutorialStep.Go, s.tutorialStep)
+        assertEquals(HandMode.None, s.hand)
         assertEquals(0, s.lane)
+        assertEquals(Tuning.SWITCH_HOP, s.vy)
+        assertEquals(flaps, h.eventsOf<GameEvent.Flap>().size)
         steps = 0
         while (s.tutorialActive && steps++ < 600) {
-            if (s.y < 4.6 && s.vy < 0) h.sim.tapLane(0)
+            if (s.y < 4.6 && s.vy < 0) {
+                h.sim.pointerDown()
+                h.sim.pointerUp()
+            }
             h.sim.step(dt, null)
         }
+        assertEquals(0, s.lane, "taps keep the dodged lane")
         assertEquals(GameMode.Playing, s.mode)
         assertFalse(s.tutorialActive)
         assertNull(s.tutorialStep)
@@ -421,11 +440,97 @@ class ScenarioTest {
     }
 
     @Test
+    fun tutorialDodgeSwipeRight() {
+        val h = SimHarness(progress = FakeProgress(runs = 0))
+        val s = h.state
+        h.sim.startTutorialRun()
+        h.sim.pointerDown() // ends the hover
+        h.sim.pointerUp()
+        var steps = 0
+        while (s.tutorialStep != TutorialStep.Switch && steps++ < 3000) {
+            if (s.y < 4.6 && s.vy < 0) {
+                h.sim.pointerDown()
+                h.sim.pointerUp()
+            }
+            h.sim.step(dt, null)
+        }
+        assertEquals(TutorialStep.Switch, s.tutorialStep)
+        // Into the other side works as well; a swipe needs an armed touch.
+        assertFalse(h.sim.swipe(+1))
+        h.sim.pointerDown()
+        assertTrue(h.sim.swipe(+1))
+        assertEquals(2, s.lane)
+        assertEquals(TutorialStep.Go, s.tutorialStep)
+    }
+
+    @Test
+    fun touchFlapsInPlaceAndSwipesStick() {
+        val h = SimHarness()
+        emptyRun(h)
+        val s = h.state
+        // A touch flaps in the current lane, never changes lanes on touch-down.
+        s.vy = -2.0
+        assertTrue(h.sim.pointerDown())
+        assertEquals(1, s.lane)
+        assertEquals(Tuning.FLAP_VELOCITY, s.vy)
+        // Sideways swipe: one lane from the gesture start, the flap becomes a hop.
+        assertTrue(h.sim.swipe(+1))
+        assertEquals(2, s.lane)
+        assertEquals(Tuning.SWITCH_HOP, s.vy)
+        assertEquals(Tuning.WING_SWITCH, s.wingSpeed)
+        assertEquals(0.5, s.squash)
+        assertEquals(GameEvent.LaneSwitch(1, 2), h.events.last())
+        assertFalse(h.sim.swipe(+1), "one swipe per touch")
+        assertFalse(h.sim.swipe(-1), "one action per gesture")
+        assertEquals(2, s.lane)
+        h.sim.pointerUp()
+        // Following touches flap in lane 2.
+        repeat(3) {
+            s.vy = -2.0
+            h.sim.pointerDown()
+            h.sim.pointerUp()
+            assertEquals(2, s.lane)
+            assertEquals(Tuning.FLAP_VELOCITY, s.vy)
+        }
+        // Swipe into the edge keeps the flap.
+        s.vy = -2.0
+        h.sim.pointerDown()
+        assertFalse(h.sim.swipe(+1))
+        assertEquals(2, s.lane)
+        assertEquals(Tuning.FLAP_VELOCITY, s.vy)
+        h.sim.pointerUp()
+        // A swipe after the touch ended does nothing.
+        assertFalse(h.sim.swipe(-1))
+        assertEquals(2, s.lane)
+        // Swipe left, twice: lane 1, then lane 0; a high vy before the touch is kept.
+        s.vy = 9.0
+        h.sim.pointerDown()
+        assertTrue(h.sim.swipe(-1))
+        assertEquals(1, s.lane)
+        assertEquals(9.0, s.vy)
+        h.sim.pointerUp()
+        h.sim.pointerDown()
+        assertTrue(h.sim.swipe(-1))
+        h.sim.pointerUp()
+        assertEquals(0, s.lane)
+        h.sim.pointerDown()
+        assertFalse(h.sim.swipe(-1))
+        assertEquals(0, s.lane)
+        h.sim.pointerUp()
+        // Paused: a touch only resumes.
+        h.sim.setPaused(true)
+        assertFalse(h.sim.pointerDown())
+        assertFalse(s.paused)
+        assertFalse(h.sim.swipe(+1))
+        assertEquals(0, s.lane)
+    }
+
+    @Test
     fun laneInputAndSwipe() {
         val h = SimHarness()
         emptyRun(h)
         val s = h.state
-        // A tap two lanes away moves one lane with a small hop.
+        // Bot/keyboard lane action: two lanes away moves one lane with a small hop.
         s.lane = 0; s.x = -3.0; s.vy = -4.0
         h.sim.tapLane(2)
         assertEquals(1, s.lane)
@@ -437,15 +542,16 @@ class ScenarioTest {
         assertEquals(Tuning.FLAP_VELOCITY, s.vy)
         // Touch flaps in place, then a right swipe takes it back as a hop to lane 2.
         s.vy = -2.0
-        assertTrue(h.sim.pointerDown(1))
+        assertTrue(h.sim.pointerDown())
         assertEquals(Tuning.FLAP_VELOCITY, s.vy)
         assertTrue(h.sim.swipe(+1))
         assertEquals(2, s.lane)
         assertEquals(Tuning.SWITCH_HOP, s.vy)
         assertFalse(h.sim.swipe(+1), "one swipe per touch")
+        h.sim.pointerUp()
         // Swipe into the edge keeps the tap.
         s.vy = -2.0
-        h.sim.pointerDown(2)
+        h.sim.pointerDown()
         assertFalse(h.sim.swipe(+1))
         assertEquals(Tuning.FLAP_VELOCITY, s.vy)
         // Keyboard.

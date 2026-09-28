@@ -16,8 +16,8 @@ missing = [name for name in required if not os.environ.get(name)]
 if missing:
     raise SystemExit("Missing GitHub Actions secrets: " + ", ".join(missing))
 
-android = Path(__file__).resolve().parents[1] / "android"
-keystore = android / "birdy-upload.jks"
+native = Path(__file__).resolve().parents[1] / "native"
+keystore = native / "birdy-upload.jks"
 keystore.write_bytes(base64.b64decode(os.environ["UPLOAD_KEYSTORE_BASE64"], validate=True))
 keystore.chmod(0o600)
 
@@ -29,7 +29,7 @@ def property_value(name: str) -> str:
     return value
 
 
-properties = android / "keystore.properties"
+properties = native / "keystore.properties"
 properties.write_text(
     "storeFile=birdy-upload.jks\n"
     f"storePassword={property_value('UPLOAD_STORE_PASSWORD')}\n"

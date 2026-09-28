@@ -1,6 +1,4 @@
-node_modules
-dist
 .DS_Store
-android/keystore.properties
-android/*.jks
-android/app/build/
+# Play signing (written by scripts/configure_play_ci.py, never commit)
+native/keystore.properties
+native/*.jks

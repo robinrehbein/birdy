@@ -88,7 +88,7 @@ class FormulaGoldenTest {
         assertEquals(c.d("HIT_STOP"), Tuning.HIT_STOP)
         assertEquals(c.d("NEAR_MISS"), Tuning.NEAR_MISS)
         assertEquals(c.i("TUT_SWITCH_ROW"), Tuning.TUT_SWITCH_ROW)
-        assertEquals(c.d("NEAR_BIRD"), Tuning.NEAR_BIRD)
+        // NEAR_BIRD (tap-near-the-bird flap zone) is gone: swipe controls ignore where a touch lands.
     }
 
     @Test
