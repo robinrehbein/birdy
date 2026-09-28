@@ -10,7 +10,7 @@ package de.robinrehbein.birdy.engine.gl
  * count (implementations copy into direct buffers as needed); byte offsets are in bytes.
  * Add methods here (and to every implementation) rather than calling platform GL directly.
  */
-interface Gl {
+interface GlApi {
     fun getError(): Int
     fun getString(name: Int): String?
     /** `glGetIntegerv` for a single-valued [pname]. */

@@ -2,7 +2,6 @@ package de.robinrehbein.birdy.game.loop
 
 import de.robinrehbein.birdy.audio.Sfx
 import de.robinrehbein.birdy.game.ButtonUi
-import de.robinrehbein.birdy.game.CoinPackUi
 import de.robinrehbein.birdy.game.PowerType
 import de.robinrehbein.birdy.game.ShopTab
 import de.robinrehbein.birdy.game.ShopTileUi
@@ -22,6 +21,7 @@ import de.robinrehbein.birdy.meta.WorldItem
 import de.robinrehbein.birdy.platform.AdsStatus
 import de.robinrehbein.birdy.platform.BillingStatus
 import de.robinrehbein.birdy.platform.RewardKind
+import de.robinrehbein.birdy.platform.purchase.ProductIds
 import kotlin.random.Random
 
 /** Workshop slots the bird wears (`LOOK_KINDS`). */
@@ -243,7 +243,8 @@ class ShopController(
 
     /** `startRealPurchase(id)`: one purchase in flight at a time. */
     fun buyReal(productId: String) {
-        if (billingBusy) return
+        if (billingBusy || !billing.ready || !ProductIds.isPermanent(productId)
+            || productId !in billing.products) return
         billingBusy = true
         feedback.effect(UiEffect.LaunchPurchase(productId))
     }
@@ -253,15 +254,14 @@ class ShopController(
         billingBusy = false
     }
 
-    /** Billing grant callback: toast, wallet bump, re-apply the bird (a cosmetic may be new). */
-    fun purchaseGranted(coins: Int, shopOpen: Boolean) {
-        feedback.toast(if (coins > 0) t("coinsPurchased", "n" to coins) else t("purchaseGranted"))
-        feedback.walletBump()
+    /** Billing grant callback: re-apply the newly owned cosmetic. */
+    fun purchaseGranted(shopOpen: Boolean) {
+        feedback.toast(t("purchaseGranted"))
         preview.applyBird()
         if (shopOpen) applyPreview()
     }
 
-    private fun price(productId: String): String? = billing.products[productId]?.formattedPrice
+    private fun price(productId: String): String? = if (billing.ready) billing.products[productId]?.formattedPrice else null
 
     // --- 3D preview and snapshot ----------------------------------------------------------------
 
@@ -291,9 +291,6 @@ class ShopController(
 
     fun ui(adPrivacy: Boolean): ShopUi {
         val coins = progress.data.value.coins
-        val packs = COIN_PACKS.mapNotNull { (id, n) ->
-            price(id)?.let { CoinPackUi(id, n, t("coinPack", "n" to n, "price" to it), !billingBusy) }
-        }
         val left = progress.rewardedAdsLeft
         val rewardAd = if (!adsAvailable || left == 0) null else ButtonUi(t("rewardAd", "n" to left), !adBusy)
         val passMinutes = progress.stylePassMinutesLeft
@@ -306,7 +303,7 @@ class ShopController(
             else t("surprise", "n" to SURPRISE_PRICE),
             missingSurprise <= 0,
         )
-        val kind = tab.kind ?: return upgradesUi(coins, packs, rewardAd, stylePass, surprise, adPrivacy)
+        val kind = tab.kind ?: return upgradesUi(coins, rewardAd, stylePass, surprise, adPrivacy)
 
         val list = Catalog.items(kind)
         val equipped = progress.equipped(kind).id
@@ -360,12 +357,12 @@ class ShopController(
             tab = tab, selectedId = item.id, tiles = tiles, name = L(item.name), desc = desc,
             action = action, actionIsBuy = isBuy, diceEnabled = diceEnabled(), surprise = surprise,
             rewardAd = rewardAd, stylePass = stylePass, adPrivacy = adPrivacy,
-            realBuy = realBuy, realBuyProductId = realBuyId, coinPacks = packs, billingBusy = billingBusy,
+            realBuy = realBuy, realBuyProductId = realBuyId, billingBusy = billingBusy,
         )
     }
 
     private fun upgradesUi(
-        coins: Int, packs: List<CoinPackUi>, rewardAd: ButtonUi?, stylePass: ButtonUi?, surprise: ButtonUi?, adPrivacy: Boolean,
+        coins: Int, rewardAd: ButtonUi?, stylePass: ButtonUi?, surprise: ButtonUi?, adPrivacy: Boolean,
     ): ShopUi {
         val tiles = Catalog.upgrades.map { u ->
             ShopTileUi(
@@ -383,7 +380,7 @@ class ShopController(
             desc = "${L(u.text)} · ${t("level", "n" to lvl, "max" to Catalog.UPGRADE_MAX)}",
             action = action, actionIsBuy = price != null, diceEnabled = diceEnabled(), surprise = surprise,
             rewardAd = rewardAd, stylePass = stylePass, adPrivacy = adPrivacy,
-            realBuy = null, realBuyProductId = null, coinPacks = packs, billingBusy = billingBusy,
+            realBuy = null, realBuyProductId = null, billingBusy = billingBusy,
         )
     }
 
@@ -392,6 +389,5 @@ class ShopController(
         const val SURPRISE_MAX = 900
         val SURPRISE_KINDS = listOf(Kind.Skin, Kind.Pattern, Kind.Hat, Kind.Eyes, Kind.Beak, Kind.Trail, Kind.Pipe)
         val DICE_KINDS = listOf(Kind.Skin) + LOOK_KINDS + Kind.Trail
-        val COIN_PACKS = listOf("birdy_coins_500" to 500, "birdy_coins_1500" to 1500)
     }
 }

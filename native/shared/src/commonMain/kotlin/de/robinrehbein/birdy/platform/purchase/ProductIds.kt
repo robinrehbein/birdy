@@ -10,14 +10,6 @@ import de.robinrehbein.birdy.meta.SkinItem
  * (golden test compares against this list, not a hand-copied one).
  */
 object ProductIds {
-    val coinIds: List<String> = listOf("birdy_coins_500", "birdy_coins_1500")
-
-    /** Coin pack product id -> coin amount (`progress.js` `grantPurchasedCoins` table). */
-    val coinAmounts: Map<String, Int> = mapOf(
-        "birdy_coins_500" to 500,
-        "birdy_coins_1500" to 1500,
-    )
-
     /**
      * One id per non-rare skin/world with `price > 0`, in catalog declaration order. Rare skins
      * are coin/achievement-only and never sold for real money (`billing.js:8-9`).
@@ -26,7 +18,7 @@ object ProductIds {
         Catalog.items(kind).filter { it.price > 0 && (it as? SkinItem)?.rare != true }.map { itemId(kind, it.id) }
     }
 
-    val ids: List<String> = coinIds + itemIds
+    val ids: List<String> = itemIds
 
     fun isPermanent(id: String): Boolean = itemIds.contains(id)
 

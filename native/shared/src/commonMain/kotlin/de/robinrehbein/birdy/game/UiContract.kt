@@ -222,9 +222,6 @@ data class ShopTileUi(
     val maxLevel: Int = 0,
 )
 
-/** Coin pack button (only products the store resolved a price for). */
-data class CoinPackUi(val productId: String, val coins: Int, val label: String, val enabled: Boolean)
-
 /** Everything `renderShop()` / `renderUpgrades()` shows. */
 data class ShopUi(
     val tab: ShopTab,
@@ -245,7 +242,6 @@ data class ShopUi(
     /** Real-money buy for the selected skin/world; [realBuyProductId] is what to request. */
     val realBuy: ButtonUi?,
     val realBuyProductId: String?,
-    val coinPacks: List<CoinPackUi>,
     val billingBusy: Boolean,
 )
 
@@ -334,7 +330,7 @@ sealed class UiCommand {
     /** The shell's purchase flow ended; [failed] shows `purchaseUnavailable`. */
     data class PurchaseEnded(val failed: Boolean) : UiCommand()
     /** Entitlement granted (after the shell saved it): toast, wallet bump, re-apply the bird. */
-    data class PurchaseGranted(val coins: Int) : UiCommand()
+    data object PurchaseGranted : UiCommand()
     /**
      * Measured menu layout (fractions of the overlay height): bottom of the menu title and top
      * of the panel for [menu] (`measureMenuFrame`). Drives the 3D bird framing.

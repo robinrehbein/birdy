@@ -34,7 +34,7 @@ internal class GlRenderTarget(
     /** True when [drawFbo] has content newer than [readFbo]. */
     var dirty = false
 
-    fun ensure(gl: Gl) {
+    fun ensure(gl: GlApi) {
         check(!disposed) { "RenderTarget used after dispose()" }
         if (generation == renderer.generation) return
         generation = renderer.generation
@@ -74,13 +74,13 @@ internal class GlRenderTarget(
         dirty = false
     }
 
-    private fun checkComplete(gl: Gl) {
+    private fun checkComplete(gl: GlApi) {
         val status = gl.checkFramebufferStatus(GL.FRAMEBUFFER)
         check(status == GL.FRAMEBUFFER_COMPLETE) { "Framebuffer incomplete: 0x${status.toString(16)}" }
     }
 
     /** Resolves the multisampled colour into [colorTexture]. No-op without MSAA. */
-    fun resolve(gl: Gl) {
+    fun resolve(gl: GlApi) {
         if (!dirty) return
         dirty = false
         if (drawFbo == readFbo) return

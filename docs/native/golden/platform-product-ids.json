@@ -1,8 +1,4 @@
 {
-  "coinIds": [
-    "birdy_coins_500",
-    "birdy_coins_1500"
-  ],
   "itemIds": [
     "birdy_skin_sky",
     "birdy_skin_cardinal",
@@ -22,8 +18,6 @@
     "birdy_world_mushroom"
   ],
   "ids": [
-    "birdy_coins_500",
-    "birdy_coins_1500",
     "birdy_skin_sky",
     "birdy_skin_cardinal",
     "birdy_skin_robin",
@@ -41,7 +35,7 @@
     "birdy_world_candy",
     "birdy_world_mushroom"
   ],
-  "count": 18,
+  "count": 16,
   "purchasable": [
     {
       "id": "birdy_skin_sky",

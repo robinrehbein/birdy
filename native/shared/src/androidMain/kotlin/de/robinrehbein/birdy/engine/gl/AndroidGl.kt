@@ -2,8 +2,8 @@ package de.robinrehbein.birdy.engine.gl
 
 import android.opengl.GLES30
 
-/** [Gl] facade over `android.opengl.GLES30`. Must be used on the GLSurfaceView render thread. */
-class AndroidGl : Gl {
+/** [GlApi] facade over `android.opengl.GLES30`. Must be used on the GLSurfaceView render thread. */
+class AndroidGl : GlApi {
     private val scratch = NioScratch()
     private val one = IntArray(1)
 

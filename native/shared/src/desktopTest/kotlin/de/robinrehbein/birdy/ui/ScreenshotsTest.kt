@@ -157,7 +157,6 @@ class ScreenshotsTest {
                 adPrivacy = false,
                 realBuy = null,
                 realBuyProductId = null,
-                coinPacks = emptyList(),
                 billingBusy = false,
             ),
         ),
@@ -185,4 +184,3 @@ private fun skiaAvailable(): Boolean = try {
 } catch (t: Throwable) {
     false
 }
-

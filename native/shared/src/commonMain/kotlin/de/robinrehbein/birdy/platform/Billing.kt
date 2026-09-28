@@ -11,7 +11,7 @@ data class StorePurchase(
     val acknowledged: Boolean,
 )
 
-/** Localized price info for a product id (e.g. `birdy_coins_500`, `birdy_skin_gold`). */
+/** Localized price info for a permanent skin or world product. */
 data class StoreProduct(val id: String, val formattedPrice: String)
 
 data class BillingStatus(
@@ -22,8 +22,7 @@ data class BillingStatus(
 
 /**
  * Store connection (Play Billing on Android, StoreKit 2 on iOS later). Entitlement logic
- * (grantPurchasedCoins / grantPaidProduct / syncPaidProducts, consume-after-credit,
- * acknowledge-after-save) lives in a common `PurchaseProcessor` built on this interface
+ * (grantPaidProduct / syncPaidProducts / acknowledge-after-save) lives in a common `PurchaseProcessor` built on this interface
  * (platform.md §2). Callbacks may arrive on any thread; implementations forward them as-is.
  */
 interface Billing {
@@ -38,6 +37,5 @@ interface Billing {
     /** Starts the purchase UI for [productId]; the result arrives via the init callback. */
     fun launchPurchase(productId: String)
 
-    fun consume(token: String, onDone: (ok: Boolean) -> Unit)
     fun acknowledge(token: String, onDone: (ok: Boolean) -> Unit)
 }

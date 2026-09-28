@@ -3,10 +3,10 @@ package de.robinrehbein.birdy.engine.gl
 import org.lwjgl.opengles.GLES30
 
 /**
- * [Gl] facade over LWJGL's OpenGL ES 3.0 bindings (Mesa llvmpipe via EGL surfaceless on CI).
+ * [GlApi] facade over LWJGL's OpenGL ES 3.0 bindings (Mesa llvmpipe via EGL surfaceless on CI).
  * Requires a current context with `GLES.createCapabilities()` done, see [HeadlessEglContext].
  */
-class LwjglGl : Gl {
+class LwjglGl : GlApi {
     private val scratch = NioScratch()
 
     override fun getError(): Int = GLES30.glGetError()

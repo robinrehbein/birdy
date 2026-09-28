@@ -8,7 +8,7 @@ import de.robinrehbein.birdy.engine.scene.InstanceData
  * [Geometry.version] changes. Instance buffers live in [GpuInstances] and are attached to the VAO
  * per draw, so several instanced meshes can share one geometry.
  */
-internal class GpuGeometry(private val gl: Gl, private val geo: Geometry) {
+internal class GpuGeometry(private val gl: GlApi, private val geo: Geometry) {
     val vao = gl.genVertexArray()
     private val buffers = HashMap<String, Int>()
     private var ebo = 0
@@ -97,7 +97,7 @@ internal class GpuGeometry(private val gl: Gl, private val geo: Geometry) {
 }
 
 /** Per-instance matrix (+ colour) buffers of one [InstanceData]. */
-internal class GpuInstances(private val gl: Gl, private val data: InstanceData) {
+internal class GpuInstances(private val gl: GlApi, private val data: InstanceData) {
     val matrixBuffer = gl.genBuffer()
     val colorBuffer = if (data.colors != null) gl.genBuffer() else 0
     private var version = -1

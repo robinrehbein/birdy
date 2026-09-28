@@ -10,7 +10,7 @@ import de.robinrehbein.birdy.engine.scene.Wrap
  * `flipY = true` (the top image row ends up at v = 1), mipmaps for [Filter.LinearMipmap] and
  * anisotropy 8 on mipmapped textures (world.js sets `anisotropy = 8` on its canvas textures).
  */
-internal class GpuTexture(private val gl: Gl) {
+internal class GpuTexture(private val gl: GlApi) {
     val id = gl.genTexture()
     private var version = -1
     var lastUsed = 0

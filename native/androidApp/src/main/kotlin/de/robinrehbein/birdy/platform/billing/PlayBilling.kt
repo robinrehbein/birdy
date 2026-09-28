@@ -8,7 +8,6 @@ import com.android.billingclient.api.BillingClient.ProductType
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -54,7 +53,8 @@ class PlayBilling(
 
     /** Product details cached by [refresh]/init's `getProducts`, keyed by id (needed for launch). */
     private val details = HashMap<String, ProductDetails>()
-    private var ready = false
+    private var connecting = false
+    private var productIds: List<String> = emptyList()
 
     private val client = BillingClient.newBuilder(context)
         .setListener { result, purchases ->
@@ -69,33 +69,54 @@ class PlayBilling(
         .build()
 
     override fun init(productIds: List<String>, onPurchase: (StorePurchase) -> Unit) {
+        this.productIds = productIds
         this.onPurchase = onPurchase
+        connect()
+    }
+
+    private fun connect() {
+        if (connecting || client.isReady) return
+        connecting = true
         client.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(result: BillingResult) {
+                connecting = false
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    ready = true
-                    refreshProducts(productIds)
+                    refresh()
+                } else {
+                    state.value = BillingStatus()
                 }
             }
 
-            // Deliberate no-op: enableAutoServiceReconnection() handles retries.
-            override fun onBillingServiceDisconnected() = Unit
+            override fun onBillingServiceDisconnected() {
+                connecting = false
+                details.clear()
+                state.value = BillingStatus()
+            }
         })
     }
 
     override fun refresh() {
-        if (!ready) return
+        if (!client.isReady) {
+            details.clear()
+            state.value = BillingStatus()
+            connect()
+            return
+        }
         client.queryPurchasesAsync(QueryPurchasesParams.newBuilder().setProductType(ProductType.INAPP).build()) { result, purchases ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                 onRestore(purchases.map { it.toStorePurchase() })
+            } else {
+                state.value = BillingStatus()
             }
         }
+        refreshProducts(productIds)
     }
 
     override fun launchPurchase(productId: String) {
         // platform.md §2.7: "Product unavailable" if not in the locally cached product map.
         val act = activity() ?: run { onPurchaseFlowEnded?.invoke(true); return }
-        val product = details[productId] ?: run { onPurchaseFlowEnded?.invoke(true); return }
+        val product = if (state.value.ready && productId in productIds) details[productId] else null
+        if (product == null) { onPurchaseFlowEnded?.invoke(true); return }
         val offerToken = product.oneTimePurchaseOfferDetails?.offerToken
             ?: run { onPurchaseFlowEnded?.invoke(true); return }
         val flowParams = BillingFlowParams.newBuilder()
@@ -110,11 +131,6 @@ class PlayBilling(
             .build()
         val result = client.launchBillingFlow(act, flowParams)
         if (result.responseCode != BillingClient.BillingResponseCode.OK) onPurchaseFlowEnded?.invoke(true)
-    }
-
-    override fun consume(token: String, onDone: (ok: Boolean) -> Unit) {
-        val params = ConsumeParams.newBuilder().setPurchaseToken(token).build()
-        client.consumeAsync(params) { result, _ -> onDone(result.responseCode == BillingClient.BillingResponseCode.OK) }
     }
 
     override fun acknowledge(token: String, onDone: (ok: Boolean) -> Unit) {
@@ -141,8 +157,7 @@ class PlayBilling(
             }
             state.value = BillingStatus(supported = true, ready = true, products = storeProducts)
         }
-        // Restored purchases are delivered separately (refresh()); this only refreshes prices.
-        refresh()
+        // Owned purchases are queried by refresh() independently of price availability.
     }
 
     private fun Purchase.toStorePurchase() = StorePurchase(

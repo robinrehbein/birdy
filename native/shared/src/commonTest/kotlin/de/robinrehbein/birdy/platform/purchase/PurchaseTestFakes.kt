@@ -28,21 +28,6 @@ class FakePurchaseProgress : ProgressRepository {
     /** Set true to make the next mutating call behave like a failed `save()`. */
     var failNextSave = false
 
-    override fun grantPurchasedCoins(productId: String, token: String): Int {
-        val amount = ProductIds.coinAmounts[productId] ?: return 0
-        if (token.isEmpty() || state.value.processedPurchases.contains(token)) return 0
-        val before = state.value
-        state.value = before.copy(
-            processedPurchases = before.processedPurchases + token,
-            coins = before.coins + amount,
-        )
-        if (consumeFailure()) {
-            state.value = before // roll back both mutations atomically, as progress.js does
-            return 0
-        }
-        return amount
-    }
-
     override fun grantPaidProduct(productId: String): Boolean? {
         val match = Regex("^birdy_(skin|world)_([a-z]+)$").matchEntire(productId) ?: return false
         val kind = Kind.of(match.groupValues[1]) ?: return false
@@ -64,10 +49,10 @@ class FakePurchaseProgress : ProgressRepository {
     override fun syncPaidProducts(productIds: List<String>): Boolean {
         val before = state.value
         state.value = before.copy(paidProducts = productIds.distinct())
-        return !consumeFailure()
+        if (!consumeFailure()) return true
+        state.value = before
+        return false
     }
-
-    override fun hasProcessedPurchase(token: String): Boolean = state.value.processedPurchases.contains(token)
 
     private fun consumeFailure(): Boolean {
         if (!failNextSave) return false
@@ -111,10 +96,8 @@ class FakeBilling : Billing {
 
     var purchaseHandler: ((StorePurchase) -> Unit)? = null
     var initIds: List<String>? = null
-    val consumed = ArrayList<String>()
     val acknowledged = ArrayList<String>()
     var refreshCalls = 0
-    var consumeShouldFail = false
     var acknowledgeShouldFail = false
 
     override fun init(productIds: List<String>, onPurchase: (StorePurchase) -> Unit) {
@@ -125,12 +108,6 @@ class FakeBilling : Billing {
     override fun refresh() { refreshCalls++ }
 
     override fun launchPurchase(productId: String) = Unit
-
-    override fun consume(token: String, onDone: (ok: Boolean) -> Unit) {
-        val ok = !consumeShouldFail
-        if (ok) consumed += token
-        onDone(ok)
-    }
 
     override fun acknowledge(token: String, onDone: (ok: Boolean) -> Unit) {
         val ok = !acknowledgeShouldFail

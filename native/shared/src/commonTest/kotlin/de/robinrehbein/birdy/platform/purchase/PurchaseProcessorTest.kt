@@ -33,48 +33,16 @@ class PurchaseProcessorTest {
     @Test
     fun pendingPurchaseStateIsIgnored() {
         val (processor, progress, billing) = harness()
-        processor.handlePurchase(purchase(listOf("birdy_coins_500"), "tok", state = 2))
-        assertEquals(0, progress.data.value.coins)
-        assertTrue(billing.consumed.isEmpty())
+        processor.handlePurchase(purchase(listOf(ProductIds.itemIds.first()), "tok", state = 2))
+        assertTrue(progress.data.value.paidProducts.isEmpty())
+        assertTrue(billing.acknowledged.isEmpty())
     }
 
     @Test
     fun purchaseWithoutTokenIsIgnored() {
         val (processor, progress, _) = harness()
-        processor.handlePurchase(purchase(listOf("birdy_coins_500"), token = ""))
-        assertEquals(0, progress.data.value.coins)
-    }
-
-    @Test
-    fun coinPackCreditsAndConsumes() {
-        val (processor, progress, billing) = harness()
-        val grants = ArrayList<PurchaseGrant>()
-        val p = PurchaseProcessor(billing, { progress }, { it() }) { grants += it }
-        p.handlePurchase(purchase(listOf("birdy_coins_500"), "tok-1"))
-        assertEquals(500, progress.data.value.coins)
-        assertEquals(listOf<PurchaseGrant>(PurchaseGrant.Coins("birdy_coins_500", 500)), grants)
-        assertEquals(listOf("tok-1"), billing.consumed)
-    }
-
-    @Test
-    fun sameTokenNeverCreditsTwiceButIsAlwaysRetriedForConsume() {
-        val (processor, progress, billing) = harness()
-        processor.handlePurchase(purchase(listOf("birdy_coins_500"), "tok-1"))
-        billing.consumed.clear()
-        // Play redelivers the still-owned purchase (consume failed previously).
-        processor.handlePurchase(purchase(listOf("birdy_coins_500"), "tok-1"))
-        assertEquals(500, progress.data.value.coins) // not double-credited
-        assertEquals(listOf("tok-1"), billing.consumed) // but consume is retried
-    }
-
-    @Test
-    fun failedSaveRollsBackCoinCreditAndSkipsConsume() {
-        val (processor, progress, billing) = harness()
-        progress.failNextSave = true
-        processor.handlePurchase(purchase(listOf("birdy_coins_1500"), "tok-2"))
-        assertEquals(0, progress.data.value.coins)
-        assertFalse(progress.hasProcessedPurchase("tok-2"))
-        assertTrue(billing.consumed.isEmpty())
+        processor.handlePurchase(purchase(listOf(ProductIds.itemIds.first()), token = ""))
+        assertTrue(progress.data.value.paidProducts.isEmpty())
     }
 
     @Test
@@ -135,16 +103,16 @@ class PurchaseProcessorTest {
     fun failedPaidProductSyncSkipsReplayingGrants() {
         val (processor, progress, billing) = harness()
         progress.failNextSave = true
-        processor.syncOwnedPurchases(listOf(purchase(listOf("birdy_coins_500"), "tok-fail")))
-        assertEquals(0, progress.data.value.coins)
-        assertTrue(billing.consumed.isEmpty())
+        val id = ProductIds.itemIds.first()
+        processor.syncOwnedPurchases(listOf(purchase(listOf(id), "tok-fail")))
+        assertTrue(progress.data.value.paidProducts.isEmpty())
+        assertTrue(billing.acknowledged.isEmpty())
     }
 
     @Test
-    fun coinAndPermanentIdsMatchTheGoldenProductList() {
+    fun permanentIdsMatchTheGoldenProductList() {
         val golden = Golden.json("platform-product-ids.json").jsonObject
         fun ids(key: String) = golden[key]!!.jsonArray.map { it.jsonPrimitive.content }
-        assertEquals(ids("coinIds"), ProductIds.coinIds)
         assertEquals(ids("itemIds"), ProductIds.itemIds)
         assertEquals(ids("ids"), ProductIds.ids)
         assertEquals(golden["count"]!!.jsonPrimitive.int, ProductIds.ids.size)
@@ -167,6 +135,14 @@ class PurchaseProcessorTest {
         val rare = Catalog.skins.first { it.rare }
         processor.handlePurchase(purchase(listOf(ProductIds.itemId(Kind.Skin, rare.id)), "tok-rare"))
         assertTrue(progress.data.value.paidProducts.isEmpty())
+        assertTrue(billing.acknowledged.isEmpty())
+    }
+
+    @Test
+    fun removedCoinPackIsIgnored() {
+        val (processor, progress, billing) = harness()
+        processor.handlePurchase(purchase(listOf("birdy_coins_500"), "old-token"))
+        assertEquals(0, progress.data.value.coins)
         assertTrue(billing.acknowledged.isEmpty())
     }
 

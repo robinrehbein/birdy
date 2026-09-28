@@ -4,7 +4,7 @@ package de.robinrehbein.birdy.engine.gl
  * Redundant-call filter for the fixed-function state the renderer toggles per draw.
  * [invalidate] forgets everything (new frame, new context, or foreign GL code ran).
  */
-internal class GlState(private val gl: Gl) {
+internal class GlState(private val gl: GlApi) {
     private var depthTest: Boolean? = null
     private var depthWrite: Boolean? = null
     private var blend: Boolean? = null

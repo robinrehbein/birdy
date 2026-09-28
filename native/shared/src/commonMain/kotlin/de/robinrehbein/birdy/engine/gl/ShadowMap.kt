@@ -7,7 +7,7 @@ import de.robinrehbein.birdy.engine.scene.DirectionalLight
  * `PCFShadowMap`): `DEPTH_COMPONENT24`, compare mode `LEQUAL`, linear filtering so every tap is a
  * hardware 2x2 PCF, clamp to edge. [matrix] maps world space to shadow texture space.
  */
-internal class ShadowMap(private val gl: Gl) {
+internal class ShadowMap(private val gl: GlApi) {
     var texture = 0
         private set
     var fbo = 0

@@ -80,7 +80,6 @@ class LocalProgressRepository(
         val rewardedAds = RewardedAds(rewardedAdsObj.str("day") ?: "", rewardedAdsObj.intOrNull("count") ?: 0)
         val stylePassUntil = o.longOrNull("stylePassUntil") ?: 0L
         val paidProducts = o.strList("paidProducts") ?: emptyList()
-        val processedPurchases = o.strList("processedPurchases") ?: emptyList()
         val tutorialDone = o.boolOrNull("tutorialDone") ?: false
         val trailsLegacy = o.strList("trails") ?: listOf("none")
         val trailLegacy = o.str("trail") ?: "none"
@@ -132,7 +131,7 @@ class LocalProgressRepository(
         return ProgressData(
             coins = coins, best = best, runs = runs, owned = owned, skin = skinLegacy,
             missions = missions, gift = gift, rewardedAds = rewardedAds, stylePassUntil = stylePassUntil,
-            paidProducts = paidProducts, processedPurchases = processedPurchases, tutorialDone = tutorialDone,
+            paidProducts = paidProducts, tutorialDone = tutorialDone,
             trails = trailsLegacy, trail = trailLegacy, stats = stats, achieved = achieved,
             items = items, equip = equip, upgrades = upgrades,
         )
@@ -381,25 +380,19 @@ class LocalProgressRepository(
 
     private val paidProductRegex = Regex("^birdy_(skin|world)_([a-z]+)$")
 
-    override fun grantPurchasedCoins(productId: String, token: String): Int {
-        val amount = COIN_PACKS[productId] ?: return 0
-        val d = state.value
-        if (token.isEmpty() || token in d.processedPurchases) return 0
-        val next = d.copy(processedPurchases = d.processedPurchases + token, coins = d.coins + amount)
-        return if (commit(next)) amount else { state.value = d; 0 }
-    }
-
     override fun grantPaidProduct(productId: String): Boolean? {
         val match = paidProductRegex.matchEntire(productId) ?: return false
         val kind = Kind.of(match.groupValues[1]) ?: return false
         val id = match.groupValues[2]
         val item = Catalog.find(kind, id) ?: return false
-        if (item.price <= 0) return false
+        if (item.price <= 0 || (item as? SkinItem)?.rare == true) return false
         val wasOwned = permanentlyOwns(kind, id)
         val d = state.value
         val paidProducts = if (productId in d.paidProducts) d.paidProducts else d.paidProducts + productId
         val ok = commit(d.copy(paidProducts = paidProducts, equip = d.equip + (kind.id to id)))
-        return if (ok) !wasOwned else null
+        if (ok) return !wasOwned
+        state.value = d
+        return null
     }
 
     override fun syncPaidProducts(productIds: List<String>): Boolean {
@@ -407,12 +400,13 @@ class LocalProgressRepository(
             val m = paidProductRegex.matchEntire(id) ?: return@filter false
             val kind = Kind.of(m.groupValues[1]) ?: return@filter false
             val item = Catalog.find(kind, m.groupValues[2]) ?: return@filter false
-            item.price > 0
+            item.price > 0 && (item as? SkinItem)?.rare != true
         }
-        return commit(state.value.copy(paidProducts = filtered))
+        val previous = state.value
+        if (commit(previous.copy(paidProducts = filtered))) return true
+        state.value = previous
+        return false
     }
-
-    override fun hasProcessedPurchase(token: String): Boolean = token in state.value.processedPurchases
 
     companion object {
         private const val GIFT_BASE = 20
@@ -421,7 +415,6 @@ class LocalProgressRepository(
         private const val REWARDED_ADS_PER_DAY = 3
         private const val REWARDED_COINS = 30
         private const val STYLE_PASS_MS = 60L * 60L * 1000L
-        private val COIN_PACKS = mapOf("birdy_coins_500" to 500, "birdy_coins_1500" to 1500)
 
         private fun ceilDiv(a: Long, b: Long): Long = (a + b - 1) / b
     }

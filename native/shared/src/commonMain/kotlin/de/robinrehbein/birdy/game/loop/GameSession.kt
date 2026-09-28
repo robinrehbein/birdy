@@ -307,7 +307,7 @@ class GameSession(
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
             is UiCommand.BuyReal -> shop.buyReal(cmd.productId)
             is UiCommand.PurchaseEnded -> shop.purchaseEnded(cmd.failed)
-            is UiCommand.PurchaseGranted -> shop.purchaseGranted(cmd.coins, s.mode == GameMode.Ready && s.menu == Menu.Shop)
+            UiCommand.PurchaseGranted -> shop.purchaseGranted(s.mode == GameMode.Ready && s.menu == Menu.Shop)
             is UiCommand.SetMuted -> {
                 startAudio()
                 audio.setMuted(cmd.muted)

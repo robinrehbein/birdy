@@ -45,17 +45,15 @@ class ReadyAds : Ads {
     override fun showPrivacyOptions() = Unit
 }
 
-/** A store that knows prices for the coin packs and the paid skins/worlds. */
+/** A store that knows prices for the paid skins and worlds. */
 class PricedBilling : Billing {
-    private val ids = listOf("birdy_coins_500" to "0,99 €", "birdy_coins_1500" to "2,49 €") +
-        listOf("sky", "cardinal", "robin", "mint", "coral", "flamingo", "parrot", "penguin", "night", "snowy", "peacock", "gold").map { "birdy_skin_$it" to "1,99 €" } +
+    private val ids = listOf("sky", "cardinal", "robin", "mint", "coral", "flamingo", "parrot", "penguin", "night", "snowy", "peacock", "gold").map { "birdy_skin_$it" to "1,99 €" } +
         listOf("winter", "beach", "candy", "mushroom").map { "birdy_world_$it" to "1,99 €" }
     override val status: StateFlow<BillingStatus> =
         MutableStateFlow(BillingStatus(true, true, ids.associate { (id, p) -> id to StoreProduct(id, p) }))
     override fun init(productIds: List<String>, onPurchase: (StorePurchase) -> Unit) = Unit
     override fun refresh() = Unit
     override fun launchPurchase(productId: String) = Unit
-    override fun consume(token: String, onDone: (ok: Boolean) -> Unit) = onDone(true)
     override fun acknowledge(token: String, onDone: (ok: Boolean) -> Unit) = onDone(true)
 }
 

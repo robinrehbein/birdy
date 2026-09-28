@@ -1,6 +1,6 @@
 {
   "source": "src/i18n.js",
-  "keyCount": 87,
+  "keyCount": 85,
   "de": {
     "zoneFlap": "flattern",
     "zoneMove": "wischen",
@@ -22,9 +22,7 @@
     "stylePassActive": "[sparkle] Style-Pass aktiv · noch {n} Min.",
     "stylePassGranted": "Alle Vögel & Welten für 1 Stunde freigeschaltet (außer seltene)!",
     "realBuy": "Dauerhaft kaufen · {price} Echtgeld",
-    "coinPack": "{n} Münzen · {price} Echtgeld",
     "purchaseGranted": "Dauerhaft freigeschaltet!",
-    "coinsPurchased": "+{n} Münzen gekauft!",
     "purchaseUnavailable": "Kauf gerade nicht möglich",
     "achTitle": "Erfolge",
     "back": "Zurück",
@@ -111,9 +109,7 @@
     "stylePassActive": "[sparkle] Style Pass active · {n} min left",
     "stylePassGranted": "All birds & worlds unlocked for 1 hour (except rare ones)!",
     "realBuy": "Own forever · {price} real money",
-    "coinPack": "{n} coins · {price} real money",
     "purchaseGranted": "Unlocked permanently!",
-    "coinsPurchased": "+{n} coins purchased!",
     "purchaseUnavailable": "Purchase unavailable right now",
     "achTitle": "Awards",
     "back": "Back",
