@@ -3,7 +3,9 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 
 export const LANES = [-3, 0, 3];
 export const PIPE_RADIUS = 1.1;
-export const PIPE_TOP = 40; // pipes extend well above the visible sky
+// Pipes end inside the cloud bank (BANK_Y). Looks only: collisions use the
+// gap edges and the `blocked` flag, not this height.
+export const PIPE_TOP = 17.4;
 export const GROUND_TILE = 10; // world units per ground texture repeat
 
 const SKY_TOP = 0x2a9bd0;
@@ -87,6 +89,10 @@ function makeGroundTexture() {
     g.lineTo(x1, i + 128);
     g.stroke();
   }
+  // Dashed lane dividers on the track (lanes at x = -3, 0, 3; the texture
+  // spans 26 units, so the dividers at ±1.5 sit ~29.5 px from the centre).
+  g.fillStyle = 'rgba(255, 252, 235, 0.75)';
+  for (const x of [226.5, 285.5]) g.fillRect(x - 2.5, 8, 5, 48);
   // track borders
   g.fillStyle = '#9ce659';
   g.fillRect(x0 - 10, 0, 10, 128);
@@ -496,11 +502,17 @@ export function createScenery(scene) {
   };
 }
 
+// Shared by the sky clouds and the cloud banks the pipes hang from, so the
+// zone tint (biomes.js) colours both.
+// Lit a little from within, so the undersides seen from below stay soft
+// instead of heavy grey.
+const cloudMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true, emissive: 0xffffff, emissiveIntensity: 0.22 });
+
 export function createClouds(scene) {
   const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, flatShading: true, fog: true });
   const geo = new THREE.IcosahedronGeometry(1, 1);
   const clouds = [];
-  const bakedMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true });
+  const bakedMat = cloudMat;
   for (let i = 0; i < 18; i++) {
     const g = new THREE.Group();
     const n = 3 + Math.floor(Math.random() * 3);
@@ -545,7 +557,7 @@ stripeGeo.translate(0, 0.5, 0);
 // the sky colour seen behind it (same gradient maths as the sky dome, same
 // uniforms, so it follows every zone's sky). No transparency, no dithering.
 export const HAZE_START = 15;
-export const HAZE_END = 26;
+export const HAZE_END = 19; // inside the cloud bank
 function addSkyHaze(mat, sky) {
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.skyTop = sky.top;
@@ -637,17 +649,47 @@ function applyPipeMat(m) {
   m.roughness = pipeStyle?.metal ? 0.3 : 0.45;
 }
 
-function makePipeSegment(mat, capGeo) {
+// Upper pipes cast no sun shadow: it fell far beside the lanes, and skipping
+// it saves up to two draw calls per pipe in the shadow pass (budget).
+function makePipeSegment(mat, capGeo, castShadow = true) {
   const g = new THREE.Group();
   const body = new THREE.Mesh(pipeBodyGeo, mat);
   const lip = new THREE.Mesh(capGeo, mat);
   for (const m of [body, lip]) {
-    m.castShadow = true;
+    m.castShadow = castShadow;
     m.receiveShadow = true;
   }
   g.add(body, lip);
   return { g, body, lip };
 }
+
+// --- Cloud banks -------------------------------------------------------------
+// The upper pipes disappear into a bank of puffy clouds instead of fading
+// out into the sky. A few baked variants (own small RNG, so the game's random
+// sequence is untouched), one draw call per row.
+export const BANK_Y = 16;
+function makeBankGeometry(seed) {
+  let h = seed * 9301 + 49297;
+  const rnd = () => ((h = (h * 9301 + 49297) % 233280) / 233280);
+  const root = new THREE.Group();
+  const puff = new THREE.IcosahedronGeometry(1, 1);
+  const white = new THREE.MeshBasicMaterial({ color: 0xffffff });
+  const shade = new THREE.MeshBasicMaterial({ color: 0xe9eef5 });
+  for (let x = -6.5; x <= 6.5; x += 1.6 + rnd() * 0.5) {
+    const s = 1.5 + rnd() * 0.9;
+    const m = new THREE.Mesh(puff, rnd() < 0.3 ? shade : white);
+    m.position.set(x, BANK_Y + rnd() * 0.9, (rnd() - 0.5) * 1.6);
+    m.scale.set(s * 1.2, s * 0.62, s);
+    root.add(m);
+  }
+  return bakeGroup(root);
+}
+const bankGeos = [1, 2, 3].map(makeBankGeometry);
+// Same zone tint as the sky clouds (shared colour), lit from within a little so
+// the undersides seen from below stay soft instead of rock-grey.
+const bankMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true, fog: true, emissive: 0xffffff, emissiveIntensity: 0.32 });
+bankMat.color = cloudMat.color;
+let gateCount = 0;
 
 // --- Spiky cactus (obstacle) ------------------------------------------------
 
@@ -655,10 +697,13 @@ export const PLANT_HEIGHT = 1.8;
 // How far the plant's head reaches into the gap when fully up. Leaves enough
 // room above it for a full flap arc.
 export const PLANT_REACH = 0.9;
+// Drawn a little wider than modelled so it reads from afar; width is looks
+// only (the hitbox is the height of its top).
+const PLANT_WIDTH = 1.2;
 // A grumpy spiky cactus that pops up out of the pipe on the beat. Built once
 // and baked into one geometry (one draw call per cactus); the "puff" when it
 // is fully up just scales the whole thing.
-const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a };
+const CACTUS = { green: 0x2fa58f, spike: 0xfff3d6, eye: 0xffffff, pupil: 0x222222, brow: 0x1c5a4c, mouth: 0x3a2030, tooth: 0xffffff, petal: 0xff5a8a, pollen: 0xffd84a, outline: 0x3a2433 };
 const CACTUS_R = new THREE.Vector3(0.74, 0.8, 0.74); // body radii
 const CACTUS_Y = PLANT_HEIGHT - 0.95; // body centre: the top sits just under PLANT_HEIGHT
 function buildCactusGeometry() {
@@ -682,7 +727,7 @@ function buildCactusGeometry() {
     return mesh;
   };
   // Spikes all around, but none on the face and none on the top (flower).
-  const spikeGeo = new THREE.ConeGeometry(0.045, 0.26, 4);
+  const spikeGeo = new THREE.ConeGeometry(0.05, 0.32, 4);
   const d = new THREE.Vector3();
   for (let i = 0; i < 46; i++) {
     const phi = Math.acos(1 - (2 * (i + 0.5)) / 46);
@@ -725,6 +770,16 @@ function buildCactusGeometry() {
   const pollen = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 4), m(CACTUS.pollen));
   pollen.position.y = top + 0.06;
   root.add(pollen);
+  // Cartoon outline: a slightly bigger body with reversed faces in plum. Only
+  // its far side is drawn, which shows as a dark rim around the silhouette,
+  // so the cactus reads against pipes and scenery. Same draw call.
+  const hullGeo = new THREE.SphereGeometry(1, 10, 7);
+  const idx = hullGeo.index.array;
+  for (let i = 0; i < idx.length; i += 3) [idx[i + 1], idx[i + 2]] = [idx[i + 2], idx[i + 1]];
+  const hull = new THREE.Mesh(hullGeo, m(CACTUS.outline));
+  hull.scale.copy(CACTUS_R).addScalar(0.07);
+  hull.position.y = CACTUS_Y;
+  root.add(hull);
   return bakeGroup(root, true);
 }
 let cactusGeo = null;
@@ -750,7 +805,7 @@ function createPlant() {
   const group = new THREE.Group();
   const mat = cactusMaterial();
   const body = new THREE.Mesh(cactusGeo, mat);
-  body.castShadow = true;
+  body.castShadow = false; // sits inside the pipe, whose shadow covers it (render budget)
   group.add(body);
   group.visible = false;
   return { group, body, bristle: mat.userData.bristle };
@@ -790,7 +845,7 @@ export function createGate(scene) {
   applyPipeMat(mats.pipe);
   const lanes = LANES.map((x) => {
     const bottom = makePipeSegment(mats.pipe, capBelowGeo);
-    const top = makePipeSegment(mats.pipe, capAboveGeo);
+    const top = makePipeSegment(mats.pipe, capAboveGeo, false);
     bottom.g.position.x = x;
     top.g.position.x = x;
     const plant = createPlant();
@@ -803,6 +858,8 @@ export function createGate(scene) {
       gapLow: 0, gapHigh: 0, hitLow: 0, hitHigh: 0,
     };
   });
+  const bank = new THREE.Mesh(bankGeos[gateCount++ % bankGeos.length], bankMat);
+  group.add(bank);
   scene.add(group);
 
   function setSegment(seg, from, to, lipAt) {
@@ -884,7 +941,7 @@ export function createGate(scene) {
           plant.group.visible = true;
           plant.group.position.y = lane.gapLow + 0.12 - (CACTUS_Y + CACTUS_R.y);
           plant.group.rotation.z = Math.sin(time * 22) * 0.1;
-          plant.body.scale.set(1, 1, 1);
+          plant.body.scale.set(PLANT_WIDTH, 1, PLANT_WIDTH);
           plant.bristle.value = 0;
           continue;
         }
@@ -897,7 +954,7 @@ export function createGate(scene) {
         // Fully up: it puffs itself up and down (wider, a little shorter), so
         // the top of the hitbox stays where it is.
         const puff = rise > 0.9 ? 0.5 + 0.5 * Math.sin(time * 16) : 0;
-        plant.body.scale.set(1 + 0.08 * puff, 1 - 0.03 * puff, 1 + 0.08 * puff);
+        plant.body.scale.set(PLANT_WIDTH * (1 + 0.08 * puff), 1 - 0.03 * puff, PLANT_WIDTH * (1 + 0.08 * puff));
         plant.bristle.value = puff; // spikes stand up (looks only, same hitbox)
       }
     },
@@ -922,12 +979,35 @@ export function createGate(scene) {
 
 // --- Coins ------------------------------------------------------------------
 
-const coinGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.12, 20);
-coinGeo.rotateX(Math.PI / 2);
+// A gold coin with a raised darker rim and an embossed star on both faces
+// (baked with vertex colours, same size as before).
+const coinGeo = (() => {
+  const root = new THREE.Group();
+  const m = (hex) => new THREE.MeshBasicMaterial({ color: hex });
+  const face = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 0.1, 16), m(0xffcf33));
+  face.rotation.x = Math.PI / 2;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(0.41, 0.055, 4, 16), m(0xf2a100));
+  const star = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const r = i % 2 ? 0.09 : 0.21;
+    const a = (i / 10) * Math.PI * 2 + Math.PI / 2;
+    if (i === 0) star.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else star.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  const starGeo = new THREE.ExtrudeGeometry(star, { depth: 0.03, bevelEnabled: false });
+  const front = new THREE.Mesh(starGeo, m(0xfff0a0));
+  front.position.z = 0.04;
+  const back = new THREE.Mesh(starGeo, m(0xfff0a0));
+  back.position.z = -0.04;
+  back.rotation.y = Math.PI;
+  root.add(face, rim, front, back);
+  return bakeGroup(root);
+})();
 // Bright gold: little metalness (there is no environment map to reflect,
 // so a metallic coin would look brown) and a warm glow of its own.
 const coinMat = new THREE.MeshStandardMaterial({
-  color: 0xffcf33,
+  vertexColors: true,
+  color: 0xffffff,
   emissive: 0xb07800,
   emissiveIntensity: 0.55,
   metalness: 0.15,
@@ -935,10 +1015,30 @@ const coinMat = new THREE.MeshStandardMaterial({
   flatShading: true,
 });
 
-export function createCoin(scene) {
-  const mesh = new THREE.Mesh(coinGeo, coinMat);
-  mesh.castShadow = true;
-  mesh.visible = false;
-  scene.add(mesh);
-  return { mesh, active: false };
+// All coins are drawn as one instanced mesh (a draw call each was the
+// biggest item in the render budget). The game moves plain Object3D proxies
+// (`coin.mesh`: position, rotation, scale, visible); sync() copies them over.
+export function createCoinField(scene, count) {
+  const inst = new THREE.InstancedMesh(coinGeo, coinMat, count);
+  inst.frustumCulled = false;
+  scene.add(inst);
+  const coins = Array.from({ length: count }, () => {
+    const mesh = new THREE.Object3D();
+    mesh.visible = false;
+    return { mesh, active: false };
+  });
+  return {
+    coins,
+    sync() {
+      let n = 0;
+      for (const c of coins) {
+        if (!c.mesh.visible) continue;
+        c.mesh.updateMatrix();
+        inst.setMatrixAt(n++, c.mesh.matrix);
+      }
+      inst.count = n;
+      inst.visible = n > 0;
+      inst.instanceMatrix.needsUpdate = true;
+    },
+  };
 }

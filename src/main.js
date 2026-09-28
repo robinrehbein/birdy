@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import './style.css';
 import { createBird } from './bird.js';
 import { sfx, music, audio, renderMusic } from './audio.js';
-import { createParticles, createSpeedLines } from './effects.js';
+import { createParticles, createSpeedLines, createImpact, createAura } from './effects.js';
 import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './powerups.js';
 import { progress, ACHIEVEMENTS } from './progress.js';
 import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
@@ -16,7 +16,7 @@ import {
   createScenery,
   createClouds,
   createGate,
-  createCoin,
+  createCoinField,
   setPipeStyle,
   createPipePreview,
 } from './world.js';
@@ -78,6 +78,8 @@ const scenery = createScenery(scene);
 const clouds = createClouds(scene);
 const particles = createParticles(scene);
 const speedLines = createSpeedLines(scene);
+const impact = createImpact(scene, camera);
+const aura = createAura(scene, camera);
 const biomes = createBiomeBlender({ scene, ground, scenery, clouds });
 const zoneMarks = []; // { z, zone } – where the next zone begins
 // The first zone (and every fourth) is the world chosen in the shop.
@@ -139,7 +141,8 @@ const gates = Array.from({ length: 12 }, () => {
   g.active = false;
   return g;
 });
-const coins = Array.from({ length: 60 }, () => createCoin(scene));
+const coinField = createCoinField(scene, 60);
+const coins = coinField.coins;
 const pickups = POWERUP_TYPES.flatMap((type) => [createPowerupPickup(scene, type), createPowerupPickup(scene, type)]);
 
 // --- DOM --------------------------------------------------------------------
@@ -348,7 +351,6 @@ function renderShop() {
   // The dice only makes sense once there is something to combine.
   $('shop-dice').disabled = ['skin', ...LOOK_KINDS, 'trail'].every((k) => CATALOG[k].filter((x) => progress.owns(k, x.id)).length < 2);
   for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
-  tabsEl.querySelector('.tab.on')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   shopDesc.textContent = '';
   if (shopTab === 'upgrade') return renderUpgrades();
   const kind = shopTab;
@@ -365,7 +367,7 @@ function renderShop() {
     return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
-  skinsEl.querySelector('.sel')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  reveal(skinsEl.querySelector('.sel'), skinsEl);
   updateGridFade();
   renderSurprise();
   shopName.textContent = L(item.name);
@@ -429,11 +431,24 @@ surpriseBtn.addEventListener('click', () => {
   renderShop();
 });
 
-// A fade at the bottom of the item grid while more items are below.
+// A fade at the bottom of a scrolling list while more items are below.
+const listFade = (el) => el.classList.toggle('more', el.scrollTop + el.clientHeight < el.scrollHeight - 4);
 function updateGridFade() {
-  skinsEl.classList.toggle('more', skinsEl.scrollTop + skinsEl.clientHeight < skinsEl.scrollHeight - 4);
+  listFade(skinsEl);
 }
 skinsEl.addEventListener('scroll', updateGridFade, { passive: true });
+
+// Scroll only `box` so that `el` is visible. (scrollIntoView would also
+// scroll the whole app container, which shifted the screens upwards.)
+function reveal(el, box) {
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const b = box.getBoundingClientRect();
+  if (r.top < b.top) box.scrollTop -= b.top - r.top + 4;
+  else if (r.bottom > b.bottom) box.scrollTop += r.bottom - b.bottom + 4;
+}
+// The app container never scrolls (focus or content can't push it).
+app.addEventListener('scroll', () => { app.scrollTop = 0; app.scrollLeft = 0; });
 
 function openShop(open) {
   state.menu = open ? 'shop' : 'start';
@@ -514,7 +529,10 @@ function renderAchievements() {
         <span class="bar"><i style="width:${pct}%"></i></span></span>
       <span class="reward">${a.done ? '✓' : `+${a.reward}`}</span></div>`;
   }).join('');
+  requestAnimationFrame(() => listFade(achList));
 }
+const achList = $('ach-list');
+achList.addEventListener('scroll', () => listFade(achList), { passive: true });
 function openAchievements(open) {
   state.menu = open ? 'achievements' : 'start';
   achEl.classList.toggle('hidden', !open);
@@ -659,6 +677,7 @@ function resetGame() {
   bird.setGlow(null);
   music.setHype(false);
   particles.clear();
+  impact.clear();
 
   for (const g of gates) { g.active = false; g.group.visible = false; }
   for (const c of coins) { c.active = false; c.mesh.visible = false; }
@@ -910,6 +929,11 @@ function startAudio() {
 
 function setPaused(paused) {
   state.paused = paused;
+  if (paused) {
+    $('pause-score').textContent = state.score;
+    $('pause-coins').textContent = state.coins;
+    $('pause-zone').textContent = state.zone + 1;
+  }
   pauseEl.classList.toggle('hidden', !paused);
   audio.setSuspended(paused);
 }
@@ -1125,7 +1149,12 @@ $('play-btn').addEventListener('click', () => {
   startAudio();
   flap();
 });
-pauseEl.addEventListener('pointerdown', () => setPaused(false));
+// Pause: "Menü" leaves the run; a tap anywhere else (or "Weiter") resumes.
+pauseEl.addEventListener('pointerdown', (e) => {
+  if (e.target.closest('#pause-menu-btn')) return;
+  setPaused(false);
+});
+$('pause-menu-btn').addEventListener('click', () => goToMenu());
 
 // Game over: tap anywhere (except "Menü") to go again, after a short delay
 // so a panicked tap at the moment of death doesn't skip the screen.
@@ -1238,6 +1267,10 @@ document.addEventListener('visibilitychange', () => {
 const birdPos = new THREE.Vector3();
 const tmpColor = new THREE.Color();
 
+// Where the bonk star appears, relative to the bird, per cause of death:
+// on the side it hit, so the squashed bird stays visible next to it.
+const HIT_OFFSET = { 'pipe-top': [0.25, 0.8, 0], 'pipe-bottom': [0.25, -0.75, 0], plant: [0.25, -0.75, 0], ground: [0.25, -0.7, 0], blocked: [0.8, 0.45, -0.6] };
+const tmpHit = new THREE.Vector3();
 function die(cause) {
   if (state.mode !== 'playing') return;
   state.mode = 'dead';
@@ -1254,11 +1287,18 @@ function die(cause) {
   music.duck();
   music.setHype(false);
   bird.setGlow(null);
+  // Feathers in the bird's own colours, a "bonk" star where it hit, and the
+  // bird squashed flat for the freeze-frame.
+  const skin = progress.skin;
   particles.emit(birdPos, {
-    count: 28, colors: [0xf7d23e, 0xfff3c4, 0xf57c21], speed: 8, size: 0.14, life: 1.2, gravity: -9,
+    count: 36, colors: [skin.body, skin.body, skin.belly, skin.wing, 0xffffff], speed: 9, size: 0.15, life: 1.3, gravity: -8,
   });
+  const at = HIT_OFFSET[cause] || HIT_OFFSET.blocked;
+  impact.hit(tmpHit.set(state.x + at[0], state.y + at[1], at[2]));
+  const sc = bird.group.scale.x;
+  bird.group.scale.set(sc * 1.3, sc * 0.72, sc * 1.25);
   flash.style.transition = 'none';
-  flash.style.opacity = '0.9';
+  flash.style.opacity = '0.55';
   requestAnimationFrame(() => {
     flash.style.transition = 'opacity 0.35s';
     flash.style.opacity = '0';
@@ -1535,10 +1575,12 @@ function updatePlaying(dt) {
       else state.nearChain = 0;
       gate.minClear = undefined;
     }
-    // Passed rows fade out so they don't hide what's coming next.
-    // Passed rows fade out completely so nothing blocks the view ahead.
-    gate.setOpacity(THREE.MathUtils.lerp(gate.opacity, gate.passed ? 0 : 1, Math.min(1, dt * 12)));
-    if (gate.passed && gate.opacity < 0.03) gate.group.visible = false;
+    // Passed rows vanish within a short distance behind the bird, so no
+    // huge see-through pipes hang in front of the camera. Looks only: the
+    // collision check below does not depend on visibility.
+    const behind = gz - (PIPE_RADIUS + r);
+    gate.setOpacity(gate.passed ? THREE.MathUtils.clamp(1 - behind / 1.5, 0, 1) : 1);
+    if (gate.passed && gate.opacity <= 0) gate.group.visible = false;
     if (!gate.passed && (!next || gz > next.group.position.z)) next = gate;
 
     if (!invincible() && Math.abs(gz) < PIPE_RADIUS + 0.25 + r) {
@@ -1579,6 +1621,11 @@ function updatePlaying(dt) {
     if (magnet && p.distanceTo(birdPos) < magnetRange() && p.z > -magnetRange()) {
       p.lerp(birdPos, Math.min(1, dt * 7));
     }
+    // Missed coins shrink away just behind the bird instead of flying into
+    // the camera as big discs. Looks only: they stay collectable (magnet).
+    const k = THREE.MathUtils.clamp(1 - (p.z - 1.5) / 1.5, 0, 1);
+    c.mesh.scale.setScalar(k);
+    c.mesh.visible = k > 0;
     if (p.z > 15) {
       c.active = false;
       c.mesh.visible = false;
@@ -1599,7 +1646,10 @@ function updatePlaying(dt) {
     if (!pu.active) continue;
     const p = pu.group.position;
     p.z += dz;
-    animatePickup(pu, state.time);
+    animatePickup(pu, state.time, camera);
+    const k = THREE.MathUtils.clamp(1 - (p.z - 1.5) / 1.5, 0, 1);
+    pu.group.scale.setScalar(k);
+    pu.group.visible = k > 0;
     if (p.z > 15) {
       pu.active = false;
       pu.group.visible = false;
@@ -1681,6 +1731,10 @@ function updateBirdVisual(dt) {
       particles.emit(trailPos, { count: 1, colors: trail.colors, speed: trail.speed, size: trail.size * 2, life: trail.life * 1.2, gravity: trail.gravity, drag: 1, drift });
     }
   }
+  // Power-up aura (rainbow first, then magnet, then mini).
+  const p = state.power;
+  const auraKind = state.mode !== 'playing' ? null : p.star > 0 ? 'star' : p.magnet > 0 ? 'magnet' : p.mini > 0 ? 'mini' : null;
+  aura.update(auraKind, g.position, state.time, state.baseScale);
   // Blink during the grace period after the rainbow ends.
   g.visible = !(state.grace > 0 && Math.floor(state.time * 12) % 2 === 0);
 }
@@ -1862,35 +1916,45 @@ function toggleFps(on) {
 function tick() {
   timer.update();
   const rawDt = timer.getDelta();
-  const dt = Math.min(rawDt, 1 / 30);
   adaptQuality(rawDt);
-  if (landscapeTouch.matches || state.paused) {
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
-    return;
-  }
+  if (!(landscapeTouch.matches || state.paused || frozen)) update(rawDt);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+
+// Everything a frame does except drawing.
+function update(rawDt) {
+  const dt = Math.min(rawDt, 1 / 30);
   if (state.hitStop > 0) {
     // Freeze-frame on impact; only the camera shake keeps going.
     state.hitStop -= rawDt;
     updateCamera(dt);
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
+    impact.update(dt);
     return;
   }
-  step(dt, music.beat());
+  step(dt, frozen ? undefined : music.beat()); // frozen (test shots): beat from game time
   particles.update(dt, state.mode === 'playing' ? state.speed * dt : 0);
   // Speed feel: streaks fade in from ~24 units/s and are strongest in the rainbow.
   const rush = state.mode === 'playing' && !state.hold
     ? Math.min(1, Math.max(0, (state.speed - 22) / 14) + (state.power.star > 0 ? 0.6 : 0)) : 0;
   speedLines.update(state.mode === 'playing' ? state.speed * dt : 0, rush);
+  impact.update(dt);
   updateToast(dt);
   updateHand();
   updateZonesOverlay();
   biomes.update(dt);
   updateBirdVisual(dt);
   updateCamera(dt);
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
+  coinField.sync();
+}
+
+// Screenshot scripts: `freeze` stops real-time updates (frames are still
+// drawn) and `advance` runs game time forward without drawing each frame
+// (headless software rendering is far slower than a phone).
+let frozen = false;
+const freeze = (on) => { frozen = on; };
+function advance(seconds) {
+  for (let s = 0; s < seconds; s += 1 / 30) if (!state.paused) update(1 / 30);
 }
 
 const SIM = new URLSearchParams(location.search).has('sim');
@@ -1926,4 +1990,4 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera };
+window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };

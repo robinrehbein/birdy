@@ -74,7 +74,13 @@
     <div id="pause" class="panel-wrap hidden">
       <div class="panel">
         <h2 data-i18n="pause"></h2>
-        <p class="controls" data-i18n="resume"></p>
+        <div class="stats pause-stats">
+          <div><small data-i18n="score"></small><strong id="pause-score">0</strong></div>
+          <div><small data-i18n="coins"></small><strong id="pause-coins">0</strong></div>
+          <div><small data-i18n="zoneLabel"></small><strong id="pause-zone">1</strong></div>
+        </div>
+        <button id="resume-btn" data-i18n="continue"></button>
+        <button id="pause-menu-btn" class="secondary" data-i18n="menu"></button>
       </div>
     </div>
 

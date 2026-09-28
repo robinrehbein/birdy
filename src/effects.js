@@ -78,7 +78,7 @@ export function createParticles(scene, max = 300) {
 // Speed streaks: thin light lines beside and above the track that rush past
 // the camera. Their opacity follows how fast the run is.
 export function createSpeedLines(scene, count = 28) {
-  const geo = new THREE.BoxGeometry(0.07, 0.07, 3.6);
+  const geo = new THREE.BoxGeometry(0.11, 0.11, 3.6);
   const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, fog: false });
   const mesh = new THREE.InstancedMesh(geo, mat, count);
   mesh.frustumCulled = false;
@@ -106,6 +106,124 @@ export function createSpeedLines(scene, count = 28) {
         mesh.setMatrixAt(i, dummy.matrix);
       });
       mesh.instanceMatrix.needsUpdate = true;
+    },
+  };
+}
+
+// Crash feedback: a comic "bonk" star at the point of impact that pops up
+// during the freeze-frame and fades. One mesh, drawn only while needed.
+function starGeometry(points, outer, inner) {
+  const shape = new THREE.Shape();
+  for (let i = 0; i < points * 2; i++) {
+    const r = i % 2 ? inner : outer;
+    const a = (i / (points * 2)) * Math.PI * 2 + Math.PI / 2;
+    if (i === 0) shape.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+    else shape.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+  }
+  return new THREE.ShapeGeometry(shape);
+}
+
+export function createImpact(scene, camera) {
+  // Bonk: plum outline star, white star, yellow core (baked, one draw call).
+  const layers = [
+    [starGeometry(8, 1.25, 0.62), 0x543847, 0],
+    [starGeometry(8, 1.08, 0.52), 0xffffff, 0.01],
+    [starGeometry(8, 0.62, 0.34), 0xffe14a, 0.02],
+  ];
+  const geos = layers.map(([g, hex, z]) => {
+    g.translate(0, 0, z);
+    const n = g.attributes.position.count;
+    const c = new THREE.Color(hex);
+    const col = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) col.set([c.r, c.g, c.b], i * 3);
+    g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.deleteAttribute('uv');
+    g.deleteAttribute('normal');
+    return g;
+  });
+  const bonkGeo = mergeSimple(geos);
+  const bonk = new THREE.Mesh(bonkGeo, new THREE.MeshBasicMaterial({
+    vertexColors: true, transparent: true, depthTest: false, depthWrite: false, toneMapped: false, fog: false,
+  }));
+  bonk.renderOrder = 11;
+  bonk.visible = false;
+  scene.add(bonk);
+
+  let t = 1;
+  return {
+    // Impact at `pos` (world space).
+    hit(pos) {
+      t = 0;
+      bonk.position.copy(pos);
+      bonk.visible = true;
+      bonk.material.opacity = 1;
+      bonk.scale.setScalar(0.5);
+    },
+    update(dt) {
+      if (!bonk.visible) return;
+      t += dt;
+      bonk.quaternion.copy(camera.quaternion);
+      bonk.rotateZ(t * 1.5);
+      // Pops to full size right away, holds through the freeze, then fades.
+      bonk.scale.setScalar(0.5 + 0.3 * Math.min(1, t / 0.12));
+      bonk.material.opacity = 1 - THREE.MathUtils.smoothstep(t, 0.25, 0.5);
+      if (t > 0.5) bonk.visible = false;
+    },
+    clear() {
+      bonk.visible = false;
+    },
+  };
+}
+
+// Merge geometries that share the same attributes (position + color).
+function mergeSimple(geos) {
+  const out = new THREE.BufferGeometry();
+  const pos = [];
+  const col = [];
+  for (const g of geos) {
+    const gi = g.index ? g.toNonIndexed() : g;
+    pos.push(...gi.attributes.position.array);
+    col.push(...gi.attributes.color.array);
+  }
+  out.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  out.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  return out;
+}
+
+// Power-up aura around the bird (one billboard ring, drawn only while a
+// power-up is active): a colour-cycling rainbow ring, magnet waves that run
+// outwards, or a pulsing ring that keeps the tiny mini bird easy to spot.
+export function createAura(scene, camera) {
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(0.82, 1, 40),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false, toneMapped: false, fog: false, side: THREE.DoubleSide }),
+  );
+  ring.renderOrder = 9;
+  ring.visible = false;
+  scene.add(ring);
+  const col = new THREE.Color();
+  return {
+    // kind: 'star' | 'magnet' | 'mini' | null; `size` = bird scale.
+    update(kind, pos, time, size) {
+      ring.visible = !!kind;
+      if (!kind) return;
+      ring.position.copy(pos);
+      ring.quaternion.copy(camera.quaternion);
+      const m = ring.material;
+      if (kind === 'star') {
+        m.color.copy(col.setHSL((time * 1.5) % 1, 1, 0.6));
+        m.opacity = 0.75;
+        ring.scale.setScalar(size * (1.25 + 0.08 * Math.sin(time * 12)));
+      } else if (kind === 'magnet') {
+        const k = (time * 1.6) % 1; // a wave every 0.6 s
+        m.color.setHex(0xff4a4a);
+        m.opacity = 0.7 * (1 - k);
+        ring.scale.setScalar(size * (1 + 2.2 * k));
+      } else {
+        m.color.setHex(0xc58bff);
+        m.opacity = 0.85;
+        ring.scale.setScalar(size * (1.5 + 0.15 * Math.sin(time * 8)));
+      }
     },
   };
 }
