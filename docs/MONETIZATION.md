@@ -29,7 +29,7 @@
 
 Alle diese Inhalte können weiterhin mit erspielten Münzen freigeschaltet werden. Im kostenlosen Spiel gibt es Tagesgeschenke, Missionen und Münzen aus Flügen; eine freiwillige Rewarded Ad gibt 30 Münzen. Echtgeldkäufe sind direkte, dauerhafte Freischaltungen. Der Style-Pass ist ausschließlich über eine freiwillige Anzeige erhältlich und verfällt nach einer Stunde. Preise außerhalb Deutschlands werden von Google Play lokalisiert und im Shop aus Play-Produktdetails angezeigt.
 
-**Status (28. September 2026):** Produktumfang und deutsche Preise wurden vom Herausgeber freigegeben. Das signierte Bundle mit `BILLING`-Berechtigung (versionCode `26092801`) wurde in Play hochgeladen und liegt als nicht ausgelieferter Entwurf im internen Track. Die Produktseite verlangt weiterhin einen veröffentlichten Build mit `BILLING`. Dem Dienstkonto fehlt für die Preis-API die Birdy-Berechtigung „App-Präsenz im Play Store verwalten“ (HTTP 403). Daher sind noch keine Play-Produkte angelegt oder aktiviert.
+**Status (28. September 2026):** Produktumfang und deutsche Preise wurden vom Herausgeber freigegeben. Das signierte Bundle mit `BILLING`-Berechtigung (versionCode `26092801`) wurde in Play hochgeladen und liegt als nicht ausgelieferter Entwurf im internen Track. Das Dienstkonto hat nun die Birdy-Berechtigung „App-Präsenz im Play Store verwalten“; der zuvor fehlschlagende Preis-API-Aufruf liefert HTTP 200. Der Versuch, `birdy_coins_500` als Entwurf anzulegen, wird weiterhin mit HTTP 400 und „request billing permission“ abgewiesen. Play erkennt die `BILLING`-Berechtigung offenbar erst nach einem ausgelieferten Build; derzeit sind keine Play-Produkte angelegt oder aktiviert.
 
 ## Vor einem Test-Release mit Monetarisierung
 
