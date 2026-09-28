@@ -1,18 +1,18 @@
 # Birdy native (Kotlin / Kotlin Multiplatform)
 
-Native Android-App für Birdy: dieselbe Spielidee wie die Web-/Capacitor-Version in
-[`../src`](../src), aber als eigenständiges Gradle-Projekt in Kotlin statt JavaScript/WebView.
-Das Spielmodul (`shared`) ist als **Kotlin-Multiplatform**-Bibliothek gebaut, damit später eine
-iOS-App auf demselben Code aufsetzen kann (siehe [`docs/native/IOS.md`](../docs/native/IOS.md)).
-Solange die native App nicht die Feature-Parität der JS-Version erreicht und freigegeben ist,
-bleibt die Capacitor-App (`../android`) der produktive Build – siehe die Hauptdatei
-[`../README.md`](../README.md).
+Birdy ist eine native Android-App in Kotlin, als eigenständiges Gradle-Projekt. Das Spielmodul
+(`shared`) ist als **Kotlin-Multiplatform**-Bibliothek gebaut, damit später eine iOS-App auf
+demselben Code aufsetzen kann (siehe [`docs/native/IOS.md`](../docs/native/IOS.md)). Diese
+App ist der produktive Build – siehe die Hauptdatei [`../README.md`](../README.md).
 
 Architektur, Modulaufteilung und Dateibesitz stehen in
 [`../docs/native/ARCHITECTURE.md`](../docs/native/ARCHITECTURE.md); die Fachspezifikation
-(Physik, Tuning-Werte, Formeln) in [`../docs/native/spec/`](../docs/native/spec/), goldene
-Testfixtures (exakte Zahlen, 1:1 aus der JS-Version übernommen) in
-[`../docs/native/golden/`](../docs/native/golden/).
+(Physik, Tuning-Werte, Formeln) in [`../docs/native/spec/`](../docs/native/spec/), geschrieben aus
+der ursprünglichen JS-Version (deren Quellen inzwischen aus dem Repo entfernt, aber vor dem
+Entfernen in der Git-Historie verfügbar sind). Goldene Testfixtures (eingefrorene Referenzwerte,
+1:1 aus der damaligen JS-Version übernommen) liegen in
+[`../docs/native/golden/`](../docs/native/golden/) und sind die Quelle der Wahrheit für die
+Kotlin-Tests; ihre ursprünglichen Generator-Skripte existieren nicht mehr.
 
 ## Module
 
@@ -51,9 +51,10 @@ cd native
 ```
 
 Die Unit-Tests in `shared/src/commonTest` und `shared/src/desktopTest` prüfen die Spiellogik
-gegen die goldenen Fixtures in `../docs/native/golden/*.json` — dieselben Zahlen, die die
-JS-Version bei identischem Zufalls-Seed und identischer Zeit liefert. Ein Test schlägt fehl, wenn
-sich Tuning-Werte oder Formeln unbeabsichtigt von der JS-Version unterscheiden.
+gegen die eingefrorenen Fixtures in `../docs/native/golden/*.json` — dieselben Zahlen, die die
+ursprüngliche JS-Version bei identischem Zufalls-Seed und identischer Zeit lieferte. Ein Test
+schlägt fehl, wenn sich Tuning-Werte oder Formeln unbeabsichtigt von diesen Referenzwerten
+unterscheiden.
 
 Kompletter CI-Lauf (Tests + Debug-Build + Lint), wie ihn auch
 [`../.github/workflows/native-build.yml`](../.github/workflows/native-build.yml) ausführt:
@@ -89,11 +90,6 @@ Diese Maschine hat keine GPU und kein KVM. Zwei Wege, das Spiel trotzdem visuell
    Boot dauert mehrere Minuten. Nur für den finalen Smoke-Test verwenden, nicht während der
    Entwicklung.
 
-Die JS-Referenzversion lässt sich parallel mit Playwright + vorinstalliertem Chromium
-screenshotten (`PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers`, WebGL über SwiftShader) — siehe
-`../scripts/store-shots.mjs` und `../scripts/playtest.mjs` dafür, wie Spielzustände angesteuert
-werden.
-
 ## Release-Signatur
 
 Details, Formeln und die Play-Publishing-Migration stehen vollständig in
@@ -104,9 +100,7 @@ cd native
 ./gradlew :androidApp:bundleRelease   # .aab für den Play Store
 ```
 
-`androidApp/build.gradle.kts` sucht zuerst `native/keystore.properties`, dann (als Fallback)
-`../android/keystore.properties` der Capacitor-App, damit beide Apps denselben Upload-Key nutzen
-können. Beide Dateien haben dasselbe Format:
+`androidApp/build.gradle.kts` sucht `native/keystore.properties`. Das Format:
 
 ```properties
 storeFile=birdy-upload.jks   # relativ zu dieser Properties-Datei aufgelöst
@@ -115,17 +109,15 @@ keyAlias=birdy-upload
 keyPassword=...
 ```
 
-Fehlt die Datei, entsteht ein **unsigniertes** Release-Artefakt (kein Fehler) — das entspricht
-dem Verhalten der Capacitor-App und ist der Grund, warum `assembleRelease`/`bundleRelease` auch
-auf dieser Maschine ohne Schlüssel funktionieren.
+Fehlt die Datei, entsteht ein **unsigniertes** Release-Artefakt (kein Fehler) — das ist der Grund,
+warum `assembleRelease`/`bundleRelease` auch auf dieser Maschine ohne Schlüssel funktionieren.
 
 ## versionCode
 
 `versionCode = (Umgebungsvariable BIRDY_VERSION_CODE, sonst 5)`. Der Default `5` liegt bewusst
-über dem letzten Capacitor-Release (`4`), damit ein lokaler Build nie mit einem bereits
-hochgeladenen Capacitor-versionCode auf demselben Play-Eintrag kollidiert. CI muss
-`BIRDY_VERSION_CODE` mit exakt derselben Formel berechnen wie die bestehende Capacitor-Pipeline
-(siehe `../docs/native/spec/platform.md` §4.2 und
+über dem letzten Capacitor-Release (`4`, der Vorgänger-App auf demselben Play-Eintrag), damit ein
+lokaler Build nie mit einem bereits hochgeladenen versionCode kollidiert. CI berechnet
+`BIRDY_VERSION_CODE` mit dieser Formel (siehe `../docs/native/spec/platform.md` §4.2 und
 `../docs/native/golden/platform-version-code.json`):
 
 ```
@@ -133,13 +125,15 @@ suffix = GITHUB_RUN_NUMBER * 10 + GITHUB_RUN_ATTEMPT   # muss <= 9999 pro UTC-Ta
 BIRDY_VERSION_CODE = floor(aktuelle_UTC_Epochensekunden / 86400) * 10000 + suffix
 ```
 
-`versionName` ist fest `"2.0.0"` (kennzeichnet den nativen Rewrite gegenüber der Capacitor-`1.x`).
+`versionName` ist fest `"2.0.0"` (kennzeichnet den nativen Rewrite gegenüber der ursprünglichen
+Capacitor-App, `1.x`).
 
 ## Migration alter Spielstände (Capacitor → nativ)
 
-Wer die bestehende Capacitor-App (`de.robinrehbein.birdy`) bereits installiert hat, hat seinen
-Fortschritt im `localStorage` der WebView unter diesen Schlüsseln gespeichert (siehe
-`../src/progress.js`, `../src/audio.js`, `../src/i18n.js`, `../src/main.js`):
+Wer die frühere Capacitor-App (`de.robinrehbein.birdy`) bereits installiert hatte, hat seinen
+Fortschritt im `localStorage` der WebView unter diesen Schlüsseln gespeichert (in der damaligen
+`src/progress.js`, `src/audio.js`, `src/i18n.js`, `src/main.js`, inzwischen aus dem Repo entfernt,
+aber vor dem Entfernen in der Git-Historie einsehbar):
 
 | Key | Inhalt |
 | --- | --- |

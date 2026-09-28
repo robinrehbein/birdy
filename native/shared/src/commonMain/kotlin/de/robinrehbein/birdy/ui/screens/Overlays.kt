@@ -39,12 +39,12 @@ fun ToastOverlay(toast: ToastUi?, modifier: Modifier = Modifier) {
     }
 }
 
-/** Ghost-hand tutorial overlay (main-b.md §9). [x]/[y] are screen fractions. */
+/** Ghost-hand tutorial overlay (main-b.md §9): tap at the bird, or a sideways swipe from it. [x]/[y] are screen fractions. */
 @Composable
 fun TutorialHandOverlay(hand: HandUi?, sizeOf: androidx.compose.ui.unit.DpSize, modifier: Modifier = Modifier) {
     if (hand == null) return
     Box(modifier.fillMaxSize()) {
-        Box(Modifier.offset(sizeOf.width * hand.x - 24.dp, sizeOf.height * hand.y - 24.dp)) {
+        Box(Modifier.offset(sizeOf.width * (hand.x + hand.dx) - 24.dp, sizeOf.height * hand.y - 24.dp).alpha(hand.alpha)) {
             GameIcon("hand", size = 48.dp, style = de.robinrehbein.birdy.ui.IconStyle.Sticker)
         }
         if (hand.label.isNotEmpty()) {

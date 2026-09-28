@@ -7,6 +7,7 @@ import de.robinrehbein.birdy.game.TapFxUi
 import de.robinrehbein.birdy.game.ZoneBannerUi
 import de.robinrehbein.birdy.game.ZonesHint
 import de.robinrehbein.birdy.game.ZonesHintUi
+import kotlin.math.floor
 import kotlin.math.max
 
 /**
@@ -64,12 +65,34 @@ class HudFx {
     }
 }
 
-/** `updateHand()`: over the bird for "flap", over the left lane (at least 20 %) for "side". */
+/**
+ * `updateHand()`: a tap at the bird for "flap"; for "side" a swipe that starts at the bird and
+ * slides [SWIPE_DX] of the screen width sideways, alternating right and left each [SWIPE_S]
+ * cycle ([timeS] = real seconds). The label stays under the bird.
+ */
 object TutorialHand {
-    fun ui(mode: HandMode, birdScreenX: Double, birdScreenY: Double, lane0ScreenX: Double, label: String): HandUi? {
+    const val SWIPE_S = 1.6
+    const val SWIPE_DX = 0.24
+
+    fun ui(mode: HandMode, birdScreenX: Double, birdScreenY: Double, timeS: Double, label: String): HandUi? {
         if (mode == HandMode.None) return null
-        val x = if (mode == HandMode.Side) max(0.2, lane0ScreenX) else birdScreenX
-        return HandUi(x.toFloat(), (birdScreenY + 0.06).toFloat(), if (mode == HandMode.Side) "side" else "flap", label)
+        val y = (birdScreenY + 0.06).toFloat()
+        if (mode != HandMode.Side) return HandUi(birdScreenX.toFloat(), y, "flap", label)
+        val cycle = floor(max(0.0, timeS) / SWIPE_S)
+        val p = max(0.0, timeS) / SWIPE_S - cycle
+        val dir = if (cycle.toLong() % 2 == 0L) 1 else -1
+        val (slide, alpha) = swipePhase(p)
+        return HandUi(birdScreenX.toFloat(), y, "side", label, (dir * SWIPE_DX * slide).toFloat(), alpha.toFloat())
+    }
+
+    /** Slide progress (0..1, eased) and opacity at cycle phase [p]: press, swipe, fade out. */
+    fun swipePhase(p: Double): Pair<Double, Double> = when {
+        p < 0.2 -> 0.0 to p / 0.2
+        p < 0.7 -> {
+            val u = (p - 0.2) / 0.5
+            u * u * (3 - 2 * u) to 1.0
+        }
+        else -> 1.0 to ((1 - p) / 0.3).coerceIn(0.0, 1.0)
     }
 }
 

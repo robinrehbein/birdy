@@ -63,8 +63,8 @@ fun BirdyApp(state: UiState, strings: Strings, onCommand: (UiCommand) -> Unit) {
 
         Box(
             Modifier.fillMaxSize().pointerInput(Unit) {
-                // Canvas pointerdown/move/up (main.js): lane targeting and the swipe detector run
-                // in the game (InputMapper). Widgets consume their own touches before this sees them.
+                // Canvas pointerdown/move/up: touch-down flaps (position does not matter), the
+                // sideways-swipe detector runs in the game (InputMapper). Widgets consume their own touches before this sees them.
                 awaitEachGesture {
                     val down = awaitFirstDown()
                     val w = size.width.toFloat().coerceAtLeast(1f)

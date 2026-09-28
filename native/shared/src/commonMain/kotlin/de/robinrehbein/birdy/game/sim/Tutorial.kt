@@ -19,7 +19,7 @@ internal fun GameSimulation.updateTutorial(): Boolean {
             s.tutorialStep = TutorialStep.Switch
             s.freezeY = s.y
             s.hand = HandMode.Side
-            // From the dodge lesson on, the tap boundaries are shown as in normal runs.
+            // From the dodge lesson on, the lane hints are shown as in normal runs.
             showZones(restart = false)
         } else {
             s.tutorialStep = TutorialStep.Go // already dodged on their own

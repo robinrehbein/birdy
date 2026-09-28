@@ -106,8 +106,8 @@ here, so the iOS work starts from verified ground:
   (`IosGl`) is a small, isolated addition once on macOS — the renderer and shaders it wraps need
   no port.
 - CI for the iOS app itself (build + unit tests on `macos-*` GitHub Actions runners) is future
-  work once `native/androidApp`'s parity sign-off gates the native rewrite; it is intentionally
-  out of scope for `native-build.yml`, which only covers Android (`native/**`) today.
+  work, to be added once iOS work actually starts; it is intentionally out of scope for
+  `native-build.yml`, which only covers Android (`native/**`) today.
 
 ## Open decisions (resolve when iOS work actually starts)
 

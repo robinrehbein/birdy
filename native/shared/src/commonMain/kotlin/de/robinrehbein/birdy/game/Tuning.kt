@@ -51,8 +51,6 @@ object Tuning {
     const val TUT_SWITCH_ROW = 3
     /** makeReachable: each lane step multiplies the reach budgets by this. */
     const val SWITCH_FACTOR = 0.6
-    /** Screen-width fraction around the drawn bird where a tap always flaps. */
-    const val NEAR_BIRD = 0.12
     /** Pickup collection radius (independent of the bubble's look). */
     const val PICKUP_RADIUS = 1.4
     /** Seconds from `die()` to `showGameOver()`. */

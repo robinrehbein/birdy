@@ -88,8 +88,20 @@ data class UiState(
 /** A toast line (i18n key + params, may contain [icon] tags); [id] restarts the animation. */
 data class ToastUi(val id: Int, val text: String, val age: Float = 0f)
 
-/** Ghost-hand tutorial overlay in screen fractions (main-b.md §9). */
-data class HandUi(val x: Float, val y: Float, val mode: String, val label: String = "")
+/**
+ * Ghost-hand tutorial overlay in screen fractions (main-b.md §9). [x]/[y] anchor the hand and
+ * its label under the bird; the hand itself is drawn [dx] to the side (the "side" swipe
+ * animation slides it sideways) with opacity [alpha]. [mode] "flap" = tap at the bird,
+ * "side" = swipe sideways starting at the bird.
+ */
+data class HandUi(
+    val x: Float,
+    val y: Float,
+    val mode: String,
+    val label: String = "",
+    val dx: Float = 0f,
+    val alpha: Float = 1f,
+)
 
 /**
  * Zone-boundary lane hint overlay (main-b.md §10); lane edges as screen-x fractions.
@@ -103,7 +115,7 @@ data class ZonesHintUi(
     val hold: Boolean = false,
     val lane: Int = 1,
     val serial: Int = 0,
-    /** Labels: `▲ zoneFlap` on the bird's column, `◀`/`▶ zoneMove` on the others. */
+    /** Labels: `▲ zoneFlap` on the bird's column, `◀`/`▶ zoneMove` (swipe that way) on the others. */
     val flapLabel: String = "",
     val moveLabel: String = "",
     /** Seconds since the `show` animation (re)started; 0 while holding. */
@@ -116,7 +128,7 @@ data class PopupUi(val id: Int, val text: String, val x: Float, val y: Float, va
 /** Zone banner: small localized zone line + big biome name. */
 data class ZoneBannerUi(val id: Int, val zoneLabel: String, val name: String, val age: Float)
 
-/** Tap ripple at the lane the bird moves to; [dir] -1 ◀, 0 ▲, +1 ▶. */
+/** Touch ripple: ▲ ([dir] 0) at the bird on touch, ◀/▶ (-1/+1) at the new lane after a sideways swipe. */
 data class TapFxUi(val id: Int, val x: Float, val y: Float, val dir: Int, val age: Float)
 
 /** One mission row (`missionHTML`); [isNew] = just completed (pop-in). */
@@ -266,9 +278,9 @@ class ThumbnailUi(val size: Int, val argb: IntArray)
  * applied at the start of the next frame, in order.
  */
 sealed class UiCommand {
-    /** Touch down on the 3D surface at screen fractions (0..1); lane targeting happens in-game. */
+    /** Touch down on the 3D surface at screen fractions (0..1): flaps in the current lane wherever it lands. */
     data class Touch(val x: Float, val y: Float) : UiCommand()
-    /** Horizontal swipe: -1 left, +1 right. */
+    /** Horizontal swipe of the current touch: -1 left, +1 right (one lane, sticks until the next swipe). */
     data class Swipe(val direction: Int) : UiCommand()
     data object Back : UiCommand()
     data class SetPaused(val paused: Boolean) : UiCommand()

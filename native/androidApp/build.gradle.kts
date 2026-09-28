@@ -7,13 +7,9 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-// Release signing: keys live outside git. native/keystore.properties wins, otherwise the
-// Capacitor project's android/keystore.properties is reused so both builds share one key.
-// storeFile is resolved relative to the properties file that defined it.
-val keystorePropsFile = listOf(
-    rootProject.file("keystore.properties"),
-    rootProject.file("../android/keystore.properties"),
-).firstOrNull { it.exists() }
+// Release signing: keys live outside git in native/keystore.properties (see docs/STORE.md).
+// storeFile is resolved relative to that file. Without it release builds stay unsigned.
+val keystorePropsFile = rootProject.file("keystore.properties").takeIf { it.exists() }
 val keystoreProps = Properties().apply { keystorePropsFile?.inputStream()?.use { load(it) } }
 
 android {
