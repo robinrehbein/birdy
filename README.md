@@ -75,7 +75,7 @@ Der Build nutzt relative Pfade und kann daher auf jedem statischen Hosting (z. B
 
 ## Android-App
 
-Die Android-App wird mit [Capacitor](https://capacitorjs.com) gebaut: Das Spiel läuft in einer nativen App (WebView mit WebGL), komplett offline, Optik identisch zur Web-Version.
+Die Android-App wird mit [Capacitor](https://capacitorjs.com) gebaut: Das Spiel läuft in einer nativen App (WebView mit WebGL). Das eigentliche Spiel funktioniert offline; freiwillige Anzeigen und optionale Play-Käufe benötigen eine Internetverbindung. Die Optik entspricht der Web-Version.
 
 - Hochformat fest, Vollbild ohne Status- und Navigationsleiste
 - Bildschirm bleibt beim Spielen an

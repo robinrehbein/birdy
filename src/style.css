@@ -417,6 +417,13 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
 .skin.equipped::before { content: '✓'; position: absolute; left: 5px; top: 1px; font-size: 14px; color: #fff; text-shadow: 0 1px 0 #543847; }
 #shop-action.buy { background: #fcb800; }
 #shop-action:disabled { background: #b7ad7a; box-shadow: 0 5px 0 #543847; opacity: 0.8; }
+.reward-ad { width: 100%; margin: 0 0 8px; padding: 6px 8px; font-size: 14px; background: #7a6fc9; }
+.reward-ad:disabled { opacity: 0.65; }
+.coin-packs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
+.panel .coin-packs button { margin: 0; padding: 6px 4px; font-size: 12px; background: #73bf2e; }
+.real-buy { background: #4a9acb; font-size: 15px; padding: 7px 8px; }
+#shop .panel { max-height: min(66vh, 580px); overflow-y: auto; }
+#ad-privacy-btn { border: 0; background: transparent; font: inherit; cursor: pointer; }
 
 #to-best { color: #543847; font-size: 18px; margin-bottom: 12px; }
 

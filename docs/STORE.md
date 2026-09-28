@@ -19,9 +19,9 @@ deutsche Screenshots sind zur Prüfung eingereicht.
   Grafiken als Fallback.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
-- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Datensicherheit: keine Datenerhebung
-  oder Weitergabe angegeben; lokale Speicherung und mögliche Android-Backups sind in der
-  Datenschutzerklärung beschrieben.
+- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Die bisherige
+  Datensicherheitsangabe „keine Datenerhebung“ gilt nur für den bereits veröffentlichten Build.
+  Vor einem Release mit AdMob und Play Billing muss der Fragebogen neu beantwortet werden.
 - Google Play Games auf dem PC wurde deaktiviert. Die ausstehende Aktivierung wurde vor der
   Einreichung aus der Änderungsliste entfernt.
 
@@ -33,13 +33,13 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 | Versionsnummer | ✅ `versionName 1.0.3`, `versionCode 4` (`android/app/build.gradle`); 1.0.2 (versionCode 3) liegt bereits bei Google Play |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
-| Offline, keine Werbung, keine Käufe, kein Tracking | ✅ |
+| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ im Entwicklungszweig, noch nicht veröffentlicht |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN), gerendert mit `scripts/render-assets.mjs` |
 | Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 gestaltete Bilder: echter Spielframe im Rahmen auf Himmel mit Claim (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Herbstwald, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Neu seit der visuellen Politur, müssen in Play neu hochgeladen werden. |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
-| Angaben zur Datensicherheit | ✅ unten |
+| Angaben zur Datensicherheit für Monetarisierung | ⚠️ Play-Console-Fragebogen vor Release aktualisieren |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in Capacitor und Android konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
@@ -82,17 +82,20 @@ Dann `npm run android:aab`. Das Bundle liegt unter
 `android/app/build/outputs/bundle/release/app-release.aab`. In der Play Console **Play App
 Signing** aktivieren; dann ist dein Schlüssel nur noch der Upload-Schlüssel.
 
-Für manuelle Updates `versionCode` (+1) und `versionName` in `android/app/build.gradle` erhöhen.
-Die GitHub-Pipeline vergibt bei jedem Lauf einen eigenen `versionCode` ab 100001.
+Für manuelle Updates einen unbenutzten `versionCode` und `versionName` in
+`android/app/build.gradle` setzen. Auch Entwurfs-Bundles verbrauchen einen Versionscode.
+Die GitHub-Pipeline berechnet ihren Code aus UTC-Tag, Workflow-Laufnummer und Versuch;
+damit liegt er oberhalb des am 28. September 2026 hochgeladenen Entwurfs `26092801`.
 
 ## Automatischer Release nach einem Merge
 
 `.github/workflows/play-release.yml` baut nach jedem Push auf `main` (also auch nach einem
 Merge) ein signiertes Bundle und veröffentlicht es im internen Test und im geschlossenen
-Alpha-Test. Offener Test und Produktion bleiben ausgeschlossen, solange der Produktionszugriff
-fehlt. Ein manueller Start über GitHub Actions ist ebenfalls möglich. Das Workflow-Job startet
-erst, wenn die Repository-Variable `PLAY_PUBLISH_ENABLED` auf `true` gesetzt wurde. Sie ist
-für dieses Repository aktiviert.
+Alpha-Test, sobald sowohl `PLAY_PUBLISH_ENABLED` als auch
+`BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Die zweite Variable bleibt bis
+zum Abschluss der Monetarisierungsprüfungen deaktiviert; auch ein manueller Workflow-Start
+umgeht diese Sperre nicht. Offener Test und Produktion bleiben ausgeschlossen, solange der
+Produktionszugriff fehlt. `PLAY_PUBLISH_ENABLED` ist bereits aktiviert.
 
 Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
 Repository-Secrets benötigt:
@@ -144,7 +147,9 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 >
 > 📅 **Jeden Tag etwas Neues:** Tagesmissionen, Erfolge und ein Tagesgeschenk mit Serien-Bonus.
 >
-> Keine Werbung. Keine In-App-Käufe. Kein Konto. Funktioniert komplett offline.
+> Kostenlos spielbar, ohne Konto. Freiwillige Videoanzeigen geben Münzen oder eine Stunde
+> Zugang zu Skins und Welten. Einzelne Skins und Welten sind dauerhaft kaufbar; Münzpakete
+> sind optional. Eine Internetverbindung wird für Anzeigen und Käufe benötigt.
 
 ## Store listing – English
 
@@ -175,42 +180,28 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 >
 > 📅 **Something new every day:** daily missions, awards and a daily gift with a streak bonus.
 >
-> No ads. No in-app purchases. No account. Works completely offline.
+> Free to play, with no account required. Optional video ads grant coins or one hour of
+> access to skins and worlds. Individual skins and worlds can be bought permanently;
+> coin packs are optional. Ads and purchases require an internet connection.
 
 **Kategorie:** Spiele → Arcade.
 **Tags:** Arcade, Auto-Runner, Casual.
 
-## Datenschutzerklärung (Text zum Veröffentlichen)
+## Datenschutz und Datensicherheit für den Monetarisierungs-Build
 
-> **Datenschutzerklärung für „Birdy“**
->
-> Birdy erhebt oder überträgt keine Nutzerdaten an den Entwickler oder Dritte.
->
-> - Die App stellt keine Verbindung zu Servern her und enthält keine Werbung, keine
->   Analyse- oder Tracking-Dienste und keine In-App-Käufe.
-> - Spielstand, Rekord, Münzen, freigeschaltete Shop-Artikel und Einstellungen (Ton an/aus,
->   Sprache, Grafikstufe) werden ausschließlich lokal auf deinem Gerät gespeichert und beim
->   Deinstallieren gelöscht.
-> - Die Berechtigung „Vibration“ wird nur für kurze Vibrationen im Spiel genutzt.
->
-> Verantwortlicher und Kontakt: Robin Rehbein, Stiegelstraße 26, 71701 Schwieberdingen,
-> Deutschland; hello@robinrehbein.de.
->
-> Stand: 27. September 2026
+Die neue Datenschutzerklärung liegt in `docs/privacy/index.html`. Vor der Veröffentlichung
+dieses Builds muss die GitHub-Pages-Seite mit dieser Fassung aktualisiert werden.
 
-## Angaben zur Datensicherheit (Play Console)
-
-| Frage | Antwort |
-|---|---|
-| Erhebt oder teilt die App Nutzerdaten? | **Nein** |
-| Werden Daten verschlüsselt übertragen? | nicht zutreffend (keine Übertragung) |
-| Können Nutzer die Löschung beantragen? | nicht zutreffend (Daten nur lokal; Deinstallation löscht sie) |
-| Werbung | **Nein** |
-| In-App-Käufe | **Nein** |
+Die bisherige Play-Console-Erklärung zum veröffentlichten Build gibt „keine Datenerhebung“,
+„keine Werbung“ und „keine In-App-Käufe“ an. Sie ist für den neuen Build falsch. Vor einem
+Test-Release in der Play Console Werbung und In-App-Käufe angeben und den
+Datensicherheitsfragebogen anhand der tatsächlichen AdMob-, UMP- und Play-Billing-SDK-Daten
+neu ausfüllen. Die Übermittlung durch Google-SDKs darf nicht als „keine Daten“ deklariert
+werden. Die Angaben müssen nach einem Test auf einem echten Gerät geprüft werden.
 
 **Einstufung (IARC-Fragebogen):**
 - Keine Gewalt gegen Figuren, kein Blut; der Vogel stößt nur gegen Röhren.
-- Keine Interaktion zwischen Nutzern, keine Käufe, kein Glücksspiel.
+- Keine Interaktion zwischen Nutzern und kein Glücksspiel; optionale Käufe vorhanden.
 - Erwartet: USK 0 / PEGI 3.
 
 ## Risiken beim Rechte-Check (bitte bewusst entscheiden)

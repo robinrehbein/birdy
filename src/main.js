@@ -7,6 +7,8 @@ import { POWERUPS, POWERUP_TYPES, createPowerupPickup, animatePickup } from './p
 import { progress, ACHIEVEMENTS } from './progress.js';
 import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
+import { ads } from './ads.js';
+import { billing } from './billing.js';
 import { t, L, applyI18n, getLang, setLang } from './i18n.js';
 import {
   LANES,
@@ -185,7 +187,59 @@ const shopName = $('shop-name');
 const shopAction = $('shop-action');
 const shopDesc = $('shop-desc');
 const toastEl = $('toast');
+const rewardAdBtn = $('reward-ad-btn');
+const stylePassBtn = $('style-pass-btn');
+const adPrivacyBtn = $('ad-privacy-btn');
+const realBuyBtn = $('shop-real-buy');
+const coinPacksEl = $('coin-packs');
+let billingBusy = false;
 let shopSel = progress.skin.id;
+
+function updateAdsUi() {
+  rewardAdBtn.classList.toggle('hidden', !ads.available || progress.rewardedAdsLeft === 0);
+  rewardAdBtn.textContent = t('rewardAd', { n: progress.rewardedAdsLeft });
+  const passMinutes = progress.stylePassMinutesLeft;
+  stylePassBtn.classList.toggle('hidden', !passMinutes && (!ads.passAvailable || progress.rewardedAdsLeft === 0));
+  stylePassBtn.disabled = passMinutes > 0;
+  stylePassBtn.textContent = passMinutes
+    ? t('stylePassActive', { n: passMinutes })
+    : t('stylePassAd', { n: progress.rewardedAdsLeft });
+  adPrivacyBtn.classList.toggle('hidden', !ads.privacyOptionsRequired);
+}
+
+rewardAdBtn.addEventListener('click', async () => {
+  if (!ads.available || progress.rewardedAdsLeft === 0 || rewardAdBtn.disabled) return;
+  rewardAdBtn.disabled = true;
+  const earned = await ads.showRewarded();
+  if (earned && progress.grantRewardedCoins()) {
+    toast(t('rewardGranted'));
+    renderShop();
+    renderWallet(true);
+  } else if (!earned) {
+    toast(t('rewardUnavailable'));
+  }
+  rewardAdBtn.disabled = false;
+  updateAdsUi();
+});
+stylePassBtn.addEventListener('click', async () => {
+  if (!ads.passAvailable || progress.rewardedAdsLeft === 0
+    || progress.stylePassMinutesLeft > 0 || stylePassBtn.disabled) return;
+  stylePassBtn.disabled = true;
+  const earned = await ads.showRewarded('pass');
+  if (earned && progress.grantStylePass()) {
+    toast(t('stylePassGranted'));
+    renderShop();
+  } else if (!earned) {
+    toast(t('rewardUnavailable'));
+  }
+  stylePassBtn.disabled = false;
+  updateAdsUi();
+});
+adPrivacyBtn.addEventListener('click', () => ads.showPrivacyOptions());
+ads.init(updateAdsUi);
+setInterval(() => {
+  if (!shopEl.classList.contains('hidden')) renderShop();
+}, 60_000);
 
 function renderWallet(bump = false) {
   walletCount.textContent = progress.coins;
@@ -348,6 +402,21 @@ function renderUpgrades() {
 }
 
 function renderShop() {
+  updateAdsUi();
+  const coinPacks = [
+    ['birdy_coins_500', 500],
+    ['birdy_coins_1500', 1500],
+  ].filter(([id]) => billing.price(id));
+  coinPacksEl.replaceChildren(...coinPacks.map(([id, amount]) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.productId = id;
+    button.disabled = billingBusy;
+    button.textContent = t('coinPack', { n: amount, price: billing.price(id) });
+    return button;
+  }));
+  coinPacksEl.classList.toggle('hidden', coinPacks.length === 0);
+  realBuyBtn.classList.add('hidden');
   // The dice only makes sense once there is something to combine.
   $('shop-dice').disabled = ['skin', ...LOOK_KINDS, 'trail'].every((k) => CATALOG[k].filter((x) => progress.owns(k, x.id)).length < 2);
   for (const tb of tabsEl.querySelectorAll('.tab')) tb.classList.toggle('on', tb.dataset.tab === shopTab);
@@ -367,6 +436,15 @@ function renderShop() {
     return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
+  if ((kind === 'skin' || kind === 'world') && item.price > 0
+    && !progress.permanentlyOwns(kind, item.id)) {
+    const price = billing.price(billing.itemId(kind, item.id));
+    if (price) {
+      realBuyBtn.textContent = t('realBuy', { price });
+      realBuyBtn.disabled = billingBusy;
+      realBuyBtn.classList.remove('hidden');
+    }
+  }
   reveal(skinsEl.querySelector('.sel'), skinsEl);
   updateGridFade();
   renderSurprise();
@@ -513,6 +591,27 @@ shopAction.addEventListener('click', () => {
     particles.emit(bird.group.position, { count: 30, colors: [...colors, 0xffffff, 0xfff176], speed: 6, size: 0.12, life: 0.8, gravity: -4 });
   }
   renderShop();
+});
+async function startRealPurchase(id) {
+  if (billingBusy) return;
+  billingBusy = true;
+  renderShop();
+  try {
+    await billing.purchase(id);
+  } catch {
+    toast(t('purchaseUnavailable'));
+  } finally {
+    billingBusy = false;
+    renderShop();
+  }
+}
+realBuyBtn.addEventListener('click', () => {
+  if (shopTab !== 'skin' && shopTab !== 'world') return;
+  startRealPurchase(billing.itemId(shopTab, shopSel));
+});
+coinPacksEl.addEventListener('click', (event) => {
+  const id = event.target.closest('button[data-product-id]')?.dataset.productId;
+  if (id) startRealPurchase(id);
 });
 $('shop-btn').addEventListener('click', () => { startAudio(); openShop(true); });
 
@@ -1191,6 +1290,7 @@ renderMute();
 const langBtn = $('lang-btn');
 function renderLang() {
   applyI18n();
+  updateAdsUi();
   langBtn.textContent = t('lang');
   langBtn.setAttribute('aria-label', t('langLabel'));
   renderMute();
@@ -1840,6 +1940,18 @@ music.setMode('menu'); // calm version until the first run starts
 // Existing saves: pay out achievements already earned before they existed.
 if (progress.tutorialDone) setTimeout(celebrateMenuAchievements, 800);
 renderStart();
+billing.init(
+  () => {
+    renderWallet();
+    if (!shopEl.classList.contains('hidden')) renderShop();
+  },
+  (grant) => {
+    toast(grant.coins ? t('coinsPurchased', { n: grant.coins }) : t('purchaseGranted'));
+    renderWallet(true);
+    applyBird();
+    if (!shopEl.classList.contains('hidden')) renderShop();
+  },
+);
 
 // One fixed game-logic step (no rendering). Shared by the render loop and the
 // headless simulation used for automated playtests.

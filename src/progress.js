@@ -81,6 +81,9 @@ function dailyMissions(date, best) {
 const GIFT_BASE = 20;
 const GIFT_STEP = 10;
 const GIFT_MAX_STREAK = 7;
+const REWARDED_ADS_PER_DAY = 3;
+const REWARDED_COINS = 30;
+const STYLE_PASS_MS = 60 * 60 * 1000;
 
 function load() {
   let data = null;
@@ -95,6 +98,10 @@ function load() {
     skin: 'sunny',
     missions: null,
     gift: { last: '', streak: 0 },
+    rewardedAds: { day: '', count: 0 },
+    stylePassUntil: 0,
+    paidProducts: [],
+    processedPurchases: [],
     tutorialDone: false,
     trails: ['none'],
     trail: 'none',
@@ -106,6 +113,8 @@ function load() {
   // skins (owned/skin) and trails (trails/trail).
   data.items = { ...(data.items || {}) };
   data.equip = { ...(data.equip || {}) };
+  data.paidProducts = Array.isArray(data.paidProducts) ? data.paidProducts : [];
+  data.processedPurchases = Array.isArray(data.processedPurchases) ? data.processedPurchases : [];
   data.items.skin = [...new Set([...(data.items.skin || []), ...data.owned])];
   data.items.trail = [...new Set([...(data.items.trail || []), ...data.trails])];
   data.equip.skin ??= data.skin;
@@ -113,7 +122,11 @@ function load() {
   for (const kind of KINDS) {
     const free = CATALOG[kind][0].id;
     if (!data.items[kind]?.includes(free)) data.items[kind] = [free, ...(data.items[kind] || [])];
-    if (!data.items[kind].includes(data.equip[kind])) data.equip[kind] = free;
+    const trialAccess = (kind === 'skin' || kind === 'world')
+      && Number(data.stylePassUntil) > Date.now();
+    const paidAccess = data.paidProducts.includes(`birdy_${kind}_${data.equip[kind]}`);
+    if (!CATALOG[kind].some((item) => item.id === data.equip[kind])
+      || (!data.items[kind].includes(data.equip[kind]) && !paidAccess && !trialAccess)) data.equip[kind] = free;
   }
   data.upgrades = { ...(data.upgrades || {}) };
   data.stats = { bestScore: data.best, bestZone: 0, nearTotal: 0, bestChain: 0, bestPowerups: 0, plantsTotal: 0, coinsTotal: 0, bestStreak: 0, ...data.stats };
@@ -149,7 +162,8 @@ function unlockAchievements() {
 function save() {
   try {
     localStorage.setItem(KEY, JSON.stringify(data));
-  } catch { /* storage unavailable */ }
+    return true;
+  } catch { return false; }
 }
 
 function missions() {
@@ -164,6 +178,30 @@ export const progress = {
   get coins() { return data.coins; },
   get best() { return data.best; },
   get runs() { return data.runs; },
+  get rewardedAdsLeft() {
+    const count = data.rewardedAds?.day === today() ? data.rewardedAds.count : 0;
+    return Math.max(0, REWARDED_ADS_PER_DAY - count);
+  },
+  get stylePassMinutesLeft() {
+    return Math.max(0, Math.ceil(((Number(data.stylePassUntil) || 0) - Date.now()) / 60000));
+  },
+  useRewardedSlot() {
+    if (this.rewardedAdsLeft === 0) return false;
+    data.rewardedAds = { day: today(), count: REWARDED_ADS_PER_DAY - this.rewardedAdsLeft + 1 };
+    return true;
+  },
+  grantRewardedCoins() {
+    if (!this.useRewardedSlot()) return 0;
+    data.coins += REWARDED_COINS;
+    save();
+    return REWARDED_COINS;
+  },
+  grantStylePass() {
+    if (this.stylePassMinutesLeft > 0 || !this.useRewardedSlot()) return false;
+    data.stylePassUntil = Date.now() + STYLE_PASS_MS;
+    save();
+    return true;
+  },
   // Players from before the tutorial existed (runs > 0) skip it.
   get tutorialDone() { return data.tutorialDone || data.runs > 0; },
   finishTutorial() {
@@ -172,14 +210,48 @@ export const progress = {
   },
   // Shop (see catalog.js). `kind` is one of KINDS.
   equipped(kind) {
-    return CATALOG[kind].find((x) => x.id === data.equip[kind]) || CATALOG[kind][0];
+    return CATALOG[kind].find((x) => x.id === data.equip[kind] && this.owns(kind, x.id))
+      || CATALOG[kind][0];
   },
   get skin() { return this.equipped('skin'); },
   get trail() { return this.equipped('trail'); },
-  owns: (kind, id) => data.items[kind].includes(id),
+  permanentlyOwns: (kind, id) => data.items[kind].includes(id)
+    || data.paidProducts.includes(`birdy_${kind}_${id}`),
+  grantPaidProduct(productId) {
+    const match = /^birdy_(skin|world)_([a-z]+)$/.exec(productId);
+    if (!match || !CATALOG[match[1]].some((item) => item.id === match[2] && item.price > 0)) return false;
+    const wasOwned = this.permanentlyOwns(match[1], match[2]);
+    if (!data.paidProducts.includes(productId)) data.paidProducts.push(productId);
+    data.equip[match[1]] = match[2];
+    return save() ? !wasOwned : null;
+  },
+  syncPaidProducts(productIds) {
+    data.paidProducts = [...new Set(productIds)].filter((id) => {
+      const match = /^birdy_(skin|world)_([a-z]+)$/.exec(id);
+      return match && CATALOG[match[1]].some((item) => item.id === match[2] && item.price > 0);
+    });
+    return save();
+  },
+  grantPurchasedCoins(productId, token) {
+    const amount = { birdy_coins_500: 500, birdy_coins_1500: 1500 }[productId];
+    if (!amount || !token || data.processedPurchases.includes(token)) return 0;
+    data.processedPurchases.push(token);
+    data.coins += amount;
+    if (!save()) {
+      data.processedPurchases.pop();
+      data.coins -= amount;
+      return 0;
+    }
+    return amount;
+  },
+  hasProcessedPurchase: (token) => data.processedPurchases.includes(token),
+  owns(kind, id) {
+    return this.permanentlyOwns(kind, id)
+      || (this.stylePassMinutesLeft > 0 && (kind === 'skin' || kind === 'world'));
+  },
   buy(kind, id) {
     const item = CATALOG[kind].find((x) => x.id === id);
-    if (!item || data.items[kind].includes(id) || data.coins < item.price) return false;
+    if (!item || this.permanentlyOwns(kind, id) || data.coins < item.price) return false;
     data.coins -= item.price;
     data.items[kind].push(id);
     data.equip[kind] = id;
@@ -187,7 +259,7 @@ export const progress = {
     return true;
   },
   select(kind, id) {
-    if (!data.items[kind].includes(id)) return false;
+    if (!CATALOG[kind]?.some((item) => item.id === id) || !this.owns(kind, id)) return false;
     data.equip[kind] = id;
     save();
     return true;
