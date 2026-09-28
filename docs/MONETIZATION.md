@@ -6,7 +6,7 @@
 - Zwei freiwillige Rewarded-Ad-Blöcke: 30 Münzen (`ca-app-pub-1786159152036324/7854280106`) oder ein einstündiger Style-Pass (`ca-app-pub-1786159152036324/8020434087`).
 - Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten, außer den sieben seltenen animierten Skins. Diese gibt es nur für Münzen oder über ihren Erfolg, nicht über Anzeigen oder Echtgeld. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
 - Debug-Builds verwenden Googles Test-Anzeigenblock. Android fordert vor dem Laden den UMP-Datenschutzstatus an, setzt TFUA und Inhaltsbewertung G.
-- Die EU-Einwilligungsnachricht „Birdy – EU-Einwilligung“ ist seit 28.09. in AdMob veröffentlicht. Die App ist noch nicht mit dem Play-Eintrag verknüpft; die AdMob-Suche fand sie bisher nicht. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe und Store-Verknüpfung zu erwarten.
+- Die EU-Einwilligungsnachricht „Birdy – EU-Einwilligung“ ist seit 28.09. in AdMob veröffentlicht. Die App ist noch nicht mit dem Play-Eintrag verknüpft; die AdMob-Suche fand sie bisher nicht. AdMob zeigt „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe und Store-Verknüpfung zu erwarten.
 
 ## Play Billing
 
