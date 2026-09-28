@@ -211,9 +211,9 @@ function updateAdsUi() {
   const passMinutes = progress.stylePassMinutesLeft;
   stylePassBtn.classList.toggle('hidden', !passMinutes && (!ads.passAvailable || progress.rewardedAdsLeft === 0));
   stylePassBtn.disabled = passMinutes > 0;
-  stylePassBtn.textContent = passMinutes
+  setRich(stylePassBtn, passMinutes
     ? t('stylePassActive', { n: passMinutes })
-    : t('stylePassAd', { n: progress.rewardedAdsLeft });
+    : t('stylePassAd', { n: progress.rewardedAdsLeft }));
   adPrivacyBtn.classList.toggle('hidden', !ads.privacyOptionsRequired);
 }
 
