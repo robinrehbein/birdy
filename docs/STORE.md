@@ -33,7 +33,7 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 | Versionsnummer | ✅ `versionName 1.0.3`, `versionCode 4` (`android/app/build.gradle`); 1.0.2 (versionCode 3) liegt bereits bei Google Play |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
-| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ im Entwicklungszweig, noch nicht veröffentlicht |
+| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ in `main`, Veröffentlichung gesperrt bis `BIRDY_MONETIZATION_RELEASE_READY` (siehe `docs/MONETIZATION.md`) |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN), gerendert mit `scripts/render-assets.mjs` |
 | Screenshots 1080×1920 | ✅ `docs/store/de/` und `docs/store/en/`, je 7 gestaltete Bilder: echter Spielframe im Rahmen auf Himmel mit Claim (`scripts/store-shots.mjs de` bzw. `en`): Menü, Park, Herbstwald, Stachelkaktus, Regenbogen, Vogel-Werkstatt, Welten. Neu seit der visuellen Politur, müssen in Play neu hochgeladen werden. |
@@ -140,7 +140,8 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 > ✨ **Knapp!** Fliege haarscharf an den Röhren vorbei und hole dir Bonus-Münzen.
 >
 > 🎩 **Bau deinen Vogel:** In der Vogel-Werkstatt kombinierst du Farben, Muster, Hüte, Brillen
-> und Schnäbel – von der Krone bis zur Propellermütze. Dazu 12 Flugspuren.
+> und Schnäbel – von der Krone bis zur Propellermütze. Dazu 12 Flugspuren und sieben seltene,
+> animierte Skins wie Lava, Galaxie oder Fußball.
 >
 > 🌍 **Neue Welten:** Schalte Winterland, Südsee, Zuckerland und Pilzwald frei, gib den Röhren ein
 > neues Design und verbessere deine Power-ups.
@@ -173,7 +174,8 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 > ✨ **Close call!** Skim past the pipes for bonus coins.
 >
 > 🎩 **Build your bird:** mix colours, patterns, hats, glasses and beaks in the bird workshop –
-> from a crown to a propeller cap. Plus 12 flight trails.
+> from a crown to a propeller cap. Plus 12 flight trails and seven rare animated skins such as
+> lava, galaxy or football.
 >
 > 🌍 **New worlds:** unlock Winterland, South Seas, Candyland and Mushroom Woods, restyle the pipes
 > and upgrade your power-ups.
