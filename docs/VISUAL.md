@@ -823,3 +823,148 @@ ohne Rückfrage lösbar und folgen in Iteration 14.
 - Spitzenwert: 170 Draw Calls (am Budget), 56 k Dreiecke.
 - Normale Probe, im direkten Wechsel gemessen: erster Frame 642 ms gegenüber 619 ms der Basis.
 - APK baut.
+
+## Runde 2: deine Entscheidungen (28.09.)
+
+Deine Wahl:
+- **Röhren:** hoch in den Himmel, pro Reihe zufällig Wolkenbank, Wolkenkragen oder keine Wolke,
+  spät ausblenden.
+- **Icons:** C, Abzeichen.
+- **Schrift:** C, Fredoka SemiBold.
+- **Vogel:** B.
+- **Weltfarben:** Varianten zeigen.
+- **Neu:** animierte Premium-Skins.
+
+Die Varianten-Bilder liegen in `docs/visual/choice-*.jpg`.
+
+### Iteration 15 – Röhren wieder hoch in den Himmel, gemischte Wolken
+
+**Warum:** Seit Iteration 9 endeten die oberen Röhren in der Wolkenbank. In der Ferne wirkten die
+Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „endlos hoch“ fehlte.
+
+**Was:**
+- Die oberen Röhren reichen wieder bis Höhe 40. Sie bleiben bis Höhe 32 kräftig grün und blenden
+  erst ganz oben aus (32–40). So entstehen keine blassen „Lichtsäulen“ wie früher mit 15–26.
+- Jede Reihe bekommt zufällig eine von drei Varianten: eine breite Wolkenbank, durch die die
+  Röhren gehen; einen kleinen Wolkenkragen um jede obere Röhre; oder keine Wolke. Der Zufall
+  kommt aus einer eigenen Folge, der Spielzufall bleibt unberührt.
+- Die Trefferzonen sind unverändert.
+
+![Iteration 15](visual/it15.jpg)
+
+**Messwerte:**
+- Playtest mit drei Seeds:
+  - Anfänger: 19,5 / 17,4 / 15,9 s
+  - Geübt: 38,8 / 35,0 / 36,1 s
+  - Profi: 142 / 142 / 143 Punkte
+
+  Das liegt im Streubereich der Basis. Keine Fehler.
+- Spitzenwert: 157 Draw Calls, 52 k Dreiecke. Ohne Wolke ist ein Draw Call gespart.
+- Erster Frame: 583–662 ms.
+- APK baut.
+
+### Iteration 16 – Vogel Variante B: Flügel im Körperton, größerer Schwanz (Bereich 1)
+
+**Was:**
+- **Flügel:** Blasse, cremefarbene Flügel lasen sich von hinten wie Stäbchen. Sie haben jetzt den
+  Farbton des Körpers: etwas heller für den Flügel, die obere Federlage in der Schwanzfarbe.
+  Das gilt automatisch für alle Farben mit hellen Flügeln (Sunny, Himmel, Kardinal, Minze,
+  Koralle, Flamingo, Rotkehlchen, Nachteule, Schneeeule). Bewusst gefärbte Flügel bleiben: Papagei,
+  Pinguin, Pfau, Gold.
+- **Schwanzfedern:** etwa 30 % größer, damit der Vogel von hinten eine klare Silhouette hat.
+- Icon, Splash und Feature-Grafiken sind mit dem neuen Vogel neu gerendert.
+
+![Iteration 16 vorher/nachher](visual/it16.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 15 (Anfänger 19,5 s, Geübt 38,8 s,
+  Profi 142 Punkte).
+- Spitzenwert: 160 Draw Calls, 56 k Dreiecke.
+- APK baut.
+
+### Iteration 17 – Fließtext in Fredoka SemiBold (Bereich 6)
+
+**Was:**
+- Alle Fließtexte (Missionen, Erfolge, Shop-Tabs, Hinweise, Datenschutz-Link) nutzen jetzt
+  Fredoka SemiBold statt der Systemschrift. Die Titel bleiben in Lilita One.
+- Die Schrift ist lokal eingebettet (offline) und steht mit Lizenz (OFL 1.1) in `docs/ASSETS.md`.
+- Missions- und Erfolgstexte sind 1 px größer, weil Fredoka kleiner läuft.
+
+![Iteration 17 vorher/nachher](visual/it17.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 16 (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Keine Änderung an der 3D-Szene, also auch keine an Draw Calls und Dreiecken.
+- APK baut.
+
+### Iteration 18 – eigene Abzeichen-Icons statt Emoji (Bereich 6, Variante C)
+
+**Was:**
+- Alle Emoji in der Oberfläche sind durch eigene SVG-Icons ersetzt: ein weißes Symbol auf einer
+  farbigen runden Plakette mit Pflaumen-Rand (`src/icons.js`). Sie sehen auf jedem Handy gleich aus.
+- Betroffen sind:
+  - Shop-Reiter und Zufall-Würfel, Welt- und Upgrade-Kacheln
+  - Erfolge und das Schloss für gesperrte Erfolge
+  - die Häkchen bei erledigten Missionen und bei angelegten Artikeln
+  - Tagesgeschenk, Serie, Überraschung, Toasts, Freischalt-Hinweis
+  - Power-up-Chips im HUD, Ton-Knopf und die Tutorial-Hand
+- Texte markieren Icons als `[name]`; `rich()`/`setRich()` machen daraus Inline-Icons in Textgröße.
+
+![Iteration 18](visual/it18.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch mit Iteration 17 (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte),
+  keine Fehler.
+- Nur die Oberfläche hat sich geändert, die 3D-Szene nicht.
+- APK baut.
+
+### Iteration 19 – eigene Straßen- und Röhrenfarben pro Welt (Bereich 2, deine Wahl: überall A)
+
+**Zur Auswahl:** [Varianten](visual/choice-worlds.jpg). Gewählt wurde:
+- Winterland: Schnee und Eisblau
+- Südsee: Sand mit türkisem Rand und türkise Röhren
+- Zuckerland: Zuckerguss und Pink
+- Pilzwald: Moos und Fliegenpilz-Rot
+
+**Was:**
+- Die Straßen-Textur wird aus einer Palette [Belag, Streifen, Rand] gemalt. Beim Zonenwechsel
+  blendet sie in acht Schritten über, zum Beispiel zurück zum Sand im Herbstwald.
+- Mit den klassischen Röhren bringt jede Welt ihre eigenen Röhrenfarben mit, für den ganzen Flug.
+  Im Shop gekaufte Röhren-Designs gewinnen immer. Der Stadtpark bleibt Sand und Grün.
+
+![Iteration 19](visual/it19.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Spitzenwert: 157 Draw Calls, 54 k Dreiecke.
+- APK baut.
+
+### Iteration 20 – seltene animierte Skins (neues Feature, deine Vorgaben)
+
+**Was:**
+- Sieben seltene Skins. Man kauft sie teuer mit Münzen oder bekommt sie gratis über einen eigenen
+  schweren Erfolg:
+
+  | Skin | Münzen | oder gratis durch |
+  |---|---|---|
+  | Fliegenpilz: weiße Punkte, die „atmen“ | 3000 | An 150 Stachelkakteen vorbei |
+  | Basketball: Nähte, dreht sich | 3500 | 200 Runden gespielt |
+  | Fußball: 12 Fünfecke, Sechsecke mit Nähten, rollt | 4000 | 100× „Knapp!“ insgesamt |
+  | Wasser: wandernde Wellen, aufsteigende Luftblasen | 4500 | 5 Power-ups in einem Flug |
+  | Lava: glühende Risse, die kriechen und pulsieren | 5000 | 10.000 Münzen eingesammelt |
+  | Diamant: Facetten, Regenbogenschimmer, Funkeln, Lichtstreif | 5500 | 10× „Knapp!“ in Folge |
+  | Galaxie: Nebel, wandernde funkelnde Sterne, Sternschnuppen | 6000 | 200 Punkte in einem Flug |
+- Die Muster entstehen im Shader (`src/skinfx.js`) auf denselben Meshes und in denselben
+  Draw Calls. Der Effekt-Shader wird nur kompiliert, wenn ein seltener Skin getragen wird.
+- Shop: schimmernder Regenbogen-Rahmen, Etikett „Selten“ und eine bewegte Kachel. Darunter steht,
+  mit welchem Erfolg es gratis geht. In den Erfolgen sind die sieben Erfolge hervorgehoben und
+  nennen den Skin. Keine echten Käufe.
+
+![Iteration 20](visual/it20.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Spitzenwert: 157 Draw Calls, 53 k Dreiecke.
+- Erster Frame, direkt im Wechsel mit Iteration 19 gemessen: im Median rund 722 ms gegenüber
+  rund 700 ms (+3 %, Budget 782 ms).
+- APK baut.

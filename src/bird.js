@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { addSkinFx, setSkinFx } from './skinfx.js';
 
 // Low-poly bird built from primitives. Faces -Z.
 export function createBird() {
@@ -69,8 +70,9 @@ export function createBird() {
   const tailMat = smooth(0xf2c230);
   for (const [x, rotY] of [[-0.12, 0.35], [0, 0], [0.12, -0.35]]) {
     const feather = new THREE.Mesh(tailGeo, tailMat);
-    feather.scale.set(0.55, 0.25, 1.2);
-    feather.position.set(x, 0.18, 0.72);
+    // A little bigger than the first model, so the bird reads from behind.
+    feather.scale.set(0.7, 0.3, 1.5);
+    feather.position.set(x * 1.2, 0.2, 0.8);
     feather.rotation.set(0.45, rotY, 0);
     group.add(feather);
   }
@@ -121,11 +123,27 @@ export function createBird() {
 
   // Recolour the bird (see SKINS in progress.js). Same model and shading.
   const skinMats = { body: yellow, belly: cream, wing: wingMat, cover: coverMat, tail: tailMat, beak: beakMat, beakLow: beakLowMat };
+  // Animated premium skins paint over these (see skinfx.js).
+  ['body', 'belly', 'wing', 'cover', 'tail'].forEach((key, i) => addSkinFx(skinMats[key], i));
+  // Pale wings (cream on the yellow bird) read as sticks from behind: those
+  // are drawn in the body's colour family instead (a lighter body tone, the
+  // covert layer in the tail colour). Distinctly coloured wings stay as set.
+  const tmp = new THREE.Color();
+  const wingColor = (skin) => {
+    tmp.setHex(skin.wing);
+    const hsl = {};
+    tmp.getHSL(hsl, THREE.SRGBColorSpace);
+    if (hsl.l < 0.8) return { wing: skin.wing, cover: skin.cover };
+    const w = new THREE.Color(skin.body).lerp(new THREE.Color(skin.belly), 0.12);
+    return { wing: w.getHex(), cover: skin.tail };
+  };
   function setSkin(skin) {
     patDark.color.setHex(skin.tail);
     patLight.color.setHex(skin.belly === skin.body ? 0xffffff : skin.belly);
+    setSkinFx(skin.fx);
+    const wc = wingColor(skin);
     for (const [key, m] of Object.entries(skinMats)) {
-      m.color.setHex(skin[key]);
+      m.color.setHex(key === 'wing' || key === 'cover' ? wc[key] : skin[key]);
       m.metalness = skin.metal && key !== 'beak' && key !== 'beakLow' ? 0.55 : 0;
       m.roughness = skin.metal ? 0.3 : key === 'tail' ? 0.45 : 0.55;
     }

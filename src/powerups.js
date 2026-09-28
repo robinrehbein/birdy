@@ -3,9 +3,9 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 
 // Power-up definitions. Duration in seconds.
 export const POWERUPS = {
-  star: { label: 'Regenbogen', icon: '🌈', duration: 6, color: 0xffd400 },
-  magnet: { label: 'Magnet', icon: '🧲', duration: 9, color: 0xe53935 },
-  mini: { label: 'Mini', icon: '🍄', duration: 9, color: 0x9b59b6 },
+  star: { label: 'Regenbogen', icon: 'rainbow', duration: 6, color: 0xffd400 },
+  magnet: { label: 'Magnet', icon: 'magnet', duration: 9, color: 0xe53935 },
+  mini: { label: 'Mini', icon: 'mushroom', duration: 9, color: 0x9b59b6 },
 };
 export const POWERUP_TYPES = Object.keys(POWERUPS);
 

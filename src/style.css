@@ -6,6 +6,15 @@
   font-display: swap;
   src: url('./fonts/lilita-one-latin.woff2') format('woff2');
 }
+/* Fredoka SemiBold (SIL Open Font License) for body text, bundled as well. */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./fonts/fredoka-latin-600.woff2') format('woff2');
+}
+:root { --body-font: 'Fredoka', 'Arial Rounded MT Bold', system-ui, sans-serif; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -164,7 +173,7 @@ h1, h2 {
 h1 span { color: #73bf2e; }
 h2 { color: #f26b1d; }
 
-.controls { font-family: system-ui, sans-serif; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
+.controls { font-family: var(--body-font); font-weight: 600; font-size: 15px; line-height: 1.6; margin-bottom: 20px; }
 
 button {
   font: inherit;
@@ -220,7 +229,7 @@ button:active { transform: translateY(4px); box-shadow: 0 1px 0 #543847; }
 }
 .controls { margin-bottom: 6px; }
 .controls.small { font-size: 12px; opacity: 0.75; }
-.powers-legend { font-family: system-ui, sans-serif; font-size: 13px; margin-top: 8px; }
+.powers-legend { font-family: var(--body-font); font-weight: 600; font-size: 13px; margin-top: 8px; }
 
 /* Three tap zones flash briefly at the start of a run. */
 #zones {
@@ -372,15 +381,15 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   background: #cbb968;
   border-radius: 10px;
   padding: 6px 10px;
-  font-family: system-ui, sans-serif;
-  font-size: 13px;
+  font-family: var(--body-font);
+  font-size: 14px;
   font-weight: 600;
 }
 .mission .reward { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
 .mission .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
 .mission .bar i { display: block; height: 100%; background: #73bf2e; }
 .mission.done { background: #b5d98a; }
-.mission.done .text::before { content: '✓ '; color: #3f8f16; }
+.mission.done .text::before { content: ''; display: inline-block; width: 1.2em; height: 1.2em; margin-right: 0.3em; vertical-align: -0.28em; background: var(--ic-check) center / contain no-repeat; }
 .mission.new { animation: mission-in 0.5s cubic-bezier(.2, 1.4, .5, 1) both; }
 @keyframes mission-in { from { transform: scale(0.6); opacity: 0; } }
 
@@ -412,9 +421,9 @@ button.secondary { font-size: 20px; padding: 6px 20px; background: #73bf2e; }
   color: #fff;
   text-shadow: 0 1px 0 #543847, 1px 0 0 #543847, -1px 0 0 #543847, 0 -1px 0 #543847;
 }
-.skin .price::before { content: '🔒 '; font-size: 10px; }
+.skin .price::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 2px; vertical-align: -2px; background: var(--ic-lock) center / contain no-repeat; }
 .skin.sel { background: #fcb800; transform: translateY(-2px); }
-.skin.equipped::before { content: '✓'; position: absolute; left: 5px; top: 1px; font-size: 14px; color: #fff; text-shadow: 0 1px 0 #543847; }
+.skin.equipped::before { content: ''; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; z-index: 1; background: var(--ic-check) center / contain no-repeat; }
 #shop-action.buy { background: #fcb800; }
 #shop-action:disabled { background: #b7ad7a; box-shadow: 0 5px 0 #543847; opacity: 0.8; }
 .reward-ad { width: 100%; margin: 0 0 8px; padding: 6px 8px; font-size: 14px; background: #7a6fc9; }
@@ -612,7 +621,7 @@ button.gift {
   .panel { padding: 14px 14px 16px; }
   .missions { gap: 4px; margin-bottom: 10px; }
   .missions h3 { font-size: 16px; }
-  .mission { padding: 4px 8px; font-size: 12px; }
+  .mission { padding: 4px 8px; font-size: 13px; }
   button.gift { font-size: 17px; padding: 6px 12px; margin-bottom: 8px; }
   #play-btn { font-size: 22px; padding: 8px 20px; }
   button.secondary { font-size: 17px; padding: 5px 16px; }
@@ -624,7 +633,7 @@ button.gift {
 .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 .btn-row button { width: 100%; padding-left: 6px; padding-right: 6px; }
 .panel .btn-row button + button { margin-top: 0; }
-.privacy-link { display: block; margin-top: 12px; color: inherit; opacity: 0.75; font: 12px system-ui, sans-serif; text-align: center; }
+.privacy-link { display: block; margin-top: 12px; color: inherit; opacity: 0.75; font: 600 12px var(--body-font); text-align: center; }
 
 /* Achievements overview. */
 .ach-list {
@@ -648,9 +657,9 @@ button.gift {
 }
 .ach.done { background: #b5d98a; }
 .ach-icon { font-size: 24px; }
-.ach-body { display: flex; flex-direction: column; gap: 2px; font-family: system-ui, sans-serif; }
+.ach-body { display: flex; flex-direction: column; gap: 2px; font-family: var(--body-font); }
 .ach-body b { font-family: 'Lilita One', system-ui, sans-serif; font-weight: normal; font-size: 16px; color: #543847; }
-.ach-body small { font-size: 12px; font-weight: 600; }
+.ach-body small { font-size: 13px; font-weight: 600; }
 .ach .bar { height: 5px; border-radius: 3px; background: rgba(84, 56, 71, 0.25); overflow: hidden; }
 .ach .bar i { display: block; height: 100%; background: #73bf2e; }
 .ach .reward { font-size: 15px; color: #fff; text-shadow: 0 2px 0 #543847; }
@@ -705,12 +714,12 @@ button.gift {
 }
 #zones b, #zones span { position: relative; }
 
-.tabs .tab small { font-size: 11px; font-family: system-ui, sans-serif; font-weight: 700; }
+.tabs .tab small { font-size: 11px; font-family: var(--body-font); font-weight: 600; }
 .tabs .tab.dice { background: #7a6fc9; }
 .skin .dot { font-size: 20px; }
 .skins { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; max-height: min(26vh, 190px); overflow-x: hidden; overflow-y: auto; touch-action: pan-y; padding: 4px 3px 5px; }
 
-.shop-desc { margin: -6px 0 10px; font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; min-height: 0; }
+.shop-desc { margin: -6px 0 10px; font-family: var(--body-font); font-size: 13px; font-weight: 600; min-height: 0; }
 .shop-desc:empty { display: none; }
 .skin.upgrade .pips { display: flex; gap: 3px; }
 .skin.upgrade .pips i { width: 8px; height: 8px; border-radius: 50%; background: rgba(84, 56, 71, 0.3); }
@@ -762,3 +771,24 @@ button.surprise:disabled { opacity: 0.55; }
 /* Pause / game over: a lighter plum scrim and a soft blur of the game
    instead of a heavy grey veil. */
 #pause, #gameover { background: rgba(43, 30, 46, 0.3); -webkit-backdrop-filter: blur(3px) saturate(1.15); backdrop-filter: blur(3px) saturate(1.15); }
+
+/* Badge icons (src/icons.js) inside texts and buttons. */
+.ic { display: inline-block; vertical-align: -0.3em; margin: 0 0.1em; line-height: 0; }
+.ic svg { display: block; }
+button > svg, .tab span svg, .power-icon svg, .ach-icon svg, #hand .finger svg { display: block; margin: 0 auto; }
+
+/* Rare animated skins: shimmering frame, "Rare" tag, moving swatch. */
+.skin.rare { background: linear-gradient(120deg, #ff8fb8, #fcb800, #7be0c8, #4ab8ff, #b58cff, #ff8fb8); background-size: 300% 100%; animation: rare-shine 5s linear infinite; }
+.skin.rare.sel { box-shadow: 0 3px 0 #543847, 0 0 0 3px #fff inset; }
+.skin.rare .dot { background-size: 170% 170% !important; animation: rare-swatch 3.2s ease-in-out infinite alternate; }
+.rare-tag {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  padding: 0 5px; border-radius: 6px; border: 2px solid #543847;
+  background: #8f63d6; color: #fff; font: 10px/13px 'Lilita One', system-ui, sans-serif; letter-spacing: 0.3px; white-space: nowrap;
+}
+.skin.rare.locked .price { bottom: 2px; }
+@keyframes rare-shine { to { background-position: 300% 0; } }
+@keyframes rare-swatch { from { background-position: 0% 20%; } to { background-position: 100% 80%; } }
+.ach.rare:not(.done) { background: linear-gradient(120deg, rgba(181, 140, 255, 0.35), rgba(74, 184, 255, 0.25)); }
+.ach-body small em { font-style: normal; color: #7a4fc4; }
+@media (prefers-reduced-motion: reduce) { .skin.rare, .skin.rare .dot { animation: none; } }

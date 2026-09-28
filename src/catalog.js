@@ -18,6 +18,22 @@ export const SKINS = [
   { id: 'snowy', name: { de: 'Schneeeule', en: 'Snowy Owl' }, price: 1200, body: 0xf4f7fb, belly: 0xffffff, wing: 0xdde6f0, cover: 0xc9d6e3, tail: 0xb8c6d6, beak: 0x4a4a4a, beakLow: 0x2e2e2e },
   { id: 'peacock', name: { de: 'Pfau', en: 'Peacock' }, price: 1400, body: 0x1f8fb0, belly: 0x7be0c8, wing: 0x3ccfa0, cover: 0x2a6fd0, tail: 0x1ea06a, beak: 0xffd24a, beakLow: 0xe8a820 },
   { id: 'gold', name: { de: 'Goldvogel', en: 'Golden Bird' }, price: 2000, body: 0xffc629, belly: 0xfff1b0, wing: 0xffe57a, cover: 0xffd23d, tail: 0xe0a100, beak: 0xff7a1a, beakLow: 0xd9530f, metal: true },
+  // Rare animated skins (skinfx.js): expensive, or free with their own hard
+  // achievement (progress.js, `skin` there). `swatch` is the shop tile.
+  { id: 'toadstool', fx: 'toadstool', rare: true, name: { de: 'Fliegenpilz', en: 'Toadstool' }, price: 3000, body: 0xe0302a, belly: 0xfff3e0, wing: 0xe0302a, cover: 0xc4241f, tail: 0xc4241f, beak: 0xfff3e0, beakLow: 0xe8d8c0,
+    swatch: 'radial-gradient(circle at 30% 35%, #fff 0 9%, transparent 10%), radial-gradient(circle at 68% 62%, #fff 0 12%, transparent 13%), radial-gradient(circle at 70% 25%, #fff 0 6%, transparent 7%), #e0302a' },
+  { id: 'basketball', fx: 'basketball', rare: true, name: { de: 'Basketball', en: 'Basketball' }, price: 3500, body: 0xf26b1d, belly: 0xffa860, wing: 0xf26b1d, cover: 0xd9530f, tail: 0xd9530f, beak: 0x3a2418, beakLow: 0x2a1a10,
+    swatch: 'linear-gradient(90deg, transparent 47%, #3a2418 47% 53%, transparent 53%), linear-gradient(transparent 47%, #3a2418 47% 53%, transparent 53%), radial-gradient(circle at 35% 30%, #ffa860, #f26b1d 60%)' },
+  { id: 'football', fx: 'football', rare: true, name: { de: 'Fußball', en: 'Football' }, price: 4000, body: 0xf4f4f4, belly: 0xffffff, wing: 0xe6e6e6, cover: 0x2a2a2a, tail: 0x2a2a2a, beak: 0xf57c21, beakLow: 0xe0521b,
+    swatch: 'radial-gradient(circle at 50% 50%, #222 0 16%, transparent 17%), radial-gradient(circle at 12% 15%, #222 0 13%, transparent 14%), radial-gradient(circle at 88% 20%, #222 0 13%, transparent 14%), radial-gradient(circle at 20% 90%, #222 0 13%, transparent 14%), radial-gradient(circle at 85% 88%, #222 0 13%, transparent 14%), #f4f4f4' },
+  { id: 'water', fx: 'water', rare: true, name: { de: 'Wasser', en: 'Water' }, price: 4500, body: 0x1e7fd6, belly: 0xbfe9ff, wing: 0x1e7fd6, cover: 0x3aa0f0, tail: 0x1466b0, beak: 0xffc93c, beakLow: 0xe8a820,
+    swatch: 'radial-gradient(circle at 30% 70%, transparent 0 7%, #e8f7ff 8% 11%, transparent 12%), radial-gradient(circle at 65% 40%, transparent 0 5%, #e8f7ff 6% 9%, transparent 10%), repeating-linear-gradient(160deg, #1e7fd6 0 10px, #4ab8ff 10px 16px)' },
+  { id: 'lava', fx: 'lava', rare: true, name: { de: 'Lava', en: 'Lava' }, price: 5000, body: 0x3a2420, belly: 0x5a3028, wing: 0x3a2420, cover: 0x2a1a18, tail: 0x2a1a18, beak: 0x2a2a2a, beakLow: 0x1a1a1a,
+    swatch: 'linear-gradient(35deg, transparent 40%, #ff8a1a 40% 46%, transparent 46%), linear-gradient(-50deg, transparent 55%, #ffb03a 55% 60%, transparent 60%), linear-gradient(80deg, transparent 20%, #ff6a10 20% 25%, transparent 25%), #3a2420' },
+  { id: 'diamond', fx: 'diamond', rare: true, name: { de: 'Diamant', en: 'Diamond' }, price: 5500, body: 0x9fe0ff, belly: 0xe6fbff, wing: 0x9fe0ff, cover: 0x7fd0f5, tail: 0x7fd0f5, beak: 0xbfefff, beakLow: 0x8fd3f0,
+    swatch: 'conic-gradient(from 20deg, #e6fbff, #8fd3ff, #ffffff, #b8a8ff, #e6fbff, #7fe0f0, #ffffff, #e6fbff)' },
+  { id: 'galaxy', fx: 'galaxy', rare: true, name: { de: 'Galaxie', en: 'Galaxy' }, price: 6000, body: 0x2a1a60, belly: 0x6a3a9a, wing: 0x2a1a60, cover: 0x4a2a8a, tail: 0x4a2a8a, beak: 0xffe14a, beakLow: 0xf0b820,
+    swatch: 'radial-gradient(circle at 25% 30%, #fff 0 3%, transparent 4%), radial-gradient(circle at 70% 60%, #fff 0 4%, transparent 5%), radial-gradient(circle at 60% 20%, #fff 0 2%, transparent 3%), radial-gradient(circle at 30% 75%, #8f63d6, transparent 45%), radial-gradient(circle at 75% 35%, #4ab8ff, transparent 40%), #1a1040' },
 ];
 
 // Patterns painted onto the body (small extra shapes in the skin's colours).
@@ -80,22 +96,28 @@ export const TRAILS = [
 // Worlds: the place of the first zone (and every fourth after it). The run
 // still moves on through autumn forest, canyon and blossom grove. Colours
 // for sky, light and ground as in biomes.js; `scenery` is a theme in world.js.
+// `road` is the track palette [track, stripes, border] and `pipes` the pipe
+// colours used while the classic pipes are equipped (owner's picks, it19).
 export const WORLDS = [
-  { id: 'park', icon: '🌳', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
+  { id: 'park', icon: 'tree', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
     top: 0x2a9bd0, horizon: 0xa6e4ea, hemiSky: 0xdff6ff, hemiGround: 0x6a8f3a, hemiI: 1.4, sun: 0xfff4d6, sunI: 2.2,
     tint: 0xffffff, clouds: 0xffffff, grass: 0x73bf2e, track: 0xffffff },
-  { id: 'winter', icon: '⛄', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
+  { id: 'winter', icon: 'snowflake', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
     top: 0x5aa9e6, horizon: 0xe3f2ff, hemiSky: 0xffffff, hemiGround: 0x9fb4c8, hemiI: 1.45, sun: 0xfff6e8, sunI: 2.0,
-    tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8 },
-  { id: 'beach', icon: '🏝️', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8,
+    road: [0xeef4fb, 0xd6e4f2, 0xbfe3ff], pipes: { pipe: 0x5fc6e6, light: 0xe6fbff, dark: 0x3a93b8 } },
+  { id: 'beach', icon: 'palm', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
     top: 0x1fa5e0, horizon: 0xbff3f0, hemiSky: 0xe8fbff, hemiGround: 0xc9b27a, hemiI: 1.45, sun: 0xfff4d6, sunI: 2.3,
-    tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff },
-  { id: 'candy', icon: '🍭', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff,
+    road: [0xf7e6b0, 0xefd48a, 0x5fd3d0], pipes: { pipe: 0x2fbfb3, light: 0x9ff0e6, dark: 0x1f8a80 } },
+  { id: 'candy', icon: 'lollipop', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
     top: 0xf07ab8, horizon: 0xffe3f1, hemiSky: 0xfff0f8, hemiGround: 0xc98fb8, hemiI: 1.45, sun: 0xfff0f6, sunI: 2.0,
-    tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6 },
-  { id: 'mushroom', icon: '🍄', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
+    tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6,
+    road: [0xffd1e6, 0xffb3d4, 0xffffff], pipes: { pipe: 0xff6fa8, light: 0xffffff, dark: 0xd9407c } },
+  { id: 'mushroom', icon: 'mushroom', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
     top: 0x4a6fd0, horizon: 0xc8f0d8, hemiSky: 0xeafff2, hemiGround: 0x5a8a5a, hemiI: 1.4, sun: 0xfff0c8, sunI: 2.1,
-    tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0 },
+    tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0,
+    road: [0xd6e6a6, 0xbfd188, 0x8fe070], pipes: { pipe: 0xe0453a, light: 0xff9a8a, dark: 0xa82a22 } },
 ];
 
 // Pipe designs: body, highlight stripe and shadow stripe/band.
@@ -126,9 +148,9 @@ export const KINDS = Object.keys(CATALOG);
 
 // Upgrades: each power-up can be improved in three steps.
 export const UPGRADES = [
-  { id: 'star', icon: '🌈', name: { de: 'Regenbogen', en: 'Rainbow' }, text: { de: '+1,5 s unverwundbar pro Stufe', en: '+1.5 s invincible per level' }, prices: [300, 800, 1800] },
-  { id: 'magnet', icon: '🧲', name: { de: 'Magnet', en: 'Magnet' }, text: { de: '+3 s und größere Reichweite pro Stufe', en: '+3 s and wider reach per level' }, prices: [300, 800, 1800] },
-  { id: 'mini', icon: '🍄', name: { de: 'Mini-Vogel', en: 'Mini Bird' }, text: { de: '+3 s klein pro Stufe', en: '+3 s tiny per level' }, prices: [300, 800, 1800] },
-  { id: 'luck', icon: '🍀', name: { de: 'Glückspilz', en: 'Lucky' }, text: { de: 'Power-ups tauchen öfter auf', en: 'Power-ups show up more often' }, prices: [500, 1200, 2500] },
+  { id: 'star', icon: 'rainbow', name: { de: 'Regenbogen', en: 'Rainbow' }, text: { de: '+1,5 s unverwundbar pro Stufe', en: '+1.5 s invincible per level' }, prices: [300, 800, 1800] },
+  { id: 'magnet', icon: 'magnet', name: { de: 'Magnet', en: 'Magnet' }, text: { de: '+3 s und größere Reichweite pro Stufe', en: '+3 s and wider reach per level' }, prices: [300, 800, 1800] },
+  { id: 'mini', icon: 'mushroom', name: { de: 'Mini-Vogel', en: 'Mini Bird' }, text: { de: '+3 s klein pro Stufe', en: '+3 s tiny per level' }, prices: [300, 800, 1800] },
+  { id: 'luck', icon: 'clover', name: { de: 'Glückspilz', en: 'Lucky' }, text: { de: 'Power-ups tauchen öfter auf', en: 'Power-ups show up more often' }, prices: [500, 1200, 2500] },
 ];
 export const UPGRADE_MAX = 3;
