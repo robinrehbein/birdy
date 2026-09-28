@@ -3,9 +3,9 @@ name: Native app build
 on:
   push:
     branches: [main]
-    paths: ['native/**']
+    paths: ['native/**', '.github/workflows/native-build.yml']
   pull_request:
-    paths: ['native/**']
+    paths: ['native/**', '.github/workflows/native-build.yml']
 
 permissions:
   contents: read
@@ -30,10 +30,14 @@ jobs:
           java-version: '21'
           cache: gradle
 
-      - uses: android-actions/setup-android@v3
-
-      - name: Write local.properties
-        run: echo "sdk.dir=${ANDROID_HOME}" > local.properties
+      # The runner image ships an Android SDK (ANDROID_HOME); only make sure
+      # the platform and build tools this project compiles against are there.
+      - name: Android SDK packages
+        run: |
+          sdkmanager=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          yes | "$sdkmanager" --licenses > /dev/null || true
+          "$sdkmanager" "platforms;android-36" "build-tools;36.0.0" > /dev/null
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
 
       - name: shared unit tests + androidApp debug build + lint
         run: ./gradlew :shared:testDebugUnitTest :androidApp:assembleDebug :androidApp:lintDebug --console=plain
