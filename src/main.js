@@ -9,6 +9,7 @@ import { CATALOG, KINDS, UPGRADES, UPGRADE_MAX } from './catalog.js';
 import { BIOMES, createBiomeBlender } from './biomes.js';
 import { t, L, applyI18n, getLang, setLang } from './i18n.js';
 import { ICONS, icon, iconSvg, rich, setRich } from './icons.js';
+import { tickSkinFx } from './skinfx.js';
 import {
   LANES,
   PIPE_RADIUS,
@@ -1718,6 +1719,7 @@ function updateBirdVisual(dt) {
     state.wingSpeed = THREE.MathUtils.lerp(state.wingSpeed, 12, dt * 4);
     state.wingPhase += dt * state.wingSpeed;
     bird.animateWings(state.wingPhase);
+    tickSkinFx(state.time);
   }
   const scale = state.power.mini > 0 ? MINI_SCALE : BIRD_SCALE;
   state.baseScale = THREE.MathUtils.lerp(state.baseScale ?? BIRD_SCALE, scale, Math.min(1, dt * 8));
@@ -2006,4 +2008,4 @@ function worldLook(id, look) {
   biomes.set(0, 0, zoneBiome(0));
   setPipeStyle(equippedPipes());
 }
-window.__birdy = { worldLook, state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };
+window.__birdy = { bird, worldLook, state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };

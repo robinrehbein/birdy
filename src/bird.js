@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { addSkinFx, setSkinFx } from './skinfx.js';
 
 // Low-poly bird built from primitives. Faces -Z.
 export function createBird() {
@@ -122,6 +123,8 @@ export function createBird() {
 
   // Recolour the bird (see SKINS in progress.js). Same model and shading.
   const skinMats = { body: yellow, belly: cream, wing: wingMat, cover: coverMat, tail: tailMat, beak: beakMat, beakLow: beakLowMat };
+  // Animated premium skins paint over these (see skinfx.js).
+  ['body', 'belly', 'wing', 'cover', 'tail'].forEach((key, i) => addSkinFx(skinMats[key], i));
   // Pale wings (cream on the yellow bird) read as sticks from behind: those
   // are drawn in the body's colour family instead (a lighter body tone, the
   // covert layer in the tail colour). Distinctly coloured wings stay as set.
@@ -137,6 +140,7 @@ export function createBird() {
   function setSkin(skin) {
     patDark.color.setHex(skin.tail);
     patLight.color.setHex(skin.belly === skin.body ? 0xffffff : skin.belly);
+    setSkinFx(skin.fx);
     const wc = wingColor(skin);
     for (const [key, m] of Object.entries(skinMats)) {
       m.color.setHex(key === 'wing' || key === 'cover' ? wc[key] : skin[key]);
