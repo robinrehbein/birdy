@@ -1,0 +1,231 @@
+{
+  "source": "src/effects.js lines 126-176",
+  "layers": [
+    {
+      "name": "outline",
+      "points": 8,
+      "outerRadius": 1.25,
+      "innerRadius": 0.62,
+      "colorHex": 5519431,
+      "zOffset": 0
+    },
+    {
+      "name": "white",
+      "points": 8,
+      "outerRadius": 1.08,
+      "innerRadius": 0.52,
+      "colorHex": 16777215,
+      "zOffset": 0.01
+    },
+    {
+      "name": "core",
+      "points": 8,
+      "outerRadius": 0.62,
+      "innerRadius": 0.34,
+      "colorHex": 16769354,
+      "zOffset": 0.02
+    }
+  ],
+  "starShapeAngleOffset": "PI/2  // first point straight up",
+  "merge": "the three star outlines are baked into ONE non-indexed BufferGeometry with a per-vertex `color` attribute (vertexColors:true material); one draw call for all three layers",
+  "material": "MeshBasicMaterial: vertexColors=true, transparent=true, depthTest=false, depthWrite=false, toneMapped=false, fog=false",
+  "renderOrder": 11,
+  "onHit": {
+    "resetT": "t = 0",
+    "position": "bonk.position = pos (world space, passed in by caller: HIT_OFFSET-adjusted death point, see main-b spec)",
+    "visible": true,
+    "opacity": 1,
+    "scale": 0.5
+  },
+  "perFrameUpdate": {
+    "guard": "no-op if bonk.visible === false",
+    "advanceT": "t += dt",
+    "billboard": "bonk.quaternion = camera.quaternion, then extra rotateZ(t * 1.5)  // spins around the view axis after billboarding",
+    "scale": "0.5 + 0.3 * min(1, t/0.12)  // pops from 0.5 to 0.8 over the first 0.12s, then holds at 0.8",
+    "opacity": "1 - smoothstep(t, 0.25, 0.5)  // holds at 1 until t=0.25, eases to 0 by t=0.5",
+    "hideAfter": "if (t > 0.5) bonk.visible = false"
+  },
+  "smoothstepFormula": "clamp x to [min,max] -> u=(x-min)/(max-min) -> u*u*(3-2u)",
+  "samples": [
+    {
+      "t": 0,
+      "scale": 0.5,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.02,
+      "scale": 0.55,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.04,
+      "scale": 0.6,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.06,
+      "scale": 0.65,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.08,
+      "scale": 0.7,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.1,
+      "scale": 0.75,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.12,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.14,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.16,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.18,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.2,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.22,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.24,
+      "scale": 0.8,
+      "opacity": 1,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.26,
+      "scale": 0.8,
+      "opacity": 0.995328,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.28,
+      "scale": 0.8,
+      "opacity": 0.960256,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.3,
+      "scale": 0.8,
+      "opacity": 0.896,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.32,
+      "scale": 0.8,
+      "opacity": 0.808704,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.34,
+      "scale": 0.8,
+      "opacity": 0.704512,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.36,
+      "scale": 0.8,
+      "opacity": 0.589568,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.38,
+      "scale": 0.8,
+      "opacity": 0.470016,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.4,
+      "scale": 0.8,
+      "opacity": 0.352,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.42,
+      "scale": 0.8,
+      "opacity": 0.241664,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.44,
+      "scale": 0.8,
+      "opacity": 0.145152,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.46,
+      "scale": 0.8,
+      "opacity": 0.068608,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.48,
+      "scale": 0.8,
+      "opacity": 0.018176,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.5,
+      "scale": 0.8,
+      "opacity": 0,
+      "visibleAfterThisFrame": true
+    },
+    {
+      "t": 0.52,
+      "scale": 0.8,
+      "opacity": 0,
+      "visibleAfterThisFrame": false
+    },
+    {
+      "t": 0.54,
+      "scale": 0.8,
+      "opacity": 0,
+      "visibleAfterThisFrame": false
+    },
+    {
+      "t": 0.56,
+      "scale": 0.8,
+      "opacity": 0,
+      "visibleAfterThisFrame": false
+    },
+    {
+      "t": 0.58,
+      "scale": 0.8,
+      "opacity": 0,
+      "visibleAfterThisFrame": false
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "description": "biomes.js createBiomeBlender: smoothstep easing e=t*t*(3-2t) over the blend duration, and paintRoad's 1/8-stepped road-palette lerp (example: SAND_ROAD -> winter road, colors mixed in linear-sRGB then re-encoded, matching THREE.Color.lerp with color management on).",
+  "easing": [
+    {
+      "t": 0,
+      "eased": 0
+    },
+    {
+      "t": 0.05,
+      "eased": 0.00725
+    },
+    {
+      "t": 0.1,
+      "eased": 0.028
+    },
+    {
+      "t": 0.15,
+      "eased": 0.06075
+    },
+    {
+      "t": 0.2,
+      "eased": 0.104
+    },
+    {
+      "t": 0.25,
+      "eased": 0.15625
+    },
+    {
+      "t": 0.3,
+      "eased": 0.216
+    },
+    {
+      "t": 0.35,
+      "eased": 0.28175
+    },
+    {
+      "t": 0.4,
+      "eased": 0.352
+    },
+    {
+      "t": 0.45,
+      "eased": 0.42525
+    },
+    {
+      "t": 0.5,
+      "eased": 0.5
+    },
+    {
+      "t": 0.55,
+      "eased": 0.57475
+    },
+    {
+      "t": 0.6,
+      "eased": 0.648
+    },
+    {
+      "t": 0.65,
+      "eased": 0.71825
+    },
+    {
+      "t": 0.7,
+      "eased": 0.784
+    },
+    {
+      "t": 0.75,
+      "eased": 0.84375
+    },
+    {
+      "t": 0.8,
+      "eased": 0.896
+    },
+    {
+      "t": 0.85,
+      "eased": 0.93925
+    },
+    {
+      "t": 0.9,
+      "eased": 0.972
+    },
+    {
+      "t": 0.95,
+      "eased": 0.99275
+    },
+    {
+      "t": 1,
+      "eased": 1
+    }
+  ],
+  "roadFrom": [
+    "ded895",
+    "d2c26a",
+    "9ce659"
+  ],
+  "roadTo": [
+    "eef4fb",
+    "d6e4f2",
+    "bfe3ff"
+  ],
+  "roadSteps": [
+    {
+      "t": 0,
+      "eased": 0,
+      "step": 0,
+      "road": [
+        "ded895",
+        "d2c26a",
+        "9ce659"
+      ]
+    },
+    {
+      "t": 0.125,
+      "eased": 0.042969,
+      "step": 0,
+      "road": [
+        "ded895",
+        "d2c26a",
+        "9ce659"
+      ]
+    },
+    {
+      "t": 0.25,
+      "eased": 0.15625,
+      "step": 0.125,
+      "road": [
+        "e0dca6",
+        "d3c786",
+        "a1e67f"
+      ]
+    },
+    {
+      "t": 0.375,
+      "eased": 0.316406,
+      "step": 0.375,
+      "road": [
+        "e4e3c4",
+        "d4d0ae",
+        "aae5b1"
+      ]
+    },
+    {
+      "t": 0.5,
+      "eased": 0.5,
+      "step": 0.5,
+      "road": [
+        "e6e7d0",
+        "d4d4be",
+        "afe5c4"
+      ]
+    },
+    {
+      "t": 0.625,
+      "eased": 0.683594,
+      "step": 0.625,
+      "road": [
+        "e8eadc",
+        "d5d8cd",
+        "b3e4d5"
+      ]
+    },
+    {
+      "t": 0.75,
+      "eased": 0.84375,
+      "step": 0.875,
+      "road": [
+        "ecf1f1",
+        "d6e0e6",
+        "bbe3f2"
+      ]
+    },
+    {
+      "t": 0.875,
+      "eased": 0.957031,
+      "step": 1,
+      "road": [
+        "eef4fb",
+        "d6e4f2",
+        "bfe3ff"
+      ]
+    },
+    {
+      "t": 1,
+      "eased": 1,
+      "step": 1,
+      "road": [
+        "eef4fb",
+        "d6e4f2",
+        "bfe3ff"
+      ]
+    }
+  ]
+}

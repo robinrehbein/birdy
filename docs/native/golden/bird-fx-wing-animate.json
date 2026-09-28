@@ -1,0 +1,540 @@
+{
+  "source": "src/bird.js lines 104-110; src/main.js lines 1056-1080 (flap), 1824-1829 (per-frame)",
+  "formulas": {
+    "animateWings": {
+      "a": "sin(phase) * 0.8",
+      "wingRotationZ": "side * a  // side is -1 (left) or +1 (right), mirrored via wing.scale.x = side",
+      "propellerRotationY": "phase * 2.2  // only visible while the propeller-cap hat is equipped",
+      "haloRingPositionY": "0.34 + sin(phase * 0.35) * 0.04  // only visible while the halo hat is equipped"
+    },
+    "wingSpeedOnFlap": "state.wingSpeed = 38  // rad/s, set instantly in flap()",
+    "wingSpeedRelax": "wingSpeed = lerp(wingSpeed, 12, min(1, dt * 4))  // every frame except mode === \"over\"",
+    "phaseIntegration": "wingPhase += dt * wingSpeed  // every frame except mode === \"over\"; phase is NOT wrapped, grows unbounded (fine for sin/cos)"
+  },
+  "phaseSamples": [
+    {
+      "phase": 0,
+      "wingRotZ_perSide": 0,
+      "propellerRotY": 0,
+      "haloRingY": 0.34
+    },
+    {
+      "phase": 0.5,
+      "wingRotZ_perSide": 0.3835404308833624,
+      "propellerRotY": 1.1,
+      "haloRingY": 0.34696432550374384
+    },
+    {
+      "phase": 1,
+      "wingRotZ_perSide": 0.6731767878463173,
+      "propellerRotY": 2.2,
+      "haloRingY": 0.3537159122982181
+    },
+    {
+      "phase": 1.5707963267948966,
+      "wingRotZ_perSide": 0.8,
+      "propellerRotY": 3.455751918948773,
+      "haloRingY": 0.360899942588638
+    },
+    {
+      "phase": 3.141592653589793,
+      "wingRotZ_perSide": 9.797174393178826e-17,
+      "propellerRotY": 6.911503837897546,
+      "haloRingY": 0.3756402609675347
+    },
+    {
+      "phase": 4.71238898038469,
+      "wingRotZ_perSide": -0.8,
+      "propellerRotY": 10.367255756846317,
+      "haloRingY": 0.37987669334932517
+    },
+    {
+      "phase": 6.283185307179586,
+      "wingRotZ_perSide": -1.9594348786357652e-16,
+      "propellerRotY": 13.823007675795091,
+      "haloRingY": 0.3723606797749979
+    }
+  ],
+  "simulation60fps_flapAtFrame0": [
+    {
+      "frame": 0,
+      "wingSpeed": 36.266667,
+      "phase": 0.604444,
+      "wingRotZ_perSide": 0.45464403432054934,
+      "propellerRotY": 1.329777777777778,
+      "haloRingY": 0.34839924113779003
+    },
+    {
+      "frame": 1,
+      "wingSpeed": 34.648889,
+      "phase": 1.181926,
+      "wingRotZ_perSide": 0.7402703441440787,
+      "propellerRotY": 2.600237037037037,
+      "haloRingY": 0.3560790479946658
+    },
+    {
+      "frame": 2,
+      "wingSpeed": 33.138963,
+      "phase": 1.734242,
+      "wingRotZ_perSide": 0.7893379756007947,
+      "propellerRotY": 3.8153323456790122,
+      "haloRingY": 0.3628157347126348
+    },
+    {
+      "frame": 3,
+      "wingSpeed": 31.729699,
+      "phase": 2.26307,
+      "wingRotZ_perSide": 0.6158372490620518,
+      "propellerRotY": 4.978754633744856,
+      "haloRingY": 0.36847247763091134
+    },
+    {
+      "frame": 4,
+      "wingSpeed": 30.414386,
+      "phase": 2.769977,
+      "wingRotZ_perSide": 0.2904972355907403,
+      "propellerRotY": 6.093948769272977,
+      "haloRingY": 0.3729839339880213
+    },
+    {
+      "frame": 5,
+      "wingSpeed": 29.18676,
+      "phase": 3.256423,
+      "wingRotZ_perSide": -0.09166229268566418,
+      "propellerRotY": 7.164129962432557,
+      "haloRingY": 0.3763411284784765
+    },
+    {
+      "frame": 6,
+      "wingSpeed": 28.040976,
+      "phase": 3.723772,
+      "wingRotZ_perSide": -0.4398766659694355,
+      "propellerRotY": 8.192299076048164,
+      "haloRingY": 0.3785776420330191
+    },
+    {
+      "frame": 7,
+      "wingSpeed": 26.971577,
+      "phase": 4.173299,
+      "wingRotZ_perSide": -0.6865407948614238,
+      "propellerRotY": 9.181256915422733,
+      "haloRingY": 0.37975762077898834
+    },
+    {
+      "frame": 8,
+      "wingSpeed": 25.973472,
+      "phase": 4.60619,
+      "wingRotZ_perSide": -0.7954929322288685,
+      "propellerRotY": 10.133617565505661,
+      "haloRingY": 0.37996577517145913
+    },
+    {
+      "frame": 9,
+      "wingSpeed": 25.041907,
+      "phase": 5.023555,
+      "wingRotZ_perSide": -0.7615817925063304,
+      "propellerRotY": 11.051820838916393,
+      "haloRingY": 0.3792993209532364
+    },
+    {
+      "frame": 10,
+      "wingSpeed": 24.172447,
+      "phase": 5.426429,
+      "wingRotZ_perSide": -0.6045777960244821,
+      "propellerRotY": 11.938143894099746,
+      "haloRingY": 0.37786168941907267
+    },
+    {
+      "frame": 11,
+      "wingSpeed": 23.36095,
+      "phase": 5.815778,
+      "wingRotZ_perSide": -0.36045840700644205,
+      "propellerRotY": 12.79471207893754,
+      "haloRingY": 0.3757577751104259
+    },
+    {
+      "frame": 12,
+      "wingSpeed": 22.603554,
+      "phase": 6.192504,
+      "wingRotZ_perSide": -0.07244557136483108,
+      "propellerRotY": 13.623509051452814,
+      "haloRingY": 0.37309047192314165
+    },
+    {
+      "frame": 13,
+      "wingSpeed": 21.89665,
+      "phase": 6.557448,
+      "wingRotZ_perSide": 0.21667002722097595,
+      "propellerRotY": 14.426386225800405,
+      "haloRingY": 0.36995825710722063
+    },
+    {
+      "frame": 14,
+      "wingSpeed": 21.236874,
+      "phase": 6.911396,
+      "wingRotZ_perSide": 0.47015851925485425,
+      "propellerRotY": 15.205071588524822,
+      "haloRingY": 0.36645360520517783
+    },
+    {
+      "frame": 15,
+      "wingSpeed": 20.621082,
+      "phase": 7.255081,
+      "wingRotZ_perSide": 0.6607646358774498,
+      "propellerRotY": 15.961177927067613,
+      "haloRingY": 0.36266204290137094
+    },
+    {
+      "frame": 16,
+      "wingSpeed": 20.046343,
+      "phase": 7.589187,
+      "wingRotZ_perSide": 0.7721169295088166,
+      "propellerRotY": 16.69621050970755,
+      "haloRingY": 0.3586616861647551
+    },
+    {
+      "frame": 17,
+      "wingSpeed": 19.50992,
+      "phase": 7.914352,
+      "wingRotZ_perSide": 0.7985426134883367,
+      "propellerRotY": 17.411574253504824,
+      "haloRingY": 0.3545231300886644
+    },
+    {
+      "frame": 18,
+      "wingSpeed": 19.009259,
+      "phase": 8.231173,
+      "wingRotZ_perSide": 0.7437622258127201,
+      "propellerRotY": 18.10858041438228,
+      "haloRingY": 0.3503095879456535
+    },
+    {
+      "frame": 19,
+      "wingSpeed": 18.541975,
+      "phase": 8.540206,
+      "wingRotZ_perSide": 0.6189151597659767,
+      "propellerRotY": 18.78845283120124,
+      "haloRingY": 0.34607719854447333
+    },
+    {
+      "frame": 20,
+      "wingSpeed": 18.105843,
+      "phase": 8.84197,
+      "wingRotZ_perSide": 0.4402964968401657,
+      "propellerRotY": 19.452333753565604,
+      "haloRingY": 0.34187543990227665
+    },
+    {
+      "frame": 21,
+      "wingSpeed": 17.698787,
+      "phase": 9.13695,
+      "wingRotZ_perSide": 0.2270964178024323,
+      "propellerRotY": 20.10128928110567,
+      "haloRingY": 0.3377476027400308
+    },
+    {
+      "frame": 22,
+      "wingSpeed": 17.318868,
+      "phase": 9.425597,
+      "wingRotZ_perSide": -0.0006556095449553796,
+      "propellerRotY": 20.736314440143072,
+      "haloRingY": 0.3337312897413663
+    },
+    {
+      "frame": 23,
+      "wingSpeed": 16.964277,
+      "phase": 9.708335,
+      "wingRotZ_perSide": -0.223818245817264,
+      "propellerRotY": 21.35833792191131,
+      "haloRingY": 0.32985891631304526
+    },
+    {
+      "frame": 24,
+      "wingSpeed": 16.633325,
+      "phase": 9.985558,
+      "wingRotZ_perSide": -0.4254772055516868,
+      "propellerRotY": 21.968226504895,
+      "haloRingY": 0.326158196178924
+    },
+    {
+      "frame": 25,
+      "wingSpeed": 16.324437,
+      "phase": 10.257631,
+      "wingRotZ_perSide": -0.5918832900840216,
+      "propellerRotY": 22.566789182346444,
+      "haloRingY": 0.32265260092825265
+    },
+    {
+      "frame": 26,
+      "wingSpeed": 16.036141,
+      "phase": 10.5249,
+      "wingRotZ_perSide": -0.7130103352747752,
+      "propellerRotY": 23.15478101463446,
+      "haloRingY": 0.31936178697693396
+    },
+    {
+      "frame": 27,
+      "wingSpeed": 15.767065,
+      "phase": 10.787685,
+      "wingRotZ_perSide": -0.7827749670912372,
+      "propellerRotY": 23.73290672476994,
+      "haloRingY": 0.31630198658937947
+    },
+    {
+      "frame": 28,
+      "wingSpeed": 15.515927,
+      "phase": 11.046284,
+      "wingRotZ_perSide": -0.7989716441690807,
+      "propellerRotY": 24.30182405422972,
+      "haloRingY": 0.31348636190107915
+    },
+    {
+      "frame": 29,
+      "wingSpeed": 15.281532,
+      "phase": 11.300976,
+      "wingRotZ_perSide": -0.7629810286257865,
+      "propellerRotY": 24.862146895058846,
+      "haloRingY": 0.31092532248418664
+    },
+    {
+      "frame": 30,
+      "wingSpeed": 15.062763,
+      "phase": 11.552022,
+      "wingRotZ_perSide": -0.6793093859053791,
+      "propellerRotY": 25.414448213166036,
+      "haloRingY": 0.30862680807619625
+    },
+    {
+      "frame": 31,
+      "wingSpeed": 14.858579,
+      "phase": 11.799665,
+      "wingRotZ_perSide": -0.5550131710617873,
+      "propellerRotY": 25.959262776732743,
+      "haloRingY": 0.3065965387767338
+    },
+    {
+      "frame": 32,
+      "wingSpeed": 14.668007,
+      "phase": 12.044132,
+      "wingRotZ_perSide": -0.3990575026896813,
+      "propellerRotY": 26.497089702728335,
+      "haloRingY": 0.3048382354126621
+    },
+    {
+      "frame": 33,
+      "wingSpeed": 14.49014,
+      "phase": 12.285634,
+      "wingRotZ_perSide": -0.22165078884845546,
+      "propellerRotY": 27.028394833657558,
+      "haloRingY": 0.303353812956909
+    },
+    {
+      "frame": 34,
+      "wingSpeed": 14.324131,
+      "phase": 12.52437,
+      "wingRotZ_perSide": -0.03359099287823337,
+      "propellerRotY": 27.553612955858167,
+      "haloRingY": 0.30214354992276327
+    },
+    {
+      "frame": 35,
+      "wingSpeed": 14.169189,
+      "phase": 12.760523,
+      "wingRotZ_perSide": 0.1543476717931165,
+      "propellerRotY": 28.07314986991207,
+      "haloRingY": 0.3012062365890879
+    },
+    {
+      "frame": 36,
+      "wingSpeed": 14.024576,
+      "phase": 12.994266,
+      "wingRotZ_perSide": 0.33196519643614353,
+      "propellerRotY": 28.58738432302904,
+      "haloRingY": 0.30053930477758334
+    },
+    {
+      "frame": 37,
+      "wingSpeed": 13.889604,
+      "phase": 13.225759,
+      "wingRotZ_perSide": 0.49010685701166434,
+      "propellerRotY": 29.09666981260488,
+      "haloRingY": 0.30013894172643046
+    },
+    {
+      "frame": 38,
+      "wingSpeed": 13.763631,
+      "phase": 13.455153,
+      "wingRotZ_perSide": 0.6210437566981742,
+      "propellerRotY": 29.601336269542333,
+      "haloRingY": 0.3000001904039506
+    },
+    {
+      "frame": 39,
+      "wingSpeed": 13.646055,
+      "phase": 13.682587,
+      "wingRotZ_perSide": 0.7187564757851205,
+      "propellerRotY": 30.101691629350622,
+      "haloRingY": 0.30011703839460807
+    },
+    {
+      "frame": 40,
+      "wingSpeed": 13.536318,
+      "phase": 13.908192,
+      "wingRotZ_perSide": 0.7791197332037373,
+      "propellerRotY": 30.598023298505023,
+      "haloRingY": 0.30048249727704185
+    },
+    {
+      "frame": 41,
+      "wingSpeed": 13.433897,
+      "phase": 14.132091,
+      "wingRotZ_perSide": 0.7999896927011421,
+      "propellerRotY": 31.090599523049136,
+      "haloRingY": 0.3010886742061277
+    },
+    {
+      "frame": 42,
+      "wingSpeed": 13.338304,
+      "phase": 14.354396,
+      "wingRotZ_perSide": 0.78119876463547,
+      "propellerRotY": 31.57967066595697,
+      "haloRingY": 0.30192683721244146
+    },
+    {
+      "frame": 43,
+      "wingSpeed": 13.249084,
+      "phase": 14.575214,
+      "wingRotZ_perSide": 0.7244654794400428,
+      "propellerRotY": 32.06547039933761,
+      "haloRingY": 0.3029874755453949
+    },
+    {
+      "frame": 44,
+      "wingSpeed": 13.165811,
+      "phase": 14.794644,
+      "wingRotZ_perSide": 0.6332292548697687,
+      "propellerRotY": 32.548216817159556,
+      "haloRingY": 0.30426035621208897
+    },
+    {
+      "frame": 45,
+      "wingSpeed": 13.088091,
+      "phase": 15.012779,
+      "wingRotZ_perSide": 0.512421656163888,
+      "propellerRotY": 33.02811347379336,
+      "haloRingY": 0.30573457770310436
+    },
+    {
+      "frame": 46,
+      "wingSpeed": 13.015551,
+      "phase": 15.229705,
+      "wingRotZ_perSide": 0.36818706349423713,
+      "propellerRotY": 33.50535035331825,
+      "haloRingY": 0.3073986217490016
+    },
+    {
+      "frame": 47,
+      "wingSpeed": 12.947848,
+      "phase": 15.445502,
+      "wingRotZ_perSide": 0.20756652097955147,
+      "propellerRotY": 33.980104774208144,
+      "haloRingY": 0.3092404038168532
+    },
+    {
+      "frame": 48,
+      "wingSpeed": 12.884658,
+      "phase": 15.660246,
+      "wingRotZ_perSide": 0.03815895397739935,
+      "propellerRotY": 34.45254223370538,
+      "haloRingY": 0.31124732293405966
+    },
+    {
+      "frame": 49,
+      "wingSpeed": 12.825681,
+      "phase": 15.874008,
+      "wingRotZ_perSide": -0.13222608230599495,
+      "propellerRotY": 34.9228171959028,
+      "haloRingY": 0.31340631131628094
+    },
+    {
+      "frame": 50,
+      "wingSpeed": 12.770635,
+      "phase": 16.086852,
+      "wingRotZ_perSide": -0.2959104027933936,
+      "propellerRotY": 35.39107382728706,
+      "haloRingY": 0.31570388417673584
+    },
+    {
+      "frame": 51,
+      "wingSpeed": 12.71926,
+      "phase": 16.298839,
+      "wingRotZ_perSide": -0.44567105941831947,
+      "propellerRotY": 35.857446683245705,
+      "haloRingY": 0.3181261900045847
+    },
+    {
+      "frame": 52,
+      "wingSpeed": 12.671309,
+      "phase": 16.510028,
+      "wingRotZ_perSide": -0.5750343952673862,
+      "propellerRotY": 36.322061348807104,
+      "haloRingY": 0.32065906151982293
+    },
+    {
+      "frame": 53,
+      "wingSpeed": 12.626555,
+      "phase": 16.72047,
+      "wingRotZ_perSide": -0.6785301316292904,
+      "propellerRotY": 36.78503503666441,
+      "haloRingY": 0.32328806744032423
+    },
+    {
+      "frame": 54,
+      "wingSpeed": 12.584785,
+      "phase": 16.930217,
+      "wingRotZ_perSide": -0.751897133259813,
+      "propellerRotY": 37.246477145331234,
+      "haloRingY": 0.32599856513268816
+    },
+    {
+      "frame": 55,
+      "wingSpeed": 12.545799,
+      "phase": 17.139314,
+      "wingRotZ_perSide": -0.7922345144228737,
+      "propellerRotY": 37.706489780086926,
+      "haloRingY": 0.32877575416172866
+    },
+    {
+      "frame": 56,
+      "wingSpeed": 12.509413,
+      "phase": 17.347804,
+      "wingRotZ_perSide": -0.7980939195073716,
+      "propellerRotY": 38.16516823919225,
+      "haloRingY": 0.33160473070319657
+    },
+    {
+      "frame": 57,
+      "wingSpeed": 12.475452,
+      "phase": 17.555728,
+      "wingRotZ_perSide": -0.7695110683882673,
+      "propellerRotY": 38.62260146769054,
+      "haloRingY": 0.33447054274014726
+    },
+    {
+      "frame": 58,
+      "wingSpeed": 12.443755,
+      "phase": 17.763124,
+      "wingRotZ_perSide": -0.7079769260029215,
+      "propellerRotY": 39.07887248095562,
+      "haloRingY": 0.33735824592476027
+    },
+    {
+      "frame": 59,
+      "wingSpeed": 12.414171,
+      "phase": 17.970027,
+      "wingRotZ_perSide": -0.616351064534411,
+      "propellerRotY": 39.53405876000302,
+      "haloRingY": 0.3402529599539752
+    }
+  ]
+}

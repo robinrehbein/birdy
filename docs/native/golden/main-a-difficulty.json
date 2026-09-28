@@ -1,0 +1,394 @@
+{
+  "source": "src/main.js lines 743-756",
+  "formulas": {
+    "difficulty": "min(1, score / 40)",
+    "baseSpeed": "18 + 16*difficulty + 8*(1 - exp(-max(0, score-40)/50))",
+    "spacing": "baseSpeed * (1.7 - 0.6*difficulty)"
+  },
+  "rows": [
+    {
+      "score": 0,
+      "difficulty": 0,
+      "baseSpeed": 18,
+      "spacing": 30.599999999999998
+    },
+    {
+      "score": 1,
+      "difficulty": 0.025,
+      "baseSpeed": 18.4,
+      "spacing": 31.003999999999998
+    },
+    {
+      "score": 5,
+      "difficulty": 0.125,
+      "baseSpeed": 20,
+      "spacing": 32.5
+    },
+    {
+      "score": 10,
+      "difficulty": 0.25,
+      "baseSpeed": 22,
+      "spacing": 34.1
+    },
+    {
+      "score": 15,
+      "difficulty": 0.375,
+      "baseSpeed": 24,
+      "spacing": 35.400000000000006
+    },
+    {
+      "score": 20,
+      "difficulty": 0.5,
+      "baseSpeed": 26,
+      "spacing": 36.4
+    },
+    {
+      "score": 25,
+      "difficulty": 0.625,
+      "baseSpeed": 28,
+      "spacing": 37.1
+    },
+    {
+      "score": 30,
+      "difficulty": 0.75,
+      "baseSpeed": 30,
+      "spacing": 37.5
+    },
+    {
+      "score": 35,
+      "difficulty": 0.875,
+      "baseSpeed": 32,
+      "spacing": 37.599999999999994
+    },
+    {
+      "score": 39,
+      "difficulty": 0.975,
+      "baseSpeed": 33.6,
+      "spacing": 37.464
+    },
+    {
+      "score": 40,
+      "difficulty": 1,
+      "baseSpeed": 34,
+      "spacing": 37.400000000000006
+    },
+    {
+      "score": 41,
+      "difficulty": 1,
+      "baseSpeed": 34.15841061354596,
+      "spacing": 37.57425167490056
+    },
+    {
+      "score": 45,
+      "difficulty": 1,
+      "baseSpeed": 34.761300655712326,
+      "spacing": 38.23743072128356
+    },
+    {
+      "score": 50,
+      "difficulty": 1,
+      "baseSpeed": 35.450153975376146,
+      "spacing": 38.995169372913765
+    },
+    {
+      "score": 55,
+      "difficulty": 1,
+      "baseSpeed": 36.073454234546254,
+      "spacing": 39.680799658000886
+    },
+    {
+      "score": 60,
+      "difficulty": 1,
+      "baseSpeed": 36.637439631714884,
+      "spacing": 40.301183594886375
+    },
+    {
+      "score": 65,
+      "difficulty": 1,
+      "baseSpeed": 37.147754722298934,
+      "spacing": 40.86253019452883
+    },
+    {
+      "score": 70,
+      "difficulty": 1,
+      "baseSpeed": 37.60950691124779,
+      "spacing": 41.370457602372575
+    },
+    {
+      "score": 75,
+      "difficulty": 1,
+      "baseSpeed": 38.027317569668725,
+      "spacing": 41.8300493266356
+    },
+    {
+      "score": 80,
+      "difficulty": 1,
+      "baseSpeed": 38.40536828706223,
+      "spacing": 42.24590511576846
+    },
+    {
+      "score": 85,
+      "difficulty": 1,
+      "baseSpeed": 38.747442722075206,
+      "spacing": 42.62218699428273
+    },
+    {
+      "score": 90,
+      "difficulty": 1,
+      "baseSpeed": 39.05696447062846,
+      "spacing": 42.96266091769131
+    },
+    {
+      "score": 95,
+      "difficulty": 1,
+      "baseSpeed": 39.337031330415364,
+      "spacing": 43.270734463456904
+    },
+    {
+      "score": 100,
+      "difficulty": 1,
+      "baseSpeed": 39.59044630470238,
+      "spacing": 43.54949093517262
+    },
+    {
+      "score": 105,
+      "difficulty": 1,
+      "baseSpeed": 39.8197456557279,
+      "spacing": 43.80172022130069
+    },
+    {
+      "score": 110,
+      "difficulty": 1,
+      "baseSpeed": 40.027224288467146,
+      "spacing": 44.02994671731386
+    },
+    {
+      "score": 115,
+      "difficulty": 1,
+      "baseSpeed": 40.21495871881256,
+      "spacing": 44.23645459069382
+    },
+    {
+      "score": 120,
+      "difficulty": 1,
+      "baseSpeed": 40.384827856042754,
+      "spacing": 44.423310641647035
+    },
+    {
+      "score": 125,
+      "difficulty": 1,
+      "baseSpeed": 40.538531807578124,
+      "spacing": 44.592384988335944
+    },
+    {
+      "score": 130,
+      "difficulty": 1,
+      "baseSpeed": 40.677608894227305,
+      "spacing": 44.74536978365004
+    },
+    {
+      "score": 135,
+      "difficulty": 1,
+      "baseSpeed": 40.80345104621892,
+      "spacing": 44.883796150840816
+    },
+    {
+      "score": 140,
+      "difficulty": 1,
+      "baseSpeed": 40.9173177341071,
+      "spacing": 45.009049507517815
+    },
+    {
+      "score": 145,
+      "difficulty": 1,
+      "baseSpeed": 41.02034857397614,
+      "spacing": 45.12238343137376
+    },
+    {
+      "score": 150,
+      "difficulty": 1,
+      "baseSpeed": 41.11357473310133,
+      "spacing": 45.22493220641147
+    },
+    {
+      "score": 155,
+      "difficulty": 1,
+      "baseSpeed": 41.19792925021757,
+      "spacing": 45.31772217523933
+    },
+    {
+      "score": 160,
+      "difficulty": 1,
+      "baseSpeed": 41.2742563736847,
+      "spacing": 45.401682011053175
+    },
+    {
+      "score": 165,
+      "difficulty": 1,
+      "baseSpeed": 41.34332001100881,
+      "spacing": 45.477652012109694
+    },
+    {
+      "score": 170,
+      "difficulty": 1,
+      "baseSpeed": 41.40581137428533,
+      "spacing": 45.54639251171386
+    },
+    {
+      "score": 175,
+      "difficulty": 1,
+      "baseSpeed": 41.462355898082,
+      "spacing": 45.60859148789021
+    },
+    {
+      "score": 180,
+      "difficulty": 1,
+      "baseSpeed": 41.51351949899826,
+      "spacing": 45.66487144889808
+    },
+    {
+      "score": 185,
+      "difficulty": 1,
+      "baseSpeed": 41.55981423954874,
+      "spacing": 45.71579566350362
+    },
+    {
+      "score": 190,
+      "difficulty": 1,
+      "baseSpeed": 41.60170345305709,
+      "spacing": 45.76187379836281
+    },
+    {
+      "score": 195,
+      "difficulty": 1,
+      "baseSpeed": 41.63960638085154,
+      "spacing": 45.8035670189367
+    },
+    {
+      "score": 200,
+      "difficulty": 1,
+      "baseSpeed": 41.673902368173074,
+      "spacing": 45.841292604990386
+    },
+    {
+      "score": 205,
+      "difficulty": 1,
+      "baseSpeed": 41.70493466079008,
+      "spacing": 45.87542812686909
+    },
+    {
+      "score": 210,
+      "difficulty": 1,
+      "baseSpeed": 41.73301384031739,
+      "spacing": 45.906315224349136
+    },
+    {
+      "score": 215,
+      "difficulty": 1,
+      "baseSpeed": 41.758420932621455,
+      "spacing": 45.9342630258836
+    },
+    {
+      "score": 220,
+      "difficulty": 1,
+      "baseSpeed": 41.78141022042166,
+      "spacing": 45.95955124246383
+    },
+    {
+      "score": 225,
+      "difficulty": 1,
+      "baseSpeed": 41.80221178823729,
+      "spacing": 45.98243296706102
+    },
+    {
+      "score": 230,
+      "difficulty": 1,
+      "baseSpeed": 41.82103382515068,
+      "spacing": 46.00313720766575
+    },
+    {
+      "score": 235,
+      "difficulty": 1,
+      "baseSpeed": 41.83806470843356,
+      "spacing": 46.02187117927692
+    },
+    {
+      "score": 240,
+      "difficulty": 1,
+      "baseSpeed": 41.853474888890126,
+      "spacing": 46.03882237777914
+    },
+    {
+      "score": 245,
+      "difficulty": 1,
+      "baseSpeed": 41.86741859678591,
+      "spacing": 46.05416045646451
+    },
+    {
+      "score": 250,
+      "difficulty": 1,
+      "baseSpeed": 41.88003538543618,
+      "spacing": 46.0680389239798
+    },
+    {
+      "score": 255,
+      "difficulty": 1,
+      "baseSpeed": 41.89145152790239,
+      "spacing": 46.080596680692636
+    },
+    {
+      "score": 260,
+      "difficulty": 1,
+      "baseSpeed": 41.90178128077545,
+      "spacing": 46.091959408853
+    },
+    {
+      "score": 265,
+      "difficulty": 1,
+      "baseSpeed": 41.91112802769406,
+      "spacing": 46.10224083046347
+    },
+    {
+      "score": 270,
+      "difficulty": 1,
+      "baseSpeed": 41.91958531404293,
+      "spacing": 46.11154384544723
+    },
+    {
+      "score": 275,
+      "difficulty": 1,
+      "baseSpeed": 41.927237783186435,
+      "spacing": 46.11996156150508
+    },
+    {
+      "score": 280,
+      "difficulty": 1,
+      "baseSpeed": 41.93416202360784,
+      "spacing": 46.12757822596863
+    },
+    {
+      "score": 285,
+      "difficulty": 1,
+      "baseSpeed": 41.9404273354326,
+      "spacing": 46.134470068975865
+    },
+    {
+      "score": 290,
+      "difficulty": 1,
+      "baseSpeed": 41.946096424007315,
+      "spacing": 46.14070606640805
+    },
+    {
+      "score": 295,
+      "difficulty": 1,
+      "baseSpeed": 41.951226027475876,
+      "spacing": 46.146348630223464
+    },
+    {
+      "score": 300,
+      "difficulty": 1,
+      "baseSpeed": 41.95586748463391,
+      "spacing": 46.15145423309731
+    }
+  ]
+}

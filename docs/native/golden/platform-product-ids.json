@@ -1,0 +1,143 @@
+{
+  "coinIds": [
+    "birdy_coins_500",
+    "birdy_coins_1500"
+  ],
+  "itemIds": [
+    "birdy_skin_sky",
+    "birdy_skin_cardinal",
+    "birdy_skin_robin",
+    "birdy_skin_mint",
+    "birdy_skin_coral",
+    "birdy_skin_flamingo",
+    "birdy_skin_parrot",
+    "birdy_skin_penguin",
+    "birdy_skin_night",
+    "birdy_skin_snowy",
+    "birdy_skin_peacock",
+    "birdy_skin_gold",
+    "birdy_world_winter",
+    "birdy_world_beach",
+    "birdy_world_candy",
+    "birdy_world_mushroom"
+  ],
+  "ids": [
+    "birdy_coins_500",
+    "birdy_coins_1500",
+    "birdy_skin_sky",
+    "birdy_skin_cardinal",
+    "birdy_skin_robin",
+    "birdy_skin_mint",
+    "birdy_skin_coral",
+    "birdy_skin_flamingo",
+    "birdy_skin_parrot",
+    "birdy_skin_penguin",
+    "birdy_skin_night",
+    "birdy_skin_snowy",
+    "birdy_skin_peacock",
+    "birdy_skin_gold",
+    "birdy_world_winter",
+    "birdy_world_beach",
+    "birdy_world_candy",
+    "birdy_world_mushroom"
+  ],
+  "count": 18,
+  "purchasable": [
+    {
+      "id": "birdy_skin_sky",
+      "kind": "skin",
+      "itemId": "sky",
+      "coinPrice": 100
+    },
+    {
+      "id": "birdy_skin_cardinal",
+      "kind": "skin",
+      "itemId": "cardinal",
+      "coinPrice": 250
+    },
+    {
+      "id": "birdy_skin_robin",
+      "kind": "skin",
+      "itemId": "robin",
+      "coinPrice": 300
+    },
+    {
+      "id": "birdy_skin_mint",
+      "kind": "skin",
+      "itemId": "mint",
+      "coinPrice": 400
+    },
+    {
+      "id": "birdy_skin_coral",
+      "kind": "skin",
+      "itemId": "coral",
+      "coinPrice": 500
+    },
+    {
+      "id": "birdy_skin_flamingo",
+      "kind": "skin",
+      "itemId": "flamingo",
+      "coinPrice": 600
+    },
+    {
+      "id": "birdy_skin_parrot",
+      "kind": "skin",
+      "itemId": "parrot",
+      "coinPrice": 750
+    },
+    {
+      "id": "birdy_skin_penguin",
+      "kind": "skin",
+      "itemId": "penguin",
+      "coinPrice": 900
+    },
+    {
+      "id": "birdy_skin_night",
+      "kind": "skin",
+      "itemId": "night",
+      "coinPrice": 1000
+    },
+    {
+      "id": "birdy_skin_snowy",
+      "kind": "skin",
+      "itemId": "snowy",
+      "coinPrice": 1200
+    },
+    {
+      "id": "birdy_skin_peacock",
+      "kind": "skin",
+      "itemId": "peacock",
+      "coinPrice": 1400
+    },
+    {
+      "id": "birdy_skin_gold",
+      "kind": "skin",
+      "itemId": "gold",
+      "coinPrice": 2000
+    },
+    {
+      "id": "birdy_world_winter",
+      "kind": "world",
+      "itemId": "winter",
+      "coinPrice": 1200
+    },
+    {
+      "id": "birdy_world_beach",
+      "kind": "world",
+      "itemId": "beach",
+      "coinPrice": 1800
+    },
+    {
+      "id": "birdy_world_candy",
+      "kind": "world",
+      "itemId": "candy",
+      "coinPrice": 2400
+    },
+    {
+      "id": "birdy_world_mushroom",
+      "kind": "world",
+      "itemId": "mushroom",
+      "coinPrice": 3000
+    }
+  ]
+}

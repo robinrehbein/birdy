@@ -1,0 +1,80 @@
+[
+  {
+    "score": 0,
+    "difficulty": 0,
+    "baseSpeed": 18,
+    "spacing": 30.599999999999998
+  },
+  {
+    "score": 1,
+    "difficulty": 0.025,
+    "baseSpeed": 18.4,
+    "spacing": 31.003999999999998
+  },
+  {
+    "score": 5,
+    "difficulty": 0.125,
+    "baseSpeed": 20,
+    "spacing": 32.5
+  },
+  {
+    "score": 10,
+    "difficulty": 0.25,
+    "baseSpeed": 22,
+    "spacing": 34.1
+  },
+  {
+    "score": 20,
+    "difficulty": 0.5,
+    "baseSpeed": 26,
+    "spacing": 36.4
+  },
+  {
+    "score": 30,
+    "difficulty": 0.75,
+    "baseSpeed": 30,
+    "spacing": 37.5
+  },
+  {
+    "score": 40,
+    "difficulty": 1,
+    "baseSpeed": 34,
+    "spacing": 37.400000000000006
+  },
+  {
+    "score": 50,
+    "difficulty": 1,
+    "baseSpeed": 35.450153975376146,
+    "spacing": 38.995169372913765
+  },
+  {
+    "score": 70,
+    "difficulty": 1,
+    "baseSpeed": 37.60950691124779,
+    "spacing": 41.370457602372575
+  },
+  {
+    "score": 90,
+    "difficulty": 1,
+    "baseSpeed": 39.05696447062846,
+    "spacing": 42.96266091769131
+  },
+  {
+    "score": 120,
+    "difficulty": 1,
+    "baseSpeed": 40.384827856042754,
+    "spacing": 44.423310641647035
+  },
+  {
+    "score": 160,
+    "difficulty": 1,
+    "baseSpeed": 41.2742563736847,
+    "spacing": 45.401682011053175
+  },
+  {
+    "score": 200,
+    "difficulty": 1,
+    "baseSpeed": 41.673902368173074,
+    "spacing": 45.841292604990386
+  }
+]

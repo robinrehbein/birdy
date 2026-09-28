@@ -94,6 +94,19 @@ npm run android:aab    # signiertes Release-Bundle für den Play Store (siehe do
 
 Die Debug-APK lässt sich direkt auf dem Handy installieren (Installation aus unbekannten Quellen erlauben). Alles für den Play Store – Signatur-Schlüssel, Store-Texte, Datenschutz, Grafiken und offene Entscheidungen – steht in [`docs/STORE.md`](docs/STORE.md).
 
+## Native App (Kotlin/KMP)
+
+Parallel zur Capacitor-App entsteht in [`native/`](native/) eine eigenständige native
+Android-App: dieselbe Spiellogik, aber in Kotlin statt JavaScript, mit dem Spielkern als
+**Kotlin-Multiplatform**-Modul, damit später eine iOS-App darauf aufsetzen kann. Details, Build-
+und Test-Anleitung stehen in [`native/README.md`](native/README.md); Architektur in
+[`docs/native/ARCHITECTURE.md`](docs/native/ARCHITECTURE.md), der iOS-Plan in
+[`docs/native/IOS.md`](docs/native/IOS.md).
+
+Die Capacitor-App in diesem Verzeichnis (`android/`, `src/`) bleibt der **produktive Build**, bis
+die native App vollständige Feature-Parität erreicht hat und das explizit freigegeben ist
+(„parity sign-off“). Bis dahin ändert sich am obigen Abschnitt „Android-App“ nichts.
+
 ## Struktur
 
 - `src/main.js` – Spielschleife, Physik, Kollision, Eingabe, UI-Zustände

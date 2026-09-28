@@ -1,0 +1,274 @@
+{
+  "source": "src/progress.js",
+  "gift": {
+    "constants": {
+      "GIFT_BASE": 20,
+      "GIFT_STEP": 10,
+      "GIFT_MAX_STREAK": 7
+    },
+    "formula": "amount = GIFT_BASE + GIFT_STEP * (min(streak, GIFT_MAX_STREAK) - 1), streak starts at 1",
+    "amountsByStreak": {
+      "1": 20,
+      "2": 30,
+      "3": 40,
+      "4": 50,
+      "5": 60,
+      "6": 70,
+      "7": 80,
+      "8": 80,
+      "9": 80,
+      "10": 80,
+      "11": 80,
+      "12": 80
+    },
+    "availability": "giftAvailable() = data.gift.last !== today() (one claim per calendar day, local device calendar day via dayKey())",
+    "streakRule": "on claim: streak = (gift.last === yesterday) ? gift.streak + 1 : 1. If neither today nor yesterday was claimed, the getter `streak` (line 316-319) reports 0 (broken streak) even though data.gift.streak is not reset until the next claim.",
+    "streakGetterFormula": "streak getter returns g.streak if g.last===today()||g.last===dayKey(-1), else 0 (does not mutate stored data)"
+  },
+  "rewardedAds": {
+    "REWARDED_ADS_PER_DAY": 3,
+    "REWARDED_COINS": 30,
+    "rewardedAdsLeftFormula": "max(0, 3 - count) where count = data.rewardedAds.count if data.rewardedAds.day===today() else 0 (count resets implicitly by being ignored, not zeroed, once the day rolls over)",
+    "useRewardedSlot": "returns false if rewardedAdsLeft===0; else sets rewardedAds={day:today(), count: 3-rewardedAdsLeft+1} and returns true — one shared pool of 3/day covers BOTH the coin reward and the style-pass reward (grantStylePass also calls useRewardedSlot)"
+  },
+  "stylePass": {
+    "STYLE_PASS_MS": 3600000,
+    "STYLE_PASS_MINUTES": 60,
+    "grantStylePass": "no-op (returns false) if stylePassMinutesLeft>0 already, or if no rewarded slot left; else stylePassUntil = Date.now() + STYLE_PASS_MS (does NOT stack/extend, only (re)starts a fresh 60 min when expired)",
+    "stylePassMinutesLeftFormula": "max(0, ceil((stylePassUntil - Date.now()) / 60000))",
+    "trialAccessRule": "while stylePassMinutesLeft>0, owns(kind,id) returns true for kind IN {skin, world} for any NON-RARE item of that kind (rare skins excluded since main #8) — see load() lines 133-134 and owns() lines 257-263"
+  },
+  "upgrades": {
+    "UPGRADE_MAX": 3,
+    "table": [
+      {
+        "id": "star",
+        "icon": "rainbow",
+        "name": {
+          "de": "Regenbogen",
+          "en": "Rainbow"
+        },
+        "text": {
+          "de": "+1,5 s unverwundbar pro Stufe",
+          "en": "+1.5 s invincible per level"
+        },
+        "prices": [
+          300,
+          800,
+          1800
+        ]
+      },
+      {
+        "id": "magnet",
+        "icon": "magnet",
+        "name": {
+          "de": "Magnet",
+          "en": "Magnet"
+        },
+        "text": {
+          "de": "+3 s und größere Reichweite pro Stufe",
+          "en": "+3 s and wider reach per level"
+        },
+        "prices": [
+          300,
+          800,
+          1800
+        ]
+      },
+      {
+        "id": "mini",
+        "icon": "mushroom",
+        "name": {
+          "de": "Mini-Vogel",
+          "en": "Mini Bird"
+        },
+        "text": {
+          "de": "+3 s klein pro Stufe",
+          "en": "+3 s tiny per level"
+        },
+        "prices": [
+          300,
+          800,
+          1800
+        ]
+      },
+      {
+        "id": "luck",
+        "icon": "clover",
+        "name": {
+          "de": "Glückspilz",
+          "en": "Lucky"
+        },
+        "text": {
+          "de": "Power-ups tauchen öfter auf",
+          "en": "Power-ups show up more often"
+        },
+        "prices": [
+          500,
+          1200,
+          2500
+        ]
+      }
+    ],
+    "priceFormula": "upgradePrice(id) = prices[currentLevel] if currentLevel < UPGRADE_MAX else null (maxed); level starts at 0",
+    "buyFormula": "buyUpgrade(id): if price===null or coins<price -> false; else coins-=price, upgrades[id]++, save(), true"
+  },
+  "runStatAggregation": {
+    "RUN_MAX_STATS": {
+      "bestScore": "score",
+      "bestZone": "zone",
+      "bestChain": "bestChain",
+      "bestPowerups": "powerups"
+    },
+    "RUN_SUM_STATS": {
+      "nearTotal": "near",
+      "plantsTotal": "plants",
+      "coinsTotal": "coins"
+    },
+    "rule": "for each [stat,runKey] in RUN_MAX_STATS: stats[stat] = max(stats[stat]||0, run[runKey]||0). For RUN_SUM_STATS: stats[stat] = (stats[stat]||0) + (run[runKey]||0). Both happen every finishRun() call, in that order, BEFORE achievement checks.",
+    "unlocksStatFormula": "statValue(\"unlocks\") = sum over KINDS of (items[kind].length - 1) [i.e. owned items excluding the always-free first slot] + sum of all upgrade levels",
+    "runsStatFormula": "statValue(\"runs\") = data.runs (lifetime run counter, incremented once per finishRun call)"
+  },
+  "achievements": {
+    "count": 21,
+    "table": [
+      {
+        "id": "score10",
+        "stat": "bestScore",
+        "goal": 10,
+        "reward": 30
+      },
+      {
+        "id": "score25",
+        "stat": "bestScore",
+        "goal": 25,
+        "reward": 60
+      },
+      {
+        "id": "score50",
+        "stat": "bestScore",
+        "goal": 50,
+        "reward": 120
+      },
+      {
+        "id": "score100",
+        "stat": "bestScore",
+        "goal": 100,
+        "reward": 300
+      },
+      {
+        "id": "zone4",
+        "stat": "bestZone",
+        "goal": 3,
+        "reward": 150
+      },
+      {
+        "id": "near10",
+        "stat": "nearTotal",
+        "goal": 10,
+        "reward": 40
+      },
+      {
+        "id": "chain5",
+        "stat": "bestChain",
+        "goal": 5,
+        "reward": 150
+      },
+      {
+        "id": "powers3",
+        "stat": "bestPowerups",
+        "goal": 3,
+        "reward": 60
+      },
+      {
+        "id": "plants25",
+        "stat": "plantsTotal",
+        "goal": 25,
+        "reward": 80
+      },
+      {
+        "id": "coins500",
+        "stat": "coinsTotal",
+        "goal": 500,
+        "reward": 80
+      },
+      {
+        "id": "coins2000",
+        "stat": "coinsTotal",
+        "goal": 2000,
+        "reward": 200
+      },
+      {
+        "id": "runs50",
+        "stat": "runs",
+        "goal": 50,
+        "reward": 100
+      },
+      {
+        "id": "streak7",
+        "stat": "bestStreak",
+        "goal": 7,
+        "reward": 200
+      },
+      {
+        "id": "unlock5",
+        "stat": "unlocks",
+        "goal": 5,
+        "reward": 100
+      },
+      {
+        "id": "rareToadstool",
+        "stat": "plantsTotal",
+        "goal": 150,
+        "reward": 100
+      },
+      {
+        "id": "rareBasketball",
+        "stat": "runs",
+        "goal": 200,
+        "reward": 100
+      },
+      {
+        "id": "rareFootball",
+        "stat": "nearTotal",
+        "goal": 100,
+        "reward": 100
+      },
+      {
+        "id": "rareWater",
+        "stat": "bestPowerups",
+        "goal": 5,
+        "reward": 100
+      },
+      {
+        "id": "rareLava",
+        "stat": "coinsTotal",
+        "goal": 10000,
+        "reward": 100
+      },
+      {
+        "id": "rareDiamond",
+        "stat": "bestChain",
+        "goal": 10,
+        "reward": 100
+      },
+      {
+        "id": "rareGalaxy",
+        "stat": "bestScore",
+        "goal": 200,
+        "reward": 100
+      }
+    ],
+    "rareSkinLinks": {
+      "rareToadstool": "toadstool",
+      "rareBasketball": "basketball",
+      "rareFootball": "football",
+      "rareWater": "water",
+      "rareLava": "lava",
+      "rareDiamond": "diamond",
+      "rareGalaxy": "galaxy"
+    },
+    "rule": "unlockAchievements(): for each achievement not yet in data.achieved whose statValue(stat) >= goal: push to achieved, coins += reward, if a.skin present and not owned, add it to items.skin. Order = declaration order in ACHIEVEMENTS array (bestScore-based ones first, evaluated array-in-order every call, no priority beyond that).",
+    "wouldUnlockFormula": "wouldUnlock(run) previews without mutating: v = statValue(stat); if stat is a RUN_MAX_STATS key, v = max(v, run[runKey]||0); if stat is a RUN_SUM_STATS key, v += run[runKey]||0 (NOTE: a stat can only be in at most one of the two maps in practice); hit if v>=goal AND not already achieved."
+  }
+}

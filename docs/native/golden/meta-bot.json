@@ -1,0 +1,569 @@
+{
+  "source": "src/bot.js",
+  "constants": {
+    "GRAVITY": 36,
+    "FLAP": 11.5,
+    "HOP": 6,
+    "BPM": 124
+  },
+  "skills": {
+    "novice": {
+      "plan2": false,
+      "delay": 0.22,
+      "anticipate": 0.6,
+      "interval": 0.2,
+      "noise": 0.9,
+      "lookAhead": 30,
+      "mistake": 0.12,
+      "predict": false,
+      "lateSwitch": false,
+      "apexCheck": 0.4
+    },
+    "good": {
+      "plan2": false,
+      "delay": 0.15,
+      "anticipate": 0.9,
+      "interval": 0.12,
+      "noise": 0.45,
+      "lookAhead": 45,
+      "mistake": 0.04,
+      "predict": false,
+      "lateSwitch": true,
+      "apexCheck": 0.85
+    },
+    "pro": {
+      "plan2": true,
+      "delay": 0,
+      "anticipate": 1,
+      "interval": 0.016666666666666666,
+      "noise": 0,
+      "lookAhead": 80,
+      "mistake": 0,
+      "predict": true,
+      "lateSwitch": true,
+      "apexCheck": 1
+    }
+  },
+  "plantRiseSamples": [
+    {
+      "beat": 0,
+      "rise": 0
+    },
+    {
+      "beat": 0.1,
+      "rise": 0
+    },
+    {
+      "beat": 0.2,
+      "rise": 0
+    },
+    {
+      "beat": 0.3,
+      "rise": 0
+    },
+    {
+      "beat": 0.4,
+      "rise": 0
+    },
+    {
+      "beat": 0.5,
+      "rise": 0
+    },
+    {
+      "beat": 0.6,
+      "rise": 0
+    },
+    {
+      "beat": 0.7,
+      "rise": 0
+    },
+    {
+      "beat": 0.8,
+      "rise": 0
+    },
+    {
+      "beat": 0.9,
+      "rise": 0
+    },
+    {
+      "beat": 1,
+      "rise": 0
+    },
+    {
+      "beat": 1.1,
+      "rise": 0
+    },
+    {
+      "beat": 1.2,
+      "rise": 0
+    },
+    {
+      "beat": 1.3,
+      "rise": 0
+    },
+    {
+      "beat": 1.4,
+      "rise": 0
+    },
+    {
+      "beat": 1.5,
+      "rise": 0
+    },
+    {
+      "beat": 1.6,
+      "rise": 0
+    },
+    {
+      "beat": 1.7,
+      "rise": 0
+    },
+    {
+      "beat": 1.8,
+      "rise": 0
+    },
+    {
+      "beat": 1.9,
+      "rise": 0
+    },
+    {
+      "beat": 2,
+      "rise": 0
+    },
+    {
+      "beat": 2.1,
+      "rise": 0.25000000000000133
+    },
+    {
+      "beat": 2.2,
+      "rise": 0.5000000000000027
+    },
+    {
+      "beat": 2.3,
+      "rise": 0.7500000000000018
+    },
+    {
+      "beat": 2.4,
+      "rise": 1
+    },
+    {
+      "beat": 2.5,
+      "rise": 1
+    },
+    {
+      "beat": 2.6,
+      "rise": 1
+    },
+    {
+      "beat": 2.7,
+      "rise": 1
+    },
+    {
+      "beat": 2.8,
+      "rise": 1
+    },
+    {
+      "beat": 2.9,
+      "rise": 1
+    },
+    {
+      "beat": 3,
+      "rise": 1
+    },
+    {
+      "beat": 3.1,
+      "rise": 1
+    },
+    {
+      "beat": 3.2,
+      "rise": 1
+    },
+    {
+      "beat": 3.3,
+      "rise": 1
+    },
+    {
+      "beat": 3.4,
+      "rise": 1
+    },
+    {
+      "beat": 3.5,
+      "rise": 1
+    },
+    {
+      "beat": 3.6,
+      "rise": 1
+    },
+    {
+      "beat": 3.7,
+      "rise": 1
+    },
+    {
+      "beat": 3.8,
+      "rise": 1
+    },
+    {
+      "beat": 3.9,
+      "rise": 0
+    },
+    {
+      "beat": 4,
+      "rise": 0
+    },
+    {
+      "beat": 4.1,
+      "rise": 0
+    },
+    {
+      "beat": 4.2,
+      "rise": 0
+    },
+    {
+      "beat": 4.3,
+      "rise": 0
+    },
+    {
+      "beat": 4.4,
+      "rise": 0
+    },
+    {
+      "beat": 4.5,
+      "rise": 0
+    },
+    {
+      "beat": 4.6,
+      "rise": 0
+    },
+    {
+      "beat": 4.7,
+      "rise": 0
+    },
+    {
+      "beat": 4.8,
+      "rise": 0
+    },
+    {
+      "beat": 4.9,
+      "rise": 0
+    },
+    {
+      "beat": 5,
+      "rise": 0
+    },
+    {
+      "beat": 5.1,
+      "rise": 0
+    },
+    {
+      "beat": 5.2,
+      "rise": 0
+    },
+    {
+      "beat": 5.3,
+      "rise": 0
+    },
+    {
+      "beat": 5.4,
+      "rise": 0
+    },
+    {
+      "beat": 5.5,
+      "rise": 0
+    },
+    {
+      "beat": 5.6,
+      "rise": 0
+    },
+    {
+      "beat": 5.7,
+      "rise": 0
+    },
+    {
+      "beat": 5.8,
+      "rise": 0
+    },
+    {
+      "beat": 5.9,
+      "rise": 0
+    },
+    {
+      "beat": 6,
+      "rise": 0
+    },
+    {
+      "beat": 6.1,
+      "rise": 0.2499999999999858
+    },
+    {
+      "beat": 6.2,
+      "rise": 0.4999999999999849
+    },
+    {
+      "beat": 6.3,
+      "rise": 0.749999999999984
+    },
+    {
+      "beat": 6.4,
+      "rise": 0.9999999999999831
+    },
+    {
+      "beat": 6.5,
+      "rise": 1
+    },
+    {
+      "beat": 6.6,
+      "rise": 1
+    },
+    {
+      "beat": 6.7,
+      "rise": 1
+    },
+    {
+      "beat": 6.8,
+      "rise": 1
+    },
+    {
+      "beat": 6.9,
+      "rise": 1
+    },
+    {
+      "beat": 7,
+      "rise": 1
+    },
+    {
+      "beat": 7.1,
+      "rise": 1
+    },
+    {
+      "beat": 7.2,
+      "rise": 1
+    },
+    {
+      "beat": 7.3,
+      "rise": 1
+    },
+    {
+      "beat": 7.4,
+      "rise": 1
+    },
+    {
+      "beat": 7.5,
+      "rise": 1
+    },
+    {
+      "beat": 7.6,
+      "rise": 1
+    },
+    {
+      "beat": 7.7,
+      "rise": 1
+    },
+    {
+      "beat": 7.8,
+      "rise": 1
+    },
+    {
+      "beat": 7.9,
+      "rise": 1
+    },
+    {
+      "beat": 8,
+      "rise": 0
+    }
+  ],
+  "pickLaneCostExample": {
+    "state": {
+      "lane": 1,
+      "y": 6
+    },
+    "lanes": [
+      {
+        "gapLow": 4,
+        "gapHigh": 8,
+        "hasPlant": false,
+        "amp": 0
+      },
+      {
+        "gapLow": 9,
+        "gapHigh": 13,
+        "hasPlant": false,
+        "amp": 0
+      },
+      {
+        "gapLow": 3,
+        "gapHigh": 6,
+        "hasPlant": true,
+        "amp": 0
+      }
+    ],
+    "costs": [
+      {
+        "lane": 0,
+        "cost": 0
+      },
+      {
+        "lane": 1,
+        "cost": 0.050000000000000044
+      },
+      {
+        "lane": 2,
+        "cost": 3.1750000000000003
+      }
+    ],
+    "rule": "pickLane() picks the lane with the LOWEST cost among non-blocked lanes, unless Math.random() < mistake (then a uniformly random non-blocked lane is picked instead)"
+  },
+  "flapDecisionFormulas": {
+    "reactFormula": "react = max(delay * anticipate, 0.05)",
+    "predictedYFormula": "yPred = y + vy*react - 0.5*GRAVITY*react^2",
+    "apexFormula": "apex = y + FLAP^2 / (2*GRAVITY)  [NOTE: uses current y and the FIXED flap impulse FLAP=11.5, not the current vy — this estimates \"if I flapped right now\", not \"given my current velocity\"]",
+    "apexSafeFormula": "apexSafe = apex < ceiling + 0.12 || Math.random() > apexCheck",
+    "needFlapFormula": "needFlap = (yPred < aim - 0.9) && apexSafe",
+    "hopApexFormula": "hopApex = y + (v>0 ? v^2/(2*GRAVITY) : 0), where v = max(vy, HOP=6)  [a lane-switch tap only applies a small HOP impulse, not a full FLAP]",
+    "switchGateFormula": "!lateSwitch || close || needFlap || hopSafe || vy<0   (close = target gate z > -14)"
+  },
+  "flapDecisionSamples": [
+    {
+      "y": 3,
+      "vy": -15,
+      "apex": 4.836805555555555,
+      "predictedY_react0_15": 0.345,
+      "hopApex_vyOrHop": 3.5
+    },
+    {
+      "y": 3,
+      "vy": -5,
+      "apex": 4.836805555555555,
+      "predictedY_react0_15": 1.845,
+      "hopApex_vyOrHop": 3.5
+    },
+    {
+      "y": 3,
+      "vy": 0,
+      "apex": 4.836805555555555,
+      "predictedY_react0_15": 2.595,
+      "hopApex_vyOrHop": 3.5
+    },
+    {
+      "y": 3,
+      "vy": 5,
+      "apex": 4.836805555555555,
+      "predictedY_react0_15": 3.345,
+      "hopApex_vyOrHop": 3.5
+    },
+    {
+      "y": 3,
+      "vy": 11.5,
+      "apex": 4.836805555555555,
+      "predictedY_react0_15": 4.32,
+      "hopApex_vyOrHop": 4.8368
+    },
+    {
+      "y": 6,
+      "vy": -15,
+      "apex": 7.836805555555555,
+      "predictedY_react0_15": 3.345,
+      "hopApex_vyOrHop": 6.5
+    },
+    {
+      "y": 6,
+      "vy": -5,
+      "apex": 7.836805555555555,
+      "predictedY_react0_15": 4.845,
+      "hopApex_vyOrHop": 6.5
+    },
+    {
+      "y": 6,
+      "vy": 0,
+      "apex": 7.836805555555555,
+      "predictedY_react0_15": 5.595,
+      "hopApex_vyOrHop": 6.5
+    },
+    {
+      "y": 6,
+      "vy": 5,
+      "apex": 7.836805555555555,
+      "predictedY_react0_15": 6.345,
+      "hopApex_vyOrHop": 6.5
+    },
+    {
+      "y": 6,
+      "vy": 11.5,
+      "apex": 7.836805555555555,
+      "predictedY_react0_15": 7.32,
+      "hopApex_vyOrHop": 7.8368
+    },
+    {
+      "y": 9,
+      "vy": -15,
+      "apex": 10.836805555555555,
+      "predictedY_react0_15": 6.345,
+      "hopApex_vyOrHop": 9.5
+    },
+    {
+      "y": 9,
+      "vy": -5,
+      "apex": 10.836805555555555,
+      "predictedY_react0_15": 7.845,
+      "hopApex_vyOrHop": 9.5
+    },
+    {
+      "y": 9,
+      "vy": 0,
+      "apex": 10.836805555555555,
+      "predictedY_react0_15": 8.595,
+      "hopApex_vyOrHop": 9.5
+    },
+    {
+      "y": 9,
+      "vy": 5,
+      "apex": 10.836805555555555,
+      "predictedY_react0_15": 9.345,
+      "hopApex_vyOrHop": 9.5
+    },
+    {
+      "y": 9,
+      "vy": 11.5,
+      "apex": 10.836805555555555,
+      "predictedY_react0_15": 10.32,
+      "hopApex_vyOrHop": 10.8368
+    },
+    {
+      "y": 12,
+      "vy": -15,
+      "apex": 13.836805555555555,
+      "predictedY_react0_15": 9.345,
+      "hopApex_vyOrHop": 12.5
+    },
+    {
+      "y": 12,
+      "vy": -5,
+      "apex": 13.836805555555555,
+      "predictedY_react0_15": 10.845,
+      "hopApex_vyOrHop": 12.5
+    },
+    {
+      "y": 12,
+      "vy": 0,
+      "apex": 13.836805555555555,
+      "predictedY_react0_15": 11.595,
+      "hopApex_vyOrHop": 12.5
+    },
+    {
+      "y": 12,
+      "vy": 5,
+      "apex": 13.836805555555555,
+      "predictedY_react0_15": 12.345,
+      "hopApex_vyOrHop": 12.5
+    },
+    {
+      "y": 12,
+      "vy": 11.5,
+      "apex": 13.836805555555555,
+      "predictedY_react0_15": 13.32,
+      "hopApex_vyOrHop": 13.8368
+    }
+  ],
+  "aimClampFormula": {
+    "formula": "a = min(lo+1, mid); b = max(hi-1, mid); clampedWant = max(a, min(b, want)); aim = clamp(clampedWant + aimOffset, lo, hi)  where mid=(lo+hi)/2, want = mid (or the pre-planned next-gate center if plan2)",
+    "aimOffsetFormula": "aimOffset = (Math.random()-0.5) * 2 * noise, drawn ONCE per newly-targeted gate (not per frame)"
+  }
+}

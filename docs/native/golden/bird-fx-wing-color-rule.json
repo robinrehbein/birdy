@@ -1,0 +1,149 @@
+{
+  "source": "src/bird.js lines 131-139",
+  "rule": "if HSL-lightness(skin.wing) < 0.8: keep skin.wing/skin.cover as-is. else: wing = lerp(skin.body, skin.belly, 0.12) in RGB, cover = skin.tail.",
+  "purpose": "Prevents pale-wing skins (e.g. sunny's cream wing, penguin/snowy near-white) from reading as invisible \"stick\" wings against the sky; repaints them in a body-family tone instead.",
+  "threshold": 0.8,
+  "lerpFactor": 0.12,
+  "perSkinResults": [
+    {
+      "id": "sunny",
+      "branch": "bodyTinted",
+      "wing": 16307790,
+      "cover": 15909424,
+      "lightness": 0.9176470588235295
+    },
+    {
+      "id": "sky",
+      "branch": "bodyTinted",
+      "wing": 6140402,
+      "cover": 3114704,
+      "lightness": 0.9372549019607843
+    },
+    {
+      "id": "cardinal",
+      "branch": "bodyTinted",
+      "wing": 15423309,
+      "cover": 12857387,
+      "lightness": 0.9313725490196079
+    },
+    {
+      "id": "robin",
+      "branch": "bodyTinted",
+      "wing": 10907464,
+      "cover": 8213048,
+      "lightness": 0.8411764705882353
+    },
+    {
+      "id": "mint",
+      "branch": "bodyTinted",
+      "wing": 7395493,
+      "cover": 3912571,
+      "lightness": 0.9450980392156862
+    },
+    {
+      "id": "coral",
+      "branch": "bodyTinted",
+      "wing": 16747898,
+      "cover": 15229006,
+      "lightness": 0.9313725490196079
+    },
+    {
+      "id": "flamingo",
+      "branch": "bodyTinted",
+      "wing": 16751039,
+      "cover": 15885466,
+      "lightness": 0.9705882352941176
+    },
+    {
+      "id": "parrot",
+      "branch": "ownWing",
+      "wing": 16734794,
+      "cover": 4897023,
+      "lightness": 0.6450980392156863
+    },
+    {
+      "id": "penguin",
+      "branch": "ownWing",
+      "wing": 5266028,
+      "cover": 3028032,
+      "lightness": 0.3686274509803922
+    },
+    {
+      "id": "night",
+      "branch": "bodyTinted",
+      "wing": 6970263,
+      "cover": 4470638,
+      "lightness": 0.8411764705882353
+    },
+    {
+      "id": "snowy",
+      "branch": "bodyTinted",
+      "wing": 16120059,
+      "cover": 12109526,
+      "lightness": 0.903921568627451
+    },
+    {
+      "id": "peacock",
+      "branch": "ownWing",
+      "wing": 3985312,
+      "cover": 2781136,
+      "lightness": 0.5235294117647059
+    },
+    {
+      "id": "gold",
+      "branch": "ownWing",
+      "wing": 16770426,
+      "cover": 16765501,
+      "lightness": 0.7392156862745098
+    },
+    {
+      "id": "toadstool",
+      "branch": "ownWing",
+      "wing": 14692394,
+      "cover": 12854303,
+      "lightness": 0.5215686274509804
+    },
+    {
+      "id": "basketball",
+      "branch": "ownWing",
+      "wing": 15887133,
+      "cover": 14242575,
+      "lightness": 0.5313725490196078
+    },
+    {
+      "id": "football",
+      "branch": "bodyTinted",
+      "wing": 16119285,
+      "cover": 2763306,
+      "lightness": 0.9019607843137255
+    },
+    {
+      "id": "water",
+      "branch": "ownWing",
+      "wing": 1998806,
+      "cover": 3842288,
+      "lightness": 0.47843137254901963
+    },
+    {
+      "id": "lava",
+      "branch": "ownWing",
+      "wing": 3810336,
+      "cover": 2759192,
+      "lightness": 0.1764705882352941
+    },
+    {
+      "id": "diamond",
+      "branch": "bodyTinted",
+      "wing": 11068415,
+      "cover": 8376565,
+      "lightness": 0.8117647058823529
+    },
+    {
+      "id": "galaxy",
+      "branch": "ownWing",
+      "wing": 2759264,
+      "cover": 4860554,
+      "lightness": 0.2392156862745098
+    }
+  ]
+}

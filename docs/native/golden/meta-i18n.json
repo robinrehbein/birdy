@@ -1,0 +1,344 @@
+{
+  "source": "src/i18n.js",
+  "keyCount": 87,
+  "de": {
+    "zoneFlap": "flattern",
+    "zoneMove": "hierhin",
+    "handFlap": "Tippen = flattern",
+    "handSide": "Andere Bahn tippen<br>= ausweichen",
+    "best": "Rekord",
+    "howto": "Tippe auf <b>die Bahn des Vogels</b> zum Flattern,<br />auf <b>eine andere Bahn</b> zum Wechseln – oder wische.",
+    "keys": "Tastatur: Leertaste / ↑ flattern, ← → Spur",
+    "legend": "[rainbow] unverwundbar · [magnet] Münz-Magnet · [mushroom] Mini-Vogel",
+    "play": "Los geht's",
+    "shop": "[bird] Shop",
+    "achievements": "[trophy] Erfolge",
+    "privacy": "Datenschutz",
+    "adPrivacy": "Werbe-Datenschutz",
+    "rewardAd": "▶ Anzeige ansehen · +30 Münzen ({n}/3 heute)",
+    "rewardGranted": "+30 Münzen für die Anzeige!",
+    "rewardUnavailable": "Gerade keine Anzeige verfügbar",
+    "stylePassAd": "[play] 1 Stunde alle Vögel & Welten testen · Anzeige ({n}/3 heute)",
+    "stylePassActive": "[sparkle] Style-Pass aktiv · noch {n} Min.",
+    "stylePassGranted": "Alle Vögel & Welten für 1 Stunde freigeschaltet (außer seltene)!",
+    "realBuy": "Dauerhaft kaufen · {price} Echtgeld",
+    "coinPack": "{n} Münzen · {price} Echtgeld",
+    "purchaseGranted": "Dauerhaft freigeschaltet!",
+    "coinsPurchased": "+{n} Münzen gekauft!",
+    "purchaseUnavailable": "Kauf gerade nicht möglich",
+    "achTitle": "Erfolge",
+    "back": "Zurück",
+    "tab_skin": "Farbe",
+    "tab_pattern": "Muster",
+    "tab_hat": "Kopf",
+    "tab_eyes": "Augen",
+    "tab_beak": "Schnabel",
+    "tab_trail": "Spuren",
+    "tab_world": "Welten",
+    "tab_pipe": "Röhren",
+    "tab_upgrade": "Power",
+    "tab_dice": "Zufall",
+    "kind_skin": "Farbe",
+    "kind_pattern": "Muster",
+    "kind_hat": "Kopfschmuck",
+    "kind_eyes": "Augen",
+    "kind_beak": "Schnabel",
+    "kind_trail": "Spur",
+    "kind_world": "Welt",
+    "kind_pipe": "Röhren-Design",
+    "level": "Stufe {n}/{max}",
+    "upgrade": "Verbessern · {n}",
+    "maxed": "Maximal",
+    "needMore": "Noch {n}",
+    "rare": "Selten",
+    "rareOr": "[sparkle] Seltener Skin · oder gratis: {text}",
+    "rareOwned": "[sparkle] Seltener animierter Skin",
+    "skinReward": "+ Skin „{name}“",
+    "surprise": "[gift] Überraschung · {n}",
+    "surpriseGot": "[gift] Neu: {name}!",
+    "swipeHint": "[hand] Tipp: Du kannst auch nach links/rechts wischen",
+    "pause": "Pause",
+    "resume": "Tippen zum Weiterspielen",
+    "continue": "Weiter",
+    "zoneLabel": "Zone",
+    "gameOver": "Game Over",
+    "score": "Punkte",
+    "coins": "Münzen",
+    "newBest": "Neuer Rekord!",
+    "again": "Nochmal",
+    "menu": "Menü",
+    "rotate": "Bitte Handy hochkant halten",
+    "missions": "Tagesmissionen",
+    "gift": "[gift] Tagesgeschenk · +{n}",
+    "streak": "[fire] Serie: Tag {d} · morgen +{n}",
+    "buy": "Kaufen · {n}",
+    "selected": "Ausgewählt",
+    "select": "Auswählen",
+    "noTrail": "Keine Spur",
+    "tieRecord": "Rekord eingestellt!",
+    "toRecord": "Nur noch {n} bis zum Rekord!",
+    "achUnlocked": "Erfolg: {name}",
+    "zoneReached": "Zone {n} erreicht: {name}",
+    "unlockReady": "[sparkle] {kind} „{name}“ jetzt freischaltbar! ›",
+    "unlockNext": "Noch {n} [coin] bis {kind} „{name}“",
+    "recordToast": "[trophy] Neuer Rekord!",
+    "near": "Knapp!",
+    "zone": "Zone {n}",
+    "tutDone": "Super! Jetzt allein weiter [star]",
+    "muteOn": "Ton an",
+    "muteOff": "Ton aus",
+    "lang": "EN",
+    "langLabel": "Switch to English"
+  },
+  "en": {
+    "zoneFlap": "flap",
+    "zoneMove": "move here",
+    "handFlap": "Tap = flap",
+    "handSide": "Tap another lane<br>= dodge",
+    "best": "Best",
+    "howto": "Tap <b>the bird's lane</b> to flap,<br />tap <b>another lane</b> or swipe to switch.",
+    "keys": "Keyboard: Space / ↑ flap, ← → lane",
+    "legend": "[rainbow] invincible · [magnet] coin magnet · [mushroom] mini bird",
+    "play": "Play",
+    "shop": "[bird] Shop",
+    "achievements": "[trophy] Awards",
+    "privacy": "Privacy policy",
+    "adPrivacy": "Ad privacy choices",
+    "rewardAd": "▶ Watch an ad · +30 coins ({n}/3 today)",
+    "rewardGranted": "+30 coins for the ad!",
+    "rewardUnavailable": "No ad available right now",
+    "stylePassAd": "[play] Try all birds & worlds for 1 hour · ad ({n}/3 today)",
+    "stylePassActive": "[sparkle] Style Pass active · {n} min left",
+    "stylePassGranted": "All birds & worlds unlocked for 1 hour (except rare ones)!",
+    "realBuy": "Own forever · {price} real money",
+    "coinPack": "{n} coins · {price} real money",
+    "purchaseGranted": "Unlocked permanently!",
+    "coinsPurchased": "+{n} coins purchased!",
+    "purchaseUnavailable": "Purchase unavailable right now",
+    "achTitle": "Awards",
+    "back": "Back",
+    "tab_skin": "Colour",
+    "tab_pattern": "Pattern",
+    "tab_hat": "Hats",
+    "tab_eyes": "Eyes",
+    "tab_beak": "Beak",
+    "tab_trail": "Trails",
+    "tab_world": "Worlds",
+    "tab_pipe": "Pipes",
+    "tab_upgrade": "Power",
+    "tab_dice": "Random",
+    "kind_skin": "colour",
+    "kind_pattern": "pattern",
+    "kind_hat": "hat",
+    "kind_eyes": "eyes",
+    "kind_beak": "beak",
+    "kind_trail": "trail",
+    "kind_world": "world",
+    "kind_pipe": "pipe design",
+    "level": "level {n}/{max}",
+    "upgrade": "Upgrade · {n}",
+    "maxed": "Maxed out",
+    "needMore": "{n} more",
+    "rare": "Rare",
+    "rareOr": "[sparkle] Rare skin · or free: {text}",
+    "rareOwned": "[sparkle] Rare animated skin",
+    "skinReward": "+ “{name}” skin",
+    "surprise": "[gift] Surprise · {n}",
+    "surpriseGot": "[gift] New: {name}!",
+    "swipeHint": "[hand] Tip: you can also swipe left/right",
+    "pause": "Paused",
+    "resume": "Tap to continue",
+    "continue": "Continue",
+    "zoneLabel": "Zone",
+    "gameOver": "Game Over",
+    "score": "Score",
+    "coins": "Coins",
+    "newBest": "New best!",
+    "again": "Again",
+    "menu": "Menu",
+    "rotate": "Please hold your phone upright",
+    "missions": "Daily missions",
+    "gift": "[gift] Daily gift · +{n}",
+    "streak": "[fire] Streak: day {d} · tomorrow +{n}",
+    "buy": "Buy · {n}",
+    "selected": "Selected",
+    "select": "Select",
+    "noTrail": "No trail",
+    "tieRecord": "You tied your best!",
+    "toRecord": "Only {n} more to beat your best!",
+    "achUnlocked": "Award: {name}",
+    "zoneReached": "Reached zone {n}: {name}",
+    "unlockReady": "[sparkle] {kind} “{name}” ready to unlock! ›",
+    "unlockNext": "{n} [coin] more for {kind} “{name}”",
+    "recordToast": "[trophy] New best!",
+    "near": "Close call!",
+    "zone": "Zone {n}",
+    "tutDone": "Great! Now on your own [star]",
+    "muteOn": "Sound on",
+    "muteOff": "Sound off",
+    "lang": "DE",
+    "langLabel": "Auf Deutsch umstellen"
+  },
+  "keysWithIconTags": {
+    "legend": {
+      "de": [
+        "rainbow",
+        "magnet",
+        "mushroom"
+      ],
+      "en": [
+        "rainbow",
+        "magnet",
+        "mushroom"
+      ]
+    },
+    "shop": {
+      "de": [
+        "bird"
+      ],
+      "en": [
+        "bird"
+      ]
+    },
+    "achievements": {
+      "de": [
+        "trophy"
+      ],
+      "en": [
+        "trophy"
+      ]
+    },
+    "stylePassAd": {
+      "de": [
+        "play"
+      ],
+      "en": [
+        "play"
+      ]
+    },
+    "stylePassActive": {
+      "de": [
+        "sparkle"
+      ],
+      "en": [
+        "sparkle"
+      ]
+    },
+    "rareOr": {
+      "de": [
+        "sparkle"
+      ],
+      "en": [
+        "sparkle"
+      ]
+    },
+    "rareOwned": {
+      "de": [
+        "sparkle"
+      ],
+      "en": [
+        "sparkle"
+      ]
+    },
+    "surprise": {
+      "de": [
+        "gift"
+      ],
+      "en": [
+        "gift"
+      ]
+    },
+    "surpriseGot": {
+      "de": [
+        "gift"
+      ],
+      "en": [
+        "gift"
+      ]
+    },
+    "swipeHint": {
+      "de": [
+        "hand"
+      ],
+      "en": [
+        "hand"
+      ]
+    },
+    "gift": {
+      "de": [
+        "gift"
+      ],
+      "en": [
+        "gift"
+      ]
+    },
+    "streak": {
+      "de": [
+        "fire"
+      ],
+      "en": [
+        "fire"
+      ]
+    },
+    "unlockReady": {
+      "de": [
+        "sparkle"
+      ],
+      "en": [
+        "sparkle"
+      ]
+    },
+    "unlockNext": {
+      "de": [
+        "coin"
+      ],
+      "en": [
+        "coin"
+      ]
+    },
+    "recordToast": {
+      "de": [
+        "trophy"
+      ],
+      "en": [
+        "trophy"
+      ]
+    },
+    "tutDone": {
+      "de": [
+        "star"
+      ],
+      "en": [
+        "star"
+      ]
+    }
+  },
+  "placeholderSubstitution": {
+    "formula": "s.replace(/\\{(\\w+)\\}/g, (_, k) => values[k] ?? '')",
+    "example_rewardAd_n3": "▶ Watch an ad · +30 coins (3/3 today)",
+    "example_missingValue_becomesEmptyString": "▶ Watch an ad · +30 coins (/3 today)",
+    "example_multiPlaceholder_streak": "[fire] Streak: day 5 · tomorrow +60"
+  },
+  "setLangUnknownIsNoOp": {
+    "afterSetLangFr": "en"
+  },
+  "setLangDe": {
+    "getLang": "de"
+  },
+  "fallbackRule": {
+    "formula": "STRINGS[lang][key] ?? STRINGS.de[key] ?? key",
+    "unknownKeyReturnsKeyItself": "___doesNotExist___"
+  },
+  "L_helper": {
+    "formula": "L(v) = (v && typeof v === \"object\") ? (v[lang] ?? v.de) : v",
+    "example_object_de": "Hallo",
+    "example_object_en": "Hello",
+    "example_plainString": "unchanged",
+    "example_missingLangFallsBackToDe": "NurDeutsch"
+  },
+  "detectFormula": {
+    "rule1": "if localStorage.getItem(\"birdy-lang\") is \"de\" or \"en\", use it",
+    "rule2": "else: navigator.language.toLowerCase().startsWith(\"de\") ? \"de\" : \"en\"",
+    "storageKey": "birdy-lang"
+  }
+}
