@@ -29,7 +29,7 @@
 
 Alle diese Inhalte können weiterhin mit erspielten Münzen freigeschaltet werden. Im kostenlosen Spiel gibt es Tagesgeschenke, Missionen und Münzen aus Flügen; eine freiwillige Rewarded Ad gibt 30 Münzen. Echtgeldkäufe sind direkte, dauerhafte Freischaltungen. Der Style-Pass ist ausschließlich über eine freiwillige Anzeige erhältlich und verfällt nach einer Stunde. Preise außerhalb Deutschlands werden von Google Play lokalisiert und im Shop aus Play-Produktdetails angezeigt.
 
-**Status (28. September 2026):** Produktumfang und deutsche Preise wurden vom Herausgeber freigegeben. Das signierte Bundle mit `BILLING`-Berechtigung (versionCode `26092801`) wurde in Play hochgeladen und liegt als nicht ausgelieferter Entwurf im internen Track. Die Produktseite verlangt weiterhin einen veröffentlichten Build mit `BILLING`; das Dienstkonto darf die Preis-API derzeit nicht aufrufen (HTTP 403). Daher sind noch keine Play-Produkte angelegt oder aktiviert.
+**Status (28. September 2026):** Produktumfang und deutsche Preise wurden vom Herausgeber freigegeben. Das signierte Bundle mit `BILLING`-Berechtigung (versionCode `26092801`) wurde in Play hochgeladen und liegt als nicht ausgelieferter Entwurf im internen Track. Die Produktseite verlangt weiterhin einen veröffentlichten Build mit `BILLING`. Dem Dienstkonto fehlt für die Preis-API die Birdy-Berechtigung „App-Präsenz im Play Store verwalten“ (HTTP 403). Daher sind noch keine Play-Produkte angelegt oder aktiviert.
 
 ## Vor einem Test-Release mit Monetarisierung
 
@@ -37,4 +37,4 @@ Alle diese Inhalte können weiterhin mit erspielten Münzen freigeschaltet werde
 2. Kaufnachweise zuverlässig validieren, doppelte Gutschriften und Erstattungen behandeln sowie Käufe nach Neuinstallation wiederherstellen.
 3. Datenschutzerklärung veröffentlichen; Play-Datensicherheit und Angaben zu Werbung/Käufen aktualisieren.
 4. AdMob-App prüfen und mit dem Play-Store-Eintrag verknüpfen; Test- und Live-Anzeigen auf einem echten Android-Gerät prüfen.
-5. Erst nach diesen Schritten die Änderungen nach `main` übernehmen: Der bestehende GitHub-Workflow veröffentlicht jeden Merge auf `main` automatisch in den internen und geschlossenen Test.
+5. Erst nach diesen Schritten die Repository-Variable `BIRDY_MONETIZATION_RELEASE_READY` auf `true` setzen. Bis dahin überspringt der GitHub-Workflow die Play-Veröffentlichung, auch wenn die Änderungen bereits in `main` liegen.

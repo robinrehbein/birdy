@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   publish:
-    if: vars.PLAY_PUBLISH_ENABLED == 'true'
+    if: vars.PLAY_PUBLISH_ENABLED == 'true' && vars.BIRDY_MONETIZATION_RELEASE_READY == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:

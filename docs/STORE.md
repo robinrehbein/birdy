@@ -91,10 +91,11 @@ damit liegt er oberhalb des am 28. September 2026 hochgeladenen Entwurfs `260928
 
 `.github/workflows/play-release.yml` baut nach jedem Push auf `main` (also auch nach einem
 Merge) ein signiertes Bundle und veröffentlicht es im internen Test und im geschlossenen
-Alpha-Test. Offener Test und Produktion bleiben ausgeschlossen, solange der Produktionszugriff
-fehlt. Ein manueller Start über GitHub Actions ist ebenfalls möglich. Das Workflow-Job startet
-erst, wenn die Repository-Variable `PLAY_PUBLISH_ENABLED` auf `true` gesetzt wurde. Sie ist
-für dieses Repository aktiviert.
+Alpha-Test, sobald sowohl `PLAY_PUBLISH_ENABLED` als auch
+`BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Die zweite Variable bleibt bis
+zum Abschluss der Monetarisierungsprüfungen deaktiviert; auch ein manueller Workflow-Start
+umgeht diese Sperre nicht. Offener Test und Produktion bleiben ausgeschlossen, solange der
+Produktionszugriff fehlt. `PLAY_PUBLISH_ENABLED` ist bereits aktiviert.
 
 Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
 Repository-Secrets benötigt:
