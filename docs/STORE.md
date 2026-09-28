@@ -21,9 +21,9 @@ deutsche Screenshots sind zur Prüfung eingereicht.
   auch im App-Menü von Version 1.0.2 verlinkt.
 - Entwickler-Website: <https://robinrehbein.github.io/>; die zugehörige
   [app-ads.txt](https://robinrehbein.github.io/app-ads.txt) enthält die AdMob-Publisher-ID.
-- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Die bisherige
-  Datensicherheitsangabe „keine Datenerhebung“ gilt nur für den bereits veröffentlichten Build.
-  Vor einem Release mit AdMob und Play Billing muss der Fragebogen neu beantwortet werden.
+- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7; unverändert.
+- Werbung ist in Play als vorhanden deklariert. Die neuen Datensicherheitsangaben sind gespeichert,
+  aber noch nicht über „Veröffentlichungen – Übersicht“ zur Prüfung eingereicht.
 - Google Play Games auf dem PC wurde deaktiviert. Die ausstehende Aktivierung wurde vor der
   Einreichung aus der Änderungsliste entfernt.
 
@@ -31,7 +31,7 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk ./gradlew :androidApp:bundleRelease` (in `native/`) erfolgreich; Bundle 1.0.3 (Capacitor-Vorgänger) von Google Play angenommen |
+| Release-Bundle (AAB) | ✅ Kotlin-Bundle baut lokal; CI-Signatur und Play-Annahme erst beim Test-Upload zu bestätigen |
 | Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
@@ -41,7 +41,7 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 | Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
 | Store-Texte DE/EN | ✅ unten |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
-| Angaben zur Datensicherheit für Monetarisierung | ⚠️ Play-Console-Fragebogen vor Release aktualisieren |
+| Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen am 28.09. gespeichert; ⚠️ Einreichung zur Prüfung offen |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
@@ -206,19 +206,18 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 
 Die Datenschutzerklärung liegt unter <https://robinrehbein.github.io/birdy/privacy/>.
 
-Die bisherige Play-Console-Erklärung zum veröffentlichten Build gibt „keine Datenerhebung“,
-„keine Werbung“ und „keine In-App-Käufe“ an. Sie ist für den neuen Build falsch. Vor einem
-Test-Release in der Play Console Werbung und In-App-Käufe angeben und den
-Datensicherheitsfragebogen anhand der tatsächlichen AdMob-, UMP- und Play-Billing-SDK-Daten
-neu ausfüllen. Die Übermittlung durch Google-SDKs darf nicht als „keine Daten“ deklariert
-werden. Die Angaben müssen nach einem Test auf einem echten Gerät geprüft werden.
+Der Play-Fragebogen wurde am 28.09.2026 mit „Datenerhebung/Weitergabe: Ja“ gespeichert.
+Erfasst und weitergegeben: ungefährer Standort (IP), bisherige Käufe, App-Interaktionen,
+Diagnosedaten, andere App-Leistungsdaten und Geräte-/andere IDs. Übertragung verschlüsselt:
+Ja. Es gibt kein Birdy-Konto und keinen eigenen Server. Die Angabe wartet auf Einreichung
+über „Veröffentlichungen – Übersicht“ und muss auf einem Play-Testgerät geprüft werden.
 
 ### Quellen und geprüfte technische Fakten (28. September 2026)
 
 - [Google Mobile Ads SDK 25.5.0: Play Data Disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure): Das SDK überträgt IP-Adresse, Nutzungsinteraktionen, Diagnosedaten und Gerätekennungen an Google für Werbung, Analyse und Betrugsprävention; Google nennt TLS für die Übertragung. Die IP kann zur ungefähren Standortbestimmung dienen.
-- [Google UMP: Android-Integration](https://developers.google.com/admob/android/privacy): Der Consent-Status wird beim App-Start aktualisiert; eine notwendige Nachricht wird aus der in AdMob veröffentlichten Konfiguration geladen. `AdMobAds.kt` setzt TFUA und maximale Inhaltsbewertung G. Eine veröffentlichte AdMob-Nachricht muss in der Konsole noch geprüft werden.
+- [Google UMP: Android-Integration](https://developers.google.com/admob/android/privacy): Der Consent-Status wird beim App-Start aktualisiert; eine notwendige Nachricht wird aus der in AdMob veröffentlichten Konfiguration geladen. `AdMobAds.kt` setzt TFUA und maximale Inhaltsbewertung G. Die Nachricht „Birdy – EU-Einwilligung“ ist in AdMob seit 28.09. als „Veröffentlicht“ bestätigt (Englisch und Deutsch, mit Ablehnen-Option).
 - [Google Play Billing: Integration und Kaufzustände](https://developer.android.com/google/play/billing/integrate): Käufe werden über Google Play abgewickelt. Birdy fragt bestehende Käufe ab und verarbeitet lokal Produkt-ID, Token und Kaufzustand; es gibt kein Birdy-Konto und keinen eigenen Kaufserver. Käufe werden erst im Zustand `PURCHASED` freigeschaltet und anschließend bestätigt.
-- Das native Manifest entfernt `com.google.android.gms.permission.AD_ID` ausdrücklich. Der Debug-Merge enthält aber `android.permission.ACCESS_ADSERVICES_AD_ID` aus SDK-Abhängigkeiten. Die Play-Frage zur **klassischen Android-Werbe-ID** ist deshalb derzeit mit „Nein“ beantwortet; der Release-Merge wird vor dem Upload nochmals geprüft. Gerätekennungen aus dem Ads-SDK bleiben unabhängig davon im Datensicherheitsformular anzugeben.
+- Das native Manifest entfernt `com.google.android.gms.permission.AD_ID` ausdrücklich. Der Release-Merge enthält `BILLING` und `android.permission.ACCESS_ADSERVICES_AD_ID`, aber keine klassische `AD_ID`-Berechtigung. Die Play-Frage zur **klassischen Android-Werbe-ID** ist deshalb mit „Nein“ beantwortet; Gerätekennungen aus dem Ads-SDK sind im Datensicherheitsformular dennoch angegeben.
 
 **Einstufung (IARC-Fragebogen):**
 - Keine Gewalt gegen Figuren, kein Blut; der Vogel stößt nur gegen Röhren.

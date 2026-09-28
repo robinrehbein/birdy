@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Port of `billing.js` + `BirdyBillingPlugin.java` (platform.md §2.8) onto Play Billing Library
  * 9.x. [activity] resolves the Activity needed to launch checkout; [PurchaseProcessor] (shared)
- * owns the entitlement logic and calls back into [consume]/[acknowledge]/[refresh].
+ * owns the entitlement logic and calls back into [acknowledge]/[refresh].
  */
 class PlayBilling(
     context: Context,

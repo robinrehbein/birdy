@@ -6,7 +6,7 @@
 - Zwei freiwillige Rewarded-Ad-Blöcke: 30 Münzen (`ca-app-pub-1786159152036324/7854280106`) oder ein einstündiger Style-Pass (`ca-app-pub-1786159152036324/8020434087`).
 - Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten, außer den sieben seltenen animierten Skins. Diese gibt es nur für Münzen oder über ihren Erfolg, nicht über Anzeigen oder Echtgeld. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
 - Debug-Builds verwenden Googles Test-Anzeigenblock. Android fordert vor dem Laden den UMP-Datenschutzstatus an, setzt TFUA und Inhaltsbewertung G.
-- Der AdMob-App-Status ist noch „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe, korrekter Store-Verknüpfung und Prüfung der Datenschutzangaben zu erwarten.
+- Die EU-Einwilligungsnachricht „Birdy – EU-Einwilligung“ ist seit 28.09. in AdMob veröffentlicht. Die App ist noch nicht mit dem Play-Eintrag verknüpft; die AdMob-Suche fand sie bisher nicht. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe und Store-Verknüpfung zu erwarten.
 
 ## Play Billing
 
@@ -33,6 +33,6 @@ Alle diese Inhalte können weiterhin mit erspielten Münzen freigeschaltet werde
 
 1. Test-Build mit `BILLING`-Berechtigung ausliefern, danach ausschließlich die freigegebenen dauerhaften Play-Produkte anlegen und mit lizenzierten Testkonten testen.
 2. Wiederherstellung, Kaufbestätigung, ausstehende Käufe und Erstattungen auf einem Play-Testgerät prüfen.
-3. Datenschutzerklärung veröffentlichen; Play-Datensicherheit und Angaben zu Werbung/Käufen aktualisieren.
+3. Gespeicherte Play-Datensicherheitsangaben zur Prüfung einreichen und auf einem Testgerät verifizieren; die Datenschutzerklärung und Werbe-Angabe sind bereits aktualisiert.
 4. AdMob-App prüfen und mit dem Play-Store-Eintrag verknüpfen; Test- und Live-Anzeigen auf einem echten Android-Gerät prüfen.
 5. Für den ersten Kotlin-Testupload nach Abschluss der Play-Pflichtangaben `BIRDY_MONETIZATION_RELEASE_READY` auf `true` setzen. Danach Produkte anlegen und den Test auf einem Play-Gerät abschließen. Bis zur Freigabe überspringt der Workflow die Veröffentlichung.

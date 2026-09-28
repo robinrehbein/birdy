@@ -18,7 +18,7 @@ private const val STATE_PURCHASED = 1
  * but [ProgressRepository] is only safe to touch from the game thread (ARCHITECTURE.md). Callers
  * that are already certain to be on the game thread (e.g. tests) may pass `{ it() }`.
  *
- * [onGrant] mirrors `billing.js`'s `onGrant` hook (coins/permanent toasts); it is invoked on the
+ * [onGrant] reports a new permanent entitlement; it is invoked on the
  * game thread, inside the same [runOnGame] dispatch as the grant itself.
  *
  * [progress] is resolved lazily (not at construction) so the app shell can build this before
@@ -74,7 +74,7 @@ class PurchaseProcessor(
      * `billing.js:60-82` minus the single-flight/network parts, which live in [Billing] itself:
      * overwrites [ProgressRepository]'s authoritative paid-product set from every currently owned
      * purchase, then replays [handlePurchase] for each (idempotent via the token/product dedup
-     * inside [progress]) so interrupted consume/acknowledge flows are retried. If persisting the
+     * inside [progress]) so interrupted acknowledgement flows are retried. If persisting the
      * synced set fails, nothing is replayed (`if (!progress.syncPaidProducts(paid)) return;`).
      */
     fun syncOwnedPurchases(purchases: List<StorePurchase>) {
