@@ -26,6 +26,9 @@ assert.equal(progress.grantPurchasedCoins('birdy_coins_1500', 'purchase-B'), 150
 assert.equal(progress.coins, 2000);
 assert.equal(progress.grantStylePass(), true);
 assert.equal(progress.owns('world', 'mushroom'), true);
+assert.equal(progress.owns('skin', 'peacock'), true);
+// Rare animated skins are not lent by the style pass.
+assert.equal(progress.owns('skin', 'galaxy'), false);
 
 now += 61 * 60_000;
 progress = await reload('expired');

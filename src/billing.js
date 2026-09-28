@@ -6,7 +6,7 @@ import { progress } from './progress.js';
 const plugin = Capacitor.isNativePlatform() ? registerPlugin('BirdyBilling') : null;
 const coinIds = ['birdy_coins_500', 'birdy_coins_1500'];
 const itemIds = ['skin', 'world'].flatMap((kind) =>
-  CATALOG[kind].filter((item) => item.price > 0).map((item) => `birdy_${kind}_${item.id}`));
+  CATALOG[kind].filter((item) => item.price > 0 && !item.rare).map((item) => `birdy_${kind}_${item.id}`));
 const ids = [...coinIds, ...itemIds];
 const isPermanent = (id) => itemIds.includes(id);
 
