@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { SAND_ROAD } from './world.js';
 
 // Times of day the run cycles through. All stay bright and colourful; only
 // sky, light and a tint over scenery/clouds/grass change. Pipes and the bird
@@ -67,10 +68,23 @@ export function createBiomeBlender({ scene, ground, scenery, clouds }) {
   let duration = 1;
   let index = 0;
 
+  // Road palette (a repainted texture): blended in a few steps.
+  let road = [...SAND_ROAD];
+  let roadFrom = road;
+  let roadTo = road;
+  const mix = (a, b, e) => new THREE.Color(a).lerp(new THREE.Color(b), e).getHex();
+  const paintRoad = (e) => {
+    const step = Math.round(e * 8) / 8;
+    road = roadFrom.map((c, k) => mix(c, roadTo[k], step));
+    ground.setRoad(road);
+  };
+
   let current = null;
   function set(i, blend = 3, b = BIOMES[i % BIOMES.length]) {
     index = i;
     current = b;
+    roadFrom = road;
+    roadTo = b.road || SAND_ROAD;
     for (const k of Object.keys(targets)) {
       from[k].copy(targets[k]);
       const key = k === 'background' || k === 'fog' ? 'horizon' : k;
@@ -82,6 +96,7 @@ export function createBiomeBlender({ scene, ground, scenery, clouds }) {
     t = 0;
     scenery.setTheme(b.scenery, blend === 0);
     if (blend === 0) update(0);
+    else paintRoad(0);
     return b;
   }
 
@@ -90,6 +105,7 @@ export function createBiomeBlender({ scene, ground, scenery, clouds }) {
     t = Math.min(1, t + dt / duration);
     const e = t * t * (3 - 2 * t);
     for (const k of Object.keys(targets)) targets[k].copy(from[k]).lerp(to[k], e);
+    paintRoad(e);
     env.hemi.intensity = THREE.MathUtils.lerp(fromI.hemi, toI.hemi, e);
     env.sun.intensity = THREE.MathUtils.lerp(fromI.sun, toI.sun, e);
   }

@@ -86,7 +86,11 @@ const zoneMarks = []; // { z, zone } – where the next zone begins
 // The first zone (and every fourth) is the world chosen in the shop.
 const zoneBiome = (zone) => (zone % BIOMES.length === 0 ? progress.equipped('world') : BIOMES[zone % BIOMES.length]);
 biomes.set(0, 0, zoneBiome(0));
-setPipeStyle(progress.equipped('pipe'));
+// With the classic pipes equipped, each world brings its own pipe colours;
+// a pipe design bought in the shop always wins.
+const pipeFor = (world, pipe) => (pipe.id === CATALOG.pipe[0].id && world.pipes ? { ...pipe, ...world.pipes } : pipe);
+const equippedPipes = () => pipeFor(progress.equipped('world'), progress.equipped('pipe'));
+setPipeStyle(equippedPipes());
 
 // Blob shadow straight under the bird: shows its lane and height exactly.
 // The bird itself casts no sun shadow (that one fell into the next lane).
@@ -347,7 +351,7 @@ function renderUpgrades() {
   applyBird();
   previewTrail = progress.trail;
   previewWorld(progress.equipped('world'));
-  setPipeStyle(progress.equipped('pipe'));
+  setPipeStyle(equippedPipes());
   pipePreview.group.visible = false;
   renderWallet();
 }
@@ -394,7 +398,7 @@ function renderShop() {
   bird.setLook(LOOK_KINDS.includes(kind) ? { ...equippedLook(), [kind]: item.id } : equippedLook());
   previewTrail = kind === 'trail' ? item : progress.trail;
   previewWorld(kind === 'world' ? item : progress.equipped('world'));
-  setPipeStyle(kind === 'pipe' ? item : progress.equipped('pipe'));
+  setPipeStyle(pipeFor(kind === 'world' ? item : progress.equipped('world'), kind === 'pipe' ? item : progress.equipped('pipe')));
   pipePreview.group.visible = kind === 'pipe';
   renderWallet();
 }
@@ -465,7 +469,7 @@ function openShop(open) {
     previewTrail = null;
     applyBird();
     previewWorld(progress.equipped('world'));
-    setPipeStyle(progress.equipped('pipe'));
+    setPipeStyle(equippedPipes());
     pipePreview.group.visible = false;
     renderStart();
   }
@@ -1995,4 +1999,11 @@ async function simulate({ runs = 50, bot: botOpts = {}, maxTime = 240 } = {}) {
 }
 
 // Expose a tiny hook for automated smoke tests.
-window.__birdy = { state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };
+// Dev/screenshot hook: try other road and pipe colours for a world.
+function worldLook(id, look) {
+  const w = CATALOG.world.find((x) => x.id === id);
+  Object.assign(w, look);
+  biomes.set(0, 0, zoneBiome(0));
+  setPipeStyle(equippedPipes());
+}
+window.__birdy = { worldLook, state, gates, pickups, coins, activatePower, simulate, renderer, progress, enterZone, renderMusic, handleBack, openShop, camera, advance, freeze, toast };

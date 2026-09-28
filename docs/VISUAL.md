@@ -917,3 +917,24 @@ Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „en
   keine Fehler.
 - Nur die Oberfläche hat sich geändert, die 3D-Szene nicht.
 - APK baut.
+
+### Iteration 19 – eigene Straßen- und Röhrenfarben pro Welt (Bereich 2, deine Wahl: überall A)
+
+**Zur Auswahl:** [Varianten](visual/choice-worlds.jpg). Gewählt wurde:
+- Winterland: Schnee und Eisblau
+- Südsee: Sand mit türkisem Rand und türkise Röhren
+- Zuckerland: Zuckerguss und Pink
+- Pilzwald: Moos und Fliegenpilz-Rot
+
+**Was:**
+- Die Straßen-Textur wird aus einer Palette [Belag, Streifen, Rand] gemalt. Beim Zonenwechsel
+  blendet sie in acht Schritten über, zum Beispiel zurück zum Sand im Herbstwald.
+- Mit den klassischen Röhren bringt jede Welt ihre eigenen Röhrenfarben mit, für den ganzen Flug.
+  Im Shop gekaufte Röhren-Designs gewinnen immer. Der Stadtpark bleibt Sand und Grün.
+
+![Iteration 19](visual/it19.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Spitzenwert: 157 Draw Calls, 54 k Dreiecke.
+- APK baut.

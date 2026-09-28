@@ -80,22 +80,28 @@ export const TRAILS = [
 // Worlds: the place of the first zone (and every fourth after it). The run
 // still moves on through autumn forest, canyon and blossom grove. Colours
 // for sky, light and ground as in biomes.js; `scenery` is a theme in world.js.
+// `road` is the track palette [track, stripes, border] and `pipes` the pipe
+// colours used while the classic pipes are equipped (owner's picks, it19).
 export const WORLDS = [
   { id: 'park', icon: 'tree', name: { de: 'Stadtpark', en: 'City Park' }, price: 0, scenery: 'park',
     top: 0x2a9bd0, horizon: 0xa6e4ea, hemiSky: 0xdff6ff, hemiGround: 0x6a8f3a, hemiI: 1.4, sun: 0xfff4d6, sunI: 2.2,
     tint: 0xffffff, clouds: 0xffffff, grass: 0x73bf2e, track: 0xffffff },
   { id: 'winter', icon: 'snowflake', name: { de: 'Winterland', en: 'Winterland' }, price: 1200, scenery: 'winter',
     top: 0x5aa9e6, horizon: 0xe3f2ff, hemiSky: 0xffffff, hemiGround: 0x9fb4c8, hemiI: 1.45, sun: 0xfff6e8, sunI: 2.0,
-    tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8 },
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xe6f0fb, track: 0xe4ecf8,
+    road: [0xeef4fb, 0xd6e4f2, 0xbfe3ff], pipes: { pipe: 0x5fc6e6, light: 0xe6fbff, dark: 0x3a93b8 } },
   { id: 'beach', icon: 'palm', name: { de: 'Südsee', en: 'South Seas' }, price: 1800, scenery: 'beach',
     top: 0x1fa5e0, horizon: 0xbff3f0, hemiSky: 0xe8fbff, hemiGround: 0xc9b27a, hemiI: 1.45, sun: 0xfff4d6, sunI: 2.3,
-    tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff },
+    tint: 0xffffff, clouds: 0xffffff, grass: 0xf2dc9b, track: 0xffffff,
+    road: [0xf7e6b0, 0xefd48a, 0x5fd3d0], pipes: { pipe: 0x2fbfb3, light: 0x9ff0e6, dark: 0x1f8a80 } },
   { id: 'candy', icon: 'lollipop', name: { de: 'Zuckerland', en: 'Candyland' }, price: 2400, scenery: 'candy',
     top: 0xf07ab8, horizon: 0xffe3f1, hemiSky: 0xfff0f8, hemiGround: 0xc98fb8, hemiI: 1.45, sun: 0xfff0f6, sunI: 2.0,
-    tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6 },
+    tint: 0xffffff, clouds: 0xfff0fa, grass: 0xffb3d9, track: 0xfff0f6,
+    road: [0xffd1e6, 0xffb3d4, 0xffffff], pipes: { pipe: 0xff6fa8, light: 0xffffff, dark: 0xd9407c } },
   { id: 'mushroom', icon: 'mushroom', name: { de: 'Pilzwald', en: 'Mushroom Woods' }, price: 3000, scenery: 'mushroom',
     top: 0x4a6fd0, horizon: 0xc8f0d8, hemiSky: 0xeafff2, hemiGround: 0x5a8a5a, hemiI: 1.4, sun: 0xfff0c8, sunI: 2.1,
-    tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0 },
+    tint: 0xffffff, clouds: 0xf0e8ff, grass: 0x6fc45a, track: 0xfffaf0,
+    road: [0xd6e6a6, 0xbfd188, 0x8fe070], pipes: { pipe: 0xe0453a, light: 0xff9a8a, dark: 0xa82a22 } },
 ];
 
 // Pipe designs: body, highlight stripe and shadow stripe/band.

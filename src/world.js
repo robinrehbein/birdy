@@ -66,12 +66,11 @@ export function createScene() {
   return scene;
 }
 
-// Ground: sandy track with diagonal stripes and borders.
-function makeGroundTexture() {
-  const c = document.createElement('canvas');
-  c.width = 512;
-  c.height = 128;
-  const g = c.getContext('2d');
+// Ground: track with diagonal stripes and borders. The colours come from
+// the zone's road palette [track, stripes, border]; the default is sand.
+export const SAND_ROAD = [0xded895, 0xd2c26a, 0x9ce659];
+const css = (hex) => `#${hex.toString(16).padStart(6, '0')}`;
+function drawGround(g, [road, stripe, edge]) {
 
   // The grass beside the track is transparent here: it comes from the grass
   // plane below, whose colour changes with the zone.
@@ -79,9 +78,9 @@ function makeGroundTexture() {
 
   // sand track across the lanes (center ~ 40% of the width)
   const x0 = 150, x1 = 362;
-  g.fillStyle = '#ded895';
+  g.fillStyle = css(road);
   g.fillRect(x0, 0, x1 - x0, 128);
-  g.strokeStyle = '#d2c26a';
+  g.strokeStyle = css(stripe);
   g.lineWidth = 14;
   for (let i = -128; i < 256; i += 32) {
     g.beginPath();
@@ -94,13 +93,18 @@ function makeGroundTexture() {
   g.fillStyle = 'rgba(255, 252, 235, 0.75)';
   for (const x of [226.5, 285.5]) g.fillRect(x - 2.5, 8, 5, 48);
   // track borders
-  g.fillStyle = '#9ce659';
+  g.fillStyle = css(edge);
   g.fillRect(x0 - 10, 0, 10, 128);
   g.fillRect(x1, 0, 10, 128);
   g.fillStyle = '#543847';
   g.fillRect(x0 - 14, 0, 4, 128);
   g.fillRect(x1 + 10, 0, 4, 128);
-
+}
+function makeGroundTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512;
+  c.height = 128;
+  drawGround(c.getContext('2d'), SAND_ROAD);
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.wrapS = THREE.ClampToEdgeWrapping;
@@ -154,9 +158,18 @@ export function createGround(scene) {
   grass.receiveShadow = true;
   scene.add(grass);
 
+  let roadKey = SAND_ROAD.join();
   return {
     trackMat: track.material,
     grassMat: grass.material,
+    // Repaint the track in a road palette (only when it actually changed).
+    setRoad(palette) {
+      const key = palette.join();
+      if (key === roadKey) return;
+      roadKey = key;
+      drawGround(tex.image.getContext('2d'), palette);
+      tex.needsUpdate = true;
+    },
     update(distance) {
       tex.offset.y = (distance / GROUND_TILE) % 1;
       grassTex.offset.y = tex.offset.y;
