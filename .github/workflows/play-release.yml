@@ -43,7 +43,14 @@ jobs:
         run: python3 scripts/configure_play_ci.py
       - name: Build signed bundle
         run: |
-          export BIRDY_VERSION_CODE=$((100000 + GITHUB_RUN_NUMBER))
+          # Play version codes must rise above every uploaded bundle, including
+          # draft bundles. Reserve four digits per UTC day for runs/retries.
+          suffix=$((GITHUB_RUN_NUMBER * 10 + GITHUB_RUN_ATTEMPT))
+          if (( suffix > 9999 )); then
+            echo 'Play version-code suffix exhausted; update the allocation scheme.' >&2
+            exit 1
+          fi
+          export BIRDY_VERSION_CODE=$(( $(date -u +%s) / 86400 * 10000 + suffix ))
           npm run android:aab
       - name: Publish internal and closed Alpha tests
         env:

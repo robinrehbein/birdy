@@ -11,6 +11,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        registerPlugin(BirdyAdsPlugin.class);
+        registerPlugin(BirdyBillingPlugin.class);
         super.onCreate(savedInstanceState);
         // Keep the display on while playing.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
