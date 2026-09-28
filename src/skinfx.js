@@ -4,8 +4,16 @@
 export const FX = { none: 0, lava: 1, diamond: 2, water: 3, galaxy: 4, basketball: 5, football: 6, toadstool: 7 };
 
 const uniforms = { uFxTime: { value: 0 }, uFx: { value: 0 } };
+// The effect shader is only compiled while a premium skin is worn, so the
+// normal skins keep their plain (fast to compile) materials.
+const fxMats = new Set();
+let active = false;
 export function setSkinFx(name) {
   uniforms.uFx.value = FX[name] || 0;
+  if (active !== uniforms.uFx.value > 0) {
+    active = !active;
+    for (const m of fxMats) m.needsUpdate = true;
+  }
 }
 export function tickSkinFx(time) {
   uniforms.uFxTime.value = time % 1000;
@@ -73,29 +81,48 @@ const APPLY = /* glsl */ `
     col = mix(vec3(0.16, 0.09, 0.08), vec3(0.3, 0.14, 0.1), light * 2.0);
     col = mix(col, vec3(1.0, 0.45, 0.08), crack);
     glow = vec3(1.0, 0.32, 0.04) * crack * pulse * 1.3;
-  } else if (uFx == 2) { // diamond: icy facets, rainbow sheen, sparkles
+  } else if (uFx == 2) { // diamond: icy facets, rainbow sheen, sparkles and a sweeping shine
     vec3 cell = floor(p * 5.0);
     float h = fxHash(cell);
-    col = mix(vec3(0.5, 0.85, 1.0), fxRainbow(h + t * 0.15), 0.3) * (0.85 + 0.3 * h);
+    col = mix(vec3(0.45, 0.82, 1.0), fxRainbow(h + t * 0.15), 0.35) * (0.8 + 0.4 * h);
     col = mix(col, vec3(1.0), light);
-    float spark = pow(max(0.0, sin(t * 3.0 + h * 40.0)), 24.0);
-    glow = vec3(0.25, 0.4, 0.5) * 0.35 + vec3(1.0) * spark * 1.4;
-  } else if (uFx == 3) { // water: blue with moving wave highlights
+    vec3 sc = floor(p * 9.0);
+    float spark = step(0.55, fxHash(sc + 7.0)) * pow(max(0.0, sin(t * 3.5 + fxHash(sc) * 40.0)), 30.0);
+    float sweep = exp(-pow((p.x * 0.8 + p.y - mod(t * 0.9, 5.0) + 2.0) * 8.0, 2.0));
+    glow = vec3(0.2, 0.35, 0.45) * 0.4 + vec3(1.0) * (spark * 1.8 + sweep * 0.45);
+  } else if (uFx == 3) { // water: moving waves and rising air bubbles
     float w = sin(p.x * 9.0 + t * 2.2 + sin(p.z * 7.0 + t * 1.3) * 1.5) * sin(p.z * 8.0 - p.y * 5.0 - t * 1.8);
     float crest = smoothstep(0.35, 0.75, w) * (0.6 + 0.4 * sin(p.y * 14.0 + t * 3.0));
     col = mix(vec3(0.05, 0.35, 0.8), vec3(0.2, 0.65, 1.0), 0.5 + 0.5 * sin(p.y * 5.0 + t));
-    col = mix(col, vec3(0.85, 0.97, 1.0), crest * 0.85 + light * 0.5);
-    glow = vec3(0.3, 0.6, 0.8) * crest * 0.35;
-  } else if (uFx == 4) { // galaxy: night sky with drifting nebula and twinkling stars
+    col = mix(col, vec3(0.85, 0.97, 1.0), crest * 0.7 + light * 0.5);
+    vec3 bp = p * 5.0 + vec3(0.0, -t * 0.9, 0.0);
+    vec3 bc = floor(bp);
+    float bh = fxHash(bc + 11.0);
+    vec3 bf = fract(bp) - 0.5 - (vec3(fxHash(bc), fxHash(bc + 3.0), fxHash(bc + 5.0)) - 0.5) * 0.3;
+    float br = 0.16 + 0.12 * fxHash(bc + 9.0);
+    float bl = length(bf);
+    float bubble = step(0.5, bh) * (smoothstep(0.05, 0.0, abs(bl - br)) + 0.25 * step(bl, br));
+    col = mix(col, vec3(0.92, 0.99, 1.0), clamp(bubble, 0.0, 1.0));
+    glow = vec3(0.3, 0.6, 0.8) * crest * 0.3 + vec3(0.5, 0.8, 1.0) * bubble * 0.35;
+  } else if (uFx == 4) { // galaxy: drifting nebula, moving twinkling stars, shooting stars
     vec3 q = p * 3.0;
     q.xz *= fxRot(t * 0.15);
     float neb = 0.5 + 0.5 * sin(q.x * 2.1 + sin(q.y * 2.7 + t * 0.4) * 1.8 + q.z * 1.3);
     col = mix(vec3(0.1, 0.07, 0.3), vec3(0.55, 0.2, 0.7), neb * 0.8);
     col = mix(col, vec3(0.25, 0.55, 0.9), smoothstep(0.7, 1.0, neb) * 0.6);
-    vec3 sc = floor(p * 16.0);
-    float star = step(0.82, fxHash(sc)) * pow(0.5 + 0.5 * sin(t * 4.0 + fxHash(sc + 3.0) * 30.0), 6.0);
-    col = mix(col, vec3(1.0), star);
-    glow = col * 0.35 + vec3(1.0) * star * 1.2;
+    vec3 g1 = (p + vec3(t * 0.12, t * 0.04, 0.0)) * 14.0;
+    vec3 s1 = floor(g1);
+    float star = step(0.7, fxHash(s1)) * smoothstep(0.32, 0.12, length(fract(g1) - 0.5))
+      * (0.35 + 0.65 * pow(0.5 + 0.5 * sin(t * 4.0 + fxHash(s1 + 3.0) * 30.0), 4.0));
+    vec3 g2 = (p + vec3(t * 0.3, -t * 0.08, t * 0.1)) * 24.0;
+    vec3 s2 = floor(g2);
+    star = max(star, step(0.85, fxHash(s2 + 21.0)) * smoothstep(0.3, 0.1, length(fract(g2) - 0.5)) * 0.7);
+    float ph = fract(t / 3.5);
+    float head = mix(-1.0, 1.0, ph / 0.35);
+    float across = abs(p.y - p.x * 0.35 - 0.15 + 0.3 * fxHash(vec3(floor(t / 3.5))));
+    float streak = step(ph, 0.35) * smoothstep(0.035, 0.0, across) * step(p.x, head) * smoothstep(0.5, 0.0, head - p.x);
+    col = mix(col, vec3(1.0), max(star, streak));
+    glow = col * 0.35 + vec3(1.0) * (star * 1.2 + streak * 1.5);
   } else if (uFx == 5) { // basketball: orange with dark seams, slowly spinning
     vec3 q = p;
     q.xz *= fxRot(t * 0.8);
@@ -127,7 +154,9 @@ const APPLY = /* glsl */ `
 
 // Hooks a bird material up to the effect; `part` tweaks it per body part.
 export function addSkinFx(material, part) {
+  fxMats.add(material);
   material.onBeforeCompile = (shader) => {
+    if (!active) return;
     shader.uniforms.uFxTime = uniforms.uFxTime;
     shader.uniforms.uFx = uniforms.uFx;
     shader.uniforms.uFxPart = { value: part };
@@ -139,5 +168,5 @@ export function addSkinFx(material, part) {
       .replace('#include <color_fragment>', `#include <color_fragment>\nvec3 fxGlow = vec3(0.0);\n${APPLY}`)
       .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += fxGlow;');
   };
-  material.customProgramCacheKey = () => 'skinfx';
+  material.customProgramCacheKey = () => (active ? 'skinfx' : 'plain');
 }

@@ -938,3 +938,33 @@ Reihen dadurch wie kurze Stummel unter einer Wolkenplatte, und das Gefühl „en
 - Playtest (`SEED=7`): identisch (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
 - Spitzenwert: 157 Draw Calls, 54 k Dreiecke.
 - APK baut.
+
+### Iteration 20 – seltene animierte Skins (neues Feature, deine Vorgaben)
+
+**Was:**
+- Sieben seltene Skins. Man kauft sie teuer mit Münzen oder bekommt sie gratis über einen eigenen
+  schweren Erfolg:
+
+  | Skin | Münzen | oder gratis durch |
+  |---|---|---|
+  | Fliegenpilz: weiße Punkte, die „atmen“ | 3000 | An 150 Stachelkakteen vorbei |
+  | Basketball: Nähte, dreht sich | 3500 | 200 Runden gespielt |
+  | Fußball: 12 Fünfecke, Sechsecke mit Nähten, rollt | 4000 | 100× „Knapp!“ insgesamt |
+  | Wasser: wandernde Wellen, aufsteigende Luftblasen | 4500 | 5 Power-ups in einem Flug |
+  | Lava: glühende Risse, die kriechen und pulsieren | 5000 | 10.000 Münzen eingesammelt |
+  | Diamant: Facetten, Regenbogenschimmer, Funkeln, Lichtstreif | 5500 | 10× „Knapp!“ in Folge |
+  | Galaxie: Nebel, wandernde funkelnde Sterne, Sternschnuppen | 6000 | 200 Punkte in einem Flug |
+- Die Muster entstehen im Shader (`src/skinfx.js`) auf denselben Meshes und in denselben
+  Draw Calls. Der Effekt-Shader wird nur kompiliert, wenn ein seltener Skin getragen wird.
+- Shop: schimmernder Regenbogen-Rahmen, Etikett „Selten“ und eine bewegte Kachel. Darunter steht,
+  mit welchem Erfolg es gratis geht. In den Erfolgen sind die sieben Erfolge hervorgehoben und
+  nennen den Skin. Keine echten Käufe.
+
+![Iteration 20](visual/it20.jpg)
+
+**Messwerte:**
+- Playtest (`SEED=7`): identisch (Anfänger 19,5 s, Geübt 38,8 s, Profi 142 Punkte).
+- Spitzenwert: 157 Draw Calls, 53 k Dreiecke.
+- Erster Frame, direkt im Wechsel mit Iteration 19 gemessen: im Median rund 722 ms gegenüber
+  rund 700 ms (+3 %, Budget 782 ms).
+- APK baut.

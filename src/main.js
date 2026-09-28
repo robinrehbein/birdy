@@ -306,7 +306,7 @@ function thumbUrl(kind, id) {
 }
 
 function tileBg(kind, k) {
-  if (kind === 'skin') return hexColor(k.body);
+  if (kind === 'skin') return k.swatch || hexColor(k.body);
   if (kind === 'trail') {
     if (!k.colors.length) return '#cbb968';
     // Dots in the trail's colours on a sky blue background.
@@ -372,15 +372,21 @@ function renderShop() {
     if (!owned) cls.push('locked');
     if (k.id === shopSel) cls.push('sel');
     if (k.id === equipped) cls.push('equipped');
+    if (k.rare) cls.push('rare');
     const price = owned ? '' : `<span class="price">${k.price}</span>`;
+    const tag = k.rare ? `<span class="rare-tag">${t('rare')}</span>` : '';
     const dot = THUMB_VIEW[kind] ? 'dot thumb' : 'dot';
-    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}</button>`;
+    return `<button class="${cls.join(' ')}" data-id="${k.id}" aria-label="${L(k.name)}"><span class="${dot}" style="background:${tileBg(kind, k)}">${tileInner(kind, k)}</span>${price}${tag}</button>`;
   }).join('');
   const item = list.find((k) => k.id === shopSel) || list[0];
   reveal(skinsEl.querySelector('.sel'), skinsEl);
   updateGridFade();
   renderSurprise();
   shopName.textContent = L(item.name);
+  if (item.rare) {
+    const ach = ACHIEVEMENTS.find((a) => a.skin === item.id);
+    setRich(shopDesc, progress.owns(kind, item.id) || !ach ? t('rareOwned') : t('rareOr', { text: L(ach.text) }));
+  }
   shopAction.classList.remove('buy');
   shopAction.disabled = false;
   if (!progress.owns(kind, item.id)) {
@@ -533,9 +539,9 @@ function renderAchievements() {
   $('ach-count').textContent = `${list.filter((a) => a.done).length} / ${list.length}`;
   $('ach-list').innerHTML = list.map((a) => {
     const pct = Math.round((a.value / a.goal) * 100);
-    return `<div class="ach${a.done ? ' done' : ''}">
+    return `<div class="ach${a.done ? ' done' : ''}${a.skin ? ' rare' : ''}">
       <span class="ach-icon">${icon(a.done ? a.icon : 'lock', '1.2em')}</span>
-      <span class="ach-body"><b>${L(a.name)}</b><small>${L(a.text)}</small>
+      <span class="ach-body"><b>${L(a.name)}</b><small>${L(a.text)}${a.skin ? ` <em>${t('skinReward', { name: L(CATALOG.skin.find((k) => k.id === a.skin).name) })}</em>` : ''}</small>
         <span class="bar"><i style="width:${pct}%"></i></span></span>
       <span class="reward">${a.done ? icon('check', 22) : `+${a.reward}`}</span></div>`;
   }).join('');

@@ -24,6 +24,14 @@ export const ACHIEVEMENTS = [
   { id: 'runs50', icon: 'play', name: { de: 'Dauerflieger', en: "Frequent Flyer" }, text: { de: '50 Runden gespielt', en: 'Play 50 rounds' }, stat: 'runs', goal: 50, reward: 100 },
   { id: 'streak7', icon: 'calendar', name: { de: 'Stammgast', en: "Regular" }, text: { de: '7 Tage Geschenk-Serie', en: '7-day gift streak' }, stat: 'bestStreak', goal: 7, reward: 200 },
   { id: 'unlock5', icon: 'palette', name: { de: 'Sammler', en: "Collector" }, text: { de: '5 Shop-Artikel freigeschaltet', en: 'Unlock 5 shop items' }, stat: 'unlocks', goal: 5, reward: 100 },
+  // Hard ones that also unlock a rare skin (see SKINS in catalog.js).
+  { id: 'rareToadstool', icon: 'cactus', skin: 'toadstool', name: { de: 'Kakteenflüsterer', en: 'Cactus Whisperer' }, text: { de: 'An 150 Stachelkakteen vorbei', en: 'Pass 150 spiky cacti' }, stat: 'plantsTotal', goal: 150, reward: 100 },
+  { id: 'rareBasketball', icon: 'play', skin: 'basketball', name: { de: 'Dauerbrenner', en: 'Marathon Flyer' }, text: { de: '200 Runden gespielt', en: 'Play 200 rounds' }, stat: 'runs', goal: 200, reward: 100 },
+  { id: 'rareFootball', icon: 'bolt', skin: 'football', name: { de: 'Nerven aus Stahl', en: 'Nerves of Steel' }, text: { de: '100× „Knapp!“ insgesamt', en: '100 close calls in total' }, stat: 'nearTotal', goal: 100, reward: 100 },
+  { id: 'rareWater', icon: 'rainbow', skin: 'water', name: { de: 'Power-Profi', en: 'Power Pro' }, text: { de: '5 Power-ups in einem Flug', en: '5 power-ups in one flight' }, stat: 'bestPowerups', goal: 5, reward: 100 },
+  { id: 'rareLava', icon: 'coin', skin: 'lava', name: { de: 'Goldgräber', en: 'Gold Digger' }, text: { de: '10.000 Münzen eingesammelt', en: 'Collect 10,000 coins' }, stat: 'coinsTotal', goal: 10000, reward: 100 },
+  { id: 'rareDiamond', icon: 'fire', skin: 'diamond', name: { de: 'Eiskalt', en: 'Ice Cold' }, text: { de: '10× „Knapp!“ in Folge', en: '10 close calls in a row' }, stat: 'bestChain', goal: 10, reward: 100 },
+  { id: 'rareGalaxy', icon: 'star', skin: 'galaxy', name: { de: 'Sternenflieger', en: 'Star Flyer' }, text: { de: '200 Punkte in einem Flug', en: 'Score 200 in one flight' }, stat: 'bestScore', goal: 200, reward: 100 },
 ];
 const RUN_MAX_STATS = { bestScore: 'score', bestZone: 'zone', bestChain: 'bestChain', bestPowerups: 'powerups' };
 const RUN_SUM_STATS = { nearTotal: 'near', plantsTotal: 'plants', coinsTotal: 'coins' };
@@ -141,6 +149,7 @@ function unlockAchievements() {
     if (data.achieved.includes(a.id) || statValue(a.stat) < a.goal) continue;
     data.achieved.push(a.id);
     data.coins += a.reward;
+    if (a.skin && !data.items.skin.includes(a.skin)) data.items.skin.push(a.skin);
     unlocked.push(a);
   }
   return unlocked;

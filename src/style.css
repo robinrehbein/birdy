@@ -769,3 +769,19 @@ button.surprise:disabled { opacity: 0.55; }
 .ic { display: inline-block; vertical-align: -0.3em; margin: 0 0.1em; line-height: 0; }
 .ic svg { display: block; }
 button > svg, .tab span svg, .power-icon svg, .ach-icon svg, #hand .finger svg { display: block; margin: 0 auto; }
+
+/* Rare animated skins: shimmering frame, "Rare" tag, moving swatch. */
+.skin.rare { background: linear-gradient(120deg, #ff8fb8, #fcb800, #7be0c8, #4ab8ff, #b58cff, #ff8fb8); background-size: 300% 100%; animation: rare-shine 5s linear infinite; }
+.skin.rare.sel { box-shadow: 0 3px 0 #543847, 0 0 0 3px #fff inset; }
+.skin.rare .dot { background-size: 170% 170% !important; animation: rare-swatch 3.2s ease-in-out infinite alternate; }
+.rare-tag {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  padding: 0 5px; border-radius: 6px; border: 2px solid #543847;
+  background: #8f63d6; color: #fff; font: 10px/13px 'Lilita One', system-ui, sans-serif; letter-spacing: 0.3px; white-space: nowrap;
+}
+.skin.rare.locked .price { bottom: 2px; }
+@keyframes rare-shine { to { background-position: 300% 0; } }
+@keyframes rare-swatch { from { background-position: 0% 20%; } to { background-position: 100% 80%; } }
+.ach.rare:not(.done) { background: linear-gradient(120deg, rgba(181, 140, 255, 0.35), rgba(74, 184, 255, 0.25)); }
+.ach-body small em { font-style: normal; color: #7a4fc4; }
+@media (prefers-reduced-motion: reduce) { .skin.rare, .skin.rare .dot { animation: none; } }
