@@ -11,8 +11,10 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 - [Interner Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4700770597020690505)
 - [Interner Testbeitritt](https://play.google.com/apps/internaltest/4700770597020690505)
 - [Geschlossener Alpha-Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4699009912977551786)
-- Tester-Liste „Tester“: 4 Personen; für Produktionszugriff verlangt Google mindestens 12
-  angemeldete Tester im geschlossenen Test über 14 Tage.
+- Tester-Liste „Tester“: 4 Personen; diese Liste ist bereits unter **Einstellungen → Lizenztest**
+  ausgewählt. Im geschlossenen Test ist derzeit eine Person angemeldet. Für Produktionszugriff
+  verlangt Google mindestens 12 angemeldete Tester über 14 Tage; Produktion ist hier nicht Teil
+  des Releases.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
 - Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die neuen
   deutschen Screenshots sind zur Prüfung eingereicht; Englisch nutzt aktuell die deutschen
@@ -39,13 +41,13 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
 | Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
-| Store-Texte DE/EN | ✅ unten |
+| Store-Texte DE/EN | ✅ aktualisiert und am 28.09. in Play als Entwurf gespeichert; Einreichung offen |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen am 28.09. gespeichert; ⚠️ Einreichung zur Prüfung offen |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
-| Test auf echten Geräten | ⚠️ noch offen (fps-Anzeige: 5× auf den Titel tippen) |
+| Test auf Play-Gerät | ⚠️ Debug-APK startet im lokalen Emulator; dessen Play-Dienste sind für AdMob zu alt. Consent, Rewarded Ads und Testkäufe benötigen ein aktuelles Play-Testgerät. |
 
 ## Entscheidungen und verbleibende Schritte
 
