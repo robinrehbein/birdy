@@ -61,21 +61,22 @@ class AdMobAds(
     private fun showAgeDialog(firstRun: Boolean) {
         val act = activity() ?: return
         val german = context.resources.configuration.locales[0].language == "de"
+        val choose: (String) -> Unit = { chosen ->
+            agePreferences.edit().putString("group", chosen).apply()
+            if (firstRun) startForAge(chosen) else {
+                // Previously loaded ads must never be shown with the wrong age treatment.
+                disabledForSession = true
+                rewardedAds.clear()
+                publishStatus()
+                act.recreate()
+            }
+        }
         AlertDialog.Builder(act)
             .setTitle(if (german) "Altersgruppe für Werbung" else "Age group for ads")
             .setMessage(if (german) "Birdy zeigt nur freiwillige Werbung. Wähle deine Altersgruppe, damit Anzeigen und Einwilligung richtig behandelt werden. Die Auswahl bleibt nur auf diesem Gerät."
                 else "Birdy shows only optional ads. Choose your age group so ads and consent are handled correctly. This choice stays on this device.")
-            .setItems(arrayOf("13–15", "16+")) { _, index ->
-                val chosen = if (index == 0) "13-15" else "16+"
-                agePreferences.edit().putString("group", chosen).apply()
-                if (firstRun) startForAge(chosen) else {
-                    // Previously loaded ads must never be shown with the wrong age treatment.
-                    disabledForSession = true
-                    rewardedAds.clear()
-                    publishStatus()
-                    act.recreate()
-                }
-            }
+            .setNegativeButton("13–15") { _, _ -> choose("13-15") }
+            .setPositiveButton("16+") { _, _ -> choose("16+") }
             .setNeutralButton(if (german) "Später" else "Later") { _, _ -> }
             .show()
     }
