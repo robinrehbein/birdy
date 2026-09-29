@@ -19,15 +19,21 @@ jobs:
           cache: gradle
       - name: Install software OpenGL ES renderer
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libgles2 libgl1-mesa-dri
-      - name: Render actual Kotlin game scenes
+      - name: Render actual Kotlin game scenes in German and English
         working-directory: native
         env:
           EGL_PLATFORM: surfaceless
           LIBGL_ALWAYS_SOFTWARE: '1'
-        run: ./gradlew :screenshots:run --console=plain
+        run: |
+          SHOT_LANGUAGE=de ./gradlew :screenshots:run --console=plain
+          mkdir -p build/store-shots/de
+          cp build/shots/*.png build/store-shots/de/
+          SHOT_LANGUAGE=en ./gradlew :screenshots:run --console=plain
+          mkdir -p build/store-shots/en
+          cp build/shots/*.png build/store-shots/en/
       - name: Upload PNGs
         uses: actions/upload-artifact@v4
         with:
           name: native-store-screenshots
-          path: native/build/shots/*.png
+          path: native/build/store-shots/
           if-no-files-found: error

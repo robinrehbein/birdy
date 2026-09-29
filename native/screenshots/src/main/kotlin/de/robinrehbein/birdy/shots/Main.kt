@@ -28,7 +28,8 @@ fun main(args: Array<String>) {
         val target = renderer.createRenderTarget(Shots.WIDTH, Shots.HEIGHT, 4)
         var count = 0
         for (session in Shots.sessions) {
-            val g = ShotGame(renderer, session.save, session.lang, store = session.store)
+            val language = System.getenv("SHOT_LANGUAGE")?.takeIf { it == "de" || it == "en" } ?: session.lang
+            val g = ShotGame(renderer, session.save, language, store = session.store)
             val capture = Capture { name ->
                 if (filter != null && !name.contains(filter)) return@Capture
                 val file = File(outDir, "$name.png")
