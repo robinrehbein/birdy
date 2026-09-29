@@ -108,20 +108,6 @@ fun ShopScreen(
                 )
             }
 
-            if (ui.coinPacks.isNotEmpty()) {
-                Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (pack in ui.coinPacks) {
-                        GameButton(
-                            pack.label,
-                            { onCommand(UiCommand.BuyReal(pack.productId)) },
-                            Modifier.weight(1f),
-                            ButtonStyle.CoinPack,
-                            enabled = pack.enabled && !ui.billingBusy,
-                        )
-                    }
-                }
-            }
-
             if (ui.rewardAd != null) {
                 GameButton(
                     ui.rewardAd.label,

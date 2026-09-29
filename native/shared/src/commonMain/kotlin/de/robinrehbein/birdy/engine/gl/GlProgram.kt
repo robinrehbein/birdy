@@ -2,7 +2,7 @@ package de.robinrehbein.birdy.engine.gl
 
 /** A linked program with a lazily filled uniform-location cache. */
 internal class GlProgram(
-    private val gl: Gl,
+    private val gl: GlApi,
     vertexSource: String,
     fragmentSource: String,
     extraAttributes: List<String>,

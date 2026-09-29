@@ -1,8 +1,10 @@
 package de.robinrehbein.birdy.platform.ads
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AgeRestrictedTreatment
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
@@ -41,19 +43,55 @@ class AdMobAds(
     private val loading = HashSet<RewardKind>()
     private var consent: ConsentInformation? = null
     private var initialized = false
+    private var disabledForSession = false
+    private val agePreferences = context.getSharedPreferences("birdy_ad_age", Context.MODE_PRIVATE)
 
     override fun init() {
-        // Every player is treated as under the age of consent: non-personalized, age-appropriate
-        // ads only, regardless of Birdy's actual 13+ target audience (platform.md §1.6 step 1).
+        val age = agePreferences.getString("group", null)
+        if (age == null) {
+            showAgeDialog(firstRun = true)
+            return
+        }
+        startForAge(age)
+    }
+
+    /** The locally selected age group can be changed without sharing a birth date. */
+    fun showAgeSettings() = showAgeDialog(firstRun = false)
+
+    private fun showAgeDialog(firstRun: Boolean) {
+        val act = activity() ?: return
+        val german = context.resources.configuration.locales[0].language == "de"
+        AlertDialog.Builder(act)
+            .setTitle(if (german) "Altersgruppe für Werbung" else "Age group for ads")
+            .setMessage(if (german) "Birdy zeigt nur freiwillige Werbung. Wähle deine Altersgruppe, damit Anzeigen und Einwilligung richtig behandelt werden. Die Auswahl bleibt nur auf diesem Gerät."
+                else "Birdy shows only optional ads. Choose your age group so ads and consent are handled correctly. This choice stays on this device.")
+            .setItems(arrayOf("13–15", "16+")) { _, index ->
+                val chosen = if (index == 0) "13-15" else "16+"
+                agePreferences.edit().putString("group", chosen).apply()
+                if (firstRun) startForAge(chosen) else {
+                    // Previously loaded ads must never be shown with the wrong age treatment.
+                    disabledForSession = true
+                    rewardedAds.clear()
+                    publishStatus()
+                    act.recreate()
+                }
+            }
+            .setNeutralButton(if (german) "Später" else "Later") { _, _ -> }
+            .show()
+    }
+
+    private fun startForAge(age: String) {
+        if (disabledForSession) return
+        val underAge = age == "13-15"
         MobileAds.setRequestConfiguration(
             RequestConfiguration.Builder()
-                .setTagForUnderAgeOfConsent(RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE)
+                .setAgeRestrictedTreatment(if (underAge) AgeRestrictedTreatment.CHILD else AgeRestrictedTreatment.UNSPECIFIED)
                 .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
                 .build()
         )
         val info = UserMessagingPlatform.getConsentInformation(context)
         consent = info
-        val params = ConsentRequestParameters.Builder().setTagForUnderAgeOfConsent(true).build()
+        val params = ConsentRequestParameters.Builder().setTagForUnderAgeOfConsent(underAge).build()
         val act = activity()
         if (act == null) {
             startAdsIfAllowed()
@@ -84,7 +122,7 @@ class AdMobAds(
         val ad = rewardedAds.remove(kind)
         publishStatus()
         val allowed = consent?.canRequestAds() == true
-        if (ad == null || !allowed || act == null) {
+        if (ad == null || !allowed || act == null || disabledForSession) {
             onResult(false)
             return
         }
@@ -113,7 +151,13 @@ class AdMobAds(
 
     private fun startAdsIfAllowed() {
         val info = consent
-        if (info == null || !info.canRequestAds() || initialized) {
+        if (disabledForSession || info == null || !info.canRequestAds()) {
+            publishStatus()
+            return
+        }
+        if (initialized) {
+            loadRewarded(RewardKind.Coins)
+            loadRewarded(RewardKind.Pass)
             publishStatus()
             return
         }
@@ -128,14 +172,14 @@ class AdMobAds(
     /** Also called opportunistically from [showRewarded]/status reads, mirroring `getStatus()`. */
     private fun loadRewarded(kind: RewardKind) {
         val info = consent
-        if (!initialized || info == null || !info.canRequestAds()) return
+        if (disabledForSession || !initialized || info == null || !info.canRequestAds()) return
         if (rewardedAds.containsKey(kind) || loading.contains(kind)) return
         loading += kind
         val unit = if (isDebug) TEST_UNIT else if (kind == RewardKind.Coins) LIVE_COINS_UNIT else LIVE_PASS_UNIT
         RewardedAd.load(context, unit, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
                 loading -= kind
-                rewardedAds[kind] = ad
+                if (!disabledForSession) rewardedAds[kind] = ad
                 publishStatus()
             }
 
@@ -151,7 +195,7 @@ class AdMobAds(
         // Every status read is also a load-retry trigger, like the Java plugin's getStatus().
         loadRewarded(RewardKind.Coins)
         loadRewarded(RewardKind.Pass)
-        val allowed = consent?.canRequestAds() == true
+        val allowed = !disabledForSession && consent?.canRequestAds() == true
         state.value = AdsStatus(
             supported = true,
             ready = RewardKind.entries.filter { allowed && rewardedAds.containsKey(it) }.toSet(),

@@ -5,21 +5,19 @@
 - Android: AdMob-App-ID `ca-app-pub-1786159152036324~5284705514`.
 - Zwei freiwillige Rewarded-Ad-Blöcke: 30 Münzen (`ca-app-pub-1786159152036324/7854280106`) oder ein einstündiger Style-Pass (`ca-app-pub-1786159152036324/8020434087`).
 - Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten, außer den sieben seltenen animierten Skins. Diese gibt es nur für Münzen oder über ihren Erfolg, nicht über Anzeigen oder Echtgeld. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
-- Debug-Builds verwenden Googles Test-Anzeigenblock. Android fordert vor dem Laden den UMP-Datenschutzstatus an, setzt TFUA und Inhaltsbewertung G.
-- Der AdMob-App-Status ist noch „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe, korrekter Store-Verknüpfung und Prüfung der Datenschutzangaben zu erwarten.
+- Debug-Builds verwenden Googles Test-Anzeigenblock. Beim ersten Start fragt Birdy lokal nur die Altersgruppe 13–15 oder 16+ ab; ohne Auswahl werden keine Anzeigen geladen. Für 13–15 setzt Android TFUA bei UMP und die entsprechende Altersbehandlung `CHILD` bei AdMob, für 16+ läuft die UMP-Einwilligung. Die Auswahl kann im Startmenü geändert werden. Die maximale Anzeigen-Einstufung bleibt G.
+- Die EU-Einwilligungsnachricht „Birdy – EU-Einwilligung“ ist seit 28.09. in AdMob veröffentlicht. Die App ist noch nicht mit dem Play-Eintrag verknüpft; die AdMob-Suche fand sie bisher nicht. AdMob zeigt „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe und Store-Verknüpfung zu erwarten.
 
 ## Play Billing
 
-- Die Android-Billing-Library 9.1.0 ist eingebunden. Der Billing-Code in `native/androidApp` (Platform-Implementierung von `platform.Billing`) kann Produktdetails und lokalisierte Preise abfragen, Play-Kaufdialoge öffnen und bestehende Käufe abfragen.
-- Einzelne Skins und Welten gehören nach einem Echtgeldkauf dauerhaft dem Spieler. Die App verarbeitet Play-Kaufereignisse und stellt nicht verbrauchte Käufe wieder her. Eine serverseitige Prüfung von Kaufnachweisen und eine dauerhafte serverseitige Gutschriftenliste für Münzpakete fehlen noch. Bis dahin keine Produkte aktivieren oder den Build mit Echtgeldkäufen veröffentlichen.
+- Die Android-Billing-Library 9.1.0 ist eingebunden. Die native Brücke kann Produktdetails und lokalisierte Preise abfragen, Play-Kaufdialoge öffnen und bestehende Käufe abfragen.
+- Einzelne Skins und Welten sind dauerhaft kaufbar. Die App verarbeitet nur bestätigte `PURCHASED`-Käufe, fragt bestehende Käufe beim Start und nach der Rückkehr in die App erneut ab, bestätigt sie bei Play und entzieht beim erfolgreichen Abgleich nicht mehr vorhandene Kauf-Freischaltungen. Ohne Play-Verbindung bleibt das Spiel spielbar; Kaufangebote werden ausgeblendet. Eine serverseitige Kaufprüfung gibt es nicht. Das begrenzt den Schutz vor manipulierten Clients; Verbrauchsgüter werden deshalb nicht angeboten.
 - Ein „Werbung entfernen“-Kauf entfällt, weil Anzeigen ausschließlich freiwillig sind.
 
 ### Freigegebene Preise
 
 | Produkt-ID | Anzeige im Shop | Inhalt | Preis in Deutschland | Kaufart |
 | --- | --- | --- | ---: | --- |
-| `birdy_coins_500` | 500 Münzen | 500 Münzen für dauerhafte Shop-Freischaltungen | 0,99 € | Einmalkauf, wiederholbar |
-| `birdy_coins_1500` | 1.500 Münzen | 1.500 Münzen; rund 16 % günstiger je Münze als das kleine Paket | 2,49 € | Einmalkauf, wiederholbar |
 | `birdy_skin_<id>` | Einzelner Vogel-Skin | Dauerhafte Freischaltung des ausgewählten Skins | 0,99–1,99 € | Einmalkauf, dauerhaft |
 | `birdy_world_<id>` | Einzelne Welt | Dauerhafte Freischaltung der ausgewählten Welt | 1,99–3,49 € | Einmalkauf, dauerhaft |
 
@@ -29,12 +27,12 @@
 
 Alle diese Inhalte können weiterhin mit erspielten Münzen freigeschaltet werden. Im kostenlosen Spiel gibt es Tagesgeschenke, Missionen und Münzen aus Flügen; eine freiwillige Rewarded Ad gibt 30 Münzen. Echtgeldkäufe sind direkte, dauerhafte Freischaltungen. Der Style-Pass ist ausschließlich über eine freiwillige Anzeige erhältlich und verfällt nach einer Stunde. Preise außerhalb Deutschlands werden von Google Play lokalisiert und im Shop aus Play-Produktdetails angezeigt.
 
-**Status (28. September 2026):** Produktumfang und deutsche Preise wurden vom Herausgeber freigegeben. Das signierte Bundle mit `BILLING`-Berechtigung (versionCode `26092801`) wurde in Play hochgeladen und liegt als nicht ausgelieferter Entwurf im internen Track. Das Dienstkonto hat nun die Birdy-Berechtigung „App-Präsenz im Play Store verwalten“; der zuvor fehlschlagende Preis-API-Aufruf liefert HTTP 200. Der Versuch, `birdy_coins_500` als Entwurf anzulegen, wird weiterhin mit HTTP 400 und „request billing permission“ abgewiesen. Play erkennt die `BILLING`-Berechtigung offenbar erst nach einem ausgelieferten Build; derzeit sind keine Play-Produkte angelegt oder aktiviert.
+**Status (28. September 2026):** Der freizugebende Build ist ausschließlich die native Kotlin-App (`native/androidApp`). Die zuvor geplanten Münzpakete wurden aus ihr entfernt. Ihr Release-Bundle baut lokal; es wurde noch nicht auf einen Track hochgeladen. Ein älterer Capacitor-Entwurf mit `BILLING`-Berechtigung (versionCode `26092801`) liegt nicht ausgeliefert im internen Track und wird nicht veröffentlicht. Das Dienstkonto hat die Birdy-Berechtigung „App-Präsenz im Play Store verwalten“; der Preis-API-Aufruf liefert HTTP 200. Ein früherer Versuch, ein Münzpaket anzulegen, wurde mit HTTP 400 und „request billing permission“ abgewiesen; dabei entstand kein Produkt. Play muss zunächst den Kotlin-Build mit `BILLING`-Berechtigung auf einem Test-Track ausliefern, bevor die dauerhaften Produkte angelegt werden können.
 
 ## Vor einem Test-Release mit Monetarisierung
 
-1. Produktumfang und Preise festlegen, Play-Produkte anlegen und mit lizenzierten Testkonten testen.
-2. Kaufnachweise zuverlässig validieren, doppelte Gutschriften und Erstattungen behandeln sowie Käufe nach Neuinstallation wiederherstellen.
-3. Datenschutzerklärung veröffentlichen; Play-Datensicherheit und Angaben zu Werbung/Käufen aktualisieren.
+1. Test-Build mit `BILLING`-Berechtigung ausliefern, danach ausschließlich die freigegebenen dauerhaften Play-Produkte anlegen und mit lizenzierten Testkonten testen.
+2. Wiederherstellung, Kaufbestätigung, ausstehende Käufe und Erstattungen auf einem Play-Testgerät prüfen.
+3. Gespeicherte Play-Datensicherheitsangaben zur Prüfung einreichen und auf einem Testgerät verifizieren; die Datenschutzerklärung und Werbe-Angabe sind bereits aktualisiert.
 4. AdMob-App prüfen und mit dem Play-Store-Eintrag verknüpfen; Test- und Live-Anzeigen auf einem echten Android-Gerät prüfen.
-5. Erst nach diesen Schritten die Repository-Variable `BIRDY_MONETIZATION_RELEASE_READY` auf `true` setzen. Bis dahin überspringt der GitHub-Workflow die Play-Veröffentlichung, auch wenn die Änderungen bereits in `main` liegen.
+5. Für den ersten Kotlin-Testupload nach Abschluss der Play-Pflichtangaben `BIRDY_MONETIZATION_RELEASE_READY` auf `true` setzen. Danach Produkte anlegen und den Test auf einem Play-Gerät abschließen. Bis zur Freigabe überspringt der Workflow die Veröffentlichung.

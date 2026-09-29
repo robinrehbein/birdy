@@ -30,7 +30,6 @@ import de.robinrehbein.birdy.platform.SharedPrefsKeyValueStore
 import de.robinrehbein.birdy.platform.WebViewLegacyMigration
 import de.robinrehbein.birdy.platform.ads.AdMobAds
 import de.robinrehbein.birdy.platform.billing.PlayBilling
-import de.robinrehbein.birdy.platform.purchase.PurchaseGrant
 import de.robinrehbein.birdy.platform.purchase.PurchaseProcessor
 import de.robinrehbein.birdy.ui.BirdyApp
 import java.lang.ref.WeakReference
@@ -88,13 +87,7 @@ class MainActivity : ComponentActivity() {
             billing = billing,
             progress = { game.progress },
             runOnGame = { game.runOnGameThread(it) },
-            onGrant = { grant ->
-                val coins = when (grant) {
-                    is PurchaseGrant.Coins -> grant.amount
-                    is PurchaseGrant.Permanent -> 0
-                }
-                game.post(UiCommand.PurchaseGranted(coins))
-            },
+            onGrant = { game.post(UiCommand.PurchaseGranted) },
         )
         billing.onPurchaseFlowEnded = { failed -> game.post(UiCommand.PurchaseEnded(failed)) }
         billing.onRestore = { owned -> purchases.syncOwnedPurchases(owned) }
@@ -119,6 +112,7 @@ class MainActivity : ComponentActivity() {
                         }
                         is UiEffect.LaunchPurchase -> billing.launchPurchase(effect.productId)
                         UiEffect.ShowPrivacyOptions -> ads.showPrivacyOptions()
+                        UiEffect.ShowAgeSettings -> ads.showAgeSettings()
                     }
                 }
             }

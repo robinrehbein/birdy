@@ -7,7 +7,7 @@ import java.nio.IntBuffer
 
 /**
  * Growable direct buffers reused across GL calls on JVM platforms (Android, desktop), so array
- * uploads in the [Gl] facade don't allocate per call. Not thread-safe: one instance per GL thread.
+ * uploads in the [GlApi] facade don't allocate per call. Not thread-safe: one instance per GL thread.
  */
 class NioScratch {
     private var bytes: ByteBuffer = ByteBuffer.allocateDirect(64 * 1024).order(ByteOrder.nativeOrder())

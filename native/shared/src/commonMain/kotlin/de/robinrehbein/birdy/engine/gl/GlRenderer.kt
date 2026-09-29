@@ -32,7 +32,7 @@ import kotlin.math.roundToInt
  * instancing (matrices + colours), shader patches, custom shader materials, frustum culling,
  * resolution scaling with optional MSAA, and lazy GPU re-creation after context loss.
  */
-class GlRenderer(internal val gl: Gl) : RenderBackend {
+class GlRenderer(internal val gl: GlApi) : RenderBackend {
     override var resolutionScale = 1f
     override var shadowsEnabled = true
     override val stats = RenderStats()

@@ -115,6 +115,7 @@ fun StartMenuScreen(
             Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.Center) {
                 val uri = LocalUriHandler.current
                 TextLink(strings.t("privacy"), { runCatching { uri.openUri(PRIVACY_URL) } })
+                Box(Modifier.padding(start = 12.dp)) { TextLink(strings.t("adAgeSettings"), { onCommand(UiCommand.AdAgeSettings) }) }
                 if (ui.adPrivacy) {
                     Box(Modifier.padding(start = 12.dp)) { TextLink(strings.t("adPrivacy"), { onCommand(UiCommand.AdPrivacy) }) }
                 }

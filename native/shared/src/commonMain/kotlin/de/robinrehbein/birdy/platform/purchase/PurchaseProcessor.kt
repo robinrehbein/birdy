@@ -18,7 +18,7 @@ private const val STATE_PURCHASED = 1
  * but [ProgressRepository] is only safe to touch from the game thread (ARCHITECTURE.md). Callers
  * that are already certain to be on the game thread (e.g. tests) may pass `{ it() }`.
  *
- * [onGrant] mirrors `billing.js`'s `onGrant` hook (coins/permanent toasts); it is invoked on the
+ * [onGrant] reports a new permanent entitlement; it is invoked on the
  * game thread, inside the same [runOnGame] dispatch as the grant itself.
  *
  * [progress] is resolved lazily (not at construction) so the app shell can build this before
@@ -41,7 +41,7 @@ class PurchaseProcessor(
 
     /**
      * `billing.js:34-58`. Only [STATE_PURCHASED] grants anything; every product id in the
-     * purchase is processed independently (coin pack vs. permanent item).
+     * purchase is processed independently for each permanent item.
      */
     fun handlePurchase(purchase: StorePurchase) {
         if (!isGrantable(purchase)) return
@@ -54,21 +54,9 @@ class PurchaseProcessor(
     /** Must run on the game thread. */
     private fun grant(purchase: StorePurchase) {
         for (id in purchase.products) {
-            if (ProductIds.coinIds.contains(id)) {
-                handleCoinPack(id, purchase)
-            } else if (ProductIds.isPermanent(id)) {
+            if (ProductIds.isPermanent(id)) {
                 handlePermanent(id, purchase)
             }
-        }
-    }
-
-    private fun handleCoinPack(id: String, purchase: StorePurchase) {
-        val credited = progress().grantPurchasedCoins(id, purchase.token)
-        if (credited > 0) onGrant(PurchaseGrant.Coins(id, credited))
-        // Consume if just credited, or if this token was already credited in a past run (a
-        // consume that failed after the coins were saved) — never re-credit, always retry consume.
-        if (credited > 0 || progress().hasProcessedPurchase(purchase.token)) {
-            billing.consume(purchase.token) { /* swallow: retried on the next restore/refresh */ }
         }
     }
 
@@ -76,7 +64,7 @@ class PurchaseProcessor(
         // null = local save failed: skip both the grant callback and acknowledge (platform.md
         // §2.4) so Play keeps offering it as unacknowledged and it is retried later.
         val newlyOwned = progress().grantPaidProduct(id) ?: return
-        if (newlyOwned) onGrant(PurchaseGrant.Permanent(id))
+        if (newlyOwned) onGrant(PurchaseGrant(id))
         if (!purchase.acknowledged) {
             billing.acknowledge(purchase.token) { /* swallow: retried on the next restore/refresh */ }
         }
@@ -86,7 +74,7 @@ class PurchaseProcessor(
      * `billing.js:60-82` minus the single-flight/network parts, which live in [Billing] itself:
      * overwrites [ProgressRepository]'s authoritative paid-product set from every currently owned
      * purchase, then replays [handlePurchase] for each (idempotent via the token/product dedup
-     * inside [progress]) so interrupted consume/acknowledge flows are retried. If persisting the
+     * inside [progress]) so interrupted acknowledgement flows are retried. If persisting the
      * synced set fails, nothing is replayed (`if (!progress.syncPaidProducts(paid)) return;`).
      */
     fun syncOwnedPurchases(purchases: List<StorePurchase>) {
@@ -102,9 +90,4 @@ class PurchaseProcessor(
     }
 }
 
-/** Mirrors `billing.js`'s `onGrant({ id, coins })` / `onGrant({ id, permanent: true })`. */
-sealed class PurchaseGrant {
-    abstract val productId: String
-    data class Coins(override val productId: String, val amount: Int) : PurchaseGrant()
-    data class Permanent(override val productId: String) : PurchaseGrant()
-}
+data class PurchaseGrant(val productId: String)

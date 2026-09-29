@@ -5,7 +5,7 @@ import de.robinrehbein.birdy.engine.scene.Scene
 
 /**
  * Platform-neutral renderer API. The Android and desktop implementation is
- * [de.robinrehbein.birdy.engine.gl.GlRenderer] on top of the [de.robinrehbein.birdy.engine.gl.Gl]
+ * [de.robinrehbein.birdy.engine.gl.GlRenderer] on top of the [de.robinrehbein.birdy.engine.gl.GlApi]
  * facade; an iOS Metal backend would implement this interface directly.
  *
  * All methods must be called on the thread that owns the graphics context.

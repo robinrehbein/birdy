@@ -1,6 +1,6 @@
 # Play-Store-Vorbereitung
 
-Stand: 27. September 2026. Version 1.0.3 (versionCode 4) ist im internen und im geschlossenen
+Stand: 28. September 2026. Version 1.0.3 (versionCode 4) ist im internen und im geschlossenen
 Alpha-Test verfügbar. Die aktualisierten deutschen und englischen Store-Texte sowie sieben neue
 deutsche Screenshots sind zur Prüfung eingereicht.
 
@@ -11,17 +11,21 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 - [Interner Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4700770597020690505)
 - [Interner Testbeitritt](https://play.google.com/apps/internaltest/4700770597020690505)
 - [Geschlossener Alpha-Test](https://play.google.com/console/u/0/developers/7715182646695737952/app/4976256029001868876/tracks/4699009912977551786)
-- Tester-Liste „Tester“: 4 Personen; für Produktionszugriff verlangt Google mindestens 12
-  angemeldete Tester im geschlossenen Test über 14 Tage.
+- Tester-Liste „Tester“: 4 Personen; diese Liste ist bereits unter **Einstellungen → Lizenztest**
+  ausgewählt. Im geschlossenen Test ist derzeit eine Person angemeldet. Für Produktionszugriff
+  verlangt Google mindestens 12 angemeldete Tester über 14 Tage; Produktion ist hier nicht Teil
+  des Releases.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
 - Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die neuen
   deutschen Screenshots sind zur Prüfung eingereicht; Englisch nutzt aktuell die deutschen
   Grafiken als Fallback.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
-- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7. Die bisherige
-  Datensicherheitsangabe „keine Datenerhebung“ gilt nur für den bereits veröffentlichten Build.
-  Vor einem Release mit AdMob und Play Billing muss der Fragebogen neu beantwortet werden.
+- Entwickler-Website: <https://robinrehbein.github.io/>; die zugehörige
+  [app-ads.txt](https://robinrehbein.github.io/app-ads.txt) enthält die AdMob-Publisher-ID.
+- Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7; unverändert.
+- Werbung ist in Play als vorhanden deklariert. Die neuen Datensicherheitsangaben sind gespeichert,
+  aber noch nicht über „Veröffentlichungen – Übersicht“ zur Prüfung eingereicht.
 - Google Play Games auf dem PC wurde deaktiviert. Die ausstehende Aktivierung wurde vor der
   Einreichung aus der Änderungsliste entfernt.
 
@@ -29,21 +33,21 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB), signiert | ✅ `ANDROID_HOME=/Users/robinrehbein/Library/Android/sdk ./gradlew :androidApp:bundleRelease` (in `native/`) erfolgreich; Bundle 1.0.3 (Capacitor-Vorgänger) von Google Play angenommen |
+| Release-Bundle (AAB) | ✅ Kotlin-Bundle baut lokal; CI-Signatur und Play-Annahme erst beim Test-Upload zu bestätigen |
 | Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
-| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ in `main`, Veröffentlichung gesperrt bis `BIRDY_MONETIZATION_RELEASE_READY` (siehe `docs/MONETIZATION.md`) |
+| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ Kotlin-Release im PR in Vorbereitung; Veröffentlichung gesperrt bis `BIRDY_MONETIZATION_RELEASE_READY` (siehe `docs/MONETIZATION.md`) |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
 | Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
-| Store-Texte DE/EN | ✅ unten |
+| Store-Texte DE/EN | ✅ aktualisiert und am 28.09. in Play als Entwurf gespeichert; Einreichung offen |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
-| Angaben zur Datensicherheit für Monetarisierung | ⚠️ Play-Console-Fragebogen vor Release aktualisieren |
+| Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen am 28.09. gespeichert; ⚠️ Einreichung zur Prüfung offen |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
-| Test auf echten Geräten | ⚠️ noch offen (fps-Anzeige: 5× auf den Titel tippen) |
+| Test auf Play-Gerät | ⚠️ Debug-APK startet im lokalen Emulator; dessen Play-Dienste sind für AdMob zu alt. Consent, Rewarded Ads und Testkäufe benötigen ein aktuelles Play-Testgerät. |
 
 ## Entscheidungen und verbleibende Schritte
 
@@ -160,8 +164,8 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 > 📅 **Jeden Tag etwas Neues:** Tagesmissionen, Erfolge und ein Tagesgeschenk mit Serien-Bonus.
 >
 > Kostenlos spielbar, ohne Konto. Freiwillige Videoanzeigen geben Münzen oder eine Stunde
-> Zugang zu Skins und Welten. Einzelne Skins und Welten sind dauerhaft kaufbar; Münzpakete
-> sind optional. Eine Internetverbindung wird für Anzeigen und Käufe benötigt.
+> Zugang zu Skins und Welten. Einzelne Skins und Welten sind dauerhaft kaufbar.
+> Eine Internetverbindung wird für Anzeigen und Käufe benötigt.
 
 ## Store listing – English
 
@@ -194,23 +198,29 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 > 📅 **Something new every day:** daily missions, awards and a daily gift with a streak bonus.
 >
 > Free to play, with no account required. Optional video ads grant coins or one hour of
-> access to skins and worlds. Individual skins and worlds can be bought permanently;
-> coin packs are optional. Ads and purchases require an internet connection.
+> access to skins and worlds. Individual skins and worlds can be bought permanently.
+> Ads and purchases require an internet connection.
 
 **Kategorie:** Spiele → Arcade.
 **Tags:** Arcade, Auto-Runner, Casual.
 
 ## Datenschutz und Datensicherheit für den Monetarisierungs-Build
 
-Die neue Datenschutzerklärung liegt in `docs/privacy/index.html`. Vor der Veröffentlichung
-dieses Builds muss die GitHub-Pages-Seite mit dieser Fassung aktualisiert werden.
+Die Datenschutzerklärung liegt unter <https://robinrehbein.github.io/birdy/privacy/>.
 
-Die bisherige Play-Console-Erklärung zum veröffentlichten Build gibt „keine Datenerhebung“,
-„keine Werbung“ und „keine In-App-Käufe“ an. Sie ist für den neuen Build falsch. Vor einem
-Test-Release in der Play Console Werbung und In-App-Käufe angeben und den
-Datensicherheitsfragebogen anhand der tatsächlichen AdMob-, UMP- und Play-Billing-SDK-Daten
-neu ausfüllen. Die Übermittlung durch Google-SDKs darf nicht als „keine Daten“ deklariert
-werden. Die Angaben müssen nach einem Test auf einem echten Gerät geprüft werden.
+Der Play-Fragebogen wurde am 28.09.2026 mit „Datenerhebung/Weitergabe: Ja“ gespeichert.
+Erfasst und weitergegeben: ungefährer Standort (IP), bisherige Käufe, App-Interaktionen,
+Diagnosedaten, andere App-Leistungsdaten und Geräte-/andere IDs. Übertragung verschlüsselt:
+Ja. Es gibt kein Birdy-Konto und keinen eigenen Server. Die Angabe wartet auf Einreichung
+über „Veröffentlichungen – Übersicht“ und muss auf einem Play-Testgerät geprüft werden.
+
+### Quellen und geprüfte technische Fakten (28. September 2026)
+
+- [Google Mobile Ads SDK 25.5.0: Play Data Disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure): Das SDK überträgt IP-Adresse, Nutzungsinteraktionen, Diagnosedaten und Gerätekennungen an Google für Werbung, Analyse und Betrugsprävention; Google nennt TLS für die Übertragung. Die IP kann zur ungefähren Standortbestimmung dienen.
+- [Google UMP: Android-Integration](https://developers.google.com/admob/android/privacy): Der Consent-Status wird beim App-Start nach der lokalen Alterswahl aktualisiert; eine notwendige Nachricht wird aus der in AdMob veröffentlichten Konfiguration geladen. Die Nachricht „Birdy – EU-Einwilligung“ ist in AdMob seit 28.09. als „Veröffentlicht“ bestätigt (Englisch und Deutsch, mit Ablehnen-Option).
+- [Google UMP: Nutzer unter dem Einwilligungsalter](https://developers.google.com/admob/android/privacy/gdpr) und [AdMob-Anzeigen-Targeting](https://developers.google.com/admob/android/targeting): TFUA unterdrückt den Consent-Dialog. Birdy setzt TFUA für 13–15 bei UMP und die entsprechende AdMob-Altersbehandlung `CHILD`; für 16+ nutzt es UMP ohne TFUA und die AdMob-Altersbehandlung `UNSPECIFIED`. Ohne Alterswahl lädt es keine Werbung. Die maximale Anzeigen-Einstufung bleibt G. Die Altersgruppe wird nur lokal gespeichert und ist im Startmenü änderbar.
+- [Google Play Billing: Integration und Kaufzustände](https://developer.android.com/google/play/billing/integrate): Käufe werden über Google Play abgewickelt. Birdy fragt bestehende Käufe ab und verarbeitet lokal Produkt-ID, Token und Kaufzustand; es gibt kein Birdy-Konto und keinen eigenen Kaufserver. Käufe werden erst im Zustand `PURCHASED` freigeschaltet und anschließend bestätigt.
+- Das native Manifest entfernt `com.google.android.gms.permission.AD_ID` ausdrücklich. Der Release-Merge enthält `BILLING` und `android.permission.ACCESS_ADSERVICES_AD_ID`, aber keine klassische `AD_ID`-Berechtigung. Die Play-Frage zur **klassischen Android-Werbe-ID** ist deshalb mit „Nein“ beantwortet; Gerätekennungen aus dem Ads-SDK sind im Datensicherheitsformular dennoch angegeben.
 
 **Einstufung (IARC-Fragebogen):**
 - Keine Gewalt gegen Figuren, kein Blut; der Vogel stößt nur gegen Röhren.

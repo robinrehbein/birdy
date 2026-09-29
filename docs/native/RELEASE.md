@@ -32,10 +32,8 @@ If the file doesn't exist, `assembleRelease`/`bundleRelease` still succeed but p
 attaches it) — this matches the old Capacitor `build.gradle`'s behaviour and is why
 `assembleRelease` is safe to run in the acceptance build on this machine (no keystore present).
 
-`minifyEnabled` stays `false`, matching the Capacitor app (no ProGuard/R8 shrink-and-obfuscate
-pass has been tested against the KMP/Compose bytecode yet — turn it on only after verifying a
-release build still runs, since Compose/coroutines/kotlinx.serialization reflection-ish paths
-are common R8 footguns).
+The release build enables R8 minification and resource shrinking. A local bundle and lint
+build passed on 28 September 2026; device installation and purchase flows still need testing.
 
 ## versionCode / versionName
 
@@ -74,7 +72,7 @@ build on the *same* Play Console app entry (numeric id `4976256029001868876`, se
 
 `.github/workflows/play-release.yml` builds and publishes the **native** app:
 
-1. **Build step**: `cd native && ./gradlew :androidApp:bundleRelease`, producing
+1. **Build step**: `cd native && ./gradlew :shared:testDebugUnitTest :androidApp:bundleRelease`, producing
    `native/androidApp/build/outputs/bundle/release/androidApp-release.aab`. `publish_play.py`
    uploads that `.aab`; its Android Publisher API logic (edit/upload/track/commit) only cares
    about the `.aab` bytes and the package name, unchanged from the Capacitor era.
@@ -84,9 +82,9 @@ build on the *same* Play Console app entry (numeric id `4976256029001868876`, se
    property, and the release-notes text are unchanged from the Capacitor pipeline — all of that
    is pure Android-Publisher-API plumbing that doesn't know or care which Gradle project produced
    the `.aab`.
-4. **Remaining steps before a real rollout**: verify an install/update over an existing Capacitor
-   install on a real device, including the legacy-progress migration (see below), on the
-   `internal` track first, before relying on the closed test track or production.
+4. **Remaining checks**: verify an install/update over an existing Capacitor install,
+   including legacy-progress migration (see below), on a Play test device. The pipeline
+   uploads to `internal` and the closed `alpha` test track only.
 5. Repository variables (`PLAY_PUBLISH_ENABLED`, `BIRDY_MONETIZATION_RELEASE_READY`,
    `PLAY_CLOSED_TRACK`) and secrets (`UPLOAD_KEYSTORE_BASE64`, `UPLOAD_STORE_PASSWORD`,
    `UPLOAD_KEY_ALIAS`, `UPLOAD_KEY_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`) are unchanged from the

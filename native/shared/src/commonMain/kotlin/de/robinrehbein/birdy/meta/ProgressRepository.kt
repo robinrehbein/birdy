@@ -47,10 +47,8 @@ interface ProgressRepository {
     fun grantStylePass(): Boolean
 
     // --- billing entitlements (platform.md §2.6) ---
-    fun grantPurchasedCoins(productId: String, token: String): Int
     /** true = newly owned, false = already owned, null = save failed (do not acknowledge). */
     fun grantPaidProduct(productId: String): Boolean?
     /** Overwrites the paid-product set; false = save failed (skip replaying grants). */
     fun syncPaidProducts(productIds: List<String>): Boolean
-    fun hasProcessedPurchase(token: String): Boolean
 }

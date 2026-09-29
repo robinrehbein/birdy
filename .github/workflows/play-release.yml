@@ -42,7 +42,7 @@ jobs:
           UPLOAD_KEY_PASSWORD: ${{ secrets.UPLOAD_KEY_PASSWORD }}
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
         run: python3 scripts/configure_play_ci.py
-      - name: Build signed bundle
+      - name: Build signed Kotlin bundle
         run: |
           # Play version codes must rise above every uploaded bundle, including
           # draft bundles. Reserve four digits per UTC day for runs/retries.
@@ -52,7 +52,8 @@ jobs:
             exit 1
           fi
           export BIRDY_VERSION_CODE=$(( $(date -u +%s) / 86400 * 10000 + suffix ))
-          cd native && ./gradlew :androidApp:bundleRelease --console=plain
+          cd native
+          ./gradlew :shared:testDebugUnitTest :androidApp:bundleRelease --console=plain
       - name: Publish internal and closed Alpha tests
         env:
           PLAY_CLOSED_TRACK: ${{ vars.PLAY_CLOSED_TRACK || 'alpha' }}

@@ -20,7 +20,6 @@ data class ProgressData(
     /** Epoch millis; style pass active while now < this. */
     val stylePassUntil: Long = 0,
     val paidProducts: List<String> = emptyList(),
-    val processedPurchases: List<String> = emptyList(),
     val tutorialDone: Boolean = false,
     val trails: List<String> = listOf("none"),
     val trail: String = "none",

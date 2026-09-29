@@ -70,10 +70,8 @@ class FakeProgress(
     override fun grantRewardedCoins(): Int = 0
     override val stylePassMinutesLeft: Int get() = 0
     override fun grantStylePass(): Boolean = false
-    override fun grantPurchasedCoins(productId: String, token: String): Int = 0
     override fun grantPaidProduct(productId: String): Boolean? = false
     override fun syncPaidProducts(productIds: List<String>) = true
-    override fun hasProcessedPurchase(token: String): Boolean = false
 }
 
 /** A simulation with a fake progress store and a recorded event list. */
