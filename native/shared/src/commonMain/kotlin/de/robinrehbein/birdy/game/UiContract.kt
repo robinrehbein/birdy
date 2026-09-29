@@ -242,6 +242,7 @@ data class ShopUi(
     /** Real-money buy for the selected skin/world; [realBuyProductId] is what to request. */
     val realBuy: ButtonUi?,
     val realBuyProductId: String?,
+    val removeAdsBuy: ButtonUi? = null,
     val billingBusy: Boolean,
 )
 
@@ -323,6 +324,7 @@ sealed class UiCommand {
     data class RequestRewardedAd(val kind: RewardKind) : UiCommand()
     /** Result of [UiEffect.ShowRewardedAd] (earned or not). */
     data class RewardResult(val kind: RewardKind, val earned: Boolean) : UiCommand()
+    data class InterstitialShown(val shown: Boolean) : UiCommand()
     /** Ad-privacy button: emits [UiEffect.ShowPrivacyOptions]. */
     data object AdPrivacy : UiCommand()
     /** Reopen the local age-group choice for optional ads. */
@@ -346,6 +348,7 @@ sealed class UiCommand {
 sealed class UiEffect {
     data object ExitApp : UiEffect()
     data class ShowRewardedAd(val kind: RewardKind) : UiEffect()
+    data object ShowInterstitialAd : UiEffect()
     data class LaunchPurchase(val productId: String) : UiEffect()
     data object ShowPrivacyOptions : UiEffect()
     data object ShowAgeSettings : UiEffect()

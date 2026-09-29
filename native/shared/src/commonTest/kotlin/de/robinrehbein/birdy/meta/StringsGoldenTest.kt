@@ -16,7 +16,7 @@ class StringsGoldenTest {
         val de = golden["de"]!!.jsonObject
         val en = golden["en"]!!.jsonObject
         assertEquals(de.keys, en.keys)
-        assertEquals(de.keys, TableStrings.STRINGS.keys, "key set must match i18n.js exactly")
+        assertEquals(de.keys, TableStrings.STRINGS.keys, "Kotlin strings must match the documented translation table")
         val storage = MemoryKeyValueStore()
         val strDe = TableStrings(storage, "de-DE")
         val strEn = TableStrings(storage, "en-US")

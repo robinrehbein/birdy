@@ -36,6 +36,8 @@ import de.robinrehbein.birdy.meta.WorldItem
 import de.robinrehbein.birdy.platform.AdsStatus
 import de.robinrehbein.birdy.platform.BillingStatus
 import de.robinrehbein.birdy.platform.PlatformServices
+import de.robinrehbein.birdy.platform.ads.InterstitialPacing
+import de.robinrehbein.birdy.platform.purchase.ProductIds
 import de.robinrehbein.birdy.view.FrameInfo
 import de.robinrehbein.birdy.view.SceneView
 import de.robinrehbein.birdy.view.bird.BirdLook
@@ -82,6 +84,7 @@ class GameSession(
     private val pending = ArrayList<GameEvent>()
     val sim = GameSimulation(progress, simRandom) { pending += it }
     val settings = Settings(services.storage)
+    private val interstitialPacing = InterstitialPacing(services.storage, services.clock)
     val rig = CameraRig(camera, uiRandom)
     val input = InputMapper(rig)
     val toasts = ToastQueue()
@@ -303,6 +306,7 @@ class GameSession(
             is UiCommand.ClaimGift -> claimGift()
             is UiCommand.RewardEarned -> shop.adResult(cmd.kind, true)
             is UiCommand.RewardResult -> shop.adResult(cmd.kind, cmd.earned)
+            is UiCommand.InterstitialShown -> if (cmd.shown) interstitialPacing.markShown()
             is UiCommand.RequestRewardedAd -> shop.requestAd(cmd.kind)
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
             is UiCommand.AdAgeSettings -> emitEffect(UiEffect.ShowAgeSettings)
@@ -520,6 +524,11 @@ class GameSession(
                 audio.setMode(MusicMode.Menu)
                 summary = e.summary
                 gameOverUi = texts.gameOver(e.summary)
+                interstitialPacing.onRunFinished(e.summary.time)
+                if (interstitialPacing.canShow(
+                        services.ads?.status?.value?.interstitialReady == true,
+                        ProductIds.REMOVE_ADS in progress.data.value.paidProducts,
+                    )) emitEffect(UiEffect.ShowInterstitialAd)
                 val r = e.summary.result
                 if (r.completed.isNotEmpty() || r.achievements.isNotEmpty() || s.coins > 0) walletBump++
             }

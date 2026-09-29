@@ -8,6 +8,8 @@ import com.google.android.gms.ads.AgeRestrictedTreatment
 import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.ump.ConsentInformation
@@ -23,6 +25,8 @@ import kotlinx.coroutines.flow.StateFlow
 private const val TEST_UNIT = "ca-app-pub-3940256099942544/5224354917"
 private const val LIVE_COINS_UNIT = "ca-app-pub-1786159152036324/7854280106"
 private const val LIVE_PASS_UNIT = "ca-app-pub-1786159152036324/8020434087"
+private const val TEST_INTERSTITIAL_UNIT = "ca-app-pub-3940256099942544/1033173712"
+private const val LIVE_INTERSTITIAL_UNIT = "ca-app-pub-1786159152036324/6477156238"
 
 /**
  * Port of `ads.js` + `BirdyAdsPlugin.java` (platform.md §1) onto the Google Mobile Ads SDK + UMP.
@@ -41,6 +45,8 @@ class AdMobAds(
 
     private val rewardedAds = HashMap<RewardKind, RewardedAd>()
     private val loading = HashSet<RewardKind>()
+    private var interstitial: InterstitialAd? = null
+    private var loadingInterstitial = false
     private var consent: ConsentInformation? = null
     private var initialized = false
     private var disabledForSession = false
@@ -67,14 +73,15 @@ class AdMobAds(
                 // Previously loaded ads must never be shown with the wrong age treatment.
                 disabledForSession = true
                 rewardedAds.clear()
+                interstitial = null
                 publishStatus()
                 act.recreate()
             }
         }
         AlertDialog.Builder(act)
             .setTitle(if (german) "Altersgruppe für Werbung" else "Age group for ads")
-            .setMessage(if (german) "Birdy zeigt nur freiwillige Werbung. Wähle deine Altersgruppe, damit Anzeigen und Einwilligung richtig behandelt werden. Die Auswahl bleibt nur auf diesem Gerät."
-                else "Birdy shows only optional ads. Choose your age group so ads and consent are handled correctly. This choice stays on this device.")
+            .setMessage(if (german) "Ab 16 zeigt Birdy nach längerer Spielzeit gelegentlich eine Anzeige zwischen Runden. Freiwillige Belohnungsanzeigen bleiben verfügbar. Wähle deine Altersgruppe für passende Anzeigen und Einwilligung. Die Auswahl bleibt auf diesem Gerät."
+                else "At 16+, Birdy occasionally shows an ad between rounds after extended play. Optional reward ads remain available. Choose your age group for appropriate ads and consent. This choice stays on this device.")
             .setNegativeButton("13–15") { _, _ -> choose("13-15") }
             .setPositiveButton("16+") { _, _ -> choose("16+") }
             .setNeutralButton(if (german) "Später" else "Later") { _, _ -> }
@@ -143,6 +150,36 @@ class AdMobAds(
         ad.show(act) { earned = true }
     }
 
+    override fun showInterstitial(onResult: (shown: Boolean) -> Unit) {
+        val act = activity()
+        val ad = interstitial
+        interstitial = null
+        publishStatus()
+        if (ad == null || act == null || act.isFinishing || act.isDestroyed || !interstitialAllowed()) {
+            onResult(false)
+            return
+        }
+        var reported = false
+        ad.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdShowedFullScreenContent() {
+                reported = true
+                onResult(true)
+            }
+
+            override fun onAdDismissedFullScreenContent() {
+                if (!reported) onResult(false)
+                loadInterstitial()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(error: com.google.android.gms.ads.AdError) {
+                if (!reported) onResult(false)
+                loadInterstitial()
+            }
+        }
+        ad.setImmersiveMode(true)
+        ad.show(act)
+    }
+
     override fun showPrivacyOptions() {
         val info = consent ?: return
         val act = activity() ?: return
@@ -159,6 +196,7 @@ class AdMobAds(
         if (initialized) {
             loadRewarded(RewardKind.Coins)
             loadRewarded(RewardKind.Pass)
+            loadInterstitial()
             publishStatus()
             return
         }
@@ -166,6 +204,7 @@ class AdMobAds(
             initialized = true
             loadRewarded(RewardKind.Coins)
             loadRewarded(RewardKind.Pass)
+            loadInterstitial()
             publishStatus()
         }
     }
@@ -192,14 +231,36 @@ class AdMobAds(
         })
     }
 
+    private fun interstitialAllowed(): Boolean = !disabledForSession &&
+        agePreferences.getString("group", null) == "16+" && consent?.canRequestAds() == true
+
+    private fun loadInterstitial() {
+        if (!initialized || !interstitialAllowed() || interstitial != null || loadingInterstitial) return
+        loadingInterstitial = true
+        val unit = if (isDebug) TEST_INTERSTITIAL_UNIT else LIVE_INTERSTITIAL_UNIT
+        InterstitialAd.load(context, unit, AdRequest.Builder().build(), object : InterstitialAdLoadCallback() {
+            override fun onAdLoaded(ad: InterstitialAd) {
+                loadingInterstitial = false
+                if (interstitialAllowed()) interstitial = ad
+                publishStatus()
+            }
+
+            override fun onAdFailedToLoad(error: com.google.android.gms.ads.LoadAdError) {
+                loadingInterstitial = false
+            }
+        })
+    }
+
     private fun publishStatus() {
         // Every status read is also a load-retry trigger, like the Java plugin's getStatus().
         loadRewarded(RewardKind.Coins)
         loadRewarded(RewardKind.Pass)
+        loadInterstitial()
         val allowed = !disabledForSession && consent?.canRequestAds() == true
         state.value = AdsStatus(
             supported = true,
             ready = RewardKind.entries.filter { allowed && rewardedAds.containsKey(it) }.toSet(),
+            interstitialReady = interstitialAllowed() && interstitial != null,
             privacyOptionsRequired = consent?.privacyOptionsRequirementStatus ==
                 ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED,
         )

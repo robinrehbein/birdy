@@ -116,6 +116,8 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
                 "All birds & worlds unlocked for 1 hour (except rare ones)!",
             ),
             "realBuy" to LocalizedText("Dauerhaft kaufen · {price} Echtgeld", "Own forever · {price} real money"),
+            "removeAdsBuy" to LocalizedText("Automatische Werbung dauerhaft entfernen · {price}", "Remove automatic ads forever · {price}"),
+            "removeAdsOwned" to LocalizedText("Automatische Werbung entfernt · freiwillige Anzeigen bleiben", "Automatic ads removed · optional ads remain"),
             "purchaseGranted" to LocalizedText("Dauerhaft freigeschaltet!", "Unlocked permanently!"),
             "purchaseUnavailable" to LocalizedText("Kauf gerade nicht möglich", "Purchase unavailable right now"),
             "achTitle" to LocalizedText("Erfolge", "Awards"),

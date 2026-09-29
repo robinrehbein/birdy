@@ -14,6 +14,7 @@ import de.robinrehbein.birdy.game.GameMode
 import de.robinrehbein.birdy.meta.KeyEchoStrings
 import de.robinrehbein.birdy.meta.LocalProgressRepository
 import de.robinrehbein.birdy.platform.FakeClock
+import de.robinrehbein.birdy.platform.Ads
 import de.robinrehbein.birdy.platform.Haptics
 import de.robinrehbein.birdy.platform.MemoryKeyValueStore
 import de.robinrehbein.birdy.platform.PlatformServices
@@ -67,13 +68,14 @@ class RecordingHaptics : Haptics {
 class LoopHarness(
     progressJson: String = """{"coins":500,"best":20,"runs":6,"tutorialDone":true}""",
     seed: Int = 7,
+    ads: Ads? = null,
 ) {
     val store = MemoryKeyValueStore(mapOf(StorageKeys.PROGRESS to progressJson))
     val clock = FakeClock(millis = 1_790_000_000_000)
     val haptics = RecordingHaptics()
     val audio = FakeAudio()
     val renderer = FakeRenderer()
-    val services = PlatformServices(store, clock, haptics, NullAudioOut, null, null, deviceLanguage = "de-DE")
+    val services = PlatformServices(store, clock, haptics, NullAudioOut, ads, null, deviceLanguage = "de-DE")
     val progress = LocalProgressRepository(store, clock)
     val game = BirdyGame(services, renderer, progress, KeyEchoStrings(), audio, Random(seed), uiRandom = Random(seed + 1))
     private var nanos = 0L

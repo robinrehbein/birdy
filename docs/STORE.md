@@ -39,7 +39,7 @@ nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API einge
 | Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
-| Freiwillige Rewarded Ads und optionale In-App-Käufe | ✅ Kotlin-Release auf beiden Test-Tracks; 16 dauerhafte Produkte aktiv. ⚠️ Geräte-Test und AdMob-Freigabe offen |
+| Rewarded Ads und optionale In-App-Käufe | ✅ Kotlin-Release auf beiden Test-Tracks; 16 dauerhafte Produkte aktiv. ⚠️ Geräte-Test und AdMob-Freigabe offen. Interstitial-Update und Werbefrei-Produkt noch nicht veröffentlicht. |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
 | Screenshots 1080×1920 | ✅ Je sieben native Kotlin-Screenshots für `de-DE` und `en-US` am 29.09. in Play eingereicht. Der [Screenshot-Workflow](https://github.com/robinrehbein/birdy/actions/workflows/store-screenshots.yml) erzeugt 24 echte Spielszenen pro Sprache; lokal liegen noch ältere Web-Bilder unter `docs/store/`. |
@@ -164,8 +164,10 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 >
 > 📅 **Jeden Tag etwas Neues:** Tagesmissionen, Erfolge und ein Tagesgeschenk mit Serien-Bonus.
 >
-> Kostenlos spielbar, ohne Konto. Freiwillige Videoanzeigen geben Münzen oder eine Stunde
-> Zugang zu Skins und Welten. Einzelne Skins und Welten sind dauerhaft kaufbar.
+> Kostenlos spielbar, ohne Konto. Ab 16 Jahren können nach längerer Spielzeit zwischen Runden
+> automatische Anzeigen erscheinen, höchstens dreimal täglich. Ein Einmalkauf entfernt diese
+> dauerhaft. Freiwillige Videoanzeigen geben Münzen oder eine Stunde Zugang zu Skins und Welten.
+> Einzelne Skins und Welten sind dauerhaft kaufbar.
 > Eine Internetverbindung wird für Anzeigen und Käufe benötigt.
 
 ## Store listing – English
@@ -198,8 +200,10 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 >
 > 📅 **Something new every day:** daily missions, awards and a daily gift with a streak bonus.
 >
-> Free to play, with no account required. Optional video ads grant coins or one hour of
-> access to skins and worlds. Individual skins and worlds can be bought permanently.
+> Free to play, with no account required. For players aged 16+, automatic ads may appear
+> between rounds after extended play, at most three times per day. A one-time purchase removes
+> them forever. Optional video ads grant coins or one hour of access to skins and worlds.
+> Individual skins and worlds can be bought permanently.
 > Ads and purchases require an internet connection.
 
 **Kategorie:** Spiele → Arcade.
@@ -219,6 +223,7 @@ Ja. Es gibt kein Birdy-Konto und keinen eigenen Server. Die Angabe wartet auf Ei
 ### Quellen und geprüfte technische Fakten (28. September 2026)
 
 - [Google Mobile Ads SDK 25.5.0: Play Data Disclosure](https://developers.google.com/admob/android/privacy/play-data-disclosure): Das SDK überträgt IP-Adresse, Nutzungsinteraktionen, Diagnosedaten und Gerätekennungen an Google für Werbung, Analyse und Betrugsprävention; Google nennt TLS für die Übertragung. Die IP kann zur ungefähren Standortbestimmung dienen.
+- [Google Mobile Ads SDK: Interstitial-Anzeigen](https://developers.google.com/admob/android/interstitial) und [AdMob-Platzierungsregeln](https://support.google.com/admob/answer/6201350): Birdy lädt Interstitials vorab und zeigt sie ausschließlich am Rundenende nach der lokalen 20-Minuten-Regel.
 - [Google UMP: Android-Integration](https://developers.google.com/admob/android/privacy): Der Consent-Status wird beim App-Start nach der lokalen Alterswahl aktualisiert; eine notwendige Nachricht wird aus der in AdMob veröffentlichten Konfiguration geladen. Die Nachricht „Birdy – EU-Einwilligung“ ist in AdMob seit 28.09. als „Veröffentlicht“ bestätigt (Englisch und Deutsch, mit Ablehnen-Option).
 - [Google UMP: Nutzer unter dem Einwilligungsalter](https://developers.google.com/admob/android/privacy/gdpr) und [AdMob-Anzeigen-Targeting](https://developers.google.com/admob/android/targeting): TFUA unterdrückt den Consent-Dialog. Birdy setzt TFUA für 13–15 bei UMP und die entsprechende AdMob-Altersbehandlung `CHILD`; für 16+ nutzt es UMP ohne TFUA und die AdMob-Altersbehandlung `UNSPECIFIED`. Ohne Alterswahl lädt es keine Werbung. Die maximale Anzeigen-Einstufung bleibt G. Die Altersgruppe wird nur lokal gespeichert und ist im Startmenü änderbar.
 - [Google Play Billing: Integration und Kaufzustände](https://developer.android.com/google/play/billing/integrate): Käufe werden über Google Play abgewickelt. Birdy fragt bestehende Käufe ab und verarbeitet lokal Produkt-ID, Token und Kaufzustand; es gibt kein Birdy-Konto und keinen eigenen Kaufserver. Käufe werden erst im Zustand `PURCHASED` freigeschaltet und anschließend bestätigt.
