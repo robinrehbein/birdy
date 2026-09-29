@@ -34,8 +34,9 @@ private fun wearing(skin: String, trail: String, hat: String = "none") =
 
 object Shots {
     const val WIDTH = 1080
-    const val HEIGHT = 2400
-    /** Matches the JS reference shots: 412x915 CSS px at devicePixelRatio 2.625. */
+    // Play phone screenshots must be no taller than twice their width; 9:16 is recommended.
+    const val HEIGHT = 1920
+    /** 1080 physical pixels at devicePixelRatio 2.625 (about 412 CSS px wide). */
     const val DENSITY = 2.625f
 
     val sessions: List<Session> = listOf(

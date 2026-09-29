@@ -73,7 +73,7 @@ Diese Maschine hat keine GPU und kein KVM. Zwei Wege, das Spiel trotzdem visuell
    `screenshots`-Modul lädt dasselbe `shared`-Rendermodul (dieselben GLSL-ES-Shader wie Android)
    über LWJGL (`lwjgl-egl` + `lwjgl-opengles`, Linux-Natives) und rendert feste Szenen
    (fester Seed, feste Zeit: Menü, früher Run, jede Zone, jedes aktive Power-up, Kaktus, Crash,
-   ein paar Skins/Trails) in PNGs bei 1080×2400:
+   ein paar Skins/Trails) in PNGs bei 1080×1920:
    ```bash
    cd native
    ./gradlew :screenshots:run

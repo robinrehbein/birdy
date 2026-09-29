@@ -11,7 +11,7 @@ import java.io.File
 /**
  * Headless screenshot tool: renders scripted, deterministic scenes of the real game (BirdyGame
  * with the shared engine and GLSL ES shaders via LWJGL GLES on Mesa llvmpipe, EGL surfaceless)
- * and composites the Compose overlay rendered with ImageComposeScene. Output: PNGs at 1080x2400
+ * and composites the Compose overlay rendered with ImageComposeScene. Output: PNGs at 1080x1920
  * (`NN-name.png`) in the directory given as the first argument (default native/build/shots).
  * An optional second argument filters scenes by substring.
  *
@@ -28,7 +28,8 @@ fun main(args: Array<String>) {
         val target = renderer.createRenderTarget(Shots.WIDTH, Shots.HEIGHT, 4)
         var count = 0
         for (session in Shots.sessions) {
-            val g = ShotGame(renderer, session.save, session.lang, store = session.store)
+            val language = System.getenv("SHOT_LANGUAGE")?.takeIf { it == "de" || it == "en" } ?: session.lang
+            val g = ShotGame(renderer, session.save, language, store = session.store)
             val capture = Capture { name ->
                 if (filter != null && !name.contains(filter)) return@Capture
                 val file = File(outDir, "$name.png")

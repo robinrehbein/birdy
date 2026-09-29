@@ -1,8 +1,10 @@
 # Play-Store-Vorbereitung
 
-Stand: 28. September 2026. Version 1.0.3 (versionCode 4) ist im internen und im geschlossenen
-Alpha-Test verfügbar. Die aktualisierten deutschen und englischen Store-Texte sowie sieben neue
-deutsche Screenshots sind zur Prüfung eingereicht.
+Stand: 29. September 2026. Die native Kotlin-Version 2.0.0 (`versionCode 207250161`) ist laut
+Play-API als abgeschlossener Release im internen und geschlossenen Alpha-Test eingetragen. Die
+aktualisierten deutschen und englischen Store-Texte sowie Werbe- und Datensicherheitsangaben
+sind in der Play Console in der Vorabprüfung für die Einreichung. Die Screenshots zeigen noch die
+alte Web-/Capacitor-Version und werden ersetzt.
 
 ## Play Console
 
@@ -16,16 +18,16 @@ deutsche Screenshots sind zur Prüfung eingereicht.
   verlangt Google mindestens 12 angemeldete Tester über 14 Tage; Produktion ist hier nicht Teil
   des Releases.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
-- Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die neuen
-  deutschen Screenshots sind zur Prüfung eingereicht; Englisch nutzt aktuell die deutschen
-  Grafiken als Fallback.
+- Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die vorhandenen
+  Screenshots zeigen noch die frühere Web-/Capacitor-App; für die Kotlin-Version fehlen neue
+  Bilder in beiden Sprachen.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
 - Entwickler-Website: <https://robinrehbein.github.io/>; die zugehörige
   [app-ads.txt](https://robinrehbein.github.io/app-ads.txt) enthält die AdMob-Publisher-ID.
 - Zielgruppe: 13–15, 16–17 und 18+. IARC: USK 12, PEGI 7; unverändert.
-- Werbung ist in Play als vorhanden deklariert. Die neuen Datensicherheitsangaben sind gespeichert,
-  aber noch nicht über „Veröffentlichungen – Übersicht“ zur Prüfung eingereicht.
+- Werbung ist in Play als vorhanden deklariert. Die neuen Datensicherheitsangaben sind in der
+  Veröffentlichungsübersicht am 29.09. als Änderung in der Vorabprüfung sichtbar.
 - Google Play Games auf dem PC wurde deaktiviert. Die ausstehende Aktivierung wurde vor der
   Einreichung aus der Änderungsliste entfernt.
 
@@ -33,17 +35,17 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB) | ✅ Kotlin-Bundle baut lokal; CI-Signatur und Play-Annahme erst beim Test-Upload zu bestätigen |
+| Release-Bundle (AAB) | ✅ Signiertes Kotlin-Bundle von CI in Play angenommen; `internal` und `alpha` enthalten `versionCode 207250161` |
 | Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
-| Freiwillige Rewarded Ads und optionale In-App-Käufe | ⚠️ Kotlin-Release im PR in Vorbereitung; Veröffentlichung gesperrt bis `BIRDY_MONETIZATION_RELEASE_READY` (siehe `docs/MONETIZATION.md`) |
+| Freiwillige Rewarded Ads und optionale In-App-Käufe | ✅ Kotlin-Release auf beiden Test-Tracks; 16 dauerhafte Produkte aktiv. ⚠️ Geräte-Test und AdMob-Freigabe offen |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
 | Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
-| Store-Texte DE/EN | ✅ aktualisiert und am 28.09. in Play als Entwurf gespeichert; Einreichung offen |
+| Store-Texte DE/EN | ✅ am 29.09. per Play-API eingereicht; Play führt Vorabprüfungen aus |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
-| Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen am 28.09. gespeichert; ⚠️ Einreichung zur Prüfung offen |
+| Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen gespeichert und am 29.09. in der Play-Vorabprüfung sichtbar; Freigabe offen |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
 | **Signatur-Schlüssel** | ✅ Upload-Schlüssel lokal erstellt; Backup außerhalb des Projekts erforderlich |
 | **Rechte-Check** | ⚠️ siehe „Risiken“ |
@@ -58,9 +60,9 @@ deutsche Screenshots sind zur Prüfung eingereicht.
 3. **Zielgruppe:** 13 Jahre und älter wurde bestätigt und in der Play Console gespeichert.
 4. **Datenschutz-URL:** Die App-spezifische GitHub-Pages-Seite ist veröffentlicht und in der
    Play Console sowie in Version 1.0.2 der App verlinkt.
-5. **Geschlossener Test:** Version 1.0.3 wird an Tester ausgeliefert. Für den späteren
-   Produktionszugriff fehlen noch mindestens 12 angemeldete Tester über 14 Tage; derzeit
-   stehen vier Personen auf der Tester-Liste und es sind noch keine Beitritte erfasst.
+5. **Geschlossener Test:** Der Kotlin-Release `207250161` liegt auf Alpha. Für den späteren
+   Produktionszugriff fehlen mindestens 12 angemeldete Tester über 14 Tage; derzeit stehen vier
+   Personen auf der Tester-Liste und laut Play-Dashboard ist eine Person beigetreten.
 
 ## Release signieren
 
@@ -99,10 +101,10 @@ hochgeladenen Capacitor-Entwurfs `26092801`. Mehr zu Build/Signatur-Details:
 Merge) das signierte native Bundle (`native/androidApp:bundleRelease`) und veröffentlicht es im
 internen Test und im geschlossenen
 Alpha-Test, sobald sowohl `PLAY_PUBLISH_ENABLED` als auch
-`BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Die zweite Variable bleibt bis
-zum Abschluss der Monetarisierungsprüfungen deaktiviert; auch ein manueller Workflow-Start
-umgeht diese Sperre nicht. Offener Test und Produktion bleiben ausgeschlossen, solange der
-Produktionszugriff fehlt. `PLAY_PUBLISH_ENABLED` ist bereits aktiviert.
+`BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Beide Variablen sind seit 29.09.
+aktiviert. Der erste manuelle Workflow-Lauf veröffentlichte `versionCode 207250161` erfolgreich
+auf `internal` und `alpha`. Jeder weitere Merge nach `main` startet den Upload automatisch.
+Offener Test und Produktion sind im Workflow ausgeschlossen.
 
 Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
 Repository-Secrets benötigt:
@@ -208,7 +210,8 @@ manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-T
 
 Die Datenschutzerklärung liegt unter <https://robinrehbein.github.io/birdy/privacy/>.
 
-Der Play-Fragebogen wurde am 28.09.2026 mit „Datenerhebung/Weitergabe: Ja“ gespeichert.
+Der Play-Fragebogen wurde am 28.09.2026 mit „Datenerhebung/Weitergabe: Ja“ gespeichert und ist
+am 29.09. in der Play-Veröffentlichungsübersicht unter „Änderungen, die überprüft werden“ sichtbar.
 Erfasst und weitergegeben: ungefährer Standort (IP), bisherige Käufe, App-Interaktionen,
 Diagnosedaten, andere App-Leistungsdaten und Geräte-/andere IDs. Übertragung verschlüsselt:
 Ja. Es gibt kein Birdy-Konto und keinen eigenen Server. Die Angabe wartet auf Einreichung
