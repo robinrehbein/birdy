@@ -3,8 +3,8 @@
 Stand: 29. September 2026. Die native Kotlin-Version 2.0.0 (`versionCode 207250161`) ist laut
 Play-API als abgeschlossener Release im internen und geschlossenen Alpha-Test eingetragen. Die
 aktualisierten deutschen und englischen Store-Texte sowie Werbe- und Datensicherheitsangaben
-sind in der Play Console in der Vorabprüfung für die Einreichung. Die Screenshots zeigen noch die
-alte Web-/Capacitor-Version und werden ersetzt.
+sind in der Play Console in der Vorabprüfung für die Einreichung. Je sieben neue Screenshots der
+nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API eingereicht.
 
 ## Play Console
 
@@ -18,9 +18,9 @@ alte Web-/Capacitor-Version und werden ersetzt.
   verlangt Google mindestens 12 angemeldete Tester über 14 Tage; Produktion ist hier nicht Teil
   des Releases.
 - Alpha-Track: Deutschland, Feedback an `hello@robinrehbein.de`.
-- Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Die vorhandenen
-  Screenshots zeigen noch die frühere Web-/Capacitor-App; für die Kotlin-Version fehlen neue
-  Bilder in beiden Sprachen.
+- Store-Eintrag: Deutsch und Englisch (USA) mit Icon und Vorstellungsgrafik. Je sieben native
+  Kotlin-Screenshots im Format 1080×1920 wurden eingereicht; die lokalen Dateien unter
+  `docs/store/` sind noch die ältere Web-Fassung.
 - Datenschutzerklärung: <https://robinrehbein.github.io/birdy/privacy/> (Deutsch und Englisch),
   auch im App-Menü von Version 1.0.2 verlinkt.
 - Entwickler-Website: <https://robinrehbein.github.io/>; die zugehörige
@@ -42,7 +42,7 @@ alte Web-/Capacitor-Version und werden ersetzt.
 | Freiwillige Rewarded Ads und optionale In-App-Käufe | ✅ Kotlin-Release auf beiden Test-Tracks; 16 dauerhafte Produkte aktiv. ⚠️ Geräte-Test und AdMob-Freigabe offen |
 | App-Icon 512×512 | ✅ `docs/store/icon-512.png` (eigenständig: Vogel frontal vor Regenbogen und Sonnenuntergangshimmel) |
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
-| Screenshots 1080×1920 | ⚠️ `docs/store/de/` und `docs/store/en/` zeigen noch die **alte Web-/Capacitor-Version** (je 7 Bilder, gerendert mit dem entfernten `scripts/store-shots.mjs`). Das Skript ist mit dem Web-Build weg; neue Screenshots aus echten Spielszenen lassen sich mit dem nativen Headless-Tool erzeugen: `cd native && ./gradlew :screenshots:run` (→ `native/build/shots/*.png`), danach ggf. mit Rahmen/Claim wie bisher weiterverarbeiten. **Vor jedem neuen Release müssen diese Bilder ersetzt werden.** |
+| Screenshots 1080×1920 | ✅ Je sieben native Kotlin-Screenshots für `de-DE` und `en-US` am 29.09. in Play eingereicht. Der [Screenshot-Workflow](https://github.com/robinrehbein/birdy/actions/workflows/store-screenshots.yml) erzeugt 24 echte Spielszenen pro Sprache; lokal liegen noch ältere Web-Bilder unter `docs/store/`. |
 | Store-Texte DE/EN | ✅ am 29.09. per Play-API eingereicht; Play führt Vorabprüfungen aus |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen gespeichert und am 29.09. in der Play-Vorabprüfung sichtbar; Freigabe offen |
@@ -127,12 +127,10 @@ niemals in `production`.
 Secrets und Keystore-Dateien bleiben außerhalb von Git. Nach dem Einrichten einmal den
 manuellen Workflow starten und den Status in GitHub Actions und in beiden Play-Tracks prüfen.
 
-> **Hinweis:** Der aktuell live geschaltete Play-Store-Eintrag sowie die Screenshots in
-> `docs/store/` zeigen noch die alte Fassung mit Tipp-Steuerung (Tippen auf eine Spur). Die
-> Steuerung wurde auf Wischen umgestellt (siehe [README](../README.md#steuerung)); Titel,
-> Kurzbeschreibung und Beschreibung unten sind bereits auf die neue Steuerung aktualisiert, müssen
-> aber **manuell in der Play Console** nachgezogen werden, bevor sie live gehen. Neue Screenshots
-> fehlen noch (siehe Checkliste oben).
+> **Hinweis:** Die neuen Store-Texte und nativen Screenshots wurden in Play eingereicht.
+> Google prüft die Änderungen noch; der öffentlich sichtbare Eintrag kann bis zur Freigabe
+> die frühere Fassung zeigen. Die Dateien unter `docs/store/` dienen weiterhin als Archiv der
+> alten Web-Fassung.
 
 ## Store-Eintrag – Deutsch
 
