@@ -1,7 +1,7 @@
 # Play-Store-Vorbereitung
 
-Stand: 29. September 2026. Die native Kotlin-Version 2.0.0 (`versionCode 207250161`) ist laut
-Play-API als abgeschlossener Release im internen und geschlossenen Alpha-Test eingetragen. Die
+Stand: 29. September 2026. Die native Kotlin-Version 2.0.0 wird automatisch nach jedem Merge
+auf `main` im internen und geschlossenen Alpha-Test veröffentlicht. Die
 aktualisierten deutschen und englischen Store-Texte sowie Werbe- und Datensicherheitsangaben
 sind in der Play Console in der Vorabprüfung für die Einreichung. Je sieben neue Screenshots der
 nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API eingereicht.
@@ -35,7 +35,7 @@ nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API einge
 
 | Punkt | Status |
 |---|---|
-| Release-Bundle (AAB) | ✅ Signiertes Kotlin-Bundle von CI in Play angenommen; `internal` und `alpha` enthalten `versionCode 207250161` |
+| Release-Bundle (AAB) | ✅ Signiertes Kotlin-Bundle von CI in Play angenommen; der Merge vom 29.09. veröffentlichte `versionCode 207250181` auf `internal` und `alpha`. Neuere Codes stehen in den Play-Tracks und im [Release-Workflow](https://github.com/robinrehbein/birdy/actions/workflows/play-release.yml). |
 | Versionsnummer | ✅ nativ: `versionName "2.0.0"` (`native/androidApp/build.gradle.kts`), `versionCode` aus `BIRDY_VERSION_CODE` (Default 5); der letzte Capacitor-Release war 1.0.3 (versionCode 4) |
 | Android-Zurück-Taste | ✅ Spiel → Pause → Menü; Shop und Game-Over → Menü; Menü → App schließen |
 | Hochformat, Vollbild, Bildschirm bleibt an | ✅ |
@@ -60,7 +60,7 @@ nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API einge
 3. **Zielgruppe:** 13 Jahre und älter wurde bestätigt und in der Play Console gespeichert.
 4. **Datenschutz-URL:** Die App-spezifische GitHub-Pages-Seite ist veröffentlicht und in der
    Play Console sowie in Version 1.0.2 der App verlinkt.
-5. **Geschlossener Test:** Der Kotlin-Release `207250161` liegt auf Alpha. Für den späteren
+5. **Geschlossener Test:** Die Kotlin-App liegt auf Alpha. Für den späteren
    Produktionszugriff fehlen mindestens 12 angemeldete Tester über 14 Tage; derzeit stehen vier
    Personen auf der Tester-Liste und laut Play-Dashboard ist eine Person beigetreten.
 
@@ -103,7 +103,8 @@ internen Test und im geschlossenen
 Alpha-Test, sobald sowohl `PLAY_PUBLISH_ENABLED` als auch
 `BIRDY_MONETIZATION_RELEASE_READY` auf `true` gesetzt sind. Beide Variablen sind seit 29.09.
 aktiviert. Der erste manuelle Workflow-Lauf veröffentlichte `versionCode 207250161` erfolgreich
-auf `internal` und `alpha`. Jeder weitere Merge nach `main` startet den Upload automatisch.
+auf `internal` und `alpha`; der nächste erfolgreiche Merge-Lauf lieferte `207250181` aus.
+Jeder weitere Merge nach `main` startet den Upload automatisch.
 Offener Test und Produktion sind im Workflow ausgeschlossen.
 
 Für die Einrichtung unter **GitHub → Settings → Secrets and variables → Actions** werden diese
