@@ -5,7 +5,7 @@
 - Android: AdMob-App-ID `ca-app-pub-1786159152036324~5284705514`.
 - Zwei freiwillige Rewarded-Ad-Blöcke: 30 Münzen (`ca-app-pub-1786159152036324/7854280106`) oder ein einstündiger Style-Pass (`ca-app-pub-1786159152036324/8020434087`).
 - Insgesamt höchstens drei belohnte Anzeigen pro lokalem Tag. Der Style-Pass gibt vorübergehend Zugriff auf alle vorhandenen Vogel-Skins und Welten, außer den sieben seltenen animierten Skins. Diese gibt es nur für Münzen oder über ihren Erfolg, nicht über Anzeigen oder Echtgeld. Er läuft 60 Minuten nach der verdienten Anzeige ab; gekaufte Inhalte bleiben davon unberührt. Während eines Flugs erscheint keine Anzeige.
-- Debug-Builds verwenden Googles Test-Anzeigenblock. Android fordert vor dem Laden den UMP-Datenschutzstatus an, setzt TFUA und Inhaltsbewertung G.
+- Debug-Builds verwenden Googles Test-Anzeigenblock. Beim ersten Start fragt Birdy lokal nur die Altersgruppe 13–15 oder 16+ ab; ohne Auswahl werden keine Anzeigen geladen. Für 13–15 setzt Android TFUA bei UMP und die entsprechende Altersbehandlung `CHILD` bei AdMob, für 16+ läuft die UMP-Einwilligung. Die Auswahl kann im Startmenü geändert werden. Die maximale Anzeigen-Einstufung bleibt G.
 - Die EU-Einwilligungsnachricht „Birdy – EU-Einwilligung“ ist seit 28.09. in AdMob veröffentlicht. Die App ist noch nicht mit dem Play-Eintrag verknüpft; die AdMob-Suche fand sie bisher nicht. AdMob zeigt „Überprüfung nötig“. Live-Anzeigen und echte Werbeerlöse sind erst nach Freigabe und Store-Verknüpfung zu erwarten.
 
 ## Play Billing

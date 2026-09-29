@@ -325,6 +325,8 @@ sealed class UiCommand {
     data class RewardResult(val kind: RewardKind, val earned: Boolean) : UiCommand()
     /** Ad-privacy button: emits [UiEffect.ShowPrivacyOptions]. */
     data object AdPrivacy : UiCommand()
+    /** Reopen the local age-group choice for optional ads. */
+    data object AdAgeSettings : UiCommand()
     /** Coin pack / real-money item button: emits [UiEffect.LaunchPurchase] unless one is in flight. */
     data class BuyReal(val productId: String) : UiCommand()
     /** The shell's purchase flow ended; [failed] shows `purchaseUnavailable`. */
@@ -346,6 +348,7 @@ sealed class UiEffect {
     data class ShowRewardedAd(val kind: RewardKind) : UiEffect()
     data class LaunchPurchase(val productId: String) : UiEffect()
     data object ShowPrivacyOptions : UiEffect()
+    data object ShowAgeSettings : UiEffect()
 }
 
 /** JS `Math.round` (half up, also for negatives). */

@@ -305,6 +305,7 @@ class GameSession(
             is UiCommand.RewardResult -> shop.adResult(cmd.kind, cmd.earned)
             is UiCommand.RequestRewardedAd -> shop.requestAd(cmd.kind)
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
+            is UiCommand.AdAgeSettings -> emitEffect(UiEffect.ShowAgeSettings)
             is UiCommand.BuyReal -> shop.buyReal(cmd.productId)
             is UiCommand.PurchaseEnded -> shop.purchaseEnded(cmd.failed)
             UiCommand.PurchaseGranted -> shop.purchaseGranted(s.mode == GameMode.Ready && s.menu == Menu.Shop)

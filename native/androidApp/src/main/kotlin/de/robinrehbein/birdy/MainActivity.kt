@@ -112,6 +112,7 @@ class MainActivity : ComponentActivity() {
                         }
                         is UiEffect.LaunchPurchase -> billing.launchPurchase(effect.productId)
                         UiEffect.ShowPrivacyOptions -> ads.showPrivacyOptions()
+                        UiEffect.ShowAgeSettings -> ads.showAgeSettings()
                     }
                 }
             }

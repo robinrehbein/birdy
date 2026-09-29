@@ -102,6 +102,7 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
             "achievements" to LocalizedText("[trophy] Erfolge", "[trophy] Awards"),
             "privacy" to LocalizedText("Datenschutz", "Privacy policy"),
             "adPrivacy" to LocalizedText("Werbe-Datenschutz", "Ad privacy choices"),
+            "adAgeSettings" to LocalizedText("Altersgruppe", "Age group"),
             "rewardAd" to LocalizedText("▶ Anzeige ansehen · +30 Münzen ({n}/3 heute)", "▶ Watch an ad · +30 coins ({n}/3 today)"),
             "rewardGranted" to LocalizedText("+30 Münzen für die Anzeige!", "+30 coins for the ad!"),
             "rewardUnavailable" to LocalizedText("Gerade keine Anzeige verfügbar", "No ad available right now"),
