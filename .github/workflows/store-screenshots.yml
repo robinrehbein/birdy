@@ -1,0 +1,33 @@
+name: Render native Store screenshots
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+      - name: Install software OpenGL ES renderer
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libegl1 libgles2 libgl1-mesa-dri
+      - name: Render actual Kotlin game scenes
+        working-directory: native
+        env:
+          EGL_PLATFORM: surfaceless
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: ./gradlew :screenshots:run --console=plain
+      - name: Upload PNGs
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-store-screenshots
+          path: native/build/shots/*.png
+          if-no-files-found: error
