@@ -3,6 +3,9 @@ package de.robinrehbein.birdy.view.thumb
 import de.robinrehbein.birdy.engine.RenderBackend
 import de.robinrehbein.birdy.engine.RenderStats
 import de.robinrehbein.birdy.engine.RenderTarget
+import de.robinrehbein.birdy.engine.math.Vec3
+import de.robinrehbein.birdy.view.bird.BirdRig
+import de.robinrehbein.birdy.view.bird.BirdLook
 import de.robinrehbein.birdy.engine.scene.Mesh
 import de.robinrehbein.birdy.engine.scene.PerspectiveCamera
 import de.robinrehbein.birdy.engine.scene.Scene
@@ -16,6 +19,7 @@ import kotlin.test.assertTrue
 
 class ThumbnailCacheTest {
     private class FakeBackend : RenderBackend {
+        lateinit var camera: PerspectiveCamera
         var renders = 0
         var lastFov = 0f
         var visibleMeshes = 0
@@ -24,6 +28,7 @@ class ThumbnailCacheTest {
         override var resolutionScale = 1f
         override var shadowsEnabled = true
         override fun render(scene: Scene, camera: PerspectiveCamera, target: RenderTarget?) {
+            this.camera = camera
             renders++
             lastFov = camera.fov
             visibleMeshes = 0
@@ -63,6 +68,29 @@ class ThumbnailCacheTest {
     }
 
     @Test
+    fun toucanTipFitsInsideThumbnail() {
+        val backend = FakeBackend()
+        val thumbs = ThumbnailRenderer(backend, size = 192)
+        thumbs.thumbnail(Kind.Beak, "toucan", Catalog.skins[0])
+        val camera = backend.camera
+        camera.updateWorldMatrix(null)
+        camera.updateView()
+        val bird = BirdRig()
+        bird.setLook(BirdLook(beak = "toucan"))
+        bird.root.updateWorldMatrix(null)
+        bird.part { it.beak }.getValue("toucan").traverse { node ->
+            if (node is Mesh) {
+                val p = node.geometry.positions
+                for (i in p.indices step 3) {
+                    val screen = camera.project(Vec3(p[i], p[i + 1], p[i + 2]).applyMat4(node.worldMatrix))
+                    assertTrue(kotlin.math.abs(screen.x) < 0.95f && kotlin.math.abs(screen.y) < 0.95f,
+                        "entire beak needs a margin inside the thumbnail: $screen")
+                }
+            }
+        }
+    }
+
+    @Test
     fun onlyTheRequestedPartIsWorn() {
         val backend = FakeBackend()
         val thumbs = ThumbnailRenderer(backend, size = 8)
@@ -72,8 +100,8 @@ class ThumbnailCacheTest {
         thumbs.thumbnail(Kind.Hat, "tophat", sunny)
         assertEquals(plain + 3, backend.visibleMeshes)
         thumbs.thumbnail(Kind.Beak, "toucan", sunny)
-        // Round beak (2 meshes) swapped for the toucan (3 meshes); the tophat is gone again.
-        assertEquals(plain + 1, backend.visibleMeshes)
+        // Round beak (2 meshes) swapped for the toucan (4 meshes); the tophat is gone again.
+        assertEquals(plain + 2, backend.visibleMeshes)
         assertTrue(ThumbView.BY_KIND.keys.containsAll(listOf(Kind.Pattern, Kind.Hat, Kind.Eyes, Kind.Beak)))
     }
 }

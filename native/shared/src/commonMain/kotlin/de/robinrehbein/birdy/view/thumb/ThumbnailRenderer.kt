@@ -14,6 +14,8 @@ import de.robinrehbein.birdy.view.bird.BirdRig
 /** Per-kind camera rig of the shop thumbnails (main.js `THUMB_VIEW`). */
 data class ThumbView(val cam: FloatArray, val look: FloatArray, val fov: Float) {
     companion object {
+        /** The long bill needs its tip centred and a little more camera distance. */
+        val TOUCAN = ThumbView(floatArrayOf(3.2f, 0.5f, -2.2f), floatArrayOf(0f, -0.02f, -1.05f), 26f)
         val BY_KIND: Map<Kind, ThumbView> = mapOf(
             Kind.Pattern to ThumbView(floatArrayOf(1.9f, 1.4f, 2.4f), floatArrayOf(0f, 0.05f, 0.1f), 30f),
             Kind.Hat to ThumbView(floatArrayOf(1.5f, 1.4f, -2.3f), floatArrayOf(0f, 0.62f, -0.12f), 24f),
@@ -49,7 +51,8 @@ class ThumbnailRenderer(private val renderer: RenderBackend, val size: Int = 192
     fun thumbnail(kind: Kind, id: String, skin: SkinItem): IntArray {
         val key = key(kind, id, skin)
         cache[key]?.let { return it }
-        val view = ThumbView.BY_KIND[kind] ?: throw IllegalArgumentException("no thumbnail rig for $kind")
+        val view = if (kind == Kind.Beak && id == "toucan") ThumbView.TOUCAN
+            else ThumbView.BY_KIND[kind] ?: throw IllegalArgumentException("no thumbnail rig for $kind")
         val k = kit ?: createKit().also { kit = it }
         k.bird.setSkin(skin)
         k.bird.setLook(BirdLook().with(kind, id))
