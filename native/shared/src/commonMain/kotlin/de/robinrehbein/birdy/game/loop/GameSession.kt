@@ -109,6 +109,9 @@ class GameSession(
         }
 
     private val menuFrames = HashMap<Menu, MenuFrameInfo>()
+    private var shopPreviewTop = 0.1355
+    private var shopPreviewBottom = 0.4083
+    private var shopDragX: Double? = null
     private var showFps = settings.fpsOverlay
     private val secretTaps = SecretTaps()
     private var scorePop = 0
@@ -255,10 +258,18 @@ class GameSession(
         when (cmd) {
             is UiCommand.Touch -> pointerDown(cmd.x.toDouble(), cmd.y.toDouble())
             is UiCommand.TouchMove -> {
-                val dir = input.move(cmd.x.toDouble(), cmd.y.toDouble(), surfaceWidth.toDouble(), surfaceHeight.toDouble(), density)
-                if (dir != 0) swipe(dir)
+                if (s.mode == GameMode.Ready && s.menu == Menu.Shop) {
+                    shopDragX?.let { previous ->
+                        views.bird?.let { it.shopYaw += ((cmd.x - previous) * kotlin.math.PI * 2).toFloat() }
+                        shopDragX = cmd.x.toDouble()
+                    }
+                } else {
+                    val dir = input.move(cmd.x.toDouble(), cmd.y.toDouble(), surfaceWidth.toDouble(), surfaceHeight.toDouble(), density)
+                    if (dir != 0) swipe(dir)
+                }
             }
             is UiCommand.TouchUp -> {
+                shopDragX = null
                 input.up()
                 sim.pointerUp()
             }
@@ -321,7 +332,13 @@ class GameSession(
             is UiCommand.ToggleFps -> toggleFps()
             is UiCommand.TitleTap -> if (secretTaps.tap(realTimeMs)) toggleFps()
             is UiCommand.AppVisible -> visibility(cmd.visible)
-            is UiCommand.MenuFrame -> menuFrames[cmd.menu] = MenuFrameInfo.fromLayout(cmd.titleBottom.toDouble(), cmd.panelTop.toDouble())
+            is UiCommand.MenuFrame -> {
+                menuFrames[cmd.menu] = MenuFrameInfo.fromLayout(cmd.titleBottom.toDouble(), cmd.panelTop.toDouble())
+                if (cmd.menu == Menu.Shop) {
+                    shopPreviewTop = cmd.titleBottom.toDouble()
+                    shopPreviewBottom = cmd.panelTop.toDouble()
+                }
+            }
         }
         routeEvents()
     }
@@ -333,6 +350,10 @@ class GameSession(
     private fun pointerDown(x: Double, y: Double) {
         startAudio()
         val s = sim.state
+        if (s.mode == GameMode.Ready && s.menu == Menu.Shop) {
+            shopDragX = if (y in shopPreviewTop..shopPreviewBottom) x else null
+            return
+        }
         if (s.mode == GameMode.Ready && s.menu != Menu.Start) return // menus cover the canvas
         if (s.mode == GameMode.Over && !s.paused) {
             // The game-over panel covers the canvas: a tap retries.
@@ -383,6 +404,9 @@ class GameSession(
     }
 
     fun openShop(open: Boolean) {
+        shopDragX = null
+        input.up()
+        views.bird?.shopYaw = 0f
         sim.state.menu = if (open) Menu.Shop else Menu.Start
         shop.open(open)
         menuDirty = true

@@ -4,6 +4,7 @@ import de.robinrehbein.birdy.engine.math.Color
 import de.robinrehbein.birdy.engine.scene.Scene
 import de.robinrehbein.birdy.game.GameMode
 import de.robinrehbein.birdy.game.PowerType
+import de.robinrehbein.birdy.game.Menu
 import de.robinrehbein.birdy.meta.Catalog
 import de.robinrehbein.birdy.meta.SkinItem
 import de.robinrehbein.birdy.meta.TrailItem
@@ -22,6 +23,9 @@ import de.robinrehbein.birdy.view.SceneView
  */
 class BirdView : SceneView {
     val rig = BirdRig()
+
+    /** User-controlled orientation retained across shop outfit previews. Radians, game thread. */
+    var shopYaw = 0f
 
     /** Currently worn skin (feather particles on death use its colours). */
     val skin: SkinItem get() = rig.skin
@@ -59,7 +63,9 @@ class BirdView : SceneView {
         val pose = s.pose
         val g = rig.root
         g.position.set(s.x.toFloat(), s.y.toFloat(), 0f)
-        g.rotation.set(pose.rotX.toFloat(), 0f, pose.rotZ.toFloat())
+        g.rotation.set(pose.rotX.toFloat(),
+            if (s.mode == GameMode.Ready && s.menu == Menu.Shop) shopYaw else 0f,
+            pose.rotZ.toFloat())
         g.scale.set(pose.scaleX.toFloat(), pose.scaleY.toFloat(), pose.scaleZ.toFloat())
         g.visible = pose.visible
         if (s.mode != GameMode.Over) {

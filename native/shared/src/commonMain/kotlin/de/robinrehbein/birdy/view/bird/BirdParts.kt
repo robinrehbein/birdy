@@ -180,16 +180,8 @@ internal class BirdParts(
                 sphere(0.26, beakMat, 1.45, 0.34, 1.5).at(0.0, -0.03, -0.74),
                 sphere(0.24, beakLowMat, 1.3, 0.3, 1.3).at(0.0, -0.13, -0.68),
             )
-            beak["hook"] = group(
-                sphere(0.26, beakMat, 0.85, 0.72, 1.15).at(0.0, 0.02, -0.66),
-                Mesh(Primitives.cone(0.1, 0.26, 6), beakMat).at(0.0, -0.1, -0.88, PI * 0.85),
-                sphere(0.2, beakLowMat, 0.8, 0.45, 0.9).at(0.0, -0.14, -0.6),
-            )
-            beak["toucan"] = group(
-                sphere(0.26, flatMat(0xff9a1f), 1.05, 0.75, 2.4).at(0.0, 0.02, -0.98),
-                sphere(0.22, flatMat(0xffd23d), 1.0, 0.55, 2.2).at(0.0, -0.14, -0.92),
-                sphere(0.1, dark).at(0.0, -0.04, -1.56),
-            )
+            beak["hook"] = BeakShapes.eagle(beakMat, beakLowMat)
+            beak["toucan"] = BeakShapes.toucan()
             return BirdParts(pattern, hat, eyes, beak, propeller, ring)
         }
 
