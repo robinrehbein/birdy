@@ -32,6 +32,8 @@ import de.robinrehbein.birdy.platform.ads.AdMobAds
 import de.robinrehbein.birdy.platform.billing.PlayBilling
 import de.robinrehbein.birdy.platform.purchase.PurchaseProcessor
 import de.robinrehbein.birdy.ui.BirdyApp
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
 import java.lang.ref.WeakReference
 import java.util.Locale
 
@@ -109,6 +111,16 @@ class MainActivity : ComponentActivity() {
                         UiEffect.ExitApp -> finish()
                         is UiEffect.ShowRewardedAd -> ads.showRewarded(effect.kind) { earned ->
                             game.post(UiCommand.RewardResult(effect.kind, earned))
+                        }
+                        UiEffect.ShowInterstitialAd -> {
+                            // The effect can reach Compose before the render thread publishes
+                            // its GameOver snapshot. Never show if the player has restarted.
+                            val over = withTimeoutOrNull(1000) {
+                                game.ui.first { it.mode == de.robinrehbein.birdy.game.GameMode.Over }
+                            } != null
+                            if (over && game.ui.value.mode == de.robinrehbein.birdy.game.GameMode.Over) {
+                                ads.showInterstitial { shown -> game.post(UiCommand.InterstitialShown(shown)) }
+                            }
                         }
                         is UiEffect.LaunchPurchase -> billing.launchPurchase(effect.productId)
                         UiEffect.ShowPrivacyOptions -> ads.showPrivacyOptions()

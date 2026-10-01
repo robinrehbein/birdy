@@ -3,6 +3,7 @@ package de.robinrehbein.birdy.meta
 import de.robinrehbein.birdy.platform.Clock
 import de.robinrehbein.birdy.platform.KeyValueStore
 import de.robinrehbein.birdy.platform.StorageKeys
+import de.robinrehbein.birdy.platform.purchase.ProductIds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
@@ -381,6 +382,14 @@ class LocalProgressRepository(
     private val paidProductRegex = Regex("^birdy_(skin|world)_([a-z]+)$")
 
     override fun grantPaidProduct(productId: String): Boolean? {
+        if (productId == ProductIds.REMOVE_ADS) {
+            val previous = state.value
+            val wasOwned = productId in previous.paidProducts
+            val paid = if (wasOwned) previous.paidProducts else previous.paidProducts + productId
+            if (commit(previous.copy(paidProducts = paid))) return !wasOwned
+            state.value = previous
+            return null
+        }
         val match = paidProductRegex.matchEntire(productId) ?: return false
         val kind = Kind.of(match.groupValues[1]) ?: return false
         val id = match.groupValues[2]
@@ -397,6 +406,7 @@ class LocalProgressRepository(
 
     override fun syncPaidProducts(productIds: List<String>): Boolean {
         val filtered = productIds.distinct().filter { id ->
+            if (id == ProductIds.REMOVE_ADS) return@filter true
             val m = paidProductRegex.matchEntire(id) ?: return@filter false
             val kind = Kind.of(m.groupValues[1]) ?: return@filter false
             val item = Catalog.find(kind, m.groupValues[2]) ?: return@filter false

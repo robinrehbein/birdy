@@ -263,6 +263,12 @@ class ShopController(
 
     private fun price(productId: String): String? = if (billing.ready) billing.products[productId]?.formattedPrice else null
 
+    private fun removeAdsBuy(): ButtonUi? {
+        if (ProductIds.REMOVE_ADS in progress.data.value.paidProducts) return ButtonUi(t("removeAdsOwned"), false)
+        val formatted = price(ProductIds.REMOVE_ADS) ?: return null
+        return ButtonUi(t("removeAdsBuy", "price" to formatted), !billingBusy)
+    }
+
     // --- 3D preview and snapshot ----------------------------------------------------------------
 
     /** The 3D part of `renderShop()` / `renderUpgrades()`. */
@@ -357,7 +363,7 @@ class ShopController(
             tab = tab, selectedId = item.id, tiles = tiles, name = L(item.name), desc = desc,
             action = action, actionIsBuy = isBuy, diceEnabled = diceEnabled(), surprise = surprise,
             rewardAd = rewardAd, stylePass = stylePass, adPrivacy = adPrivacy,
-            realBuy = realBuy, realBuyProductId = realBuyId, billingBusy = billingBusy,
+            realBuy = realBuy, realBuyProductId = realBuyId, removeAdsBuy = removeAdsBuy(), billingBusy = billingBusy,
         )
     }
 
@@ -380,7 +386,7 @@ class ShopController(
             desc = "${L(u.text)} · ${t("level", "n" to lvl, "max" to Catalog.UPGRADE_MAX)}",
             action = action, actionIsBuy = price != null, diceEnabled = diceEnabled(), surprise = surprise,
             rewardAd = rewardAd, stylePass = stylePass, adPrivacy = adPrivacy,
-            realBuy = null, realBuyProductId = null, billingBusy = billingBusy,
+            realBuy = null, realBuyProductId = null, removeAdsBuy = removeAdsBuy(), billingBusy = billingBusy,
         )
     }
 

@@ -3,6 +3,9 @@ package de.robinrehbein.birdy.platform.purchase
 import de.robinrehbein.birdy.Golden
 import de.robinrehbein.birdy.meta.Catalog
 import de.robinrehbein.birdy.meta.Kind
+import de.robinrehbein.birdy.meta.LocalProgressRepository
+import de.robinrehbein.birdy.platform.FakeClock
+import de.robinrehbein.birdy.platform.MemoryKeyValueStore
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -114,8 +117,8 @@ class PurchaseProcessorTest {
         val golden = Golden.json("platform-product-ids.json").jsonObject
         fun ids(key: String) = golden[key]!!.jsonArray.map { it.jsonPrimitive.content }
         assertEquals(ids("itemIds"), ProductIds.itemIds)
-        assertEquals(ids("ids"), ProductIds.ids)
-        assertEquals(golden["count"]!!.jsonPrimitive.int, ProductIds.ids.size)
+        assertEquals(ids("ids") + ProductIds.REMOVE_ADS, ProductIds.ids)
+        assertEquals(golden["count"]!!.jsonPrimitive.int + 1, ProductIds.ids.size)
     }
 
     @Test
@@ -136,6 +139,24 @@ class PurchaseProcessorTest {
         processor.handlePurchase(purchase(listOf(ProductIds.itemId(Kind.Skin, rare.id)), "tok-rare"))
         assertTrue(progress.data.value.paidProducts.isEmpty())
         assertTrue(billing.acknowledged.isEmpty())
+    }
+
+    @Test
+    fun removeAdsPurchaseIsPermanentRestoredAndRevocable() {
+        val id = "birdy_remove_ads"
+        assertTrue(ProductIds.isPermanent(id))
+        val store = MemoryKeyValueStore()
+        val progress = LocalProgressRepository(store, FakeClock())
+        val billing = FakeBilling()
+        val processor = PurchaseProcessor(billing, { progress }, { it() })
+
+        processor.handlePurchase(purchase(listOf(id), "ad-free-token"))
+        assertTrue(id in progress.data.value.paidProducts)
+        assertEquals(listOf("ad-free-token"), billing.acknowledged)
+        assertTrue(id in LocalProgressRepository(store, FakeClock()).data.value.paidProducts)
+
+        processor.syncOwnedPurchases(emptyList())
+        assertFalse(id in progress.data.value.paidProducts)
     }
 
     @Test

@@ -39,9 +39,10 @@ const val STORE_SAVE = """{"coins":2400,"best":32,"runs":6,"tutorialDone":true,"
 
 /** Rewarded ads that are always loaded (for the shop's ad buttons). */
 class ReadyAds : Ads {
-    override val status: StateFlow<AdsStatus> = MutableStateFlow(AdsStatus(true, setOf(RewardKind.Coins, RewardKind.Pass), false))
+    override val status: StateFlow<AdsStatus> = MutableStateFlow(AdsStatus(supported = true, ready = setOf(RewardKind.Coins, RewardKind.Pass)))
     override fun init() = Unit
     override fun showRewarded(kind: RewardKind, onResult: (earned: Boolean) -> Unit) = onResult(true)
+    override fun showInterstitial(onResult: (shown: Boolean) -> Unit) = onResult(false)
     override fun showPrivacyOptions() = Unit
 }
 

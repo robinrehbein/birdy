@@ -144,6 +144,15 @@ fun ShopScreen(
                     enabled = ui.realBuy.enabled && !ui.billingBusy,
                 )
             }
+            if (ui.removeAdsBuy != null) {
+                GameButton(
+                    ui.removeAdsBuy.label,
+                    { onCommand(UiCommand.BuyReal(de.robinrehbein.birdy.platform.purchase.ProductIds.REMOVE_ADS)) },
+                    Modifier.fillMaxWidth().padding(top = 10.dp),
+                    ButtonStyle.RealMoney,
+                    enabled = ui.removeAdsBuy.enabled && !ui.billingBusy,
+                )
+            }
             if (ui.adPrivacy) {
                 Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.Center) {
                     de.robinrehbein.birdy.ui.TextLink(strings.t("adPrivacy"), { onCommand(UiCommand.AdPrivacy) })

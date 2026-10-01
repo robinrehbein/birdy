@@ -23,6 +23,7 @@ object StorageKeys {
     const val LANG = "birdy-lang"
     const val QUALITY = "birdy-quality"
     const val FPS = "birdy-fps"
+    const val INTERSTITIAL_PACING = "birdy-interstitial-pacing"
     /** Native-only: set once the WebView localStorage import has completed ("1"). */
     const val MIGRATED = "birdy-native-migrated"
 
