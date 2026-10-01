@@ -10,9 +10,9 @@ import kotlin.test.assertTrue
 
 class InterstitialPacingTest {
     @Test
-    fun waitsForTwentyMinutesOfCompletedFlightTime() {
+    fun waitsForFiveMinutesOfCompletedFlightTime() {
         val pacing = InterstitialPacing(MemoryKeyValueStore(), FakeClock())
-        pacing.onRunFinished(1199.0)
+        pacing.onRunFinished(299.0)
         assertFalse(pacing.canShow(adReady = true, adFree = false))
         pacing.onRunFinished(1.0)
         assertTrue(pacing.canShow(adReady = true, adFree = false))

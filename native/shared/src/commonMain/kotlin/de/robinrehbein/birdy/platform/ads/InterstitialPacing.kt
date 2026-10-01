@@ -46,7 +46,7 @@ class InterstitialPacing(
     }
 
     companion object {
-        const val INTERVAL_MS = 20L * 60L * 1000L
+        const val INTERVAL_MS = 5L * 60L * 1000L
         const val DAILY_LIMIT = 3
     }
 }
