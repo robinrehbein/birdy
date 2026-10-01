@@ -69,6 +69,7 @@ class LoopHarness(
     progressJson: String = """{"coins":500,"best":20,"runs":6,"tutorialDone":true}""",
     seed: Int = 7,
     ads: Ads? = null,
+    views: GameViews = GameViews(),
 ) {
     val store = MemoryKeyValueStore(mapOf(StorageKeys.PROGRESS to progressJson))
     val clock = FakeClock(millis = 1_790_000_000_000)
@@ -77,7 +78,7 @@ class LoopHarness(
     val renderer = FakeRenderer()
     val services = PlatformServices(store, clock, haptics, NullAudioOut, ads, null, deviceLanguage = "de-DE")
     val progress = LocalProgressRepository(store, clock)
-    val game = BirdyGame(services, renderer, progress, KeyEchoStrings(), audio, Random(seed), uiRandom = Random(seed + 1))
+    val game = BirdyGame(services, renderer, progress, KeyEchoStrings(), audio, Random(seed), views = views, uiRandom = Random(seed + 1))
     private var nanos = 0L
 
     init {
