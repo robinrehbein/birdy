@@ -19,6 +19,7 @@ object GateRows {
         row.cloud = cloud
         row.visible = true
         row.passed = false
+        row.record = false
         setOpacity(row, 1.0)
         spec.forEachIndexed { i, gap ->
             val lane = row.lanes[i]

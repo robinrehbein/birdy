@@ -130,6 +130,9 @@ class GameSession(
     private var gameOverUi: GameOverUi? = null
     /** The current run was revived with a rewarded ad: skip the interstitial at its game over. */
     private var revivedWithAd = false
+    /** Game-over "coins x2": used for this game over / ad in flight with the coins it will double. */
+    private var doubleCoinsUsed = false
+    private var doubleCoinsPending = 0
     private val thumbnails = HashMap<String, ThumbnailUi>()
     private var thumbnailVersion = 0
 
@@ -327,7 +330,8 @@ class GameSession(
             is UiCommand.RewardEarned -> adResult(cmd.kind, true)
             is UiCommand.RewardResult -> adResult(cmd.kind, cmd.earned)
             is UiCommand.InterstitialShown -> if (cmd.shown) interstitialPacing.markShown()
-            is UiCommand.RequestRewardedAd -> shop.requestAd(cmd.kind)
+            is UiCommand.RequestRewardedAd ->
+                if (cmd.kind == RewardKind.DoubleCoins) requestDoubleCoins() else shop.requestAd(cmd.kind)
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
             is UiCommand.AdAgeSettings -> emitEffect(UiEffect.ShowAgeSettings)
             is UiCommand.BuyReal -> shop.buyReal(cmd.productId)
@@ -445,7 +449,11 @@ class GameSession(
     }
 
     private fun adResult(kind: RewardKind, earned: Boolean) {
-        if (kind != RewardKind.Revive) return shop.adResult(kind, earned)
+        when (kind) {
+            RewardKind.Revive -> Unit
+            RewardKind.DoubleCoins -> return rewardResult(kind, earned)
+            RewardKind.Coins, RewardKind.Pass -> return shop.adResult(kind, earned)
+        }
         if (earned && sim.state.revive?.pending == true) revivedWithAd = true
         sim.reviveResult(earned)
     }
@@ -499,6 +507,35 @@ class GameSession(
         }
         walletBump++
         menuDirty = true
+    }
+
+    private fun doubleCoinsUi(ads: AdsStatus): ButtonUi? {
+        val sum = summary ?: return null
+        return texts.doubleCoins(
+            sum.coins, RewardKind.DoubleCoins in ads.ready, progress.doubleCoinsAdsLeft,
+            ProductIds.REMOVE_ADS in progress.data.value.paidProducts, doubleCoinsUsed, doubleCoinsPending > 0,
+        )
+    }
+
+    private fun requestDoubleCoins() {
+        val ads = services.ads?.status?.value ?: return
+        if (summary == null || doubleCoinsUi(ads)?.enabled != true) return
+        doubleCoinsPending = summary?.coins ?: return
+        emitEffect(UiEffect.ShowRewardedAd(RewardKind.DoubleCoins))
+    }
+
+    private fun rewardResult(kind: RewardKind, earned: Boolean) {
+        if (kind != RewardKind.DoubleCoins) return shop.adResult(kind, earned)
+        val coins = doubleCoinsPending
+        doubleCoinsPending = 0
+        if (!earned) {
+            toasts.push(t("rewardUnavailable"))
+        } else if (!doubleCoinsUsed && progress.grantDoubleCoins(coins) > 0) {
+            doubleCoinsUsed = true
+            toasts.push(t("doubleCoinsGranted"))
+            walletBump++
+            menuDirty = true
+        }
     }
 
     private fun toggleFps() {
@@ -612,6 +649,8 @@ class GameSession(
                 audio.setMode(MusicMode.Menu)
                 summary = e.summary
                 gameOverUi = texts.gameOver(e.summary)
+                doubleCoinsUsed = false
+                doubleCoinsPending = 0
                 interstitialPacing.onRunFinished(e.summary.time)
                 // A run revived with a rewarded ad already showed an ad: no second one right away.
                 val adJustShown = revivedWithAd
@@ -724,7 +763,7 @@ class GameSession(
             tutorialHand = hand,
             zonesHint = zonesUi,
             gameOver = if (s.mode == GameMode.Over) summary else null,
-            gameOverUi = if (s.mode == GameMode.Over) gameOverUi else null,
+            gameOverUi = if (s.mode == GameMode.Over) gameOverUi?.copy(doubleCoins = doubleCoinsUi(ads)) else null,
             revive = if (s.mode == GameMode.Dead) reviveUi() else null,
             shopKind = shop.tab.kind ?: base.shopKind,
             progress = data,

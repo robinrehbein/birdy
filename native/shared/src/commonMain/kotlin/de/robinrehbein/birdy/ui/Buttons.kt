@@ -98,13 +98,13 @@ fun GameButton(
 
 /** `.privacy-link`: 12px Fredoka, 75 % opacity, underlined, no button chrome. */
 @Composable
-fun TextLink(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, color: Color = BirdyColors.Ink) {
+fun TextLink(label: String, onClick: () -> Unit, modifier: Modifier = Modifier, color: Color = BirdyColors.Ink, size: Float = 12f) {
     androidx.compose.foundation.text.BasicText(
         label,
         modifier.clickable(onClick = onClick),
         style = androidx.compose.ui.text.TextStyle(
             fontFamily = bodyFont(),
-            fontSize = androidx.compose.ui.unit.TextUnit(12f, androidx.compose.ui.unit.TextUnitType.Sp),
+            fontSize = androidx.compose.ui.unit.TextUnit(size, androidx.compose.ui.unit.TextUnitType.Sp),
             color = color.copy(alpha = color.alpha * 0.75f),
             textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,

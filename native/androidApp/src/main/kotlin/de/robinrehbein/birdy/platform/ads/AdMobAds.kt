@@ -123,11 +123,22 @@ class AdMobAds(
         )
     }
 
+    /**
+     * The loaded ad behind a [RewardKind]: the game-over x2 bonus reuses the coin ad, the revive
+     * keeps its own preloaded instance (so a revive never eats the shop's coin ad).
+     */
+    private fun adSlot(kind: RewardKind): RewardKind = when (kind) {
+        RewardKind.Coins, RewardKind.DoubleCoins -> RewardKind.Coins
+        RewardKind.Pass -> RewardKind.Pass
+        RewardKind.Revive -> RewardKind.Revive
+    }
+
     override fun showRewarded(kind: RewardKind, onResult: (earned: Boolean) -> Unit) {
+        val unit = adSlot(kind)
         val act = activity()
         // Pop the ad regardless of outcome (platform.md §1.6 `showRewarded` step 2): a failed
         // show must not leave a stale ad instance around.
-        val ad = rewardedAds.remove(kind)
+        val ad = rewardedAds.remove(unit)
         publishStatus()
         val allowed = consent?.canRequestAds() == true
         if (ad == null || !allowed || act == null || disabledForSession) {
@@ -138,12 +149,12 @@ class AdMobAds(
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 onResult(earned)
-                loadRewarded(kind)
+                loadRewarded(unit)
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: com.google.android.gms.ads.AdError) {
                 onResult(false)
-                loadRewarded(kind)
+                loadRewarded(unit)
             }
         }
         ad.setImmersiveMode(true)
@@ -208,7 +219,7 @@ class AdMobAds(
     }
 
     private fun loadAllRewarded() {
-        for (kind in RewardKind.entries) loadRewarded(kind)
+        for (slot in RewardKind.entries.map(::adSlot).distinct()) loadRewarded(slot)
     }
 
     /** Also called opportunistically from [showRewarded]/status reads, mirroring `getStatus()`. */
@@ -217,9 +228,10 @@ class AdMobAds(
         if (disabledForSession || !initialized || info == null || !info.canRequestAds()) return
         if (rewardedAds.containsKey(kind) || loading.contains(kind)) return
         loading += kind
-        val unit = if (isDebug) TEST_UNIT else when (kind) {
-            // The revive reuses the coin reward's unit; it keeps its own preloaded instance.
-            RewardKind.Coins, RewardKind.Revive -> LIVE_COINS_UNIT
+        val unit = if (isDebug) TEST_UNIT else when (adSlot(kind)) {
+            // The revive and the x2 bonus reuse the coin reward's unit; the revive keeps its own
+            // preloaded instance, the x2 bonus shares the coin ad.
+            RewardKind.Coins, RewardKind.Revive, RewardKind.DoubleCoins -> LIVE_COINS_UNIT
             RewardKind.Pass -> LIVE_PASS_UNIT
         }
         RewardedAd.load(context, unit, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
@@ -264,7 +276,7 @@ class AdMobAds(
         val allowed = !disabledForSession && consent?.canRequestAds() == true
         state.value = AdsStatus(
             supported = true,
-            ready = RewardKind.entries.filter { allowed && rewardedAds.containsKey(it) }.toSet(),
+            ready = RewardKind.entries.filter { allowed && rewardedAds.containsKey(adSlot(it)) }.toSet(),
             interstitialReady = interstitialAllowed() && interstitial != null,
             privacyOptionsRequired = consent?.privacyOptionsRequirementStatus ==
                 ConsentInformation.PrivacyOptionsRequirementStatus.REQUIRED,

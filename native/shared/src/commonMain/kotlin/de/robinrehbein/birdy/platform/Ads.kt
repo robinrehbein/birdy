@@ -3,10 +3,11 @@ package de.robinrehbein.birdy.platform
 import kotlinx.coroutines.flow.StateFlow
 
 /**
- * Which rewarded ad unit to show (platform.md §1): coin reward, 1 h style pass, or a revive
- * after a crash near the record (never counts toward the shop's 3/day).
+ * Which rewarded ad to show (platform.md §1): shop coin reward, 1 h style pass, a revive after a
+ * crash near the record, or the game-over "coins x2" bonus (shares the coin ad unit). Neither the
+ * revive nor the x2 bonus counts toward the shop's 3/day; the x2 bonus has its own daily limit.
  */
-enum class RewardKind { Coins, Pass, Revive }
+enum class RewardKind { Coins, Pass, Revive, DoubleCoins }
 
 /** Snapshot of the ads SDK state used by the UI (`ads.js` status). */
 data class AdsStatus(

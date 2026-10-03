@@ -56,6 +56,12 @@ internal fun GameSimulation.spawnRush(z: Double) {
 internal fun GameSimulation.gateSpec(): List<GapSpec?> =
     RowGenerator.gateSpec(state.score, state.gatesSpawned, state.prevGaps, state.tutorialActive, rng).spec
 
+/**
+ * The row with index [best] is the one that, once passed, scores best + 1 (a new record), so it
+ * gets the golden marker; only for records worth chasing (best >= 5, like the record toast).
+ */
+internal fun isRecordRow(rowIndex: Int, best: Int): Boolean = best >= 5 && rowIndex == best
+
 /** `spawnGate(z)`: a rush every [Tuning.ZONE_ROWS] rows, else a pooled gate row with extras. */
 internal fun GameSimulation.spawnGate(z: Double) {
     val s = state
@@ -69,6 +75,7 @@ internal fun GameSimulation.spawnGate(z: Double) {
     val spec = gateSpec()
     gate.active = true
     GateRows.configure(gate, z, spec, rowClouds.next())
+    gate.record = isRecordRow(s.gatesSpawned, progress.data.value.best)
     if (s.tutorialActive && s.gatesSpawned == Tuning.TUT_SWITCH_ROW) tutorialGate = gate
     s.gatesSpawned++
 

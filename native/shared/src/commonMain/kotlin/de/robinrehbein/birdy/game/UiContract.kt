@@ -276,6 +276,15 @@ data class GameOverUi(
     val nextUnlock: NextUnlockUi?,
     /** Wallet chip carries the `.over` class (hidden on short screens). */
     val walletOver: Boolean = true,
+    /**
+     * The one progress goal when there is no [nextUnlock]: the unfinished daily mission closest
+     * to completion (null when all are done or an unlock bar is shown).
+     */
+    val goalMission: MissionUi? = null,
+    /** Compact "Missionen 1/3" line replacing the full [missions] list, null without missions. */
+    val missionsSummary: String? = null,
+    /** Gold "+N coins (ad)" button, null unless eligible (see `MenuTexts.doubleCoins`). */
+    val doubleCoins: ButtonUi? = null,
 )
 
 /** The cheapest cosmetic not owned yet; [ready] = affordable (glowing shortcut into the shop). */

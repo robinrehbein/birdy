@@ -2,6 +2,7 @@ package de.robinrehbein.birdy.game.loop
 
 import de.robinrehbein.birdy.game.AchievementUi
 import de.robinrehbein.birdy.game.AchievementsUi
+import de.robinrehbein.birdy.game.ButtonUi
 import de.robinrehbein.birdy.game.GameOverUi
 import de.robinrehbein.birdy.game.MissionUi
 import de.robinrehbein.birdy.game.NextUnlockUi
@@ -99,6 +100,8 @@ class MenuTexts(private val progress: ProgressRepository, private val strings: S
         val toBest = if (result.isBest || missing > 15 || best < 5) null
         else if (missing == 0) t("tieRecord") else t("toRecord", "n" to missing + 1)
         val doneNow = result.completed.map { it.id }.toSet()
+        val missions = progress.missions().map { mission(it, it.id in doneNow) }
+        val nextUnlock = nextUnlock()
         return GameOverUi(
             score = summary.score,
             coins = summary.coins,
@@ -106,16 +109,36 @@ class MenuTexts(private val progress: ProgressRepository, private val strings: S
             newBest = result.isBest,
             toBest = toBest,
             achievementLines = result.achievements.map { "[${it.icon}] ${t("achUnlocked", "name" to L(it.name))}" to it.reward },
-            missions = progress.missions().map { mission(it, it.id in doneNow) },
+            missions = missions,
             zoneReached = if (summary.zone == 0) null
             else t("zoneReached", "n" to summary.zone + 1, "name" to L(zoneName(summary.zone))),
-            nextUnlock = nextUnlock(),
+            nextUnlock = nextUnlock,
+            goalMission = if (nextUnlock != null) null else closestMission(missions),
+            missionsSummary = if (missions.isEmpty()) null
+            else t("missionsSummary", "done" to missions.count { it.done }, "total" to missions.size),
         )
     }
+
+    /** The unfinished mission with the highest progress ratio (first on ties). */
+    fun closestMission(missions: List<MissionUi>): MissionUi? =
+        missions.filter { !it.done }.maxByOrNull { it.progress.toDouble() / it.goal }
+
+    /**
+     * Game-over "coins x2" button: needs a run with >= [MIN_DOUBLE_COINS] coins, a ready rewarded
+     * ad, daily slots left, no remove-ads purchase and not yet used for this game over.
+     */
+    fun doubleCoins(runCoins: Int, adReady: Boolean, slotsLeft: Int, ownsRemoveAds: Boolean, used: Boolean, busy: Boolean): ButtonUi? =
+        if (runCoins < MIN_DOUBLE_COINS || !adReady || slotsLeft <= 0 || ownsRemoveAds || used) null
+        else ButtonUi(t("doubleCoinsAd", "n" to runCoins), !busy)
 
     /** Name of `zoneBiome(zone)`: every 4th zone is the equipped world. */
     fun zoneName(zone: Int): LocalizedText {
         val i = zone % Tuning.BIOME_COUNT
         return if (i == 0) (progress.equipped(Kind.World) as WorldItem).name else Catalog.zoneBiomes[i].name
+    }
+
+    companion object {
+        /** Minimum run coins for the game-over x2 offer. */
+        const val MIN_DOUBLE_COINS = 5
     }
 }

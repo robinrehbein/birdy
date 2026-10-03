@@ -59,6 +59,8 @@ class GateRow {
     var opacity = 1.0
     /** Row cloud decoration index from the seeded pickRowCloud() LCG (-1 = none). */
     var cloud = -1
+    /** The row whose index equals the previous best score: carries the golden record marker. */
+    var record = false
     /** Tightest clearance seen inside this row (JS `gate.minClear`, null = undefined). */
     var minClear: Double? = null
     val lanes = Array(3) { LaneState(WorldConst.LANES[it]) }

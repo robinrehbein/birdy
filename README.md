@@ -76,6 +76,12 @@ Das Spiel gibt es auf **Deutsch und Englisch**. Die Sprache richtet sich nach de
 - Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Stachelkakteen springen im Takt der Musik.
 - Soundeffekte gibt es für Flattern, Ausweichen, Punkte, Münzen, „Knapp!“, Power-ups, Zonenwechsel und Crash. Oben links schaltest du den Ton aus (samt Vibration), die Einstellung bleibt gespeichert.
 
+## Game-Over und Rekord
+
+- Der Game-Over-Bildschirm ist aufgeräumt: große Punktzahl, Rekord und Münzen klein darunter, genau ein Fortschrittsziel (nächste Freischaltung, sonst die fast fertige Tagesmission), die übrigen Missionen als eine Zeile. „Nochmal“ ist der große Button unten, „Menü“ ein kleiner Link.
+- Mit mindestens 5 Münzen im Lauf und geladener Werbung gibt es „+N Münzen (Werbung)“: die Münzen des Laufs werden ein zweites Mal gutgeschrieben (5× pro Tag, getrennt vom Shop-Limit; mit „Werbung entfernen“ wird der Button ausgeblendet).
+- Ab Rekord 5 steht in der Welt vor der Reihe, die den Rekord bricht, ein goldenes Tor als Marker.
+
 ## Speicherstand
 
 Spielstand, Rekord, Münzen, freigeschaltete Inhalte und Einstellungen liegen ausschließlich lokal
