@@ -343,8 +343,8 @@ class GameSession(
                 audio.setMuted(cmd.muted)
             }
             is UiCommand.SetReminders -> {
-                runCatching { reminders.switchTo(cmd.on) }
-                toasts.push(t(if (cmd.on) "remindOn" else "remindOff"))
+                val shown = runCatching { reminders.switchTo(cmd.on) }.getOrDefault(cmd.on)
+                toasts.push(t(if (!cmd.on) "remindOff" else if (shown) "remindOn" else "remindBlocked"))
             }
             is UiCommand.SetLang -> {
                 strings.setLang(cmd.lang)

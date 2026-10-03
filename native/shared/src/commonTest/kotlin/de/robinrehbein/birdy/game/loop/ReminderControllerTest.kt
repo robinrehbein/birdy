@@ -122,6 +122,27 @@ class ReminderControllerTest {
     }
 
     @Test
+    fun switchingOnAfterDenialAsksAgain() {
+        val r = rig("""{"runs":3}""")
+        r.fake.permission = ReminderPermission.Denied
+        r.fake.promptAnswer = false
+        r.ctl.onRunFinished()
+        assertEquals(false, r.ctl.shownOn)
+        // Still denied: the toggle reports "blocked" instead of claiming reminders are on.
+        assertEquals(false, r.ctl.switchTo(true))
+        assertEquals(2, r.fake.prompts)
+        assertTrue(r.fake.plans.isEmpty())
+        // Granted on the re-ask: reminders come back and get scheduled.
+        r.fake.promptAnswer = true
+        assertEquals(true, r.ctl.switchTo(true))
+        assertEquals(3, r.fake.prompts)
+        assertTrue(r.fake.plans.isNotEmpty())
+        // Switching off never prompts.
+        assertEquals(false, r.ctl.switchTo(false))
+        assertEquals(3, r.fake.prompts)
+    }
+
+    @Test
     fun toggleOffCancelsAndPersists() {
         val r = rig("""{"runs":4}""")
         r.ctl.onBackground()

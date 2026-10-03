@@ -89,6 +89,7 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
             "remindGift" to LocalizedText("Dein Tagesgeschenk wartet (+{n} Münzen)", "Your daily gift is waiting (+{n} coins)"),
             "remindOn" to LocalizedText("Erinnerungen an", "Reminders on"),
             "remindOff" to LocalizedText("Erinnerungen aus", "Reminders off"),
+            "remindBlocked" to LocalizedText("Mitteilungen in den Systemeinstellungen erlauben", "Allow notifications in system settings"),
         )
 
         val STRINGS: Map<String, LocalizedText> = mapOf(

@@ -68,9 +68,17 @@ class ReminderController(
 
     fun onBackground() = reschedule()
 
-    fun switchTo(on: Boolean) {
+    /**
+     * Turning on while the system permission is denied asks again (Android may still show the
+     * prompt once more). Returns [shownOn] afterwards, so the caller can tell "on" from "blocked".
+     */
+    fun switchTo(on: Boolean): Boolean {
         isOn = on
+        if (on && asked && reminders.permissionState == ReminderPermission.Denied) {
+            reminders.requestPermission { granted -> if (granted) reschedule() }
+        }
         reschedule()
+        return shownOn
     }
 
     /** Re-plans (or cancels) the single pending reminder. */
