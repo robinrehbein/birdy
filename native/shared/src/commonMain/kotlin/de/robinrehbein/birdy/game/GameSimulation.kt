@@ -88,6 +88,7 @@ class GameSimulation(
         val runs = progress.data.value.runs
         s.mode = GameMode.Playing
         s.hold = true
+        s.holdY = 5.0
         s.x = 0.0
         s.y = 5.0
         s.vy = 0.0
@@ -115,6 +116,10 @@ class GameSimulation(
         s.pose.rotZ = 0.0
         s.pose.visible = true
         s.deathCause = null
+        s.runBest = progress.data.value.best
+        s.reviveOffered = false
+        s.revived = false
+        s.revive = null
         nextGate = null
         emit(GameEvent.RunStarted(s.tutorialActive))
         // Second and fourth run: point out the swipe alternative once more.
@@ -161,6 +166,99 @@ class GameSimulation(
         emit(GameEvent.Died(cause))
     }
 
+    // --- revive ("Weiterfliegen?") ----------------------------------------------------------------
+
+    /**
+     * Injected by the session: how a revive could be paid right now (coins when automatic ads
+     * were removed, an ad when one is loaded), or null to never offer one. Default: never.
+     */
+    var reviveOption: () -> RevivePay? = { null }
+
+    /** Once per run, only with a record of [Tuning.REVIVE_MIN_BEST]+ and a score of 80 % of it. */
+    fun reviveEligible(): Boolean {
+        val s = state
+        return !s.tutorialActive && !s.reviveOffered && s.runBest >= Tuning.REVIVE_MIN_BEST &&
+            s.score * 5 >= s.runBest * 4
+    }
+
+    /** At the end of the death freeze: opens the offer if eligible and payable. */
+    internal fun offerRevive(): Boolean {
+        val s = state
+        if (!reviveEligible()) return false
+        val pay = reviveOption() ?: return false
+        s.reviveOffered = true
+        s.revive = ReviveOffer(pay)
+        return true
+    }
+
+    /** "Watch ad" / "Continue for coins": freezes the countdown; returns how to pay, or null. */
+    fun acceptRevive(): RevivePay? {
+        val offer = state.revive ?: return null
+        if (offer.pending || state.mode != GameMode.Dead) return null
+        offer.pending = true
+        return offer.pay
+    }
+
+    /** "No thanks", a tap elsewhere or the timeout: the normal game over. */
+    fun declineRevive() {
+        val offer = state.revive ?: return
+        if (offer.pending) return
+        state.revive = null
+        showGameOver()
+    }
+
+    /** Outcome of an accepted offer: [earned] revives the run, otherwise game over. */
+    fun reviveResult(earned: Boolean) {
+        val offer = state.revive ?: return
+        if (!offer.pending) return
+        state.revive = null
+        if (earned) revive(offer.pay) else showGameOver()
+    }
+
+    /**
+     * Back into the run with the same score and coins: the colliding row counts as passed (no
+     * point) and vanishes, the bird hovers in its lane at the next gap's height until the first
+     * tap, then has [Tuning.REVIVE_GRACE] seconds of the star's grace invulnerability.
+     */
+    private fun revive(pay: RevivePay) {
+        val s = state
+        s.mode = GameMode.Playing
+        s.revived = true
+        s.deathCause = null
+        s.hitStop = 0.0
+        s.shake = 0.0
+        s.deadTimer = 0.0
+        s.nearChain = 0
+        val reach = WorldConst.PIPE_RADIUS + 0.25 + s.radius
+        for (g in gates) {
+            if (!g.active || g.passed || g.z < -reach) continue
+            g.passed = true
+            g.minClear = null
+            g.visible = false
+        }
+        s.x = WorldConst.LANES[s.lane]
+        s.holdY = safeHoverY()
+        s.y = s.holdY
+        s.vy = 0.0
+        s.hold = true
+        s.grace = Tuning.REVIVE_GRACE
+        s.pose.rotX = 0.0
+        s.pose.rotZ = 0.0
+        s.pose.visible = true
+        s.hand = HandMode.None
+        s.zonesHint = ZonesHint.Hold
+        emit(GameEvent.Revived(pay))
+    }
+
+    /** Middle of the next open gap in the bird's lane, else the usual hover height. */
+    private fun safeHoverY(): Double {
+        val s = state
+        val next = gates.filter { it.active && !it.passed && it.z < 0 }.maxByOrNull { it.z } ?: return 5.0
+        val lane = next.lanes[s.lane]
+        if (lane.blocked) return 5.0
+        return SimMath.clamp((lane.hitLow + lane.hitHigh) / 2, 2.0, Tuning.CEILING - 2)
+    }
+
     /** `showGameOver()`: persists the run through `progress.finishRun`. */
     internal fun showGameOver() {
         val s = state
@@ -197,6 +295,7 @@ class GameSimulation(
         setPaused(false)
         s.mode = GameMode.Ready
         s.hold = false
+        s.revive = null
         // Leaving a run with a power-up active: no rainbow glow or mini bird in the menu.
         s.power.fill(0.0)
         s.grace = 0.0

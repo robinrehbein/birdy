@@ -2,8 +2,11 @@ package de.robinrehbein.birdy.platform
 
 import kotlinx.coroutines.flow.StateFlow
 
-/** Which rewarded ad unit to show (platform.md §1): coin reward or 1 h style pass. */
-enum class RewardKind { Coins, Pass }
+/**
+ * Which rewarded ad unit to show (platform.md §1): coin reward, 1 h style pass, or a revive
+ * after a crash near the record (never counts toward the shop's 3/day).
+ */
+enum class RewardKind { Coins, Pass, Revive }
 
 /** Snapshot of the ads SDK state used by the UI (`ads.js` status). */
 data class AdsStatus(

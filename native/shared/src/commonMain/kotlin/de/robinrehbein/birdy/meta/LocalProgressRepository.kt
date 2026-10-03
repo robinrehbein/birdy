@@ -234,6 +234,13 @@ class LocalProgressRepository(
         return true
     }
 
+    override fun spendCoins(amount: Int): Boolean {
+        val d = state.value
+        if (amount < 0 || d.coins < amount) return false
+        commit(d.copy(coins = d.coins - amount))
+        return true
+    }
+
     override fun grant(kind: Kind, id: String) {
         val d = state.value
         val owned = d.items[kind.id] ?: emptyList()

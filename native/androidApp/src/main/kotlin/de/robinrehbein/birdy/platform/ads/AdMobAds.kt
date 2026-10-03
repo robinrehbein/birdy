@@ -194,19 +194,21 @@ class AdMobAds(
             return
         }
         if (initialized) {
-            loadRewarded(RewardKind.Coins)
-            loadRewarded(RewardKind.Pass)
+            loadAllRewarded()
             loadInterstitial()
             publishStatus()
             return
         }
         MobileAds.initialize(context) {
             initialized = true
-            loadRewarded(RewardKind.Coins)
-            loadRewarded(RewardKind.Pass)
+            loadAllRewarded()
             loadInterstitial()
             publishStatus()
         }
+    }
+
+    private fun loadAllRewarded() {
+        for (kind in RewardKind.entries) loadRewarded(kind)
     }
 
     /** Also called opportunistically from [showRewarded]/status reads, mirroring `getStatus()`. */
@@ -215,7 +217,11 @@ class AdMobAds(
         if (disabledForSession || !initialized || info == null || !info.canRequestAds()) return
         if (rewardedAds.containsKey(kind) || loading.contains(kind)) return
         loading += kind
-        val unit = if (isDebug) TEST_UNIT else if (kind == RewardKind.Coins) LIVE_COINS_UNIT else LIVE_PASS_UNIT
+        val unit = if (isDebug) TEST_UNIT else when (kind) {
+            // The revive reuses the coin reward's unit; it keeps its own preloaded instance.
+            RewardKind.Coins, RewardKind.Revive -> LIVE_COINS_UNIT
+            RewardKind.Pass -> LIVE_PASS_UNIT
+        }
         RewardedAd.load(context, unit, AdRequest.Builder().build(), object : RewardedAdLoadCallback() {
             override fun onAdLoaded(ad: RewardedAd) {
                 loading -= kind
@@ -253,8 +259,7 @@ class AdMobAds(
 
     private fun publishStatus() {
         // Every status read is also a load-retry trigger, like the Java plugin's getStatus().
-        loadRewarded(RewardKind.Coins)
-        loadRewarded(RewardKind.Pass)
+        loadAllRewarded()
         loadInterstitial()
         val allowed = !disabledForSession && consent?.canRequestAds() == true
         state.value = AdsStatus(

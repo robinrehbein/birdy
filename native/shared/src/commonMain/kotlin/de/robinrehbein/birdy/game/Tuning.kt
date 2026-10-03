@@ -65,6 +65,15 @@ object Tuning {
     const val SWIPE_MIN_PX = 18.0
     const val SWIPE_MIN_WIDTH = 0.05
     const val SWIPE_DOMINANCE = 1.2
+
+    /** Revive ("Weiterfliegen?"): only once the record before the run is at least this. */
+    const val REVIVE_MIN_BEST = 10
+    /** Seconds the revive offer stays up before it counts as declined. */
+    const val REVIVE_OFFER_TIME = 3.0
+    /** Invulnerability after a revive (the star's grace blink), counted from the first tap. */
+    const val REVIVE_GRACE = 2.0
+    /** Coin price of a revive when automatic ads were removed (no ad offered then). */
+    const val REVIVE_COINS = 100
 }
 
 /** world.js exported/shared constants used by simulation and views. */

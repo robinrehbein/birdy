@@ -17,6 +17,8 @@ interface ProgressRepository {
     fun buy(kind: Kind, id: String): Boolean
     fun select(kind: Kind, id: String): Boolean
     fun buySurprise(price: Int): Boolean
+    /** Takes [amount] coins from the wallet if there are enough (revive for coins). */
+    fun spendCoins(amount: Int): Boolean
     fun grant(kind: Kind, id: String)
     fun level(upgradeId: String): Int
     /** Null when maxed. */

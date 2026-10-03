@@ -32,6 +32,7 @@ class FakeProgress(
 
     fun setBest(best: Int) { state.value = state.value.copy(best = best) }
     fun setRuns(runs: Int) { state.value = state.value.copy(runs = runs) }
+    fun setCoins(coins: Int) { state.value = state.value.copy(coins = coins) }
 
     override fun equipped(kind: Kind): CatalogItem = TODO("not used by the simulation")
     override fun owns(kind: Kind, id: String): Boolean = false
@@ -39,6 +40,12 @@ class FakeProgress(
     override fun buy(kind: Kind, id: String): Boolean = false
     override fun select(kind: Kind, id: String): Boolean = false
     override fun buySurprise(price: Int): Boolean = false
+    override fun spendCoins(amount: Int): Boolean {
+        val d = state.value
+        if (d.coins < amount) return false
+        state.value = d.copy(coins = d.coins - amount)
+        return true
+    }
     override fun grant(kind: Kind, id: String) = Unit
     override fun level(upgradeId: String): Int = levels[upgradeId] ?: 0
     override fun upgradePrice(upgradeId: String): Int? = null
