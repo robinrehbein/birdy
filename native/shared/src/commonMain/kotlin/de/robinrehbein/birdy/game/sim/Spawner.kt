@@ -75,7 +75,7 @@ internal fun GameSimulation.spawnGate(z: Double) {
     val spec = gateSpec()
     gate.active = true
     GateRows.configure(gate, z, spec, rowClouds.next())
-    gate.record = isRecordRow(s.gatesSpawned, progress.data.value.best)
+    gate.record = isRecordRow(s.gatesSpawned - s.unscoredRows, progress.data.value.best)
     if (s.tutorialActive && s.gatesSpawned == Tuning.TUT_SWITCH_ROW) tutorialGate = gate
     s.gatesSpawned++
 

@@ -183,4 +183,34 @@ class ReviveTest {
         h.run(0.5)
         assertTrue(h.state.y in 8.0..10.0)
     }
+
+    @Test
+    fun acceptedReviveWithoutAdResultTimesOutToGameOver() {
+        val h = harness()
+        emptyRun(h, score = 18)
+        crash(h)
+        h.sim.acceptRevive()
+        h.run(Tuning.REVIVE_OFFER_TIME + 0.5)
+        assertNotNull(h.state.revive, "the countdown is frozen while waiting for the ad")
+        h.run(Tuning.REVIVE_PENDING_TIMEOUT)
+        assertNull(h.state.revive)
+        assertEquals(GameMode.Over, h.state.mode)
+        assertEquals(1, h.progress.finished.size)
+    }
+
+    @Test
+    fun reviveHandsTheRecordMarkerToTheNextRow() {
+        val h = harness()
+        emptyRun(h, score = 18)
+        val near = h.sim.debug.scriptedRow(-30.0, listOf(gap, gap, gap))
+        val far = h.sim.debug.scriptedRow(-60.0, listOf(gap, gap, gap))
+        near.record = true
+        crash(h)
+        h.sim.acceptRevive()
+        h.sim.reviveResult(true)
+        // The crash row is cleared without a point, so the record now falls one row later.
+        assertEquals(1, h.state.unscoredRows)
+        assertFalse(near.record)
+        assertTrue(far.record)
+    }
 }

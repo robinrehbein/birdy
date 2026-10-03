@@ -119,6 +119,7 @@ class GameSimulation(
         s.runBest = progress.data.value.best
         s.reviveOffered = false
         s.revived = false
+        s.unscoredRows = 0
         s.revive = null
         nextGate = null
         emit(GameEvent.RunStarted(s.tutorialActive))
@@ -230,12 +231,17 @@ class GameSimulation(
         s.deadTimer = 0.0
         s.nearChain = 0
         val reach = WorldConst.PIPE_RADIUS + 0.25 + s.radius
+        val marker = gates.firstOrNull { it.active && !it.passed && it.record }
+        var cleared = 0
         for (g in gates) {
             if (!g.active || g.passed || g.z < -reach) continue
             g.passed = true
             g.minClear = null
             g.visible = false
+            cleared++
         }
+        s.unscoredRows += cleared
+        if (marker != null && cleared > 0) shiftRecordMarker(marker, cleared)
         s.x = WorldConst.LANES[s.lane]
         s.holdY = safeHoverY()
         s.y = s.holdY
@@ -248,6 +254,18 @@ class GameSimulation(
         s.hand = HandMode.None
         s.zonesHint = ZonesHint.Hold
         emit(GameEvent.Revived(pay))
+    }
+
+    /**
+     * Rows cleared by a revive score nothing, so the record falls [rows] rows later: hand the marker
+     * that many rows further ahead (rows not spawned yet follow via [GameState.unscoredRows]).
+     */
+    private fun shiftRecordMarker(marker: GateRow, rows: Int) {
+        marker.record = false
+        gates.filter { it.active && !it.passed && it.z < marker.z }
+            .sortedByDescending { it.z }
+            .getOrNull(rows - 1)
+            ?.record = true
     }
 
     /** Middle of the next open gap in the bird's lane, else the usual hover height. */

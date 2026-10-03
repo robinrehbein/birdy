@@ -109,6 +109,16 @@ class ReminderControllerTest {
     }
 
     @Test
+    fun promptWaitsForAGameOverWithoutInterstitial() {
+        val r = rig("""{"runs":3}""")
+        r.fake.permission = ReminderPermission.Denied
+        r.ctl.onRunFinished(mayAsk = false)
+        assertEquals(0, r.fake.prompts)
+        r.ctl.onRunFinished()
+        assertEquals(1, r.fake.prompts)
+    }
+
+    @Test
     fun deniedPermissionIsRespected() {
         val r = rig("""{"runs":3}""")
         r.fake.permission = ReminderPermission.Denied

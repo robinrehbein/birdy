@@ -55,11 +55,12 @@ class ReminderController(
     val shownOn: Boolean
         get() = isOn && !(asked && reminders.permissionState == ReminderPermission.Denied)
 
-    fun onRunFinished() {
+    /** [mayAsk] false postpones the permission prompt (e.g. an interstitial is about to show). */
+    fun onRunFinished(mayAsk: Boolean = true) {
         val now = clock.nowMillis()
         val hour = ReminderTiming.localHour(now, clock.utcOffsetMillis(now))
         storage.putString(StorageKeys.REMINDER_HOUR, hour.toString())
-        if (isOn && !asked && progress.data.value.runs >= PERMISSION_AFTER_RUNS) {
+        if (mayAsk && isOn && !asked && progress.data.value.runs >= PERMISSION_AFTER_RUNS) {
             asked = true
             reminders.requestPermission { granted -> if (granted) reschedule() }
         }

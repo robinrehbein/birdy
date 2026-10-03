@@ -36,6 +36,8 @@ enum class RevivePay { Ad, Coins }
 class ReviveOffer(val pay: RevivePay) {
     var timeLeft = Tuning.REVIVE_OFFER_TIME
     var pending = false
+    /** Visible game time spent waiting for the payment; frames stop while the ad covers the game. */
+    var pendingTime = 0.0
 }
 
 /** main.js `lastRun`: snapshot taken in `die()` (or by the bot harness on timeout, cause = null). */
@@ -96,6 +98,8 @@ class GameState {
     var reviveOffered = false
     /** This run was revived. */
     var revived = false
+    /** Rows cleared by a revive without scoring; shifts which row index carries the record marker. */
+    var unscoredRows = 0
     /** Non-null while the revive offer is up. */
     var revive: ReviveOffer? = null
     /** Monotonic millis when game over was shown (restart debounce 350 ms). */

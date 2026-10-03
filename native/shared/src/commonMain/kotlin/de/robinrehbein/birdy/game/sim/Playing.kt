@@ -202,6 +202,9 @@ internal fun GameSimulation.updateDead(dt: Double) {
         if (!offer.pending) {
             offer.timeLeft -= dt
             if (offer.timeLeft <= 0) declineRevive()
+        } else {
+            offer.pendingTime += dt
+            if (offer.pendingTime > Tuning.REVIVE_PENDING_TIMEOUT) reviveResult(false)
         }
     } else if (s.mode == GameMode.Dead && s.deadTimer > Tuning.DEAD_TO_OVER && !offerRevive()) {
         showGameOver()

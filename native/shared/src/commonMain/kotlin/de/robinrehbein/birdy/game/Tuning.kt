@@ -74,6 +74,11 @@ object Tuning {
     const val REVIVE_GRACE = 2.0
     /** Coin price of a revive when automatic ads were removed (no ad offered then). */
     const val REVIVE_COINS = 100
+    /**
+     * Visible seconds an accepted revive may wait for the ad result before it counts as failed
+     * (the surface is paused while the ad shows, so this only runs if the callback never comes).
+     */
+    const val REVIVE_PENDING_TIMEOUT = 6.0
 }
 
 /** world.js exported/shared constants used by simulation and views. */

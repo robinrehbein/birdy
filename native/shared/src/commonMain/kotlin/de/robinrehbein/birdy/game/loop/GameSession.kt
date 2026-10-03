@@ -658,14 +658,16 @@ class GameSession(
                 doubleCoinsUsed = false
                 doubleCoinsPending = 0
                 interstitialPacing.onRunFinished(e.summary.time)
-                runCatching { reminders.onRunFinished() }
                 // A run revived with a rewarded ad already showed an ad: no second one right away.
                 val adJustShown = revivedWithAd
                 revivedWithAd = false
-                if (!adJustShown && interstitialPacing.canShow(
-                        services.ads?.status?.value?.interstitialReady == true,
-                        ProductIds.REMOVE_ADS in progress.data.value.paidProducts,
-                    )) emitEffect(UiEffect.ShowInterstitialAd)
+                val showInterstitial = !adJustShown && interstitialPacing.canShow(
+                    services.ads?.status?.value?.interstitialReady == true,
+                    ProductIds.REMOVE_ADS in progress.data.value.paidProducts,
+                )
+                // The notification prompt waits for a game over without a full-screen ad.
+                runCatching { reminders.onRunFinished(mayAsk = !showInterstitial) }
+                if (showInterstitial) emitEffect(UiEffect.ShowInterstitialAd)
                 val r = e.summary.result
                 if (r.completed.isNotEmpty() || r.achievements.isNotEmpty() || s.coins > 0) walletBump++
             }
