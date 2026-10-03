@@ -14,11 +14,18 @@ import kotlin.math.sin
  * (`hitLow/hitHigh`) that collisions test every frame.
  */
 object GateRows {
+    /** Wandering gap timing (native addition): seconds before the bird arrives. */
+    const val WANDER_START = 2.0
+    const val WANDER_END = 0.6
+
     fun configure(row: GateRow, z: Double, spec: List<GapSpec?>, cloud: Int) {
         row.z = z
         row.cloud = cloud
         row.visible = true
         row.passed = false
+        row.wanderFrom = -1
+        row.wanderTo = -1
+        row.wanderT = 0.0
         setOpacity(row, 1.0)
         spec.forEachIndexed { i, gap ->
             val lane = row.lanes[i]
@@ -44,6 +51,52 @@ object GateRows {
             setGap(lane, gap.center, lane.size)
             lane.hitLow = lane.gapLow
             lane.hitHigh = lane.gapHigh
+            if (gap.wanderFrom >= 0) {
+                row.wanderFrom = gap.wanderFrom
+                row.wanderTo = i
+            }
+        }
+        if (row.wanderTo >= 0) startWander(row)
+    }
+
+    /**
+     * Start of a wandering gap: the gap shows in [GateRow.wanderFrom] and its final lane is pipe.
+     * Both lanes keep the gap's numbers so the view and the bot can read them in either state.
+     */
+    private fun startWander(row: GateRow) {
+        val from = row.lanes[row.wanderFrom]
+        val to = row.lanes[row.wanderTo]
+        from.center = to.center
+        from.size = to.size
+        from.amp = 0.0
+        from.hasPlant = false
+        from.pulse = false
+        from.gapLow = to.gapLow
+        from.gapHigh = to.gapHigh
+        setOpen(from, true)
+        setOpen(to, false)
+    }
+
+    private fun setOpen(lane: LaneState, open: Boolean) {
+        lane.blocked = !open
+        lane.hitLow = if (open) lane.gapLow else 0.0
+        lane.hitHigh = if (open) lane.gapHigh else 0.0
+    }
+
+    /** 0..1 slide progress when the bird (at [speed]) is [-z] units away; 1 from [WANDER_END] on. */
+    fun wanderProgress(z: Double, speed: Double): Double {
+        val left = -z / max(1.0, speed)
+        return SimMath.clamp((WANDER_START - left) / (WANDER_START - WANDER_END), 0.0, 1.0)
+    }
+
+    /** Advances a wandering gap (never backwards); the open lane switches halfway. */
+    fun wander(row: GateRow, speed: Double) {
+        if (row.wanderTo < 0 || row.wanderT >= 1.0) return
+        val before = row.wanderT
+        row.wanderT = max(before, wanderProgress(row.z, speed))
+        if (before < 0.5 && row.wanderT >= 0.5) {
+            setOpen(row.lanes[row.wanderFrom], false)
+            setOpen(row.lanes[row.wanderTo], true)
         }
     }
 

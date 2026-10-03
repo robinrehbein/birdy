@@ -6,6 +6,7 @@ import de.robinrehbein.birdy.game.PowerType
 import de.robinrehbein.birdy.game.ShopTab
 import de.robinrehbein.birdy.game.TutorialStep
 import de.robinrehbein.birdy.game.UiCommand
+import de.robinrehbein.birdy.game.sim.GateRows
 import de.robinrehbein.birdy.meta.Kind
 import kotlin.math.ceil
 
@@ -105,6 +106,15 @@ object Shots {
             g.advance(1.5)
             shot("17-gameover")
         },
+        // Wandering gap: the open column (right) trades places with the pipe in the middle.
+        Session { g ->
+            g.startRun()
+            g.run(4.0)
+            wander(g, 0.15)
+            shot("11b-wander-start")
+            wander(g, 0.5)
+            shot("11c-wander-swap")
+        },
         Session { g ->
             g.startRun()
             g.run(5.0)
@@ -186,6 +196,18 @@ object Shots {
         s.y = 5.2
         val bar = 240.0 / 124
         s.time = 2.95 * 60 / 124 + ceil(s.time / bar) * bar - 1.0 / 30
+        g.advance(1.0 / 30)
+    }
+
+    /** A scripted wandering-gap row ahead of the bird, posed at slide progress [t]. */
+    private fun wander(g: ShotGame, t: Double) {
+        val s = g.state
+        val row = g.sim.gates.filter { it.active && !it.passed }.maxByOrNull { it.z }
+        val z = -(GateRows.WANDER_START - t * (GateRows.WANDER_START - GateRows.WANDER_END)) * s.speed
+        g.sim.debug.scriptedRow(z, listOf(GapSpec(5.4, 4.4), GapSpec(5.8, 4.4, wanderFrom = 2), null), row)
+        s.lane = 1
+        s.x = 0.0
+        s.y = 5.6
         g.advance(1.0 / 30)
     }
 }

@@ -13,7 +13,8 @@ eigener OpenGL-ES-Renderer).
 - Pro durchflogener Röhren-Reihe gibt es einen Punkt, Münzen sind Bonus.
 - Leuchtende Ringe markieren die Lücken, die nächste Reihe leuchtet gelb. Durchflogene Reihen werden durchsichtig, damit sie die Sicht nicht verdecken.
 - Ab 6 Punkten bewegen sich manche Lücken auf und ab, ab 10 Punkten springen grimmige Stachelkakteen im Takt der Musik aus den Röhren. Eine Spur pro Reihe bleibt immer „einfach“.
-- Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher.
+- Ab 40 Punkten gibt es wandernde Lücken: Kurz bevor der Vogel ankommt, tauscht eine Lücke sichtbar mit der Nachbarröhre den Platz – die einfache Spur bleibt dabei immer, wo sie ist.
+- Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher. Jede Zone steigert sich bis zum Münzregen und startet danach etwas leichter; nach 40 Punkten wird es langsam weiter schwerer statt auf einem Plateau zu bleiben.
 - Der Rekord wird lokal auf dem Gerät gespeichert.
 
 ## Hochformat

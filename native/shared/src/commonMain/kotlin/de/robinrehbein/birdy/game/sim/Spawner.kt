@@ -72,14 +72,15 @@ internal fun GameSimulation.spawnGate(z: Double) {
     if (s.tutorialActive && s.gatesSpawned == Tuning.TUT_SWITCH_ROW) tutorialGate = gate
     s.gatesSpawned++
 
-    // Coins inside some (static) gaps.
+    // Coins inside some (static) gaps; a wandering gap would leave its coin floating in pipe.
     spec.forEachIndexed { i, g ->
-        if (g != null && g.amp == 0.0 && rng.nextDouble() < 0.3) placeCoin(WorldConst.LANES[i], g.center, z)
+        if (g != null && g.amp == 0.0 && g.wanderFrom < 0 && rng.nextDouble() < 0.3) placeCoin(WorldConst.LANES[i], g.center, z)
     }
 
     val prev = s.prevGaps
     val calm = (0 until 3).filter { i ->
-        prev != null && prev[i] != null && spec[i] != null && prev[i]!!.amp == 0.0 && spec[i]!!.amp == 0.0
+        prev != null && prev[i] != null && spec[i] != null && prev[i]!!.amp == 0.0 && spec[i]!!.amp == 0.0 &&
+            spec[i]!!.wanderFrom < 0
     }
 
     // Now and then a power-up floats between two rows.

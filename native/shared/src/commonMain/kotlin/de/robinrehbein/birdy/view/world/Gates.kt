@@ -13,7 +13,10 @@ import de.robinrehbein.birdy.engine.scene.StandardMaterial
 import de.robinrehbein.birdy.game.GateRow
 import de.robinrehbein.birdy.game.LaneState
 import de.robinrehbein.birdy.game.WorldConst
+import kotlin.math.PI
 import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sin
 
 /** One pipe segment's placement: body from [from] to [from] + [height], lip centre at [lipAt]. */
 internal class Segment {
@@ -32,14 +35,44 @@ internal class Segment {
 }
 
 /** world.js `setGap` / blocked-lane layout of a lane's bottom and top segments. */
-internal fun layoutLane(lane: LaneState, bottom: Segment, top: Segment) {
-    if (lane.blocked) {
+internal fun layoutLane(lane: LaneState, bottom: Segment, top: Segment) =
+    layoutColumn(lane.blocked, lane.gapLow, lane.gapHigh, bottom, top)
+
+internal fun layoutColumn(blocked: Boolean, gapLow: Double, gapHigh: Double, bottom: Segment, top: Segment) {
+    if (blocked) {
         bottom.set(0.0, WorldConst.PIPE_TOP, null)
         top.visible = false
         return
     }
-    bottom.set(0.0, lane.gapLow, lane.gapLow - 0.4)
-    top.set(lane.gapHigh, WorldConst.PIPE_TOP, lane.gapHigh + 0.4)
+    bottom.set(0.0, gapLow, gapLow - 0.4)
+    top.set(gapHigh, WorldConst.PIPE_TOP, gapHigh + 0.4)
+}
+
+/** Wandering gap slide 0..1 for progress [t]: a small flinch backwards first (the telegraph). */
+internal fun wanderEase(t: Double): Double {
+    val c = t.coerceIn(0.0, 1.0)
+    val flinch = if (c < WANDER_FLINCH) -0.08 * sin(PI * c / WANDER_FLINCH) else 0.0
+    return c * c * (3 - 2 * c) + flinch
+}
+
+private const val WANDER_FLINCH = 0.3
+/** The two columns swap places; the open one passes in front (towards the bird). */
+internal const val WANDER_DODGE = 1.3
+
+/**
+ * Where lane slot [k] of [row] is drawn while a gap wanders: the `wanderFrom` slot carries the
+ * open column, the `wanderTo` slot the full pipe, and they trade places. Writes x and z into
+ * [out]; returns false for lanes that are drawn normally.
+ */
+internal fun wanderColumn(row: GateRow, k: Int, out: DoubleArray): Boolean {
+    if (row.wanderTo < 0 || row.wanderT >= 1.0 || (k != row.wanderFrom && k != row.wanderTo)) return false
+    val e = wanderEase(row.wanderT)
+    val open = k == row.wanderFrom
+    val a = WorldConst.LANES[row.wanderFrom]
+    val b = WorldConst.LANES[row.wanderTo]
+    out[0] = if (open) a + (b - a) * e else b + (a - b) * e
+    out[1] = row.z + (if (open) 1 else -1) * sin(PI * min(1.0, max(0.0, e))) * WANDER_DODGE
+    return true
 }
 
 /**
@@ -77,6 +110,7 @@ internal class GateLayer(private val scene: Scene, private val pipes: PipeKit, h
     private val s = Vec3()
     private val bottom = Segment()
     private val top = Segment()
+    private val xz = DoubleArray(2)
 
     fun sync(gates: List<GateRow>) {
         var nb = 0; var nbl = 0; var nt = 0; var ntl = 0
@@ -89,16 +123,25 @@ internal class GateLayer(private val scene: Scene, private val pipes: PipeKit, h
             nodes.setFading(fading, row.opacity.toFloat())
             val z = row.z
             for ((k, lane) in row.lanes.withIndex()) {
-                layoutLane(lane, bottom, top)
+                var x = lane.x
+                var lz = z
+                if (wanderColumn(row, k, xz)) {
+                    x = xz[0]
+                    lz = xz[1]
+                    val gap = row.lanes[row.wanderTo]
+                    layoutColumn(k != row.wanderFrom, gap.gapLow, gap.gapHigh, bottom, top)
+                } else {
+                    layoutLane(lane, bottom, top)
+                }
                 if (fading) {
-                    nodes.lanes[k].place(bottom, top)
+                    nodes.lanes[k].place(bottom, top, x, lz - z)
                     continue
                 }
-                setBody(bottomBodies, nb++, lane.x, bottom, z)
-                bottom.lipAt?.let { setLip(bottomLips, nbl++, lane.x, it, z) }
+                setBody(bottomBodies, nb++, x, bottom, lz)
+                bottom.lipAt?.let { setLip(bottomLips, nbl++, x, it, lz) }
                 if (top.visible) {
-                    setBody(topBodies, nt++, lane.x, top, z)
-                    top.lipAt?.let { setLip(topLips, ntl++, lane.x, it, z) }
+                    setBody(topBodies, nt++, x, top, lz)
+                    top.lipAt?.let { setLip(topLips, ntl++, x, it, lz) }
                 }
             }
         }
@@ -175,7 +218,12 @@ internal class LaneNodes(x: Double, pipes: PipeKit, private val mat: StandardMat
         parent.add(bottomG, topG)
     }
 
-    fun place(bottom: Segment, top: Segment) {
+    /** [x] and [dz] (relative to the row) only differ from the lane's own while a gap wanders. */
+    fun place(bottom: Segment, top: Segment, x: Double, dz: Double) {
+        for (g in arrayOf(bottomG, topG)) {
+            g.position.x = x.toFloat()
+            g.position.z = dz.toFloat()
+        }
         apply(bottom, bottomG, bottomBody, bottomLip)
         topG.visible = top.visible
         if (top.visible) apply(top, topG, topBody, topLip)

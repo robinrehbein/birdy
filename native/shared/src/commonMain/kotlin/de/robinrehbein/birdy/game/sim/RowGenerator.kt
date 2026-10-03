@@ -22,8 +22,16 @@ class GeneratedRow(
  * `gateSpec()` (main.js:862-921, main-a.md §8.1). Draws from [rng] at exactly the JS
  * `Math.random()` call sites, except the lane-blocking shuffle, which is Fisher-Yates instead of
  * `[0,1,2].sort(() => Math.random() - 0.5)` (main-a.md §12.3: harmless, documented deviation).
+ * Native additions: rows scale with [Difficulty.intensity] instead of `difficulty()` (equal in
+ * the first zone), and from [WANDER_SCORE] a gap may wander into its neighbouring lane.
  */
 object RowGenerator {
+    /** Score from which wandering gaps appear. */
+    const val WANDER_SCORE = 40
+
+    /** Chance per row of a wandering gap: rises over the zone like the wave. */
+    fun wanderChance(gatesSpawned: Int): Double = 0.1 + 0.1 * Difficulty.zonePos(gatesSpawned)
+
     /** Scripted first-run rows: middle only, then middle blocked; null afterwards. */
     fun tutorialSpec(gatesSpawned: Int): List<GapSpec?>? {
         val gap = GapSpec(center = 5.2, size = 6.2)
@@ -43,10 +51,10 @@ object RowGenerator {
             val t = tutorialSpec(gatesSpawned)
             if (t != null) return GeneratedRow(t, Double.NaN, Double.NaN, -1)
         }
-        val d = Difficulty.difficulty(score)
+        val d = Difficulty.intensity(score, gatesSpawned)
         // Warm-up: the first rows are extra wide and near the start height.
         val warm = max(0.0, 1 - gatesSpawned.toDouble() / Tuning.WARMUP_GATES)
-        val size = 5.2 - 1.4 * d + 1.8 * warm
+        val size = max(Difficulty.MIN_GAP, 5.2 - 1.4 * d + 1.8 * warm)
         val lo = max(size / 2 + 1.2, SimMath.lerp(0.0, 4.2, warm))
         val hi = max(lo, min(Tuning.CEILING - 2.5 - size / 2, SimMath.lerp(99.0, 6.5, warm)))
         val spec = arrayOfNulls<Gap>(3)
@@ -54,7 +62,7 @@ object RowGenerator {
 
         // After a short warm-up, block some lanes (always keep at least one open).
         if (score >= 3 && gatesSpawned >= Tuning.WARMUP_GATES) {
-            val pBlock = 0.2 + 0.3 * d
+            val pBlock = 0.2 + 0.3 * min(1.0, d)
             val order = intArrayOf(0, 1, 2)
             for (i in 2 downTo 1) {
                 val j = floor(rng.nextDouble() * (i + 1)).toInt()
@@ -78,8 +86,11 @@ object RowGenerator {
         val open = (0 until 3).filter { spec[it] != null }
         // Keep one open lane "easy" (no plant, no movement).
         val easy = open[floor(rng.nextDouble() * open.size).toInt()]
+        // Wandering gap: picked before the obstacles so its gap stays plain.
+        val move = if (score >= WANDER_SCORE && rng.nextDouble() < wanderChance(gatesSpawned)) pickWander(spec, easy, rng) else null
         for (i in open) {
             if (i == easy && open.size > 1) continue
+            if (move != null && i == move.first) continue
             val g = spec[i]!!
             if (pulseChance != 0.0 && rng.nextDouble() < pulseChance) {
                 // Breathing gap: opens and narrows with the beat.
@@ -95,10 +106,30 @@ object RowGenerator {
             } else if (score >= 10 && rng.nextDouble() < (0.25 + 0.25 * d) * plantBoost) {
                 // Spiky cactus: pops out of the lower pipe in time with the music.
                 g.plant = true
+                g.size = max(g.size, Difficulty.MIN_PLANT_GAP)
                 g.plantOffset = if (rng.nextDouble() < 0.5) 0.0 else 2.0
             }
         }
+        if (move != null) {
+            // The spec holds the final layout; the gap remembers where it starts.
+            spec[move.second] = spec[move.first]!!.also { it.wanderFrom = move.first }
+            spec[move.first] = null
+        }
         makeReachable(spec, lo, hi, prevGaps, score)
         return GeneratedRow(spec.map { it?.toSpec() }, lo, hi, easy)
+    }
+
+    /**
+     * Wandering gap: a non-easy gap (from, to) that slides into a neighbouring lane which is not
+     * the easy one; whatever was there is replaced by pipe. Null if the row has no such pair.
+     */
+    private fun pickWander(spec: Array<Gap?>, easy: Int, rng: Random): Pair<Int, Int>? {
+        val moves = ArrayList<Pair<Int, Int>>()
+        for (a in 0 until 3) {
+            if (a == easy || spec[a] == null) continue
+            for (b in intArrayOf(a - 1, a + 1)) if (b in 0 until 3 && b != easy) moves.add(a to b)
+        }
+        if (moves.isEmpty()) return null
+        return moves[floor(rng.nextDouble() * moves.size).toInt()]
     }
 }
