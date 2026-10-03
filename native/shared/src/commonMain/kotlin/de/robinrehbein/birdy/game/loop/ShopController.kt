@@ -212,6 +212,8 @@ class ShopController(
                 if (!passAvailable || progress.rewardedAdsLeft == 0 || progress.stylePassMinutesLeft > 0 || passBusy) return
                 passBusy = true
             }
+            RewardKind.Revive -> return // offered by the game-over flow, not the shop
+            RewardKind.DoubleCoins -> return // game-over bonus, handled by GameSession
         }
         feedback.effect(UiEffect.ShowRewardedAd(kind))
     }
@@ -235,6 +237,8 @@ class ShopController(
                 }
                 passBusy = false
             }
+            RewardKind.Revive -> return
+            RewardKind.DoubleCoins -> return // game-over bonus, handled by GameSession
         }
         applyPreview()
     }

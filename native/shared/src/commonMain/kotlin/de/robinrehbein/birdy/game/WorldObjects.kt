@@ -13,6 +13,8 @@ data class GapSpec(
     val plant: Boolean = false,
     val plantOffset: Double = 0.0,
     val pulse: Boolean = false,
+    /** Wandering gap: the lane this gap starts in before it slides into its own (-1 = none). */
+    val wanderFrom: Int = -1,
 )
 
 /**
@@ -59,8 +61,17 @@ class GateRow {
     var opacity = 1.0
     /** Row cloud decoration index from the seeded pickRowCloud() LCG (-1 = none). */
     var cloud = -1
+    /** The row whose index equals the previous best score: carries the golden record marker. */
+    var record = false
     /** Tightest clearance seen inside this row (JS `gate.minClear`, null = undefined). */
     var minClear: Double? = null
+    /**
+     * Wandering gap (native addition): the gap starts in lane [wanderFrom] and slides into lane
+     * [wanderTo] (-1 = none) while [wanderT] runs 0..1; the lanes swap open/blocked at 0.5.
+     */
+    var wanderFrom = -1
+    var wanderTo = -1
+    var wanderT = 0.0
     val lanes = Array(3) { LaneState(WorldConst.LANES[it]) }
 }
 

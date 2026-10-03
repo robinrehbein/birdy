@@ -17,10 +17,13 @@ interface Clock {
     fun monotonicNanos(): Long
     /** Local calendar day in the device time zone. */
     fun today(): LocalDay
+    /** Local time zone offset from UTC at [atMillis] (DST aware); 0 where unknown. */
+    fun utcOffsetMillis(atMillis: Long): Long = 0L
 }
 
 /** Fixed/controllable clock for tests and deterministic screenshots. */
-class FakeClock(var millis: Long = 0L, var day: LocalDay = LocalDay(2026, 1, 1)) : Clock {
+class FakeClock(var millis: Long = 0L, var day: LocalDay = LocalDay(2026, 1, 1), var offsetMillis: Long = 0L) : Clock {
+    override fun utcOffsetMillis(atMillis: Long): Long = offsetMillis
     var nanos = 0L
     override fun nowMillis(): Long = millis
     override fun monotonicNanos(): Long = nanos

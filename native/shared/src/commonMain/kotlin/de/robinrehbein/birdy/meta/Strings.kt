@@ -40,7 +40,7 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
     override val lang: StateFlow<Lang> = state
 
     override fun t(key: String, params: Map<String, Any?>): String {
-        val entry = STRINGS[key]
+        val entry = STRINGS[key] ?: NATIVE_STRINGS[key]
         val s = entry?.get(state.value) ?: entry?.de ?: key
         return substitute(s, params)
     }
@@ -81,6 +81,16 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
             if (saved == "en") return Lang.EN
             return if (deviceLanguage.lowercase().startsWith("de")) Lang.DE else Lang.EN
         }
+
+        /** Keys added by the native app only; kept apart so [STRINGS] still mirrors the legacy table. */
+        val NATIVE_STRINGS: Map<String, LocalizedText> = mapOf(
+            "remindTitle" to LocalizedText("Birdy", "Birdy"),
+            "remindStreak" to LocalizedText("Deine {n}-Tage-Serie läuft heute ab!", "Your {n}-day streak ends today!"),
+            "remindGift" to LocalizedText("Dein Tagesgeschenk wartet (+{n} Münzen)", "Your daily gift is waiting (+{n} coins)"),
+            "remindOn" to LocalizedText("Erinnerungen an", "Reminders on"),
+            "remindOff" to LocalizedText("Erinnerungen aus", "Reminders off"),
+            "remindBlocked" to LocalizedText("Mitteilungen in den Systemeinstellungen erlauben", "Allow notifications in system settings"),
+        )
 
         val STRINGS: Map<String, LocalizedText> = mapOf(
             "zoneFlap" to LocalizedText("flattern", "flap"),
@@ -161,6 +171,13 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
             "newBest" to LocalizedText("Neuer Rekord!", "New best!"),
             "again" to LocalizedText("Nochmal", "Again"),
             "menu" to LocalizedText("Menü", "Menu"),
+            "reviveTitle" to LocalizedText("Weiterfliegen?", "Keep flying?"),
+            "reviveAd" to LocalizedText("Werbung ansehen", "Watch ad"),
+            "reviveCoins" to LocalizedText("Weiter für {n} [coin]", "Continue for {n} [coin]"),
+            "reviveNo" to LocalizedText("Nein danke", "No thanks"),
+            "doubleCoinsAd" to LocalizedText("+{n} Münzen (Werbung)", "+{n} coins (ad)"),
+            "doubleCoinsGranted" to LocalizedText("Münzen verdoppelt!", "Coins doubled!"),
+            "missionsSummary" to LocalizedText("Missionen {done}/{total}", "Missions {done}/{total}"),
             "rotate" to LocalizedText("Bitte Handy hochkant halten", "Please hold your phone upright"),
             "missions" to LocalizedText("Tagesmissionen", "Daily missions"),
             "gift" to LocalizedText("[gift] Tagesgeschenk · +{n}", "[gift] Daily gift · +{n}"),

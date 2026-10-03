@@ -567,6 +567,27 @@ points `{0,1,39,40,41,90}`. Sample rows: score 0 → speed 18.0, spacing
 30.6; score 40 → speed 34.0, spacing 37.4; score 90 → speed 39.06,
 spacing 42.97 (values rounded here to 2dp; the JSON has full precision).
 
+### 5.1 Native addition: zone waves and late-game intensity (not in main.js)
+
+Speed and spacing stay exactly the JS curve above (golden fixtures unchanged). Row
+*generation* (§8.1) scales with `intensity` instead of `difficulty`:
+
+```
+zonePos   = (gatesSpawned % ZONE_ROWS) / (ZONE_ROWS - 1)    // 0 right after a coin rush .. 1 before the next
+wave      = gatesSpawned < ZONE_ROWS ? 0 : 0.2 * difficulty() * (zonePos - 0.4)
+late      = 0.2 * (1 - exp(-max(0, score - 40) / 60))
+intensity = difficulty() + late + wave
+```
+- **Waves**: within every zone after the first the rows ramp up towards the next coin rush
+  and dip slightly right after it (−0.08 … +0.12 at full difficulty). The amplitude scales
+  with `difficulty()`, so before score 40 the wave is small, and the **whole first zone
+  (rows 0–9) is identical to JS** (`intensity == difficulty`).
+- **Late game**: the extra term keeps rows getting a little harder after score 40 (+0.2 at
+  most), where JS plateaus.
+- **Safety**: gap size is floored at `MIN_GAP = 3.6`; a cactus gap keeps at least `3.8`
+  (the JS minimum). `pBlock` uses `min(1, intensity)` (still at most 0.5). The reachability
+  budgets (§8.2) depend only on `spacing/baseSpeed` and are unchanged.
+
 ## 6. `resetGame()` (lines 758–825)
 
 Called from `flap()` when `state.mode === 'ready'` (§8), i.e. the player's
@@ -697,7 +718,8 @@ blocked) or a gap descriptor object.
 Step by step:
 1. **Tutorial override**: if `tut.active`, try `tutorialSpec()` (§7); if it
    returns non-null, return it immediately — none of the steps below run.
-2. `d = difficulty()`.
+2. `d = difficulty()`. (Native: `d = intensity`, see §5.1; equal to `difficulty()` in the
+   first zone.)
 3. **Warm-up factor**: `warm = max(0, 1 - gatesSpawned/WARMUP_GATES)` — `1`
    at row 0, linearly down to `0` at row `WARMUP_GATES=6` and beyond (never
    negative).
@@ -800,6 +822,28 @@ math) are covered by `main-a-difficulty.json` and `main-a-reachability.json`.
 The RNG-dependent parts (blocking, obstacle assignment) are **not**
 bit-exact-fixtured — see "Porting notes" below for why, and for the
 correctness invariants a port should test instead.
+
+### 8.1a Native addition: wandering gap (not in main.js)
+
+From score 40, with chance `0.1 + 0.1*zonePos` per row (rolled right after `easy` is picked),
+one non-easy open lane `from` is chosen together with a neighbouring lane `to` (`|to-from| = 1`,
+`to != easy`). `from` skips the obstacle chain (its gap stays plain); afterwards the gap moves to
+`to` (replacing whatever was there) with `wanderFrom = from`, and `from` becomes pipe. The spec
+therefore holds the **final** layout; `makeReachable`, `prevGaps`, coins and pickups all see it.
+The easy lane is never touched. About 5 % of late rows get one.
+
+- **Reachability**: a wandering gap is budgeted as one extra lane step (`k = 0.6^(steps+1)`)
+  in `fits` and in the pull-in fix of `makeReachable`, because its final lane shows late.
+- **Timing** (`GateRows.wander`, every frame before `update`): progress
+  `p = clamp((2.0 - t) / (2.0 - 0.6), 0, 1)` with `t = -z / speed` seconds to arrival, never
+  decreasing. The lanes swap open/blocked at `p = 0.5`; from 0.6 s before arrival it is settled,
+  so collisions only ever see the final layout. Both lanes keep the gap numbers.
+- **Look** (`view/world/Gates.kt`): the open column (pipes + lips) and the pipe column trade
+  places sideways with a smoothstep; the open one passes in front (towards the bird), and a
+  short flinch the other way at the start telegraphs the move.
+- **Bot**: predicting skills (pro) plan for the destination as soon as the slide starts;
+  others re-pick their lane when the chosen one closes.
+- No coins are placed in a wandering gap and no coin trail/pickup leads into it.
 
 ### 8.2 `makeReachable(spec, lo, hi)` — fairness pass (lines 923–955)
 

@@ -1,6 +1,7 @@
 package de.robinrehbein.birdy.view.world
 
 import de.robinrehbein.birdy.engine.math.Mat4
+import de.robinrehbein.birdy.engine.mesh.Primitives
 import de.robinrehbein.birdy.engine.math.Quat
 import de.robinrehbein.birdy.engine.math.Vec3
 import de.robinrehbein.birdy.engine.scene.Geometry
@@ -13,7 +14,10 @@ import de.robinrehbein.birdy.engine.scene.StandardMaterial
 import de.robinrehbein.birdy.game.GateRow
 import de.robinrehbein.birdy.game.LaneState
 import de.robinrehbein.birdy.game.WorldConst
+import kotlin.math.PI
 import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sin
 
 /** One pipe segment's placement: body from [from] to [from] + [height], lip centre at [lipAt]. */
 internal class Segment {
@@ -32,14 +36,44 @@ internal class Segment {
 }
 
 /** world.js `setGap` / blocked-lane layout of a lane's bottom and top segments. */
-internal fun layoutLane(lane: LaneState, bottom: Segment, top: Segment) {
-    if (lane.blocked) {
+internal fun layoutLane(lane: LaneState, bottom: Segment, top: Segment) =
+    layoutColumn(lane.blocked, lane.gapLow, lane.gapHigh, bottom, top)
+
+internal fun layoutColumn(blocked: Boolean, gapLow: Double, gapHigh: Double, bottom: Segment, top: Segment) {
+    if (blocked) {
         bottom.set(0.0, WorldConst.PIPE_TOP, null)
         top.visible = false
         return
     }
-    bottom.set(0.0, lane.gapLow, lane.gapLow - 0.4)
-    top.set(lane.gapHigh, WorldConst.PIPE_TOP, lane.gapHigh + 0.4)
+    bottom.set(0.0, gapLow, gapLow - 0.4)
+    top.set(gapHigh, WorldConst.PIPE_TOP, gapHigh + 0.4)
+}
+
+/** Wandering gap slide 0..1 for progress [t]: a small flinch backwards first (the telegraph). */
+internal fun wanderEase(t: Double): Double {
+    val c = t.coerceIn(0.0, 1.0)
+    val flinch = if (c < WANDER_FLINCH) -0.08 * sin(PI * c / WANDER_FLINCH) else 0.0
+    return c * c * (3 - 2 * c) + flinch
+}
+
+private const val WANDER_FLINCH = 0.3
+/** The two columns swap places; the open one passes in front (towards the bird). */
+internal const val WANDER_DODGE = 1.3
+
+/**
+ * Where lane slot [k] of [row] is drawn while a gap wanders: the `wanderFrom` slot carries the
+ * open column, the `wanderTo` slot the full pipe, and they trade places. Writes x and z into
+ * [out]; returns false for lanes that are drawn normally.
+ */
+internal fun wanderColumn(row: GateRow, k: Int, out: DoubleArray): Boolean {
+    if (row.wanderTo < 0 || row.wanderT >= 1.0 || (k != row.wanderFrom && k != row.wanderTo)) return false
+    val e = wanderEase(row.wanderT)
+    val open = k == row.wanderFrom
+    val a = WorldConst.LANES[row.wanderFrom]
+    val b = WorldConst.LANES[row.wanderTo]
+    out[0] = if (open) a + (b - a) * e else b + (a - b) * e
+    out[1] = row.z + (if (open) 1 else -1) * sin(PI * min(1.0, max(0.0, e))) * WANDER_DODGE
+    return true
 }
 
 /**
@@ -77,6 +111,7 @@ internal class GateLayer(private val scene: Scene, private val pipes: PipeKit, h
     private val s = Vec3()
     private val bottom = Segment()
     private val top = Segment()
+    private val xz = DoubleArray(2)
 
     fun sync(gates: List<GateRow>) {
         var nb = 0; var nbl = 0; var nt = 0; var ntl = 0
@@ -89,16 +124,25 @@ internal class GateLayer(private val scene: Scene, private val pipes: PipeKit, h
             nodes.setFading(fading, row.opacity.toFloat())
             val z = row.z
             for ((k, lane) in row.lanes.withIndex()) {
-                layoutLane(lane, bottom, top)
+                var x = lane.x
+                var lz = z
+                if (wanderColumn(row, k, xz)) {
+                    x = xz[0]
+                    lz = xz[1]
+                    val gap = row.lanes[row.wanderTo]
+                    layoutColumn(k != row.wanderFrom, gap.gapLow, gap.gapHigh, bottom, top)
+                } else {
+                    layoutLane(lane, bottom, top)
+                }
                 if (fading) {
-                    nodes.lanes[k].place(bottom, top)
+                    nodes.lanes[k].place(bottom, top, x, lz - z)
                     continue
                 }
-                setBody(bottomBodies, nb++, lane.x, bottom, z)
-                bottom.lipAt?.let { setLip(bottomLips, nbl++, lane.x, it, z) }
+                setBody(bottomBodies, nb++, x, bottom, lz)
+                bottom.lipAt?.let { setLip(bottomLips, nbl++, x, it, lz) }
                 if (top.visible) {
-                    setBody(topBodies, nt++, lane.x, top, z)
-                    top.lipAt?.let { setLip(topLips, ntl++, lane.x, it, z) }
+                    setBody(topBodies, nt++, x, top, lz)
+                    top.lipAt?.let { setLip(topLips, ntl++, x, it, lz) }
                 }
             }
         }
@@ -133,15 +177,17 @@ internal class RowNodes(scene: Scene, pipes: PipeKit, haze: ShaderPatch, bankMat
     private val fade = Node("fade").apply { visible = false }
     val lanes = WorldConst.LANES.map { x -> LaneNodes(x, pipes, fadeMat, fade) }
     val plants = WorldConst.LANES.map { x -> PlantNodes(x) }
+    private val record = RecordMarker(haze)
 
     init {
-        group.add(bank, fade)
+        group.add(bank, fade, record.group)
         for (pl in plants) group.add(pl.group)
         scene.add(group)
     }
 
     fun sync(row: GateRow) {
         group.position.z = row.z.toFloat()
+        record.group.visible = row.record
         bank.visible = row.cloud >= 0
         if (row.cloud >= 0) bank.geometry = RowCloudGeometry.all[row.cloud]
         for ((k, lane) in row.lanes.withIndex()) plants[k].sync(lane)
@@ -175,7 +221,12 @@ internal class LaneNodes(x: Double, pipes: PipeKit, private val mat: StandardMat
         parent.add(bottomG, topG)
     }
 
-    fun place(bottom: Segment, top: Segment) {
+    /** [x] and [dz] (relative to the row) only differ from the lane's own while a gap wanders. */
+    fun place(bottom: Segment, top: Segment, x: Double, dz: Double) {
+        for (g in arrayOf(bottomG, topG)) {
+            g.position.x = x.toFloat()
+            g.position.z = dz.toFloat()
+        }
         apply(bottom, bottomG, bottomBody, bottomLip)
         topG.visible = top.visible
         if (top.visible) apply(top, topG, topBody, topLip)
@@ -211,5 +262,52 @@ internal class PlantNodes(x: Double) {
         val w = CactusLook.PLANT_WIDTH * (1 + 0.08f * puff)
         body.scale.set(w, 1 - 0.03f * puff, w)
         mat.bristle.value = puff
+    }
+}
+
+/**
+ * The record marker: a golden gantry just in front of the row (two posts outside the lanes, a
+ * beam and a hanging banner with a ring at the flight ceiling, plus a glowing strip on the ground) so it reads from far away.
+ * Glows through an emissive gold material; meshes share static geometry.
+ */
+internal class RecordMarker(haze: ShaderPatch) {
+    private val gold = StandardMaterial().apply {
+        color.setHex(0xffd400); emissive.setHex(0xffb000); emissiveIntensity = 0.7f; roughness = 0.4f; flatShading = true
+        patch = haze
+    }
+    private val orange = StandardMaterial().apply {
+        color.setHex(0xff7a00); emissive.setHex(0xff5a00); emissiveIntensity = 0.5f; roughness = 0.5f; flatShading = true
+        patch = haze
+    }
+
+    val group = Node("record").apply {
+        visible = false
+        position.z = Z_FRONT // in front of the pipes and the row cloud (rows come towards +z)
+    }
+
+    init {
+        for (sx in floatArrayOf(-X, X)) {
+            group.add(Mesh(post, gold, "record-post").apply { position.set(sx, TOP / 2, 0f); castShadow = false })
+            // Glowing ball and an outward pennant on each post: readable beside the pipe towers.
+            group.add(Mesh(ball, orange, "record-ball").apply { position.set(sx, TOP + 0.9f, 0f); castShadow = false })
+            group.add(Mesh(flag, orange, "record-flag").apply { position.set(sx + Math.signum(sx) * 1.5f, TOP - 0.4f, 0f); castShadow = false })
+        }
+        group.add(Mesh(beam, gold, "record-beam").apply { position.set(0f, TOP, 0f); castShadow = false })
+        group.add(Mesh(banner, gold, "record-banner").apply { position.set(0f, TOP - 2.2f, 0f); castShadow = false })
+        group.add(Mesh(ring, orange, "record-ring").apply { position.set(0f, TOP - 2.2f, 0.2f); castShadow = false })
+        group.add(Mesh(strip, gold, "record-strip").apply { position.set(0f, 0.06f, 0f); castShadow = false })
+    }
+
+    private companion object {
+        const val X = 6.2f
+        const val TOP = 14.8f
+        const val Z_FRONT = 5f
+        val post by lazy { Primitives.cylinder(0.7, 0.7, TOP.toDouble(), 8) }
+        val beam by lazy { Primitives.box(2 * X + 1.0, 0.9, 0.9) }
+        val banner by lazy { Primitives.box(7.0, 2.6, 0.3) }
+        val ring by lazy { Primitives.torus(0.8, 0.24, 8, 20) }
+        val ball by lazy { Primitives.sphere(1.2, 10, 8) }
+        val flag by lazy { Primitives.box(2.4, 1.5, 0.2) }
+        val strip by lazy { Primitives.box(2 * X + 1.0, 0.1, 1.2) }
     }
 }

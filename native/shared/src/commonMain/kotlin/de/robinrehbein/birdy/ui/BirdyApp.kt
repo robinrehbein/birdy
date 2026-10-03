@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import de.robinrehbein.birdy.ui.screens.GameOverScreen
 import de.robinrehbein.birdy.ui.screens.HudScreen
 import de.robinrehbein.birdy.ui.screens.PauseScreen
 import de.robinrehbein.birdy.ui.screens.PopupOverlay
+import de.robinrehbein.birdy.ui.screens.ReviveScreen
 import de.robinrehbein.birdy.ui.screens.ShopScreen
 import de.robinrehbein.birdy.ui.screens.StartMenuScreen
 import de.robinrehbein.birdy.ui.screens.TapFxOverlay
@@ -95,6 +97,7 @@ fun BirdyApp(state: UiState, strings: Strings, onCommand: (UiCommand) -> Unit) {
                     PopupOverlay(state.popup, sizeOf)
                     ZoneBannerOverlay(state.zoneBanner)
                     TapFxOverlay(state.tapFx, sizeOf)
+                    state.revive?.let { ReviveScreen(it, onCommand) }
                     if (state.paused) PauseScreen(state, strings, onCommand)
                 }
                 GameMode.Over -> state.gameOverUi?.let {
@@ -146,6 +149,10 @@ private fun TopButtons(state: UiState, strings: Strings, onCommand: (UiCommand) 
         }
         val inRun = state.mode == GameMode.Playing || state.mode == GameMode.Dead
         if (!inRun) {
+            CornerChip(onClick = { onCommand(UiCommand.SetReminders(!state.remindersOn)) }) {
+                // The gift icon doubles as the "daily reminder" symbol; dimmed when switched off.
+                GameIcon("gift", size = 26.dp, modifier = Modifier.alpha(if (state.remindersOn) 1f else 0.35f))
+            }
             CornerChip(onClick = {
                 onCommand(UiCommand.SetLang(if (state.lang == Lang.DE) Lang.EN else Lang.DE))
             }) {
