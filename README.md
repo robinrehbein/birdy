@@ -83,6 +83,13 @@ Das Spiel gibt es auf **Deutsch und Englisch**. Die Sprache richtet sich nach de
 - Mit mindestens 5 Münzen im Lauf und geladener Werbung gibt es „+N Münzen (Werbung)“: die Münzen des Laufs werden ein zweites Mal gutgeschrieben (5× pro Tag, getrennt vom Shop-Limit; mit „Werbung entfernen“ wird der Button ausgeblendet).
 - Ab Rekord 5 steht in der Welt vor der Reihe, die den Rekord bricht, ein goldenes Tor als Marker.
 
+## Erinnerungen
+
+Optional erinnert Birdy höchstens einmal pro Tag lokal an das Tagesgeschenk bzw. die laufende Serie
+(am nächsten Tag zur typischen Spielzeit, standardmäßig 18 Uhr, nie zwischen 21:30 und 09:00). Es gibt
+keinen Server. Ab Android 13 fragt die App einmalig nach dem dritten Spiel nach der Berechtigung.
+Oben links schaltet die Geschenk-Schaltfläche die Erinnerungen aus und an.
+
 ## Speicherstand
 
 Spielstand, Rekord, Münzen, freigeschaltete Inhalte und Einstellungen liegen ausschließlich lokal
