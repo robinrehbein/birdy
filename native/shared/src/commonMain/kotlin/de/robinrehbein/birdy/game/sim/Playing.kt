@@ -91,6 +91,7 @@ private fun GameSimulation.updateGates(dt: Double, dz: Double, r: Double) {
             gate.visible = false
             continue
         }
+        GateRows.wander(gate, s.speed)
         GateRows.update(gate, s.time, s.beat)
         if (!gate.passed && gz > WorldConst.PIPE_RADIUS + r) {
             gate.passed = true

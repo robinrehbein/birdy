@@ -21,7 +21,9 @@ class RowPropertyTest {
         val r = Reach.atScore(score)
         return spec.indices.any { i ->
             val g = spec[i] ?: return@any false
-            r.reach(p.center, g.center - g.amp, abs(i - j)) && r.reach(p.center, g.center + g.amp, abs(i - j))
+            // A wandering gap is budgeted as one lane step further away.
+            val steps = abs(i - j) + if (g.wanderFrom >= 0) 1 else 0
+            r.reach(p.center, g.center - g.amp, steps) && r.reach(p.center, g.center + g.amp, steps)
         }
     }
 

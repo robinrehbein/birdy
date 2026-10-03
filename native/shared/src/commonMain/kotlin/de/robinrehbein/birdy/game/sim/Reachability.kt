@@ -19,9 +19,14 @@ class Reach(val t: Double) {
         return d <= maxRise * k && -d <= maxDrop * k
     }
 
-    /** A moving gap only counts if its whole travel range is in reach. */
-    fun fits(prev: GapSpec, gap: Gap, steps: Int): Boolean =
-        reach(prev.center, gap.center - gap.amp, steps) && reach(prev.center, gap.center + gap.amp, steps)
+    /**
+     * A moving gap only counts if its whole travel range is in reach; a wandering gap only shows
+     * its final lane late, so it is budgeted as one lane step further away.
+     */
+    fun fits(prev: GapSpec, gap: Gap, steps: Int): Boolean {
+        val n = steps + gap.wanderSteps
+        return reach(prev.center, gap.center - gap.amp, n) && reach(prev.center, gap.center + gap.amp, n)
+    }
 
     companion object {
         /** `t = spacing() / baseSpeed()` at [score]. */
@@ -44,7 +49,7 @@ fun makeReachable(spec: Array<Gap?>, lo: Double, hi: Double, prev: List<GapSpec?
         // Stable sort: ties keep the lower lane index, like Array.prototype.sort.
         val i = open.sortedBy { abs(it - j) }[0]
         val g = spec[i]!!
-        val k = Tuning.SWITCH_FACTOR.pow(abs(i - j))
+        val k = Tuning.SWITCH_FACTOR.pow(abs(i - j) + g.wanderSteps)
         g.amp = 0.0
         g.center = SimMath.clamp(g.center, p.center - r.maxDrop * k * 0.9, p.center + r.maxRise * k * 0.9)
         g.center = SimMath.clamp(g.center, lo, hi)

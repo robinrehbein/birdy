@@ -102,6 +102,31 @@ class WorldPartsTest {
     }
 
     @Test
+    fun wanderingGapColumnsSwapPlaces() {
+        val row = GateRow()
+        GateRows.configure(row, -40.0, listOf(GapSpec(5.0, 4.0), GapSpec(6.0, 4.0, wanderFrom = 2), null), -1)
+        val xz = DoubleArray(2)
+        assertFalse(wanderColumn(row, 0, xz), "other lanes draw normally")
+        assertTrue(wanderColumn(row, 2, xz))
+        assertEquals(3.0, xz[0], 1e-12, "open column starts in its origin lane")
+        assertTrue(wanderColumn(row, 1, xz))
+        assertEquals(0.0, xz[0], 1e-12, "pipe column starts in the destination lane")
+        row.wanderT = 0.1
+        assertTrue(wanderColumn(row, 2, xz))
+        assertTrue(xz[0] > 3.0, "telegraph: a small flinch away first (${xz[0]})")
+        row.wanderT = 0.5
+        assertTrue(wanderColumn(row, 2, xz))
+        assertEquals(1.5, xz[0], 1e-12)
+        assertTrue(xz[1] > row.z, "the open column passes in front")
+        assertTrue(wanderColumn(row, 1, xz))
+        assertEquals(1.5, xz[0], 1e-12)
+        assertTrue(xz[1] < row.z)
+        assertEquals(1.0, wanderEase(1.0), 1e-12)
+        row.wanderT = 1.0
+        assertFalse(wanderColumn(row, 2, xz), "settled: plain lanes again")
+    }
+
+    @Test
     fun pipeStyleRecolorsSharedGeometry() {
         val kit = PipeKit()
         val mat = kit.newMaterial()

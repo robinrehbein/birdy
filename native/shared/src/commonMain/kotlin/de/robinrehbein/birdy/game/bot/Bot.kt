@@ -40,7 +40,7 @@ class Bot(private val skill: BotSkill, private val hop: Double = BotConst.HOP, p
 
     /** Lowest cost among open lanes, or a random open lane on a mistake. */
     fun pickLane(gate: GateRow, state: GameState): Int {
-        val options = gate.lanes.indices.filter { !gate.lanes[it].blocked }
+        val options = gate.lanes.indices.filter { !closed(gate, it) }
         if (rng.nextDouble() < skill.mistake) return options[floor(rng.nextDouble() * options.size).toInt()]
         var bestI = options[0]
         var bestCost = Double.POSITIVE_INFINITY
@@ -52,6 +52,18 @@ class Bot(private val skill: BotSkill, private val hop: Double = BotConst.HOP, p
             }
         }
         return bestI
+    }
+
+    /**
+     * Whether lane [i] is (or, for a predicting player, is about to be) blocked: once a wandering
+     * gap starts sliding its destination is plain to see.
+     */
+    fun closed(gate: GateRow, i: Int): Boolean {
+        if (skill.predict && gate.wanderTo >= 0 && gate.wanderT > 0) {
+            if (i == gate.wanderFrom) return true
+            if (i == gate.wanderTo) return false
+        }
+        return gate.lanes[i].blocked
     }
 
     /** Safe band [lo, hi] for the bird's centre when it reaches the gate. */
@@ -99,6 +111,9 @@ class Bot(private val skill: BotSkill, private val hop: Double = BotConst.HOP, p
                 lane = pickLane(next, state)
                 aimOffset = (rng.nextDouble() - 0.5) * 2 * skill.noise
             }
+        } else if (next != null && closed(next, lane)) {
+            // The gap wandered away from the chosen lane: choose again.
+            lane = pickLane(next, state)
         }
 
         var aim = 6.0
