@@ -147,6 +147,14 @@ Sequence of side effects, in order:
 9. Hide `#hud`; show `#gameover`, `#wallet` (with `.over` class added — see the `@media (max-height:720px)` rule at `style.css:693-698` that hides `.wallet.over` entirely on short screens, since the game-over panel needs that vertical space instead); show `#lang-btn`.
 10. `renderWallet(bump)` where `bump = completed.length>0 || achievements.length>0 || state.coins>0` — the coin-wallet chip only does its "pop" animation if the run actually earned something.
 
+### 5.1 Revive ("Weiterfliegen?", native only, not in main.js)
+At most **once per run**, a crash can open a revive offer instead of the game over. When `updateDead()` reaches the 0.45 s mark, the offer opens instead of `showGameOver()` iff: not the tutorial, no offer yet this run, `best >= 10` and `score >= 0.8 * best` (`best` = the record **before** this run, so a new record qualifies), and the revive is payable:
+- automatic ads removed (`birdy_remove_ads` in `paidProducts`): pay **100 coins**; the offer is shown even if the wallet is short, with the button disabled;
+- otherwise only when a `RewardKind.Revive` rewarded ad is loaded (`AdsStatus.ready`); no ad → no offer. The revive ad reuses the coin reward's ad unit and never counts toward the shop's 3/day.
+
+The overlay (`ReviveScreen`, mode stays `Dead`, the bird keeps falling behind it): heading `reviveTitle`, a 3 s countdown bar, the primary button (`reviveAd`, or gold `reviveCoins` with the price) and the secondary `reviveNo`. "No thanks", a tap outside the buttons, the back button or the countdown running out decline: the normal game over (§5) follows. Accepting freezes the countdown until the payment ends; an ad without the reward also ends in the game over.
+Revived: same score, coins and run stats; the colliding row counts as passed (no point) and disappears; the bird returns to its lane and hovers at the middle of the next open gap in that lane (else at 5) with the pulsing lane hint, like the run's start, until the first tap; from then it has 2 s of the star's grace invulnerability (blink). A second crash in that run goes straight to game over. The game over of a run revived with an ad shows no interstitial.
+
 ### `renderNextUnlock()` (`main.js:1462-1479`)
 Finds the **cheapest not-yet-owned cosmetic across every catalog kind** (`KINDS` from `catalog.js`), sorted by price ascending, first = `next`. If none (everything owned): `#next-unlock` hidden, `nextUnlock=null`.
 Else: `pct = min(100, round(progress.coins/next.price*100))`.

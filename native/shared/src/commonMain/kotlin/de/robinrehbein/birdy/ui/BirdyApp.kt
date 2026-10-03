@@ -37,6 +37,7 @@ import de.robinrehbein.birdy.ui.screens.GameOverScreen
 import de.robinrehbein.birdy.ui.screens.HudScreen
 import de.robinrehbein.birdy.ui.screens.PauseScreen
 import de.robinrehbein.birdy.ui.screens.PopupOverlay
+import de.robinrehbein.birdy.ui.screens.ReviveScreen
 import de.robinrehbein.birdy.ui.screens.ShopScreen
 import de.robinrehbein.birdy.ui.screens.StartMenuScreen
 import de.robinrehbein.birdy.ui.screens.TapFxOverlay
@@ -95,6 +96,7 @@ fun BirdyApp(state: UiState, strings: Strings, onCommand: (UiCommand) -> Unit) {
                     PopupOverlay(state.popup, sizeOf)
                     ZoneBannerOverlay(state.zoneBanner)
                     TapFxOverlay(state.tapFx, sizeOf)
+                    state.revive?.let { ReviveScreen(it, onCommand) }
                     if (state.paused) PauseScreen(state, strings, onCommand)
                 }
                 GameMode.Over -> state.gameOverUi?.let {

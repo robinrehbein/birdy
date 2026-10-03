@@ -71,6 +71,8 @@ data class UiState(
     val achievements: AchievementsUi = AchievementsUi(),
     /** Non-null while the shop is open. */
     val shop: ShopUi? = null,
+    /** "Weiterfliegen?" offer after a crash near the record (mode Dead), null otherwise. */
+    val revive: ReviveUi? = null,
     /** Game-over screen details (non-null in mode Over). */
     val gameOverUi: GameOverUi? = null,
     /** Shop part thumbnails (ARGB_8888, top row first) keyed `kind:id:skinId`. */
@@ -246,6 +248,18 @@ data class ShopUi(
     val billingBusy: Boolean,
 )
 
+/**
+ * The revive offer: [percent] of the countdown left, the pay button ([coins] = gold coin-price
+ * style, disabled without enough coins or while the payment runs) and the decline label.
+ */
+data class ReviveUi(
+    val title: String,
+    val percent: Int,
+    val accept: ButtonUi,
+    val coins: Boolean,
+    val decline: String,
+)
+
 /** Game-over details (`showGameOver`, `renderNextUnlock`). */
 data class GameOverUi(
     val score: Int,
@@ -342,6 +356,10 @@ sealed class UiCommand {
     data class MenuFrame(val menu: Menu, val titleBottom: Float, val panelTop: Float) : UiCommand()
     /** Tap on the start title (5 quick taps toggle the dev FPS overlay). */
     data object TitleTap : UiCommand()
+    /** Revive offer: pay (ad or coins) and keep flying. */
+    data object ReviveAccept : UiCommand()
+    /** Revive offer: "No thanks" or a tap outside the panel; the normal game over follows. */
+    data object ReviveDecline : UiCommand()
 }
 
 /** One-off requests from the game to the app shell (need an Activity). */

@@ -22,7 +22,7 @@ internal fun GameSimulation.updatePlaying(dt: Double) {
     if (s.hold) {
         // Get ready: hover in place, ground and scenery keep scrolling.
         moveWorld(8 * dt)
-        s.y = 5 + sin(s.time * 3) * 0.35
+        s.y = s.holdY + sin(s.time * 3) * 0.35
         s.vy = cos(s.time * 3) * 1.05
         return
     }
@@ -194,7 +194,16 @@ internal fun GameSimulation.updateDead(dt: Double) {
         s.y = max(s.radius, s.y + s.vy * dt)
         s.pose.rotZ += dt * 6
     }
-    // Game over comes quickly; the fall keeps playing behind the panel.
-    if (s.mode == GameMode.Dead && s.deadTimer > Tuning.DEAD_TO_OVER) showGameOver()
+    // Game over comes quickly; the fall keeps playing behind the panel. Near the record the
+    // revive offer comes first and counts down to the game over unless accepted.
+    val offer = s.revive
+    if (s.mode == GameMode.Dead && offer != null) {
+        if (!offer.pending) {
+            offer.timeLeft -= dt
+            if (offer.timeLeft <= 0) declineRevive()
+        }
+    } else if (s.mode == GameMode.Dead && s.deadTimer > Tuning.DEAD_TO_OVER && !offerRevive()) {
+        showGameOver()
+    }
     for (gate in gates) if (gate.active) GateRows.update(gate, s.time, s.beat)
 }

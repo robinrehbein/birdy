@@ -12,9 +12,13 @@ import de.robinrehbein.birdy.game.GameSimulation
 import de.robinrehbein.birdy.game.GameOverUi
 import de.robinrehbein.birdy.game.Menu
 import de.robinrehbein.birdy.game.PowerType
+import de.robinrehbein.birdy.game.ReviveUi
+import de.robinrehbein.birdy.game.RevivePay
 import de.robinrehbein.birdy.game.RunSummary
 import de.robinrehbein.birdy.game.ShopTab
 import de.robinrehbein.birdy.game.ShopUi
+import de.robinrehbein.birdy.game.ButtonUi
+import de.robinrehbein.birdy.game.Tuning
 import de.robinrehbein.birdy.game.StartMenuUi
 import de.robinrehbein.birdy.game.AchievementsUi
 import de.robinrehbein.birdy.game.ThumbnailUi
@@ -22,6 +26,7 @@ import de.robinrehbein.birdy.game.UiCommand
 import de.robinrehbein.birdy.game.UiEffect
 import de.robinrehbein.birdy.game.UiState
 import de.robinrehbein.birdy.game.WorldConst
+import de.robinrehbein.birdy.game.jsRound
 import de.robinrehbein.birdy.meta.Kind
 import de.robinrehbein.birdy.meta.LocalizedText
 import de.robinrehbein.birdy.meta.Missions
@@ -36,6 +41,7 @@ import de.robinrehbein.birdy.meta.WorldItem
 import de.robinrehbein.birdy.platform.AdsStatus
 import de.robinrehbein.birdy.platform.BillingStatus
 import de.robinrehbein.birdy.platform.PlatformServices
+import de.robinrehbein.birdy.platform.RewardKind
 import de.robinrehbein.birdy.platform.ads.InterstitialPacing
 import de.robinrehbein.birdy.platform.purchase.ProductIds
 import de.robinrehbein.birdy.view.FrameInfo
@@ -122,6 +128,8 @@ class GameSession(
     private var walletBump = 0
     private var summary: RunSummary? = null
     private var gameOverUi: GameOverUi? = null
+    /** The current run was revived with a rewarded ad: skip the interstitial at its game over. */
+    private var revivedWithAd = false
     private val thumbnails = HashMap<String, ThumbnailUi>()
     private var thumbnailVersion = 0
 
@@ -175,6 +183,7 @@ class GameSession(
     init {
         shop = ShopController(progress, strings, preview, feedback, uiRandom)
         sim.clockMillis = { realTimeMs.toLong() }
+        sim.reviveOption = { reviveOption() }
         views.world?.attach(scene)
         views.bird?.attach(scene)
         views.fx?.attach(scene)
@@ -315,8 +324,8 @@ class GameSession(
             is UiCommand.Surprise -> shop.surprise()
             is UiCommand.RandomizeOutfit -> shop.dice()
             is UiCommand.ClaimGift -> claimGift()
-            is UiCommand.RewardEarned -> shop.adResult(cmd.kind, true)
-            is UiCommand.RewardResult -> shop.adResult(cmd.kind, cmd.earned)
+            is UiCommand.RewardEarned -> adResult(cmd.kind, true)
+            is UiCommand.RewardResult -> adResult(cmd.kind, cmd.earned)
             is UiCommand.InterstitialShown -> if (cmd.shown) interstitialPacing.markShown()
             is UiCommand.RequestRewardedAd -> shop.requestAd(cmd.kind)
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
@@ -335,6 +344,8 @@ class GameSession(
             }
             is UiCommand.ToggleFps -> toggleFps()
             is UiCommand.TitleTap -> if (secretTaps.tap(realTimeMs)) toggleFps()
+            is UiCommand.ReviveAccept -> acceptRevive()
+            is UiCommand.ReviveDecline -> sim.declineRevive()
             is UiCommand.AppVisible -> visibility(cmd.visible)
             is UiCommand.MenuFrame -> {
                 menuFrames[cmd.menu] = MenuFrameInfo.fromLayout(cmd.titleBottom.toDouble(), cmd.panelTop.toDouble())
@@ -383,6 +394,11 @@ class GameSession(
 
     private fun back() {
         val s = sim.state
+        if (s.revive != null) {
+            // Back on the revive offer declines it (the run is still saved via game over).
+            sim.declineRevive()
+            return
+        }
         when (MenuFlow.backAction(s.mode, s.paused, s.menu)) {
             BackAction.Pause -> sim.setPaused(true)
             BackAction.ToMenu -> goToMenu()
@@ -400,6 +416,50 @@ class GameSession(
         } else if (!s.paused) {
             audio.setSuspended(false)
         }
+    }
+
+    // --- revive -----------------------------------------------------------------------------------
+
+    /**
+     * How a revive could be paid now: coins once automatic ads were removed, otherwise only with
+     * a loaded rewarded ad (no offer at all without one). Never touches the shop's 3/day count.
+     */
+    private fun reviveOption(): RevivePay? {
+        if (ProductIds.REMOVE_ADS in progress.data.value.paidProducts) return RevivePay.Coins
+        val ads = services.ads?.status?.value ?: return null
+        return if (ads.supported && RewardKind.Revive in ads.ready) RevivePay.Ad else null
+    }
+
+    private fun acceptRevive() {
+        val offer = sim.state.revive ?: return
+        if (offer.pay == RevivePay.Coins && progress.data.value.coins < Tuning.REVIVE_COINS) return
+        when (sim.acceptRevive()) {
+            RevivePay.Ad -> emitEffect(UiEffect.ShowRewardedAd(RewardKind.Revive))
+            RevivePay.Coins -> {
+                val paid = progress.spendCoins(Tuning.REVIVE_COINS)
+                if (paid) walletBump++
+                sim.reviveResult(paid)
+            }
+            null -> Unit
+        }
+    }
+
+    private fun adResult(kind: RewardKind, earned: Boolean) {
+        if (kind != RewardKind.Revive) return shop.adResult(kind, earned)
+        if (earned && sim.state.revive?.pending == true) revivedWithAd = true
+        sim.reviveResult(earned)
+    }
+
+    private fun reviveUi(): ReviveUi? {
+        val offer = sim.state.revive ?: return null
+        val coins = offer.pay == RevivePay.Coins
+        val percent = jsRound(offer.timeLeft / Tuning.REVIVE_OFFER_TIME * 100).coerceIn(0, 100)
+        val accept = if (coins) {
+            ButtonUi(t("reviveCoins", mapOf("n" to Tuning.REVIVE_COINS)), !offer.pending && progress.data.value.coins >= Tuning.REVIVE_COINS)
+        } else {
+            ButtonUi(t("reviveAd"), !offer.pending)
+        }
+        return ReviveUi(t("reviveTitle"), percent, accept, coins, t("reviveNo"))
     }
 
     fun goToMenu() {
@@ -538,6 +598,10 @@ class GameSession(
                 audio.sfx(Sfx.Zone)
             }
             GameEvent.Bounce -> audio.sfx(Sfx.Bounce)
+            is GameEvent.Revived -> {
+                audio.sfx(Sfx.PowerUp(PowerType.Star))
+                zones.invalidate()
+            }
             is GameEvent.Died -> {
                 audio.sfx(Sfx.Hit)
                 audio.duck()
@@ -549,7 +613,10 @@ class GameSession(
                 summary = e.summary
                 gameOverUi = texts.gameOver(e.summary)
                 interstitialPacing.onRunFinished(e.summary.time)
-                if (interstitialPacing.canShow(
+                // A run revived with a rewarded ad already showed an ad: no second one right away.
+                val adJustShown = revivedWithAd
+                revivedWithAd = false
+                if (!adJustShown && interstitialPacing.canShow(
                         services.ads?.status?.value?.interstitialReady == true,
                         ProductIds.REMOVE_ADS in progress.data.value.paidProducts,
                     )) emitEffect(UiEffect.ShowInterstitialAd)
@@ -582,6 +649,7 @@ class GameSession(
                 applyBird()
                 summary = null
                 gameOverUi = null
+                revivedWithAd = false
                 zones.invalidate()
             }
             GameEvent.HoldEnded -> Unit
@@ -657,6 +725,7 @@ class GameSession(
             zonesHint = zonesUi,
             gameOver = if (s.mode == GameMode.Over) summary else null,
             gameOverUi = if (s.mode == GameMode.Over) gameOverUi else null,
+            revive = if (s.mode == GameMode.Dead) reviveUi() else null,
             shopKind = shop.tab.kind ?: base.shopKind,
             progress = data,
             lang = lang,

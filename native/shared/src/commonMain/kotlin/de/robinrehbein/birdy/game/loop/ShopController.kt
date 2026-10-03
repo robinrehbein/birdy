@@ -212,6 +212,7 @@ class ShopController(
                 if (!passAvailable || progress.rewardedAdsLeft == 0 || progress.stylePassMinutesLeft > 0 || passBusy) return
                 passBusy = true
             }
+            RewardKind.Revive -> return // offered by the game-over flow, not the shop
         }
         feedback.effect(UiEffect.ShowRewardedAd(kind))
     }
@@ -235,6 +236,7 @@ class ShopController(
                 }
                 passBusy = false
             }
+            RewardKind.Revive -> return
         }
         applyPreview()
     }

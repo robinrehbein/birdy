@@ -34,6 +34,8 @@ sealed class GameEvent {
      * bird + [hitOffset], white flash 0.55. Hit-stop and shake are in [GameState].
      */
     data class Died(val cause: DeathCause) : GameEvent()
+    /** The run was revived ([pay]): back to the hover with the revive grace, same score and coins. */
+    data class Revived(val pay: RevivePay) : GameEvent()
     /** `showGameOver()`: `music.setMode(menu)`, game-over screen. */
     data class GameOver(val summary: RunSummary) : GameEvent()
     /** Newly reached daily missions mid-run: toast `[check] text +reward` and `sfx.powerup()` each. */
