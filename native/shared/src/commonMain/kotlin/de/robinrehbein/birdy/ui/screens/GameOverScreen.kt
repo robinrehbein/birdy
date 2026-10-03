@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -23,7 +24,9 @@ import de.robinrehbein.birdy.meta.Strings
 import de.robinrehbein.birdy.ui.BirdyColors
 import de.robinrehbein.birdy.ui.ButtonStyle
 import de.robinrehbein.birdy.ui.Heading
-import de.robinrehbein.birdy.ui.StatsGrid
+import de.robinrehbein.birdy.platform.RewardKind
+import de.robinrehbein.birdy.ui.TextLink
+import de.robinrehbein.birdy.ui.bodyFont
 import de.robinrehbein.birdy.ui.displayFont
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.text.TextStyle
@@ -60,35 +63,44 @@ fun GameOverScreen(
         Scrim(Modifier.fillMaxSize())
 
         Panel(Modifier.padding(16.dp)) {
-            // `#gameover h2` shrinks to 38px on short screens (@media max-height 720px).
-            Heading(strings.t("gameOver"), Modifier.padding(bottom = if (shortScreenHideWallet) 10.dp else 16.dp), size = if (shortScreenHideWallet) 38.sp else 48.sp)
-            StatsGrid(
-                listOf(
-                    strings.t("score") to ui.score.toString(),
-                    strings.t("coins") to ui.coins.toString(),
-                    strings.t("best") to ui.best.toString(),
-                ),
-                Modifier.padding(bottom = 16.dp),
-                valueSize = if (shortScreenHideWallet) 26.sp else 32.sp,
+            // Decluttered: big score on top, best/coins as small secondary stats, then exactly one
+            // progress goal (next unlock, else the closest daily mission) and the actions.
+            val short = shortScreenHideWallet
+            Heading(strings.t("gameOver"), Modifier.padding(bottom = 0.dp), size = if (short) 28.sp else 34.sp)
+            OutlinedText(ui.score.toString(), size = if (short) 64.sp else 84.sp, color = BirdyColors.White, thickness = 4.dp, down = 5.dp)
+            BasicText(
+                "${strings.t("best")} ${ui.best}  ·  ${strings.t("coins")} ${ui.coins}",
+                Modifier.padding(bottom = 10.dp),
+                style = TextStyle(fontFamily = displayFont(), fontSize = 16.sp, color = BirdyColors.Ink.copy(alpha = 0.75f), textAlign = TextAlign.Center),
             )
             if (ui.newBest) {
-                BasicText(strings.t("newBest"), Modifier.padding(bottom = 14.dp), style = TextStyle(fontFamily = displayFont(), fontSize = 22.sp, color = BirdyColors.Orange))
-            }
-            if (ui.toBest != null) {
-                BasicText(ui.toBest, Modifier.padding(bottom = 12.dp), style = TextStyle(fontFamily = displayFont(), fontSize = 18.sp, color = BirdyColors.Ink, textAlign = TextAlign.Center))
+                BasicText(strings.t("newBest"), Modifier.padding(bottom = 10.dp), style = TextStyle(fontFamily = displayFont(), fontSize = 22.sp, color = BirdyColors.Orange))
+            } else if (ui.toBest != null) {
+                BasicText(ui.toBest, Modifier.padding(bottom = 10.dp), style = TextStyle(fontFamily = displayFont(), fontSize = 18.sp, color = BirdyColors.Ink, textAlign = TextAlign.Center))
             }
             if (ui.zoneReached != null) {
-                RichText(ui.zoneReached, Modifier.padding(bottom = 8.dp), size = 16.sp, color = BirdyColors.Orange, font = displayFont(), center = true)
+                RichText(ui.zoneReached, Modifier.padding(bottom = 8.dp), size = 14.sp, color = BirdyColors.Orange, font = displayFont(), center = true)
             }
             if (ui.nextUnlock != null) {
                 NextUnlockBar(ui.nextUnlock.text, ui.nextUnlock.percent, ui.nextUnlock.ready) { onCommand(UiCommand.NextUnlock) }
+            } else if (ui.goalMission != null) {
+                MissionRow(ui.goalMission, Modifier.padding(bottom = 6.dp))
             }
-            Column(Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
-                for ((line, reward) in ui.achievementLines) AchievementLine(line, reward)
-                for (m in ui.missions) MissionRow(m)
+            for ((line, reward) in ui.achievementLines) AchievementLine(line, reward)
+            if (ui.missionsSummary != null) {
+                BasicText(ui.missionsSummary, Modifier.padding(top = 2.dp, bottom = 8.dp), style = TextStyle(fontFamily = bodyFont(), fontSize = 14.sp, color = BirdyColors.Ink.copy(alpha = 0.75f), textAlign = TextAlign.Center))
             }
-            GameButton(strings.t("again"), { onCommand(UiCommand.Restart) }, Modifier.fillMaxWidth())
-            GameButton(strings.t("menu"), { onCommand(UiCommand.GoToMenu) }, Modifier.fillMaxWidth().padding(top = 10.dp), ButtonStyle.Secondary)
+            if (ui.doubleCoins != null) {
+                GameButton(
+                    ui.doubleCoins.label,
+                    { onCommand(UiCommand.RequestRewardedAd(RewardKind.DoubleCoins)) },
+                    Modifier.fillMaxWidth().padding(bottom = 10.dp),
+                    ButtonStyle.Gift,
+                    enabled = ui.doubleCoins.enabled,
+                )
+            }
+            GameButton(strings.t("again"), { onCommand(UiCommand.Restart) }, Modifier.fillMaxWidth().heightIn(min = 72.dp), ButtonStyle.Primary)
+            TextLink(strings.t("menu"), { onCommand(UiCommand.GoToMenu) }, Modifier.padding(top = 10.dp, bottom = 4.dp).padding(horizontal = 24.dp, vertical = 8.dp), size = 16f)
         }
     }
 }

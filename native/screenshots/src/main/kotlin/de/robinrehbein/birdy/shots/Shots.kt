@@ -90,20 +90,29 @@ object Shots {
             g.run(90.0) { g.state.zone >= 3 }
             g.run(3.0)
             shot("12-zone-4")
-            // Crash: no god mode, dive into the ground.
-            g.sim.debug.setGod(false)
-            for (p in PowerType.entries) g.state.power[p.ordinal] = 0.0
-            g.state.grace = 0.0
-            var t = 0.0
-            while (g.state.mode == GameMode.Playing && t < 10) {
-                g.state.vy = -22.0
-                g.advance(1.0 / 30)
-                t += 1.0 / 30
-            }
+            crash(g)
             g.advance(0.1)
             shot("16-crash")
             g.advance(1.5)
             shot("17-gameover")
+        },
+        // The golden record marker on the row that beats the previous best (best >= 5).
+        Session(save = """{"best":5,"runs":6,"tutorialDone":true,"coins":120}""") { g ->
+            g.startRun()
+            g.run(1.0)
+            // Normally the row with index == best; here simply the third row ahead.
+            g.sim.gates.filter { it.active && !it.passed }.sortedByDescending { it.z }.getOrNull(2)?.record = true
+            g.advance(0.2)
+            shot("25-record-marker")
+        },
+        // Game over with a ready rewarded ad: the gold "+N coins (ad)" button.
+        Session(store = true) { g ->
+            g.startRun()
+            g.run(8.0)
+            g.state.coins = 17
+            crash(g)
+            g.advance(1.6)
+            shot("26-gameover-x2")
         },
         Session { g ->
             g.startRun()
@@ -171,6 +180,19 @@ object Shots {
             shot("24-menu-en")
         },
     )
+
+    /** No god mode, dive into the ground. */
+    private fun crash(g: ShotGame) {
+        g.sim.debug.setGod(false)
+        for (p in PowerType.entries) g.state.power[p.ordinal] = 0.0
+        g.state.grace = 0.0
+        var t = 0.0
+        while (g.state.mode == GameMode.Playing && t < 10) {
+            g.state.vy = -22.0
+            g.advance(1.0 / 30)
+            t += 1.0 / 30
+        }
+    }
 
     /** store-shots.mjs "kaktus": a real row with a fully risen cactus next to the bird. */
     private fun cactus(g: ShotGame) {

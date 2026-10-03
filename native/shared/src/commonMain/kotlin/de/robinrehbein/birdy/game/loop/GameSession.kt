@@ -33,7 +33,9 @@ import de.robinrehbein.birdy.meta.SkinItem
 import de.robinrehbein.birdy.meta.Strings
 import de.robinrehbein.birdy.meta.TrailItem
 import de.robinrehbein.birdy.meta.WorldItem
+import de.robinrehbein.birdy.game.ButtonUi
 import de.robinrehbein.birdy.platform.AdsStatus
+import de.robinrehbein.birdy.platform.RewardKind
 import de.robinrehbein.birdy.platform.BillingStatus
 import de.robinrehbein.birdy.platform.PlatformServices
 import de.robinrehbein.birdy.platform.ads.InterstitialPacing
@@ -122,6 +124,9 @@ class GameSession(
     private var walletBump = 0
     private var summary: RunSummary? = null
     private var gameOverUi: GameOverUi? = null
+    /** Game-over "coins x2": used for this game over / ad in flight with the coins it will double. */
+    private var doubleCoinsUsed = false
+    private var doubleCoinsPending = 0
     private val thumbnails = HashMap<String, ThumbnailUi>()
     private var thumbnailVersion = 0
 
@@ -315,10 +320,11 @@ class GameSession(
             is UiCommand.Surprise -> shop.surprise()
             is UiCommand.RandomizeOutfit -> shop.dice()
             is UiCommand.ClaimGift -> claimGift()
-            is UiCommand.RewardEarned -> shop.adResult(cmd.kind, true)
-            is UiCommand.RewardResult -> shop.adResult(cmd.kind, cmd.earned)
+            is UiCommand.RewardEarned -> rewardResult(cmd.kind, true)
+            is UiCommand.RewardResult -> rewardResult(cmd.kind, cmd.earned)
             is UiCommand.InterstitialShown -> if (cmd.shown) interstitialPacing.markShown()
-            is UiCommand.RequestRewardedAd -> shop.requestAd(cmd.kind)
+            is UiCommand.RequestRewardedAd ->
+                if (cmd.kind == RewardKind.DoubleCoins) requestDoubleCoins() else shop.requestAd(cmd.kind)
             is UiCommand.AdPrivacy -> emitEffect(UiEffect.ShowPrivacyOptions)
             is UiCommand.AdAgeSettings -> emitEffect(UiEffect.ShowAgeSettings)
             is UiCommand.BuyReal -> shop.buyReal(cmd.productId)
@@ -441,6 +447,35 @@ class GameSession(
         menuDirty = true
     }
 
+    private fun doubleCoinsUi(ads: AdsStatus): ButtonUi? {
+        val sum = summary ?: return null
+        return texts.doubleCoins(
+            sum.coins, RewardKind.DoubleCoins in ads.ready, progress.doubleCoinsAdsLeft,
+            ProductIds.REMOVE_ADS in progress.data.value.paidProducts, doubleCoinsUsed, doubleCoinsPending > 0,
+        )
+    }
+
+    private fun requestDoubleCoins() {
+        val ads = services.ads?.status?.value ?: return
+        if (summary == null || doubleCoinsUi(ads)?.enabled != true) return
+        doubleCoinsPending = summary?.coins ?: return
+        emitEffect(UiEffect.ShowRewardedAd(RewardKind.DoubleCoins))
+    }
+
+    private fun rewardResult(kind: RewardKind, earned: Boolean) {
+        if (kind != RewardKind.DoubleCoins) return shop.adResult(kind, earned)
+        val coins = doubleCoinsPending
+        doubleCoinsPending = 0
+        if (!earned) {
+            toasts.push(t("rewardUnavailable"))
+        } else if (!doubleCoinsUsed && progress.grantDoubleCoins(coins) > 0) {
+            doubleCoinsUsed = true
+            toasts.push(t("doubleCoinsGranted"))
+            walletBump++
+            menuDirty = true
+        }
+    }
+
     private fun toggleFps() {
         showFps = !showFps
         runCatching { settings.fpsOverlay = showFps }
@@ -548,6 +583,8 @@ class GameSession(
                 audio.setMode(MusicMode.Menu)
                 summary = e.summary
                 gameOverUi = texts.gameOver(e.summary)
+                doubleCoinsUsed = false
+                doubleCoinsPending = 0
                 interstitialPacing.onRunFinished(e.summary.time)
                 if (interstitialPacing.canShow(
                         services.ads?.status?.value?.interstitialReady == true,
@@ -656,7 +693,7 @@ class GameSession(
             tutorialHand = hand,
             zonesHint = zonesUi,
             gameOver = if (s.mode == GameMode.Over) summary else null,
-            gameOverUi = if (s.mode == GameMode.Over) gameOverUi else null,
+            gameOverUi = if (s.mode == GameMode.Over) gameOverUi?.copy(doubleCoins = doubleCoinsUi(ads)) else null,
             shopKind = shop.tab.kind ?: base.shopKind,
             progress = data,
             lang = lang,

@@ -79,6 +79,8 @@ class LocalProgressRepository(
         val gift = Gift(giftObj.str("last") ?: "", giftObj.intOrNull("streak") ?: 0)
         val rewardedAdsObj = o.child("rewardedAds")
         val rewardedAds = RewardedAds(rewardedAdsObj.str("day") ?: "", rewardedAdsObj.intOrNull("count") ?: 0)
+        val doubleAdsObj = o.child("doubleCoinsAds")
+        val doubleCoinsAds = RewardedAds(doubleAdsObj.str("day") ?: "", doubleAdsObj.intOrNull("count") ?: 0)
         val stylePassUntil = o.longOrNull("stylePassUntil") ?: 0L
         val paidProducts = o.strList("paidProducts") ?: emptyList()
         val tutorialDone = o.boolOrNull("tutorialDone") ?: false
@@ -131,7 +133,7 @@ class LocalProgressRepository(
 
         return ProgressData(
             coins = coins, best = best, runs = runs, owned = owned, skin = skinLegacy,
-            missions = missions, gift = gift, rewardedAds = rewardedAds, stylePassUntil = stylePassUntil,
+            missions = missions, gift = gift, rewardedAds = rewardedAds, doubleCoinsAds = doubleCoinsAds, stylePassUntil = stylePassUntil,
             paidProducts = paidProducts, tutorialDone = tutorialDone,
             trails = trailsLegacy, trail = trailLegacy, stats = stats, achieved = achieved,
             items = items, equip = equip, upgrades = upgrades,
@@ -364,6 +366,22 @@ class LocalProgressRepository(
         return REWARDED_COINS
     }
 
+    override val doubleCoinsAdsLeft: Int
+        get() {
+            val a = state.value.doubleCoinsAds
+            return maxOf(0, DOUBLE_COINS_ADS_PER_DAY - if (a.day == today()) a.count else 0)
+        }
+
+    override fun grantDoubleCoins(runCoins: Int): Int {
+        if (runCoins <= 0 || doubleCoinsAdsLeft == 0) return 0
+        val d = state.value
+        commit(d.copy(
+            coins = d.coins + runCoins,
+            doubleCoinsAds = RewardedAds(today(), DOUBLE_COINS_ADS_PER_DAY - doubleCoinsAdsLeft + 1),
+        ))
+        return runCoins
+    }
+
     override val stylePassMinutesLeft: Int
         get() {
             val leftMs = state.value.stylePassUntil - clock.nowMillis()
@@ -423,6 +441,7 @@ class LocalProgressRepository(
         private const val GIFT_STEP = 10
         private const val GIFT_MAX_STREAK = 7
         private const val REWARDED_ADS_PER_DAY = 3
+        const val DOUBLE_COINS_ADS_PER_DAY = 5
         private const val REWARDED_COINS = 30
         private const val STYLE_PASS_MS = 60L * 60L * 1000L
 

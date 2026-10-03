@@ -1,6 +1,6 @@
 {
   "source": "src/i18n.js",
-  "keyCount": 85,
+  "keyCount": 91,
   "de": {
     "zoneFlap": "flattern",
     "zoneMove": "wischen",
@@ -68,6 +68,9 @@
     "newBest": "Neuer Rekord!",
     "again": "Nochmal",
     "menu": "Menü",
+    "doubleCoinsAd": "+{n} Münzen (Werbung)",
+    "doubleCoinsGranted": "Münzen verdoppelt!",
+    "missionsSummary": "Missionen {done}/{total}",
     "rotate": "Bitte Handy hochkant halten",
     "missions": "Tagesmissionen",
     "gift": "[gift] Tagesgeschenk · +{n}",
@@ -158,6 +161,9 @@
     "newBest": "New best!",
     "again": "Again",
     "menu": "Menu",
+    "doubleCoinsAd": "+{n} coins (ad)",
+    "doubleCoinsGranted": "Coins doubled!",
+    "missionsSummary": "Missions {done}/{total}",
     "rotate": "Please hold your phone upright",
     "missions": "Daily missions",
     "gift": "[gift] Daily gift · +{n}",

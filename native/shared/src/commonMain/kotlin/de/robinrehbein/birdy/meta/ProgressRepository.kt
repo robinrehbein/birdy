@@ -43,6 +43,10 @@ interface ProgressRepository {
     // --- rewarded ads / style pass ---
     val rewardedAdsLeft: Int
     fun grantRewardedCoins(): Int
+    /** Game-over "coins x2" ads left today (own limit, separate from [rewardedAdsLeft]). */
+    val doubleCoinsAdsLeft: Int
+    /** Credits [runCoins] a second time and uses one x2 slot; returns the amount granted (0 = limit reached / nothing to grant). */
+    fun grantDoubleCoins(runCoins: Int): Int
     val stylePassMinutesLeft: Int
     fun grantStylePass(): Boolean
 

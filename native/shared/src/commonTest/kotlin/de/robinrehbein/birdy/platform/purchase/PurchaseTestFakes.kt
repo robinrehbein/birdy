@@ -85,6 +85,8 @@ class FakePurchaseProgress : ProgressRepository {
     override fun claimGift(): GiftClaim? = null
     override val rewardedAdsLeft: Int get() = 0
     override fun grantRewardedCoins(): Int = 0
+    override val doubleCoinsAdsLeft: Int get() = 0
+    override fun grantDoubleCoins(runCoins: Int): Int = 0
     override val stylePassMinutesLeft: Int get() = 0
     override fun grantStylePass(): Boolean = false
 }
