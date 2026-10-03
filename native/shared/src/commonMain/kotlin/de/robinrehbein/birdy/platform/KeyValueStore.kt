@@ -24,6 +24,12 @@ object StorageKeys {
     const val QUALITY = "birdy-quality"
     const val FPS = "birdy-fps"
     const val INTERSTITIAL_PACING = "birdy-interstitial-pacing"
+    /** Native-only: "0" = reminder notifications switched off (absent = on). */
+    const val REMINDERS = "birdy-reminders"
+    /** Native-only: local hour (0-23) of the last finished run, the player's typical play hour. */
+    const val REMINDER_HOUR = "birdy-reminder-hour"
+    /** Native-only: "1" once the notification permission prompt was shown. */
+    const val REMINDER_ASKED = "birdy-reminder-asked"
     /** Native-only: set once the WebView localStorage import has completed ("1"). */
     const val MIGRATED = "birdy-native-migrated"
 

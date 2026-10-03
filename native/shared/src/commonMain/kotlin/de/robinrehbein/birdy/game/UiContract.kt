@@ -40,6 +40,8 @@ data class UiState(
     val progress: ProgressData = ProgressData(),
     val lang: Lang = Lang.DE,
     val muted: Boolean = false,
+    /** Reminder notifications switched on (and not blocked by a denied permission). */
+    val remindersOn: Boolean = true,
     val ads: AdsStatus = AdsStatus(),
     val billing: BillingStatus = BillingStatus(),
     val showFps: Boolean = false,
@@ -297,6 +299,7 @@ sealed class UiCommand {
     data object ClaimGift : UiCommand()
     data class RewardEarned(val kind: RewardKind) : UiCommand()
     data class SetMuted(val muted: Boolean) : UiCommand()
+    data class SetReminders(val on: Boolean) : UiCommand()
     data class SetLang(val lang: Lang) : UiCommand()
     data object ToggleFps : UiCommand()
     /** App went to background / foreground (visibilitychange). */

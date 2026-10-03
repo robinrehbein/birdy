@@ -13,4 +13,6 @@ class PlatformServices(
     val migration: LegacyMigration = NoLegacyMigration,
     /** Device language tag, e.g. "de-DE" (navigator.language equivalent). */
     val deviceLanguage: String,
+    /** Local reminder notifications; no-op where unsupported. */
+    val reminders: Reminders = NoReminders,
 )

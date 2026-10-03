@@ -76,6 +76,13 @@ Das Spiel gibt es auf **Deutsch und Englisch**. Die Sprache richtet sich nach de
 - Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Stachelkakteen springen im Takt der Musik.
 - Soundeffekte gibt es für Flattern, Ausweichen, Punkte, Münzen, „Knapp!“, Power-ups, Zonenwechsel und Crash. Oben links schaltest du den Ton aus (samt Vibration), die Einstellung bleibt gespeichert.
 
+## Erinnerungen
+
+Optional erinnert Birdy höchstens einmal pro Tag lokal an das Tagesgeschenk bzw. die laufende Serie
+(am nächsten Tag zur typischen Spielzeit, standardmäßig 18 Uhr, nie zwischen 21:30 und 09:00). Es gibt
+keinen Server. Ab Android 13 fragt die App einmalig nach dem dritten Spiel nach der Berechtigung.
+Oben links schaltet die Geschenk-Schaltfläche die Erinnerungen aus und an.
+
 ## Speicherstand
 
 Spielstand, Rekord, Münzen, freigeschaltete Inhalte und Einstellungen liegen ausschließlich lokal

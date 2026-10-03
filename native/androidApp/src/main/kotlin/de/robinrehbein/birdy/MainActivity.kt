@@ -1,6 +1,9 @@
 package de.robinrehbein.birdy
 
+import android.Manifest
 import android.content.res.Configuration
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -12,6 +15,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.app.ActivityCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,6 +33,7 @@ import de.robinrehbein.birdy.platform.PlatformServices
 import de.robinrehbein.birdy.platform.SharedPrefsKeyValueStore
 import de.robinrehbein.birdy.platform.WebViewLegacyMigration
 import de.robinrehbein.birdy.platform.ads.AdMobAds
+import de.robinrehbein.birdy.platform.reminders.AndroidReminders
 import de.robinrehbein.birdy.platform.billing.PlayBilling
 import de.robinrehbein.birdy.platform.purchase.PurchaseProcessor
 import de.robinrehbein.birdy.ui.BirdyApp
@@ -49,6 +54,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var ads: AdMobAds
     private lateinit var billing: PlayBilling
     private lateinit var purchases: PurchaseProcessor
+    private var permissionCallback: ((Boolean) -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splash = installSplashScreen()
@@ -65,6 +71,16 @@ class MainActivity : ComponentActivity() {
         ads = AdMobAds(applicationContext, isDebug = BuildConfig.DEBUG, activity = activityProvider)
         billing = PlayBilling(applicationContext, activity = activityProvider)
 
+        val reminders = AndroidReminders(this)
+        reminders.permissionRequester = { onResult ->
+            runOnUiThread {
+                if (Build.VERSION.SDK_INT >= 33) {
+                    permissionCallback = onResult
+                    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATIONS)
+                } else onResult(false)
+            }
+        }
+
         val services = PlatformServices(
             storage = storage,
             clock = clock,
@@ -74,6 +90,7 @@ class MainActivity : ComponentActivity() {
             billing = billing,
             migration = WebViewLegacyMigration(this),
             deviceLanguage = Locale.getDefault().toLanguageTag(),
+            reminders = reminders,
         )
         game = createBirdyGame(services, GlRenderer(AndroidGl()))
         game.displayDensity = resources.displayMetrics.density.toDouble()
@@ -140,6 +157,14 @@ class MainActivity : ComponentActivity() {
         )
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode != REQUEST_NOTIFICATIONS) return
+        val granted = grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+        permissionCallback?.invoke(granted)
+        permissionCallback = null
+    }
+
     // configChanges includes density: the Activity survives a display-size change, so refresh it here.
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
@@ -184,5 +209,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val SPLASH_MAX_MS = 4000L
+        const val REQUEST_NOTIFICATIONS = 4711
     }
 }

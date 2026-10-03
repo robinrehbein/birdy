@@ -84,6 +84,7 @@ class GameSession(
     private val pending = ArrayList<GameEvent>()
     val sim = GameSimulation(progress, simRandom) { pending += it }
     val settings = Settings(services.storage)
+    private val reminders = ReminderController(services.storage, services.clock, services.reminders, progress, strings)
     private val interstitialPacing = InterstitialPacing(services.storage, services.clock)
     val rig = CameraRig(camera, uiRandom)
     val input = InputMapper(rig)
@@ -328,6 +329,10 @@ class GameSession(
                 startAudio()
                 audio.setMuted(cmd.muted)
             }
+            is UiCommand.SetReminders -> {
+                runCatching { reminders.switchTo(cmd.on) }
+                toasts.push(t(if (cmd.on) "remindOn" else "remindOff"))
+            }
             is UiCommand.SetLang -> {
                 strings.setLang(cmd.lang)
                 zones.invalidate()
@@ -396,6 +401,7 @@ class GameSession(
     private fun visibility(visible: Boolean) {
         val s = sim.state
         if (!visible) {
+            runCatching { reminders.onBackground() }
             if (s.mode == GameMode.Playing) sim.setPaused(true) else audio.setSuspended(true)
         } else if (!s.paused) {
             audio.setSuspended(false)
@@ -549,6 +555,7 @@ class GameSession(
                 summary = e.summary
                 gameOverUi = texts.gameOver(e.summary)
                 interstitialPacing.onRunFinished(e.summary.time)
+                runCatching { reminders.onRunFinished() }
                 if (interstitialPacing.canShow(
                         services.ads?.status?.value?.interstitialReady == true,
                         ProductIds.REMOVE_ADS in progress.data.value.paidProducts,
@@ -661,6 +668,7 @@ class GameSession(
             progress = data,
             lang = lang,
             muted = audio.muted,
+            remindersOn = reminders.shownOn,
             ads = ads,
             billing = billing,
             showFps = showFps,

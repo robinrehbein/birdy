@@ -44,6 +44,7 @@ nativen Kotlin-App wurden am 29.09. für Deutsch und Englisch per Play-API einge
 | Feature-Grafik 1024×500 | ✅ `docs/store/feature-birdy-1024x500.png` (DE), `docs/store/feature-birdy-1024x500-en.png` (EN). Das Render-Skript `scripts/render-assets.mjs` (JS-Tooling) wurde mit dem Web-Build entfernt; neue Grafiken müssen manuell oder mit einem neuen Skript auf Basis der nativen Screenshots (`native/screenshots`, siehe unten) erzeugt werden. |
 | Screenshots 1080×1920 | ✅ Je sieben native Kotlin-Screenshots für `de-DE` und `en-US` am 29.09. in Play eingereicht. Der [Screenshot-Workflow](https://github.com/robinrehbein/birdy/actions/workflows/store-screenshots.yml) erzeugt 24 echte Spielszenen pro Sprache; lokal liegen noch ältere Web-Bilder unter `docs/store/`. |
 | Store-Texte DE/EN | ✅ am 29.09. per Play-API eingereicht; Play führt Vorabprüfungen aus |
+| Lokale Erinnerungen | ✅ `POST_NOTIFICATIONS` (ab Android 13, einmalig nach dem 3. Spiel) und `RECEIVE_BOOT_COMPLETED`; Alarm über `AlarmManager` (inexakt), kein Server. In der Datensicherheit **keine** zusätzliche Datenerhebung angeben; Datenschutzerklärung enthält den Abschnitt „Erinnerungen“. Auf einem Android-13-Gerät prüfen: Abfrage, Ablehnung, Ausschalter oben links. |
 | Datenschutzerklärung | ✅ <https://robinrehbein.github.io/birdy/privacy/> über GitHub Pages veröffentlicht |
 | Angaben zur Datensicherheit für Monetarisierung | ✅ Fragebogen gespeichert und am 29.09. in der Play-Vorabprüfung sichtbar; Freigabe offen |
 | **App-ID** | ✅ `de.robinrehbein.birdy` in `native/androidApp/build.gradle.kts` konfiguriert |
@@ -233,6 +234,9 @@ Ja. Es gibt kein Birdy-Konto und keinen eigenen Server. Die Angabe wartet auf Ei
 - Keine Gewalt gegen Figuren, kein Blut; der Vogel stößt nur gegen Röhren.
 - Keine Interaktion zwischen Nutzern und kein Glücksspiel; optionale Käufe vorhanden.
 - Erwartet: USK 0 / PEGI 3.
+
+Lokale Erinnerungs-Benachrichtigungen (Tagesgeschenk/Serie) werden ausschließlich auf dem Gerät geplant
+und angezeigt. Sie erheben und übertragen keine Daten und ändern die Angaben im Datensicherheitsformular nicht.
 
 ## Risiken beim Rechte-Check (bitte bewusst entscheiden)
 
