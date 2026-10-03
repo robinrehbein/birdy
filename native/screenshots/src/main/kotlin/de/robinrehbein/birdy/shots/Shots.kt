@@ -115,6 +115,15 @@ object Shots {
             g.advance(1.6)
             shot("26-gameover-x2")
         },
+        // Crash near the record (best 32) with a ready revive ad: the "Weiterfliegen?" offer.
+        Session(store = true) { g ->
+            g.startRun()
+            g.run(8.0)
+            g.state.score = 30
+            crash(g)
+            g.advance(0.8)
+            shot("27-revive")
+        },
         // Wandering gap: the open column (right) trades places with the pipe in the middle.
         Session { g ->
             g.startRun()
