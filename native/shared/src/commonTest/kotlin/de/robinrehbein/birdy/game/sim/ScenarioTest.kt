@@ -605,6 +605,8 @@ class ScenarioTest {
             h.sim.clearTrack()
         }
         assertEquals(6, h.state.score)
-        assertEquals(listOf("recordToast"), h.eventsOf<GameEvent.Toast>().map { it.key })
+        // Beating the record toasts once and pays the coin bonus.
+        assertEquals(listOf("recordBonus"), h.eventsOf<GameEvent.Toast>().map { it.key })
+        assertEquals(Tuning.RECORD_BONUS, h.state.coins)
     }
 }

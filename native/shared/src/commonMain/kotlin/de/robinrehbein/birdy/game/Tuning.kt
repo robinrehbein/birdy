@@ -79,6 +79,10 @@ object Tuning {
      * (the surface is paused while the ad shows, so this only runs if the callback never comes).
      */
     const val REVIVE_PENDING_TIMEOUT = 6.0
+    /** Coins for beating the record mid-run (best >= 5). */
+    const val RECORD_BONUS = 10
+    /** The HUD counts down the rows to a new record from this many rows out. */
+    const val RECORD_HINT_ROWS = 5
 }
 
 /** world.js exported/shared constants used by simulation and views. */

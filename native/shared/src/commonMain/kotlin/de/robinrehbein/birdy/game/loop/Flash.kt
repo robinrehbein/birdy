@@ -4,7 +4,7 @@ package de.robinrehbein.birdy.game.loop
  * The white hit flash (`#flash`): snapped to 0.55 in `die()`, then a CSS `opacity 0.35s`
  * transition (default `ease` timing) back to 0.
  */
-class Flash {
+class Flash(private val duration: Double = DURATION) {
     private var from = 0.0
     private var t = 1.0
 
@@ -14,8 +14,11 @@ class Flash {
     }
 
     fun update(dt: Double) {
-        if (t < 1) t = minOf(1.0, t + dt / DURATION)
+        if (t < 1) t = minOf(1.0, t + dt / duration)
     }
+
+    /** 0 right after [hit], 1 when done. */
+    val progress: Float get() = t.toFloat()
 
     val alpha: Float get() = if (t >= 1) 0f else (from * (1 - CubicBezier.EASE.y(t))).toFloat()
 

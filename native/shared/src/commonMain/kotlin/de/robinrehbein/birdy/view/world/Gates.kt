@@ -113,13 +113,16 @@ internal class GateLayer(private val scene: Scene, private val pipes: PipeKit, h
     private val top = Segment()
     private val xz = DoubleArray(2)
 
-    fun sync(gates: List<GateRow>) {
+    /** Text on the record gate's banner, e.g. "REKORD 32" (set per run by the session). */
+    var recordLabel = ""
+
+    fun sync(gates: List<GateRow>, time: Double) {
         var nb = 0; var nbl = 0; var nt = 0; var ntl = 0
         for ((i, row) in gates.withIndex()) {
             val nodes = rows.getOrNull(i) ?: break
             nodes.group.visible = row.visible
             if (!row.visible) continue
-            nodes.sync(row)
+            nodes.sync(row, recordLabel, time)
             val fading = row.opacity < 0.999
             nodes.setFading(fading, row.opacity.toFloat())
             val z = row.z
@@ -185,10 +188,11 @@ internal class RowNodes(scene: Scene, pipes: PipeKit, haze: ShaderPatch, bankMat
         scene.add(group)
     }
 
-    fun sync(row: GateRow) {
+    fun sync(row: GateRow, recordLabel: String, time: Double) {
         group.position.z = row.z.toFloat()
-        record.group.visible = row.record
-        bank.visible = row.cloud >= 0
+        record.sync(row.record, row.z, recordLabel, time)
+        // The record gate's banner hangs at cloud height: no cloud bank behind it.
+        bank.visible = row.cloud >= 0 && !row.record
         if (row.cloud >= 0) bank.geometry = RowCloudGeometry.all[row.cloud]
         for ((k, lane) in row.lanes.withIndex()) plants[k].sync(lane)
     }
@@ -262,52 +266,5 @@ internal class PlantNodes(x: Double) {
         val w = CactusLook.PLANT_WIDTH * (1 + 0.08f * puff)
         body.scale.set(w, 1 - 0.03f * puff, w)
         mat.bristle.value = puff
-    }
-}
-
-/**
- * The record marker: a golden gantry just in front of the row (two posts outside the lanes, a
- * beam and a hanging banner with a ring at the flight ceiling, plus a glowing strip on the ground) so it reads from far away.
- * Glows through an emissive gold material; meshes share static geometry.
- */
-internal class RecordMarker(haze: ShaderPatch) {
-    private val gold = StandardMaterial().apply {
-        color.setHex(0xffd400); emissive.setHex(0xffb000); emissiveIntensity = 0.7f; roughness = 0.4f; flatShading = true
-        patch = haze
-    }
-    private val orange = StandardMaterial().apply {
-        color.setHex(0xff7a00); emissive.setHex(0xff5a00); emissiveIntensity = 0.5f; roughness = 0.5f; flatShading = true
-        patch = haze
-    }
-
-    val group = Node("record").apply {
-        visible = false
-        position.z = Z_FRONT // in front of the pipes and the row cloud (rows come towards +z)
-    }
-
-    init {
-        for (sx in floatArrayOf(-X, X)) {
-            group.add(Mesh(post, gold, "record-post").apply { position.set(sx, TOP / 2, 0f); castShadow = false })
-            // Glowing ball and an outward pennant on each post: readable beside the pipe towers.
-            group.add(Mesh(ball, orange, "record-ball").apply { position.set(sx, TOP + 0.9f, 0f); castShadow = false })
-            group.add(Mesh(flag, orange, "record-flag").apply { position.set(sx + Math.signum(sx) * 1.5f, TOP - 0.4f, 0f); castShadow = false })
-        }
-        group.add(Mesh(beam, gold, "record-beam").apply { position.set(0f, TOP, 0f); castShadow = false })
-        group.add(Mesh(banner, gold, "record-banner").apply { position.set(0f, TOP - 2.2f, 0f); castShadow = false })
-        group.add(Mesh(ring, orange, "record-ring").apply { position.set(0f, TOP - 2.2f, 0.2f); castShadow = false })
-        group.add(Mesh(strip, gold, "record-strip").apply { position.set(0f, 0.06f, 0f); castShadow = false })
-    }
-
-    private companion object {
-        const val X = 6.2f
-        const val TOP = 14.8f
-        const val Z_FRONT = 5f
-        val post by lazy { Primitives.cylinder(0.7, 0.7, TOP.toDouble(), 8) }
-        val beam by lazy { Primitives.box(2 * X + 1.0, 0.9, 0.9) }
-        val banner by lazy { Primitives.box(7.0, 2.6, 0.3) }
-        val ring by lazy { Primitives.torus(0.8, 0.24, 8, 20) }
-        val ball by lazy { Primitives.sphere(1.2, 10, 8) }
-        val flag by lazy { Primitives.box(2.4, 1.5, 0.2) }
-        val strip by lazy { Primitives.box(2 * X + 1.0, 0.1, 1.2) }
     }
 }

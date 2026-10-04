@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpSize
@@ -123,6 +124,7 @@ fun BirdyApp(state: UiState, strings: Strings, onCommand: (UiCommand) -> Unit) {
             }
             ToastOverlay(state.toast)
             state.fpsText?.let { FpsOverlay(it, Modifier.align(Alignment.BottomStart)) }
+            if (state.recordFx < 1f) RecordCelebration(state.recordFx)
             if (state.flashAlpha > 0f) {
                 Box(
                     Modifier.fillMaxSize().then(
@@ -204,4 +206,62 @@ private fun FpsOverlay(text: String, modifier: Modifier) {
             color = BirdyColors.White,
         ),
     )
+}
+
+/**
+ * New-record celebration in screen space: a golden glow along the edges and two party poppers
+ * shooting confetti up from the bottom corners. Everything stays in the outer quarter of the
+ * screen, so the bird and the rows ahead remain in clear view. [t] runs 0..1.
+ */
+@Composable
+private fun RecordCelebration(t: Float) {
+    androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+        val fade = 1f - t
+        val edge = androidx.compose.ui.graphics.Color(0xFFFFC400).copy(alpha = 0.8f * fade * fade)
+        val clear = edge.copy(alpha = 0f)
+        val band = size.minDimension * 0.16f
+        val v = androidx.compose.ui.graphics.Brush
+        drawRect(v.verticalGradient(listOf(edge, clear), startY = 0f, endY = band))
+        drawRect(v.verticalGradient(listOf(clear, edge), startY = size.height - band, endY = size.height))
+        drawRect(v.horizontalGradient(listOf(edge, clear), startX = 0f, endX = band))
+        drawRect(v.horizontalGradient(listOf(clear, edge), startX = size.width - band, endX = size.width))
+        // Confetti: fixed pseudo-random pieces, ballistic from each bottom corner, kept to the
+        // outer 28 % of the width; they fade out over the last third.
+        val w = size.width
+        val h = size.height
+        val alpha = if (t < 0.66f) 1f else (1f - t) / 0.34f
+        for (side in 0..1) {
+            for (i in 0 until CONFETTI_PIECES) {
+                val r1 = hash(i * 7 + side * 131 + 1)
+                val r2 = hash(i * 13 + side * 71 + 5)
+                val r3 = hash(i * 29 + side * 17 + 9)
+                val vx = (0.05f + 0.20f * r1) * w // inward
+                val vy = (0.75f + 0.55f * r2) * h // upward
+                val g = 1.6f * h
+                val x0 = vx * t
+                val y = h - (vy * t - 0.5f * g * t * t)
+                val x = (if (side == 0) x0 else w - x0).coerceIn(0f, w)
+                if (x0 > w * 0.28f || y > h) continue
+                val s = size.minDimension * (0.012f + 0.012f * r3)
+                val col = CONFETTI_COLORS[(i + side) % CONFETTI_COLORS.size]
+                rotate(degrees = 720f * t * (if (r3 > 0.5f) 1f else -1f) + 90f * r1, pivot = androidx.compose.ui.geometry.Offset(x, y)) {
+                    drawRect(
+                        androidx.compose.ui.graphics.Color(col).copy(alpha = alpha),
+                        topLeft = androidx.compose.ui.geometry.Offset(x - s, y - s * 0.5f),
+                        size = androidx.compose.ui.geometry.Size(2 * s, s),
+                    )
+                }
+            }
+        }
+    }
+}
+
+private const val CONFETTI_PIECES = 26
+private val CONFETTI_COLORS = longArrayOf(0xFFFFD400, 0xFFFF7A00, 0xFFFF5A8A, 0xFF5AD1FF, 0xFF7BE07B, 0xFFFFFFFF)
+
+/** Deterministic 0..1 noise for the confetti layout (no per-frame randomness). */
+private fun hash(n: Int): Float {
+    var x = n * 374761393 + 668265263
+    x = (x xor (x ushr 13)) * 1274126177
+    return ((x xor (x ushr 16)) and 0xffff) / 65535f
 }

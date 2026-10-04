@@ -1,5 +1,7 @@
 package de.robinrehbein.birdy.ui.screens
 
+import de.robinrehbein.birdy.ui.displayFont
+import de.robinrehbein.birdy.ui.RichText
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutout
@@ -68,6 +70,20 @@ fun HudScreen(state: UiState, strings: Strings, modifier: Modifier = Modifier) {
             size = scoreSize.sp,
             thickness = 3.dp,
         )
+        state.recordHint?.let { hint ->
+            RichText(
+                hint,
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = (24 + scoreSize * 1.1f).dp)
+                    .background(BirdyColors.Ink.copy(alpha = 0.55f), RoundedCornerShape(14.dp))
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                size = 18.sp,
+                color = BirdyColors.White,
+                font = displayFont(),
+                center = true,
+            )
+        }
         Row(
             Modifier.align(Alignment.TopEnd).padding(top = 20.dp, end = 20.dp),
             verticalAlignment = Alignment.CenterVertically,

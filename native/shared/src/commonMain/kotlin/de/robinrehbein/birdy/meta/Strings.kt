@@ -85,6 +85,10 @@ class TableStrings(private val storage: KeyValueStore, deviceLanguage: String) :
         /** Keys added by the native app only; kept apart so [STRINGS] still mirrors the legacy table. */
         val NATIVE_STRINGS: Map<String, LocalizedText> = mapOf(
             "remindTitle" to LocalizedText("Birdy", "Birdy"),
+            // Record gate banner, blocky 3D letters (only A-Z/0-9 used: R E K O D B S T).
+            "recordGate" to LocalizedText("Rekord {n}", "Best {n}"),
+            "recordBonus" to LocalizedText("[trophy] Neuer Rekord! +{n} [coin]", "[trophy] New best! +{n} [coin]"),
+            "recordIn" to LocalizedText("[trophy] noch {n}", "[trophy] {n} to go"),
             "remindStreak" to LocalizedText("Deine {n}-Tage-Serie läuft heute ab!", "Your {n}-day streak ends today!"),
             "remindGift" to LocalizedText("Dein Tagesgeschenk wartet (+{n} Münzen)", "Your daily gift is waiting (+{n} coins)"),
             "remindOn" to LocalizedText("Erinnerungen an", "Reminders on"),
