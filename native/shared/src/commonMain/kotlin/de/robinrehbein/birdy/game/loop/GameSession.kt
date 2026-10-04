@@ -97,6 +97,8 @@ class GameSession(
     val toasts = ToastQueue()
     val scheduler = Scheduler()
     val flash = Flash()
+    /** Golden screen-edge glow when the record falls (keeps the centre clear). */
+    private val recordGlow = Flash(duration = 1.1)
     val hud = HudFx()
     private val zones = ZonesOverlay()
     val quality = QualityController(settings, renderer)
@@ -231,6 +233,7 @@ class GameSession(
         quality.tick(rawDt, s.mode == GameMode.Playing && !s.paused)
         scheduler.advance(rawDt)
         flash.update(rawDt)
+        recordGlow.update(rawDt)
         hud.update(rawDt)
         zones.tick(rawDt)
         shopRefresh += rawDt
@@ -682,6 +685,10 @@ class GameSession(
             }
             is GameEvent.Buzz -> if (!audio.muted) runCatching { services.haptics.vibrate(e.millis) }
             is GameEvent.Toast -> {
+                if (e.key == "recordBonus") {
+                    recordGlow.hit(1.0)
+                    coinBump++
+                }
                 if (e.delayMs > 0) scheduler.after(e.delayMs) { toasts.push(t(e.key, e.params)) }
                 else toasts.push(t(e.key, e.params))
             }
@@ -720,6 +727,13 @@ class GameSession(
     }
 
     // --- snapshot -------------------------------------------------------------------------------
+
+    /** "🏆 noch 3" under the score while a new record is a few rows away. */
+    private fun recordHint(mode: GameMode, score: Int, best: Int): String? {
+        if (mode != GameMode.Playing || best < 5) return null
+        val left = best + 1 - score
+        return if (left in 1..Tuning.RECORD_HINT_ROWS) t("recordIn", mapOf("n" to left)) else null
+    }
 
     fun snapshot(base: UiState): UiState {
         val s = sim.state
@@ -770,6 +784,8 @@ class GameSession(
             powerEnding = PowerType.entries.map { s.power(it) > 0 && s.power(it) < 1.5 },
             toast = toasts.visible,
             flashAlpha = flash.alpha,
+            recordFx = recordGlow.progress,
+            recordHint = recordHint(s.mode, s.score, data.best),
             tutorialHand = hand,
             zonesHint = zonesUi,
             gameOver = if (s.mode == GameMode.Over) summary else null,

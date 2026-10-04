@@ -24,12 +24,6 @@ object Bursts {
     /** main.js:1409 feathers in the bird's own colours on death. */
     fun death(skin: SkinItem) = EmitOptions(count = 36, colors = listOf(skin.body, skin.body, skin.belly, skin.wing, 0xffffff), speed = 9.0, size = 0.15, life = 1.3, gravity = -8.0)
 
-    /** New record mid-run: a big confetti shower around the bird... */
-    val recordShower = EmitOptions(count = 70, colors = listOf(0xffd400, 0xff7a00, 0xff5a8a, 0x5ad1ff, 0x7be07b, 0xffffff), speed = 11.0, size = 0.16, life = 1.4, gravity = -7.0, drag = 1.2)
-
-    /** ...and a fountain from each of the gate's post tops. */
-    val recordFountain = EmitOptions(count = 35, colors = listOf(0xffd400, 0xff7a00, 0xffffff), speed = 9.0, size = 0.18, life = 1.3, gravity = -9.0, drag = 1.0)
-
     /** main.js:1531 near miss. */
     val nearMiss = EmitOptions(count = 10, colors = listOf(0xffffff, 0xfff176), speed = 5.0, size = 0.09, life = 0.4, gravity = 0.0)
 

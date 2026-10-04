@@ -67,12 +67,6 @@ class FxView(private val bird: BirdView, random: Random = Random.Default) : Scen
             is GameEvent.CoinCollected -> particles.emit(event.x, event.y, event.z, Bursts.coin)
             is GameEvent.PowerUp -> particles.emit(s.x, s.y, 0.0, Bursts.powerUp(event.type))
             is GameEvent.NearMiss -> particles.emit(s.x, s.y, 0.0, Bursts.nearMiss)
-            is GameEvent.Toast -> if (event.key == "recordToast") {
-                // Record gate just flown through: shower on the bird, confetti cannons left and
-                // right a little ahead (the gate's own posts are already off-screen behind).
-                particles.emit(s.x, s.y + 0.5, -1.0, Bursts.recordShower)
-                for (sx in doubleArrayOf(-4.6, 4.6)) particles.emit(sx, s.y + 3.0, -4.0, Bursts.recordFountain)
-            }
             is GameEvent.Died -> {
                 marker.hide()
                 particles.emit(s.x, s.y, 0.0, Bursts.death(bird.skin))

@@ -5,6 +5,7 @@ import de.robinrehbein.birdy.game.GameMode
 import de.robinrehbein.birdy.game.GameSimulation
 import de.robinrehbein.birdy.game.GateRow
 import de.robinrehbein.birdy.game.PowerType
+import de.robinrehbein.birdy.game.Tuning
 import de.robinrehbein.birdy.meta.RunStats
 import kotlin.math.max
 
@@ -33,8 +34,9 @@ internal fun GameSimulation.addScore(gate: GateRow) {
     s.score++
     val best = progress.data.value.best
     if (s.score == best + 1 && best >= 5) {
-        // Beat the record mid-run: celebrate right away.
-        emit(GameEvent.Toast("recordToast"))
+        // Beat the record mid-run: celebrate right away, with a small coin bonus.
+        s.coins += Tuning.RECORD_BONUS
+        emit(GameEvent.Toast("recordBonus", mapOf("n" to Tuning.RECORD_BONUS)))
         emit(GameEvent.Fanfare())
         emit(GameEvent.Buzz(30))
     }

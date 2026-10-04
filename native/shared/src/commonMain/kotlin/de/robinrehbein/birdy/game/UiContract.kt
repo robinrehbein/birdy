@@ -32,6 +32,10 @@ data class UiState(
     /** Full-screen flash overlay (impact / power-up), alpha 0..1 and sRGB colour. */
     val flashAlpha: Float = 0f,
     val flashColor: Int = 0xffffff,
+    /** Record celebration progress 0..1 (1 = idle): golden edge glow + corner confetti, centre stays clear. */
+    val recordFx: Float = 1f,
+    /** HUD countdown to a new record ("🏆 noch 3"), null when not close. */
+    val recordHint: String? = null,
     val tutorialHand: HandUi? = null,
     val zonesHint: ZonesHintUi? = null,
     val gameOver: RunSummary? = null,

@@ -19,7 +19,7 @@ import kotlin.math.sin
 /**
  * The record marker: a golden finish gate just in front of the row that beats the previous best.
  * Two striped posts outside the lanes carry spinning stars; the beam and a plum banner with the
- * label ("REKORD 32" / "BEST 32", blocky 5×7 letters) hang entirely above the flight ceiling, and a
+ * label ("REKORD 32" / "BEST 32", blocky 5×7 letters built from merged pixel runs) hang entirely above the flight ceiling, and a
  * checkered finish line lies on the ground. The overhead parts hide once the gate is behind the
  * bird, so the chase camera (up to ~16 high) never flies through them. Purely visual: the
  * simulation has no collider for it.
@@ -167,10 +167,18 @@ internal class RecordMarker(private val haze: ShaderPatch) {
             var cx = 0
             for (g in glyphs) {
                 if (g != null) {
-                    for ((r, row) in g.withIndex()) for ((c, ch) in row.withIndex()) {
-                        if (ch != '#') continue
-                        parts += Primitives.box(cell * 0.92, cell * 0.92, 0.18)
-                            .translate((cx + c - cols / 2.0 + 0.5) * cell, (3 - r) * cell, 0.0)
+                    // One bar per horizontal run of pixels: solid strokes instead of loose cubes.
+                    for ((r, row) in g.withIndex()) {
+                        var c = 0
+                        while (c < row.length) {
+                            if (row[c] != '#') { c++; continue }
+                            var end = c
+                            while (end + 1 < row.length && row[end + 1] == '#') end++
+                            val n = end - c + 1
+                            parts += Primitives.box(cell * (n - 0.04), cell * 0.96, 0.18)
+                                .translate((cx + c + n / 2.0 - cols / 2.0) * cell, (3 - r) * cell, 0.0)
+                            c = end + 1
+                        }
                     }
                 }
                 cx += (g?.get(0)?.length ?: 3) + 1
