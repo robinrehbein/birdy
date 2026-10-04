@@ -45,6 +45,9 @@ class WorldView(private val rng: Random = Random.Default) : SceneView, BiomeTarg
         private set
     internal lateinit var gates: GateLayer
         private set
+
+    /** Banner text of the record gate ("REKORD 32"), set by the session at each run start. */
+    var recordLabel = ""
     private lateinit var scene: Scene
 
     override val cloudColors: List<Color> get() = listOf(clouds.material.color, gates.bankColor)
@@ -84,14 +87,14 @@ class WorldView(private val rng: Random = Random.Default) : SceneView, BiomeTarg
 
     override fun update(frame: FrameInfo) {
         if (!booted) boot(frame.sim.progress)
-        sync(frame.dt, frame.sim.state.distance, frame.sim.gates, frame.sim.coins)
+        sync(frame.dt, frame.sim.state.distance, frame.sim.gates, frame.sim.coins, frame.time)
     }
 
     /**
      * Mirrors one frame: ground scroll and scenery/cloud movement by the distance flown since the
      * last frame (main.js `moveWorld`), gate rows, the biome blend and the coin instances.
      */
-    fun sync(dt: Double, distance: Double, gateRows: List<GateRow>, coinList: List<Coin>) {
+    fun sync(dt: Double, distance: Double, gateRows: List<GateRow>, coinList: List<Coin>, time: Double = 0.0) {
         val dz = if (lastDistance.isNaN() || distance < lastDistance) 0.0 else distance - lastDistance
         lastDistance = distance
         ground.update(distance)
@@ -99,7 +102,8 @@ class WorldView(private val rng: Random = Random.Default) : SceneView, BiomeTarg
             scenery.update(dz)
             clouds.update(dz)
         }
-        gates.sync(gateRows)
+        gates.recordLabel = recordLabel
+        gates.sync(gateRows, time)
         biomes.update(dt)
         coins.sync(coinList)
     }

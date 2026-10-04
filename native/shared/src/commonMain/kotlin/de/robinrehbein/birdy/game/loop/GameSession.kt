@@ -687,6 +687,7 @@ class GameSession(
             }
             is GameEvent.RunStarted -> {
                 toasts.clear() // no leftovers from the menu or the last run
+                views.world?.recordLabel = strings.t("recordGate", mapOf("n" to progress.data.value.best))
                 views.world?.let { w ->
                     val b0 = zoneBiome(0)
                     if (w.biomes.current !== b0) w.biomes.set(0, 1.2, b0)
