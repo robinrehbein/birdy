@@ -17,6 +17,8 @@ data class ProgressData(
     val missions: MissionDay? = null,
     val gift: Gift = Gift(),
     val rewardedAds: RewardedAds = RewardedAds(),
+    /** Game-over "coins x2" ads watched today (own limit, separate from [rewardedAds]). */
+    val doubleCoinsAds: RewardedAds = RewardedAds(),
     /** Epoch millis; style pass active while now < this. */
     val stylePassUntil: Long = 0,
     val paidProducts: List<String> = emptyList(),

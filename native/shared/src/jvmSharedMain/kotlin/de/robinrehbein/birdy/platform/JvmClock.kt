@@ -6,6 +6,7 @@ import java.time.LocalDate
 class JvmClock : Clock {
     override fun nowMillis(): Long = System.currentTimeMillis()
     override fun monotonicNanos(): Long = System.nanoTime()
+    override fun utcOffsetMillis(atMillis: Long): Long = java.util.TimeZone.getDefault().getOffset(atMillis).toLong()
     override fun today(): LocalDay {
         val d = LocalDate.now()
         return LocalDay(d.year, d.monthValue, d.dayOfMonth)

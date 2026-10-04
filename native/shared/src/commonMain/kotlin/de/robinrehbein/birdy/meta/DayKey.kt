@@ -30,6 +30,9 @@ private fun civilFromDays(z0: Long): Triple<Int, Int, Int> {
     return Triple(yFinal, m, d)
 }
 
+/** Days since 1970-01-01 of this civil date. */
+fun LocalDay.epochDay(): Long = daysFromCivil(year, month, day)
+
 /** [LocalDay] shifted by [offsetDays] (may be negative), matching progress.js `dayKey(offset)`. */
 fun LocalDay.plusDays(offsetDays: Int): LocalDay {
     if (offsetDays == 0) return this

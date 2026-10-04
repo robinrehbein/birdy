@@ -6,6 +6,7 @@ import de.robinrehbein.birdy.game.PowerType
 import de.robinrehbein.birdy.game.ShopTab
 import de.robinrehbein.birdy.game.TutorialStep
 import de.robinrehbein.birdy.game.UiCommand
+import de.robinrehbein.birdy.game.sim.GateRows
 import de.robinrehbein.birdy.meta.Kind
 import kotlin.math.ceil
 
@@ -90,20 +91,47 @@ object Shots {
             g.run(90.0) { g.state.zone >= 3 }
             g.run(3.0)
             shot("12-zone-4")
-            // Crash: no god mode, dive into the ground.
-            g.sim.debug.setGod(false)
-            for (p in PowerType.entries) g.state.power[p.ordinal] = 0.0
-            g.state.grace = 0.0
-            var t = 0.0
-            while (g.state.mode == GameMode.Playing && t < 10) {
-                g.state.vy = -22.0
-                g.advance(1.0 / 30)
-                t += 1.0 / 30
-            }
+            crash(g)
             g.advance(0.1)
             shot("16-crash")
             g.advance(1.5)
             shot("17-gameover")
+        },
+        // The golden record marker on the row that beats the previous best (best >= 5).
+        Session(save = """{"best":5,"runs":6,"tutorialDone":true,"coins":120}""") { g ->
+            g.startRun()
+            g.run(1.0)
+            // Normally the row with index == best; here simply the third row ahead.
+            g.sim.gates.filter { it.active && !it.passed }.sortedByDescending { it.z }.getOrNull(2)?.record = true
+            g.advance(0.2)
+            shot("25-record-marker")
+        },
+        // Game over with a ready rewarded ad: the gold "+N coins (ad)" button.
+        Session(store = true) { g ->
+            g.startRun()
+            g.run(8.0)
+            g.state.coins = 17
+            crash(g)
+            g.advance(1.6)
+            shot("26-gameover-x2")
+        },
+        // Crash near the record (best 32) with a ready revive ad: the "Weiterfliegen?" offer.
+        Session(store = true) { g ->
+            g.startRun()
+            g.run(8.0)
+            g.state.score = 30
+            crash(g)
+            g.advance(0.8)
+            shot("27-revive")
+        },
+        // Wandering gap: the open column (right) trades places with the pipe in the middle.
+        Session { g ->
+            g.startRun()
+            g.run(4.0)
+            wander(g, 0.15)
+            shot("11b-wander-start")
+            wander(g, 0.5)
+            shot("11c-wander-swap")
         },
         Session { g ->
             g.startRun()
@@ -172,6 +200,19 @@ object Shots {
         },
     )
 
+    /** No god mode, dive into the ground. */
+    private fun crash(g: ShotGame) {
+        g.sim.debug.setGod(false)
+        for (p in PowerType.entries) g.state.power[p.ordinal] = 0.0
+        g.state.grace = 0.0
+        var t = 0.0
+        while (g.state.mode == GameMode.Playing && t < 10) {
+            g.state.vy = -22.0
+            g.advance(1.0 / 30)
+            t += 1.0 / 30
+        }
+    }
+
     /** store-shots.mjs "kaktus": a real row with a fully risen cactus next to the bird. */
     private fun cactus(g: ShotGame) {
         val s = g.state
@@ -186,6 +227,18 @@ object Shots {
         s.y = 5.2
         val bar = 240.0 / 124
         s.time = 2.95 * 60 / 124 + ceil(s.time / bar) * bar - 1.0 / 30
+        g.advance(1.0 / 30)
+    }
+
+    /** A scripted wandering-gap row ahead of the bird, posed at slide progress [t]. */
+    private fun wander(g: ShotGame, t: Double) {
+        val s = g.state
+        val row = g.sim.gates.filter { it.active && !it.passed }.maxByOrNull { it.z }
+        val z = -(GateRows.WANDER_START - t * (GateRows.WANDER_START - GateRows.WANDER_END)) * s.speed
+        g.sim.debug.scriptedRow(z, listOf(GapSpec(5.4, 4.4), GapSpec(5.8, 4.4, wanderFrom = 2), null), row)
+        s.lane = 1
+        s.x = 0.0
+        s.y = 5.6
         g.advance(1.0 / 30)
     }
 }

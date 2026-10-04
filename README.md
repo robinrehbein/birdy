@@ -13,7 +13,8 @@ eigener OpenGL-ES-Renderer).
 - Pro durchflogener Röhren-Reihe gibt es einen Punkt, Münzen sind Bonus.
 - Leuchtende Ringe markieren die Lücken, die nächste Reihe leuchtet gelb. Durchflogene Reihen werden durchsichtig, damit sie die Sicht nicht verdecken.
 - Ab 6 Punkten bewegen sich manche Lücken auf und ab, ab 10 Punkten springen grimmige Stachelkakteen im Takt der Musik aus den Röhren. Eine Spur pro Reihe bleibt immer „einfach“.
-- Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher.
+- Ab 40 Punkten gibt es wandernde Lücken: Kurz bevor der Vogel ankommt, tauscht eine Lücke sichtbar mit der Nachbarröhre den Platz – die einfache Spur bleibt dabei immer, wo sie ist.
+- Mit steigender Punktzahl werden die Lücken kleiner, der Abstand kürzer und das Tempo höher. Jede Zone steigert sich bis zum Münzregen und startet danach etwas leichter; nach 40 Punkten wird es langsam weiter schwerer statt auf einem Plateau zu bleiben.
 - Der Rekord wird lokal auf dem Gerät gespeichert.
 
 ## Hochformat
@@ -75,6 +76,19 @@ Das Spiel gibt es auf **Deutsch und Englisch**. Die Sprache richtet sich nach de
   A-Teil, B-Teil und Breakdown.
 - Menü und Game-Over spielen eine ruhige Fassung ohne Schlagzeug. Die Stachelkakteen springen im Takt der Musik.
 - Soundeffekte gibt es für Flattern, Ausweichen, Punkte, Münzen, „Knapp!“, Power-ups, Zonenwechsel und Crash. Oben links schaltest du den Ton aus (samt Vibration), die Einstellung bleibt gespeichert.
+
+## Game-Over und Rekord
+
+- Der Game-Over-Bildschirm ist aufgeräumt: große Punktzahl, Rekord und Münzen klein darunter, genau ein Fortschrittsziel (nächste Freischaltung, sonst die fast fertige Tagesmission), die übrigen Missionen als eine Zeile. „Nochmal“ ist der große Button unten, „Menü“ ein kleiner Link.
+- Mit mindestens 5 Münzen im Lauf und geladener Werbung gibt es „+N Münzen (Werbung)“: die Münzen des Laufs werden ein zweites Mal gutgeschrieben (5× pro Tag, getrennt vom Shop-Limit; mit „Werbung entfernen“ wird der Button ausgeblendet).
+- Ab Rekord 5 steht in der Welt vor der Reihe, die den Rekord bricht, ein goldenes Tor als Marker.
+
+## Erinnerungen
+
+Optional erinnert Birdy höchstens einmal pro Tag lokal an das Tagesgeschenk bzw. die laufende Serie
+(am nächsten Tag zur typischen Spielzeit, standardmäßig 18 Uhr, nie zwischen 21:30 und 09:00). Es gibt
+keinen Server. Ab Android 13 fragt die App einmalig nach dem dritten Spiel nach der Berechtigung.
+Oben links schaltet die Geschenk-Schaltfläche die Erinnerungen aus und an.
 
 ## Speicherstand
 

@@ -26,6 +26,20 @@ enum class HandMode { None, Flap, Side }
  */
 enum class ZonesHint { None, Hold, Show }
 
+/** How a revive is paid: a rewarded ad, or coins once automatic ads were removed. */
+enum class RevivePay { Ad, Coins }
+
+/**
+ * The "Weiterfliegen?" offer shown after a crash near the record (mode stays [GameMode.Dead]).
+ * [timeLeft] counts down to an automatic decline; [pending] = accepted, waiting for the payment.
+ */
+class ReviveOffer(val pay: RevivePay) {
+    var timeLeft = Tuning.REVIVE_OFFER_TIME
+    var pending = false
+    /** Visible game time spent waiting for the payment; frames stop while the ad covers the game. */
+    var pendingTime = 0.0
+}
+
 /** main.js `lastRun`: snapshot taken in `die()` (or by the bot harness on timeout, cause = null). */
 data class LastRun(val score: Int, val coins: Int, val time: Double, val cause: DeathCause?, val zone: Int)
 
@@ -76,6 +90,18 @@ class GameState {
     var beat = 0.0
     var runTime = 0.0
     var hold = false
+    /** Centre height of the "get ready" hover (5; a revive moves it into the next gap). */
+    var holdY = 5.0
+    /** The record before this run (revive eligibility). */
+    var runBest = 0
+    /** A revive was already offered this run (at most once per run). */
+    var reviveOffered = false
+    /** This run was revived. */
+    var revived = false
+    /** Rows cleared by a revive without scoring; shifts which row index carries the record marker. */
+    var unscoredRows = 0
+    /** Non-null while the revive offer is up. */
+    var revive: ReviveOffer? = null
     /** Monotonic millis when game over was shown (restart debounce 350 ms). */
     var overAt = 0L
     var zone = 0

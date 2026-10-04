@@ -67,6 +67,7 @@ class FakePurchaseProgress : ProgressRepository {
     override fun buy(kind: Kind, id: String): Boolean = false
     override fun select(kind: Kind, id: String): Boolean = false
     override fun buySurprise(price: Int): Boolean = false
+    override fun spendCoins(amount: Int): Boolean = false
     override fun grant(kind: Kind, id: String) = Unit
     override fun level(upgradeId: String): Int = 0
     override fun upgradePrice(upgradeId: String): Int? = null
@@ -85,6 +86,8 @@ class FakePurchaseProgress : ProgressRepository {
     override fun claimGift(): GiftClaim? = null
     override val rewardedAdsLeft: Int get() = 0
     override fun grantRewardedCoins(): Int = 0
+    override val doubleCoinsAdsLeft: Int get() = 0
+    override fun grantDoubleCoins(runCoins: Int): Int = 0
     override val stylePassMinutesLeft: Int get() = 0
     override fun grantStylePass(): Boolean = false
 }

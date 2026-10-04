@@ -17,6 +17,8 @@ interface ProgressRepository {
     fun buy(kind: Kind, id: String): Boolean
     fun select(kind: Kind, id: String): Boolean
     fun buySurprise(price: Int): Boolean
+    /** Takes [amount] coins from the wallet if there are enough (revive for coins). */
+    fun spendCoins(amount: Int): Boolean
     fun grant(kind: Kind, id: String)
     fun level(upgradeId: String): Int
     /** Null when maxed. */
@@ -43,6 +45,10 @@ interface ProgressRepository {
     // --- rewarded ads / style pass ---
     val rewardedAdsLeft: Int
     fun grantRewardedCoins(): Int
+    /** Game-over "coins x2" ads left today (own limit, separate from [rewardedAdsLeft]). */
+    val doubleCoinsAdsLeft: Int
+    /** Credits [runCoins] a second time and uses one x2 slot; returns the amount granted (0 = limit reached / nothing to grant). */
+    fun grantDoubleCoins(runCoins: Int): Int
     val stylePassMinutesLeft: Int
     fun grantStylePass(): Boolean
 

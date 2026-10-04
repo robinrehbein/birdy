@@ -40,6 +40,8 @@ data class UiState(
     val progress: ProgressData = ProgressData(),
     val lang: Lang = Lang.DE,
     val muted: Boolean = false,
+    /** Reminder notifications switched on (and not blocked by a denied permission). */
+    val remindersOn: Boolean = true,
     val ads: AdsStatus = AdsStatus(),
     val billing: BillingStatus = BillingStatus(),
     val showFps: Boolean = false,
@@ -71,6 +73,8 @@ data class UiState(
     val achievements: AchievementsUi = AchievementsUi(),
     /** Non-null while the shop is open. */
     val shop: ShopUi? = null,
+    /** "Weiterfliegen?" offer after a crash near the record (mode Dead), null otherwise. */
+    val revive: ReviveUi? = null,
     /** Game-over screen details (non-null in mode Over). */
     val gameOverUi: GameOverUi? = null,
     /** Shop part thumbnails (ARGB_8888, top row first) keyed `kind:id:skinId`. */
@@ -246,6 +250,18 @@ data class ShopUi(
     val billingBusy: Boolean,
 )
 
+/**
+ * The revive offer: [percent] of the countdown left, the pay button ([coins] = gold coin-price
+ * style, disabled without enough coins or while the payment runs) and the decline label.
+ */
+data class ReviveUi(
+    val title: String,
+    val percent: Int,
+    val accept: ButtonUi,
+    val coins: Boolean,
+    val decline: String,
+)
+
 /** Game-over details (`showGameOver`, `renderNextUnlock`). */
 data class GameOverUi(
     val score: Int,
@@ -262,6 +278,15 @@ data class GameOverUi(
     val nextUnlock: NextUnlockUi?,
     /** Wallet chip carries the `.over` class (hidden on short screens). */
     val walletOver: Boolean = true,
+    /**
+     * The one progress goal when there is no [nextUnlock]: the unfinished daily mission closest
+     * to completion (null when all are done or an unlock bar is shown).
+     */
+    val goalMission: MissionUi? = null,
+    /** Compact "Missionen 1/3" line replacing the full [missions] list, null without missions. */
+    val missionsSummary: String? = null,
+    /** Gold "+N coins (ad)" button, null unless eligible (see `MenuTexts.doubleCoins`). */
+    val doubleCoins: ButtonUi? = null,
 )
 
 /** The cheapest cosmetic not owned yet; [ready] = affordable (glowing shortcut into the shop). */
@@ -297,6 +322,7 @@ sealed class UiCommand {
     data object ClaimGift : UiCommand()
     data class RewardEarned(val kind: RewardKind) : UiCommand()
     data class SetMuted(val muted: Boolean) : UiCommand()
+    data class SetReminders(val on: Boolean) : UiCommand()
     data class SetLang(val lang: Lang) : UiCommand()
     data object ToggleFps : UiCommand()
     /** App went to background / foreground (visibilitychange). */
@@ -342,6 +368,10 @@ sealed class UiCommand {
     data class MenuFrame(val menu: Menu, val titleBottom: Float, val panelTop: Float) : UiCommand()
     /** Tap on the start title (5 quick taps toggle the dev FPS overlay). */
     data object TitleTap : UiCommand()
+    /** Revive offer: pay (ad or coins) and keep flying. */
+    data object ReviveAccept : UiCommand()
+    /** Revive offer: "No thanks" or a tap outside the panel; the normal game over follows. */
+    data object ReviveDecline : UiCommand()
 }
 
 /** One-off requests from the game to the app shell (need an Activity). */
